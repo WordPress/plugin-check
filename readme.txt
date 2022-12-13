@@ -17,7 +17,7 @@ Plugin Check plugin from the WordPress Performance Team, a collection of tests t
 The Plugin Check plugin can be used to run a number of performance and security related tests against plugins and provide useful insights on how they can be improved.
 
 == Installation ==
-
+t
 = Installation from within WordPress =
 
 1. Visit **Plugins > Add New**.
