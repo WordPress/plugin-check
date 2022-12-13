@@ -43,6 +43,7 @@ jobs:
     steps:
       - uses: styfle/cancel-workflow-action@0.9.1
       - uses: actions/checkout@v3
+      - uses: shivammathur/setup-php@v2
       - name: Setup Node.js (.nvmrc)
         uses: actions/setup-node@v3
         with:
@@ -50,6 +51,8 @@ jobs:
           cache: npm
       - name: npm install
         run: npm ci
+      - name: Composer Install
+        run: composer install --no-interaction --no-progress
       - name: Install WordPress
         run: npm run wp-env start
       - name: Running php unit tests
