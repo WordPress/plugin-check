@@ -12,7 +12,6 @@
   "scripts": {
     "wp-env": "wp-env",
     "lint-php": "wp-env run composer run-script lint",
-    "test-php": "wp-env run phpunit 'phpunit -c /var/www/html/wp-content/plugins/plugin-check/phpunit.xml.dist --verbose'",
-    "lint-js": "wp-scripts lint-js"
+    "test-php": "wp-env run phpunit 'phpunit -c /var/www/html/wp-content/plugins/plugin-check/phpunit.xml.dist --verbose'"
   }
 }
