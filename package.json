@@ -5,7 +5,14 @@
     "type": "git",
     "url": "git+https://github.com/10up/plugin-check.git"
   },
+  "devDependencies": {
+    "@wordpress/env": "^5.7.0",
+    "@wordpress/scripts": "^24.6.0"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "wp-env": "wp-env",
+    "lint-php": "wp-env run composer run-script lint",
+    "test-php": "wp-env run phpunit 'phpunit -c /var/www/html/wp-content/plugins/plugin-check/phpunit.xml.dist --verbose'",
+    "lint-js": "wp-scripts lint-js"
   }
 }
