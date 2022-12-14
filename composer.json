@@ -8,7 +8,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Wordpress\\Plugin_Check\\": "includes/"
+            "WordPress\\Plugin_Check\\": "includes/"
         }
     }
 }
