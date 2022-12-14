@@ -1,6 +1,6 @@
 {
     "name": "wordpress/plugin-check",
-    "description": "WordPress Plugin Check Plugin",
+    "description": "Plugin Check plugin from the WordPress Performance Team, a collection of tests to help improve plugin performance.",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
     "require": {
