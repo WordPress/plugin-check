@@ -1,14 +1,14 @@
 {
-    "name": "wordpress/plugin-check",
-    "description": "Plugin Check plugin from the WordPress Performance Team, a collection of tests to help improve plugin performance.",
-    "type": "wordpress-plugin",
-    "license": "GPL-2.0-or-later",
-    "require": {
-        "php": ">=5.6"
-    },
-    "autoload": {
-        "psr-4": {
-            "WordPress\\Plugin_Check\\": "includes/"
-        }
+  "name": "wordpress/plugin-check",
+  "description": "Plugin Check plugin from the WordPress Performance Team, a collection of tests to help improve plugin performance.",
+  "type": "wordpress-plugin",
+  "license": "GPL-2.0-or-later",
+  "require": {
+    "php": ">=5.6"
+  },
+  "autoload": {
+    "psr-4": {
+      "WordPress\\Plugin_Check\\": "includes/"
     }
+  }
 }
