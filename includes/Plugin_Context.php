@@ -13,5 +13,5 @@ namespace WordPress\Plugin_Check;
  * @since 0.1.0
  */
 class Plugin_Context {
-	//
+	// @TODO: To complete as part of issue #5
 }
