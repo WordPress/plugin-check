@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Plugin Check
  * Plugin URI: https://github.com/wordpress/plugin-check
- * Description: Plugin Check plugin from the WordPress Performance Team.
+ * Description: Plugin Check plugin from the WordPress Performance Team, a collection of tests to help improve plugin performance.
  * Requires at least: 6.0
  * Requires PHP: 5.6
  * Version: 0.1.0
