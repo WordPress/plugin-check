@@ -53,7 +53,7 @@ class Plugin_Context {
 	 * @return string Absolute path.
 	 */
 	public function path( $relative_path = '/' ) {
-		return plugin_dir_path( $this->main_file ) . ltrim( $relative_path . '/' );
+		return plugin_dir_path( $this->main_file ) . ltrim( $relative_path, '/' );
 	}
 
 	/**
@@ -65,6 +65,6 @@ class Plugin_Context {
 	 * @return string Full URL.
 	 */
 	public function url( $relative_path = '/' ) {
-		return plugin_dir_url( $this->main_file ) . \ltrim( $relative_path . '/' );
+		return plugin_dir_url( $this->main_file ) . ltrim( $relative_path, '/' );
 	}
 }
