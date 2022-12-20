@@ -36,6 +36,17 @@ class Plugin_Main {
 	}
 
 	/**
+	 * Returns the Plugin Context.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return Plugin_Context
+	 */
+	public function context() {
+		return $this->context;
+	}
+
+	/**
 	 * Register WordPress hooks for the plugin.
 	 *
 	 * @since n.e.x.t
