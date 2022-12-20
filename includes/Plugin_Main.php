@@ -8,7 +8,7 @@
 namespace WordPress\Plugin_Check;
 
 /**
- * Main class for the plugin
+ * Main class for the plugin.
  *
  * @since n.e.x.t
  */
@@ -46,7 +46,7 @@ class Plugin_Main {
 	}
 
 	/**
-	 * Register WordPress hooks for the plugin.
+	 * Registers WordPress hooks for the plugin.
 	 *
 	 * @since n.e.x.t
 	 */
