@@ -11,6 +11,7 @@
   },
   "scripts": {
     "wp-env": "wp-env",
+    "prelint-php": "wp-env run composer 'install --no-interaction'",
     "lint-php": "wp-env run composer run-script lint",
     "pretest-php": "wp-env run composer 'install --no-interaction'",
     "test-php": "wp-env run phpunit 'phpunit -c /var/www/html/wp-content/plugins/plugin-check/phpunit.xml.dist --verbose'",
