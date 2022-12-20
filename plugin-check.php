@@ -17,6 +17,7 @@
 
 define( 'WP_PLUGIN_CHECK_VERSION', 'n.e.x.t' );
 define( 'WP_PLUGIN_CHECK_MINIMUM_PHP', '5.6' );
+define( 'WP_PLUGIN_CHECK_PLUGIN_DIR_PATH', plugin_dir_path( __FILE__ ) );
 
 /**
  * Checks basic requirements and loads the plugin.
@@ -31,13 +32,13 @@ function wp_plugin_check_load() {
 	}
 
 	// Check Composer autoloader exists.
-	if ( ! file_exists( plugin_dir_path( __FILE__ ) . 'vendor/autoload.php' ) ) {
+	if ( ! file_exists( WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'vendor/autoload.php' ) ) {
 		add_action( 'admin_notices', 'wp_plugin_check_display_composer_autoload_notice' );
 		return;
 	}
 
 	// Load the Composer autoloader.
-	require_once plugin_dir_path( __FILE__ ) . 'vendor/autoload.php';
+	require_once WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'vendor/autoload.php';
 
 	// Setup the plugin.
 	$class_name = 'WordPress\\Plugin_Check\\Plugin_Main';
