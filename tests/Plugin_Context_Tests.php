@@ -15,32 +15,22 @@ class Plugin_Context_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_basename() {
-		$basename = $this->plugin_context->basename();
-
-		$this->assertSame( $basename, 'plugin-check/plugin-check.php' );
+		$this->assertSame('plugin-check/plugin-check.php', $this->plugin_context->basename() );
 	}
 
 	public function test_path() {
-		$path = $this->plugin_context->path();
-
-		$this->assertSame( $path, 'plugin-check/' );
+		$this->assertSame( 'plugin-check/', $this->plugin_context->path() );
 	}
 
 	public function test_path_with_parameter() {
-		$path = $this->plugin_context->path( '/another/folder' );
-
-		$this->assertSame( $path, 'plugin-check/another/folder' );
+		$this->assertSame( 'plugin-check/another/folder', $this->plugin_context->path( '/another/folder' ) );
 	}
 
 	public function test_url() {
-		$url = $this->plugin_context->path();
-
-		$this->assertSame( $url, 'plugin-check/' );
+		$this->assertSame( site_url( '/wp-content/plugins/plugin-check/' ), $this->plugin_context->url() );
 	}
 
 	public function test_url_with_parameter() {
-		$url = $this->plugin_context->path( '/folder/file.css' );
-
-		$this->assertSame( $url, 'plugin-check/folder/file.css' );
+		$this->assertSame( site_url( '/wp-content/plugins/plugin-check/folder/file.css' ), $this->plugin_context->url( '/folder/file.css' ) );
 	}
 }
