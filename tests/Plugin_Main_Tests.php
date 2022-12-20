@@ -6,17 +6,19 @@
  */
 
 use WordPress\Plugin_Check\Plugin_Main;
+use WordPress\Plugin_Check\Plugin_Context;
 
 class Plugin_Main_Tests extends WP_UnitTestCase {
-	/**
-	 * Test class can be instantiated.
-	 *
-	 * @test
-	 */
-	public function it_can_be_instantiated() {
-		$main = new Plugin_Main( __DIR__ . '/../plugin-check.php' );
+	public function set_up() {
+		parent::set_up();
 
-		$this->assertIsObject( $main );
-		$this->assertInstanceOf( Plugin_Main::class, $main );
+		$this->plugin_main = new Plugin_Main( 'plugin-check/plugin-check.php' );
+	}
+
+	public function test_context() {
+		$context = $this->plugin_main->context();
+
+		$this->assertIsObject( $context );
+		$this->assertInstanceOf( Plugin_Context::class, $context );
 	}
 }
