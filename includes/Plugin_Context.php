@@ -10,14 +10,14 @@ namespace WordPress\Plugin_Check;
 /**
  * Class representing the context in which the plugin is running.
  *
- * @since 0.1.0
+ * @since n.e.x.t
  */
 class Plugin_Context {
 
 	/**
 	 * Absolute path of the plugin main file.
 	 *
-	 * @since 0.1.0
+	 * @since n.e.x.t
 	 * @var string
 	 */
 	protected $main_file;
@@ -25,7 +25,7 @@ class Plugin_Context {
 	/**
 	 * Constructor.
 	 *
-	 * @since 0.1.0
+	 * @since n.e.x.t
 	 *
 	 * @param string $main_file The absolute path to the plugin main file.
 	 */
@@ -36,7 +36,7 @@ class Plugin_Context {
 	/**
 	 * Returns the plugin basename.
 	 *
-	 * @since 0.1.0
+	 * @since n.e.x.t
 	 *
 	 * @return string Plugin basename.
 	 */
@@ -47,7 +47,7 @@ class Plugin_Context {
 	/**
 	 * Returns the absolute path for a relative path to the plugin directory.
 	 *
-	 * @since 0.1.0
+	 * @since n.e.x.t
 	 *
 	 * @param string $relative_path Optional. Relative path. Default '/'.
 	 * @return string Absolute path.
@@ -59,7 +59,7 @@ class Plugin_Context {
 	/**
 	 * Returns the full URL for a pth relative to the plugin directory.
 	 *
-	 * @since 0.1.0
+	 * @since n.e.x.t
 	 *
 	 * @param string $relative_path Optional. Relative path. Default '/'.
 	 * @return string Full URL.
