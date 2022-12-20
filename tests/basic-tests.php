@@ -6,12 +6,7 @@
  */
 
 class Basic_Tests extends WP_UnitTestCase {
-	/**
-	 * Basic test that asserts true.
-	 *
-	 * @test
-	 */
-	public function it_should_assert_true() {
+	public function test_true() {
 		$this->assertTrue( true );
 	}
 }
