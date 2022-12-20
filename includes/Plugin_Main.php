@@ -29,7 +29,6 @@ class Plugin_Main {
 	 * @since n.e.x.t
 	 *
 	 * @param string $main_file Absolute path of the plugin main file.
-	 * @return void
 	 */
 	public function __construct( $main_file ) {
 		$this->context = new Plugin_Context( $main_file );
@@ -50,8 +49,6 @@ class Plugin_Main {
 	 * Register WordPress hooks for the plugin.
 	 *
 	 * @since n.e.x.t
-	 *
-	 * @return void
 	 */
 	public function add_hooks() {
 		// @TODO: Update to register CLI command to WordPress as part of issue #30
