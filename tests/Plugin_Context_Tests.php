@@ -15,7 +15,7 @@ class Plugin_Context_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_basename() {
-		$this->assertSame('plugin-check/plugin-check.php', $this->plugin_context->basename() );
+		$this->assertSame( 'plugin-check/plugin-check.php', $this->plugin_context->basename() );
 	}
 
 	public function test_path() {
