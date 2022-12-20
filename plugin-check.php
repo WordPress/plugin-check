@@ -5,7 +5,7 @@
  * Description: Plugin Check plugin from the WordPress Performance Team, a collection of tests to help improve plugin performance.
  * Requires at least: 6.0
  * Requires PHP: 5.6
- * Version: 0.1.0
+ * Version: n.e.x.t
  * Author: WordPress Performance Team
  * Author URI: https://make.wordpress.org/performance/
  * License: GPLv2 or later
@@ -15,13 +15,13 @@
  * @package plugin-check
  */
 
-define( 'WP_PLUGIN_CHECK_VERSION', '0.1.0' );
+define( 'WP_PLUGIN_CHECK_VERSION', 'n.e.x.t' );
 define( 'WP_PLUGIN_CHECK_MINIMUM_PHP', '5.6' );
 
 /**
  * Checks basic requirements and loads the plugin.
  *
- * @since 0.1.0
+ * @since n.e.x.t
  */
 function wp_plugin_check_load() {
 	// Check for supported PHP version.

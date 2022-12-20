@@ -10,14 +10,14 @@ namespace WordPress\Plugin_Check;
 /**
  * Main class for the plugin
  *
- * @since 0.1.0
+ * @since n.e.x.t
  */
 class Plugin_Main {
 
 	/**
 	 * Context instance for the plugin.
 	 *
-	 * @since 0.1.0
+	 * @since n.e.x.t
 	 *
 	 * @var Plugin_Context
 	 */
@@ -26,7 +26,7 @@ class Plugin_Main {
 	/**
 	 * Constructor. Set the plugin main file.
 	 *
-	 * @since 0.1.0
+	 * @since n.e.x.t
 	 *
 	 * @param string $main_file Absolute path of the plugin main file.
 	 * @return void
@@ -38,7 +38,7 @@ class Plugin_Main {
 	/**
 	 * Register WordPress hooks for the plugin.
 	 *
-	 * @since 0.1.0
+	 * @since n.e.x.t
 	 *
 	 * @return void
 	 */
