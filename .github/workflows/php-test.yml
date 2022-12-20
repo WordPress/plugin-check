@@ -51,9 +51,9 @@ jobs:
           cache: npm
       - name: npm install
         run: npm ci
-      - name: Composer Install
-        run: composer install --no-interaction --no-progress
       - name: Install WordPress
         run: npm run wp-env start
       - name: Running php unit tests
         run: npm run test-php
+      - name: Running multisite unit tests
+        run: npm run test-php-multisite
