@@ -31,6 +31,6 @@ class Check_Context_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_url_with_parameter() {
- 		$this->assertSame( site_url( '/wp-content/plugins/test-plugin/folder/file.css' ), $this->check_context->url( '/folder/file.css' ) );
+		$this->assertSame( site_url( '/wp-content/plugins/test-plugin/folder/file.css' ), $this->check_context->url( '/folder/file.css' ) );
 	}
 }
