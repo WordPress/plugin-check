@@ -18,7 +18,6 @@ class Plugin_Main_Tests extends WP_UnitTestCase {
 	public function test_context() {
 		$context = $this->plugin_main->context();
 
-		$this->assertIsObject( $context );
 		$this->assertInstanceOf( Plugin_Context::class, $context );
 	}
 }
