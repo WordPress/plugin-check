@@ -57,7 +57,7 @@ class Plugin_Context {
 	}
 
 	/**
-	 * Returns the full URL for a pth relative to the plugin directory.
+	 * Returns the full URL for a path relative to the plugin directory.
 	 *
 	 * @since n.e.x.t
 	 *
