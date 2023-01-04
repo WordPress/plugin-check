@@ -12,7 +12,7 @@ class Check_Result_Tests extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 
-		$check_context  = new Check_Context( 'test-plugin/test-plugin.php' );
+		$check_context = new Check_Context( 'test-plugin/test-plugin.php' );
 
 		$this->check_result = new Check_Result( $check_context );
 	}
@@ -48,7 +48,6 @@ class Check_Result_Tests extends WP_UnitTestCase {
 		$expected = array(
 			'message' => 'Warning message',
 			'code'    => 'test_warning',
-			'file'    => 'test-plugin/test-plugin.php',
 		);
 
 		$this->assertEquals( $expected, $warnings['test-plugin.php'][12][40][0] );
@@ -82,7 +81,6 @@ class Check_Result_Tests extends WP_UnitTestCase {
 		$expected = array(
 			'message' => 'Warning message',
 			'code'    => 'test_warning',
-			'file'    => 'test-plugin/test-plugin.php',
 		);
 
 		$this->assertEquals( $expected, $warnings['test-plugin.php'][12][40][0] );
@@ -116,7 +114,6 @@ class Check_Result_Tests extends WP_UnitTestCase {
 		$expected = array(
 			'message' => 'Error message',
 			'code'    => 'test_error',
-			'file'    => 'test-plugin/test-plugin.php',
 		);
 
 		$this->assertEquals( $expected, $errors['test-plugin.php'][22][30][0] );
@@ -147,7 +144,6 @@ class Check_Result_Tests extends WP_UnitTestCase {
 		$expected = array(
 			'message' => 'Error message',
 			'code'    => 'test_error',
-			'file'    => 'test-plugin/test-plugin.php',
 		);
 
 		$this->assertEquals( $expected, $errors['test-plugin.php'][22][30][0] );
@@ -178,7 +174,6 @@ class Check_Result_Tests extends WP_UnitTestCase {
 		$expected = array(
 			'message' => 'Warning message',
 			'code'    => 'test_warning',
-			'file'    => 'test-plugin/test-plugin.php',
 		);
 
 		$this->assertEquals( $expected, $warnings['test-plugin.php'][22][30][0] );

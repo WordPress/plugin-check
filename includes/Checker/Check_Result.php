@@ -61,8 +61,7 @@ class Check_Result {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param Plugin_Context $main_context  Main context instance.
-	 * @param Check_Context  $check_context Check context instance for the plugin.
+	 * @param Check_Context $check_context Check context instance for the plugin.
 	 */
 	public function __construct( Check_Context $check_context ) {
 		$this->check_context = $check_context;
@@ -111,10 +110,10 @@ class Check_Result {
 			array_intersect_key( $args, $defaults )
 		);
 
-		$file   = str_replace( $this->check_context->path( '/' ), '', $data['file'] );
+		$file   = str_replace( $this->plugin()->path( '/' ), '', $data['file'] );
 		$line   = $data['line'];
 		$column = $data['column'];
-		unset( $data['line'], $data['column'] );
+		unset( $data['line'], $data['column'], $data['file'] );
 
 		if ( $error ) {
 			if ( ! isset( $this->errors[ $file ] ) ) {
