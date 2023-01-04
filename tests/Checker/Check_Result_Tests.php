@@ -5,7 +5,6 @@
  * @package plugin-check
  */
 
-use WordPress\Plugin_Check\Plugin_Context;
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
 
@@ -13,14 +12,9 @@ class Check_Result_Tests extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 
-		$plugin_context = new Plugin_Context( 'plugin-check/plugin-check.php' );
 		$check_context  = new Check_Context( 'test-plugin/test-plugin.php' );
 
-		$this->check_result = new Check_Result( $plugin_context, $check_context );
-	}
-
-	public function test_context() {
-		$this->assertInstanceOf( Plugin_Context::class, $this->check_result->context() );
+		$this->check_result = new Check_Result( $check_context );
 	}
 
 	public function test_plugin() {

@@ -7,7 +7,6 @@
 
 namespace WordPress\Plugin_Check\Checker;
 
-use WordPress\Plugin_Check\Plugin_Context;
 use WordPress\Plugin_Check\Checker\Check_Context;
 
 /**
@@ -16,14 +15,6 @@ use WordPress\Plugin_Check\Checker\Check_Context;
  * @since n.e.x.t
  */
 class Check_Result {
-
-	/**
-	 * Main context instance.
-	 *
-	 * @since n.e.x.t
-	 * @var Plugin_Context
-	 */
-	protected $main_context;
 
 	/**
 	 * Context for the plugin to check.
@@ -73,20 +64,8 @@ class Check_Result {
 	 * @param Plugin_Context $main_context  Main context instance.
 	 * @param Check_Context  $check_context Check context instance for the plugin.
 	 */
-	public function __construct( Plugin_Context $main_context, Check_Context $check_context ) {
-		$this->main_context  = $main_context;
+	public function __construct( Check_Context $check_context ) {
 		$this->check_context = $check_context;
-	}
-
-	/**
-	 * Returns the main context for the plugin checker.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @return Plugin_Context Main context instance.
-	 */
-	public function context() {
-		return $this->main_context;
 	}
 
 	/**
