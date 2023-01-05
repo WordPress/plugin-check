@@ -9,6 +9,13 @@ use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
 
 class Check_Result_Tests extends WP_UnitTestCase {
+	/**
+	 * Check_Result instance.
+	 *
+	 * @var Check_Result
+	 */
+	protected $check_result;
+
 	public function set_up() {
 		parent::set_up();
 
@@ -19,38 +26,9 @@ class Check_Result_Tests extends WP_UnitTestCase {
 
 	public function test_plugin() {
 		$this->assertInstanceOf( Check_Context::class, $this->check_result->plugin() );
-	}
 
-	public function test_add_message() {
-		$this->check_result->add_message(
-			false,
-			'Warning message',
-			array(
-				'code'   => 'test_warning',
-				'file'   => 'test-plugin/test-plugin.php',
-				'line'   => 12,
-				'column' => 40,
-			)
-		);
-
-		$warnings = $this->check_result->get_warnings();
-
-		// Tests the filename used as the main key for the message associated with that file.
-		$this->assertArrayHasKey( 'test-plugin.php', $warnings );
-
-		// Tests the line number is used as the first key for the filename array.
-		$this->assertArrayHasKey( 12, $warnings['test-plugin.php'] );
-
-		// Tests the column is used as the first key for the line number array.
-		$this->assertArrayHasKey( 40, $warnings['test-plugin.php'][12] );
-
-		// Tests the column array contains the message details.
-		$expected = array(
-			'message' => 'Warning message',
-			'code'    => 'test_warning',
-		);
-
-		$this->assertEquals( $expected, $warnings['test-plugin.php'][12][40][0] );
+		// Check the Check_Context has the correct basename.
+		$this->assertSame( 'test-plugin/test-plugin.php', $this->check_result->plugin()->basename() );
 	}
 
 	public function test_add_message_with_warning() {
