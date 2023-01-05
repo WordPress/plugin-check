@@ -11,8 +11,8 @@ class Check_Context_Tests extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 
-		$this->plugin_name   = basename( dirname( __DIR__ ) );
-		$this->check_context = new Check_Context( $this->plugin_name . '/plugin-check.php' );
+		$this->plugin_name   = basename( TESTS_PLUGIN_DIR );
+		$this->check_context = new Check_Context( WP_PLUGIN_DIR . '/' . $this->plugin_name . '/plugin-check.php' );
 	}
 
 	public function test_basename() {
@@ -20,11 +20,11 @@ class Check_Context_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_path() {
-		$this->assertSame( $this->plugin_name . '/', $this->check_context->path() );
+		$this->assertSame( WP_PLUGIN_DIR . '/' . $this->plugin_name . '/', $this->check_context->path() );
 	}
 
 	public function test_path_with_parameter() {
-		$this->assertSame( $this->plugin_name . '/another/folder', $this->check_context->path( '/another/folder' ) );
+		$this->assertSame( WP_PLUGIN_DIR . '/' . $this->plugin_name . '/another/folder', $this->check_context->path( '/another/folder' ) );
 	}
 
 	public function test_url() {
