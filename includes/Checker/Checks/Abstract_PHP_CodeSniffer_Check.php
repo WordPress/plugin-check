@@ -14,12 +14,14 @@ use Exception;
 /**
  * Check for running one or more PHP CodeSniffer sniffs.
  *
- * @since 1.0.0
+ * @since n.e.x.t
  */
 abstract class Abstract_PHP_CodeSniffer_Check implements Check {
 
 	/**
 	 * List of allowed PHPCS arguments.
+	 *
+	 * @since n.e.x.t
 	 *
 	 * @var array
 	 */
@@ -33,12 +35,16 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Check {
 	/**
 	 * Returns an associative array of arguements to pass to PHPCS.
 	 *
+	 * @since n.e.x.t
+	 *
 	 * @return array
 	 */
 	abstract public function get_args();
 
 	/**
 	 * Creates the command arguments.
+	 *
+	 * @since n.e.x.t
 	 *
 	 * @param Check_Result $result The check results including the plugin context to check.
 	 *
@@ -73,7 +79,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Check {
 	/**
 	 * Amends the given result by running the check on the associated plugin.
 	 *
-	 * @since 1.0.0
+	 * @since n.e.x.t
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 *
@@ -82,7 +88,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Check {
 	 */
 	public function run( Check_Result $result ) {
 		// Include the PHPCS autoloader.
-		$autoloader = TESTS_PLUGIN_DIR . '/vendor/squizlabs/php_codesniffer/autoload.php';
+		$autoloader = WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/vendor/squizlabs/php_codesniffer/autoload.php';
 
 		if ( file_exists( $autoloader ) ) {
 			include_once $autoloader;
