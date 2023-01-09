@@ -82,7 +82,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Check {
 	 */
 	public function run( Check_Result $result ) {
 		// Include the PHPCS autoloader.
-		$autoloader = TESTS_PLUGIN_DIR . '/vendor/squizlabs/php_codesniffer/autoload.php' );
+		$autoloader = TESTS_PLUGIN_DIR . '/vendor/squizlabs/php_codesniffer/autoload.php';
 
 		if ( file_exists( $autoloader ) ) {
 			include_once $autoloader;
