@@ -37,12 +37,12 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Check {
 	 * @since n.e.x.t
 	 *
 	 * @return array {
-	 * 		An associative array of PHPCS CLI arguments. Can include one or more of the following options.
+	 *    An associative array of PHPCS CLI arguments. Can include one or more of the following options.
 	 *
-	 * 		@type string $standard   The name or path to the coding standard to check against.
-	 * 		@type string $extensions A comma separated list of file extensions to check against.
-	 * 		@type string $sniffs     A comma separated list of sniff codes to include from checks.
-	 * 		@type string $exclude    A comma separated list of sniff codes to exclude from checks.
+	 *    @type string $standard   The name or path to the coding standard to check against.
+	 *    @type string $extensions A comma separated list of file extensions to check against.
+	 *    @type string $sniffs     A comma separated list of sniff codes to include from checks.
+	 *    @type string $exclude    A comma separated list of sniff codes to exclude from checks.
 	 * }
 	 */
 	abstract public function get_args();
@@ -122,8 +122,8 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Check {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param array  $argv     An array of arguments to pass.
-	 * @param array  $defaults An array of default arguments.
+	 * @param array $argv     An array of arguments to pass.
+	 * @param array $defaults An array of default arguments.
 	 * @return array An indexed array of PHPCS CLI arguments.
 	 */
 	private function parse_argv( $argv, $defaults ) {
