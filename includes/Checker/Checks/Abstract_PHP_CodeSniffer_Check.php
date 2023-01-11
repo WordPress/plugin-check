@@ -22,14 +22,13 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Check {
 	 * List of allowed PHPCS arguments.
 	 *
 	 * @since n.e.x.t
-	 *
 	 * @var array
 	 */
 	protected $allowed_args = array(
-		'extensions',
-		'standard',
-		'sniffs',
-		'exclude',
+		'extensions' => true,
+		'standard'   => true,
+		'sniffs'     => true,
+		'exclude'    => true,
 	);
 
 	/**
@@ -40,41 +39,6 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Check {
 	 * @return array
 	 */
 	abstract public function get_args();
-
-	/**
-	 * Creates the command arguments.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @param Check_Result $result The check results including the plugin context to check.
-	 *
-	 * @return array
-	 */
-	private function create_args( Check_Result $result ) {
-		// Set the default arguments for PHPCS.
-		$argv = array(
-			'',
-			$result->plugin()->path( '' ),
-			'--report=Json',
-			'--report-width=9999',
-		);
-
-		// Only accept allowed PHPCS arguments from check arguments array.
-		$check_args = array_filter(
-			$this->get_args(),
-			function( $key ) {
-				return in_array( $key, $this->allowed_args, true );
-			},
-			ARRAY_FILTER_USE_KEY
-		);
-
-		// Format check arguments for PHPCS.
-		foreach ( $check_args as $key => $value ) {
-			$argv[] = "--{$key}=$value";
-		}
-
-		return $argv;
-	}
 
 	/**
 	 * Amends the given result by running the check on the associated plugin.
@@ -97,8 +61,16 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Check {
 		// Backup the original command line arguments.
 		$orig_cmd_args = $_SERVER['argv'];
 
+		// Create the default arguments for PHPCS.
+		$defaults = array(
+			'',
+			$result->plugin()->path( '' ),
+			'--report=Json',
+			'--report-width=9999',
+		);
+
 		// Set the check arguments for PHPCS.
-		$_SERVER['argv'] = $this->create_args( $result );
+		$_SERVER['argv'] = $this->parse_argv( $this->get_args(), $defaults );
 
 		// Run PHPCS.
 		try {
@@ -136,5 +108,26 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Check {
 				);
 			}
 		}
+	}
+
+	/**
+	 * Parse the command arguments.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param array $argv     An array of arguments to pass.
+	 * @param array $defaults An array of default arguments.
+	 * @return array
+	 */
+	private function parse_argv( $argv, $defaults ) {
+		// Only accept allowed PHPCS arguments from check arguments array.
+		$check_args = array_intersect_key( $argv, $this->allowed_args );
+
+		// Format check arguments for PHPCS.
+		foreach ( $check_args as $key => $value ) {
+			$defaults[] = "--{$key}=$value";
+		}
+
+		return $defaults;
 	}
 }
