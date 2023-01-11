@@ -72,6 +72,9 @@ class Use_Minimal_Theme_Preparation implements Preparation {
 		// Register the custom themes directory if relevant.
 		if ( ! empty( $this->themes_dir ) ) {
 			register_theme_directory( $this->themes_dir );
+
+			// Force new directory scan to ensure the new theme directory is available.
+			search_theme_directories( true );
 		}
 
 		// Return the cleanup function.

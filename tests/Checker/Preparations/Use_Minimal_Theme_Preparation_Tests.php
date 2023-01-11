@@ -24,7 +24,7 @@ class Use_Minimal_Theme_Preparation_Tests extends WP_UnitTestCase {
 		parent::tear_down();
 
 		// Run the cleanup function.
-		($this->cleanup)();
+		( $this->cleanup )();
 	}
 
 	public function test_implements_preparation_interface() {
@@ -40,6 +40,6 @@ class Use_Minimal_Theme_Preparation_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_get_theme_root() {
-		$this->assertSame( $this->theme_dir, $this->preparation->get_theme_root() );
+		$this->assertSame( str_replace( WP_CONTENT_DIR, '', $this->theme_dir ), $this->preparation->get_theme_root() );
 	}
 }
