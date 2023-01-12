@@ -24,20 +24,32 @@ class Checks_Tests extends WP_UnitTestCase {
 		$this->assertIsCallable( $cleanup );
 	}
 
-	public function test_get_checks_returns_array() {
+	public function test_get_checks_returns_array_of_expected_checks() {
+		$expected = array(
+			'example_check_class',
+		);
+
+		add_filter(
+			'wp_plugin_check_checks',
+			function( $checks ) use ( $expected ) {
+				return $expected;
+			}
+		);
+
 		$checks = $this->checks->get_checks();
 
 		$this->assertIsArray( $checks );
+		$this->assertSame( $expected, $checks );
 	}
 
 	public function test_run_all_checks_throws_exception_if_not_prepared() {
-		$this->expectException(Exception::class);
+		$this->expectException( Exception::class );
 
 		$this->checks->run_all_checks();
 	}
 
 	public function test_run_single_check_throws_exception_if_not_prepared() {
-		$this->expectException(Exception::class);
+		$this->expectException( Exception::class );
 
 		$this->checks->run_single_check( 'check' );
 	}
