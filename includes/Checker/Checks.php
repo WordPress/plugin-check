@@ -55,7 +55,11 @@ class Checks implements Preparation {
 	 */
 	public function prepare() {
 		// TODO: Add preparations once implemented.
-		return function() {};
+		$this->prepared = true;
+
+		return function() {
+			$this->prepared = false;
+		};
 	}
 
 	/**
@@ -162,7 +166,7 @@ class Checks implements Preparation {
 	 *
 	 * @return array List of plugin check class instances implementing the Check interface.
 	 */
-	protected function get_checks() {
+	public function get_checks() {
 		// TODO: Add checks once implemented.
 		$checks = array();
 
