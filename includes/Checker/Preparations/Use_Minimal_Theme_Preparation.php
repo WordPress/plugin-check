@@ -73,7 +73,7 @@ class Use_Minimal_Theme_Preparation implements Preparation {
 		if ( ! empty( $this->themes_dir ) ) {
 			register_theme_directory( $this->themes_dir );
 
-			// Force new directory scan to ensure the new theme directory is available.
+			// Force new directory scan to ensure the test theme directory is available.
 			search_theme_directories( true );
 		}
 
@@ -97,6 +97,9 @@ class Use_Minimal_Theme_Preparation implements Preparation {
 					$wp_theme_directories = array_values( $wp_theme_directories );
 				}
 			}
+
+			// Force new directory scan to remove the test theme directory.
+			search_theme_directories( true );
 		};
 	}
 
