@@ -26,14 +26,6 @@ class Checks implements Preparation {
 	protected $check_context;
 
 	/**
-	 * Internal flag for whether the environment is prepared.
-	 *
-	 * @since n.e.x.t
-	 * @var bool
-	 */
-	protected $prepared = false;
-
-	/**
 	 * Sets the main context and the main file of the plugin to check.
 	 *
 	 * @since n.e.x.t
@@ -42,24 +34,6 @@ class Checks implements Preparation {
 	 */
 	public function __construct( $plugin_main_file ) {
 		$this->check_context = new Check_Context( $plugin_main_file );
-	}
-
-	/**
-	 * Prepares the environment for running checks and returns a cleanup function.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @return callable Cleanup function to revert any changes made here.
-	 *
-	 * @throws Exception Thrown when preparation fails.
-	 */
-	public function prepare() {
-		// TODO: Add preparations once implemented.
-		$this->prepared = true;
-
-		return function() {
-			$this->prepared = false;
-		};
 	}
 
 	/**
@@ -72,12 +46,6 @@ class Checks implements Preparation {
 	 * @throws Exception Thrown when checks fail with critical error.
 	 */
 	public function run_all_checks() {
-		if ( ! $this->prepared ) {
-			throw new Exception(
-				__( 'Environment not prepared to run checks. The Checks::prepare() method must be called first.', 'plugin-check' )
-			);
-		}
-
 		$result = new Check_Result( $this->main_context, $this->check_context );
 		$checks = $this->get_checks();
 
@@ -102,12 +70,6 @@ class Checks implements Preparation {
 	 * @throws Exception Thrown when check fails with critical error.
 	 */
 	public function run_single_check( $check ) {
-		if ( ! $this->prepared ) {
-			throw new Exception(
-				__( 'Environment not prepared to run checks. The Checks::prepare() method must be called first.', 'plugin-check' )
-			);
-		}
-
 		$result = new Check_Result( $this->main_context, $this->check_context );
 		$checks = $this->get_checks();
 
