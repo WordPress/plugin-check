@@ -18,7 +18,7 @@ class Use_Minimal_Theme_Preparation_Tests extends WP_UnitTestCase {
 
 		$this->theme_name = 'WP Empty Theme';
 		$this->theme_slug = 'wp-empty-theme';
-		$this->theme_dir  = WP_PLUGIN_DIR . '/' . basename( TESTS_PLUGIN_DIR ) . '/test-content/themes';
+		$this->theme_dir  = TESTS_PLUGIN_DIR . '/test-content/themes';
 	}
 
 	public function test_get_theme_slug() {
@@ -28,15 +28,20 @@ class Use_Minimal_Theme_Preparation_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_prepare() {
-		$preparation = new Use_Minimal_Theme_Preparation( $this->theme_slug, $this->theme_dir );
-		$cleanup     = $preparation->prepare();
+		$preparation     = new Use_Minimal_Theme_Preparation( $this->theme_slug, $this->theme_dir );
+		$cleanup         = $preparation->prepare();
+		$template        = get_option( 'template' );
+		$stylesheet      = get_option( 'stylesheet' );
+		$current_theme   = get_option( 'current_theme' );
+		$template_root   = get_option( 'template_root' );
+		$stylesheet_root = get_option( 'stylesheet_root' );
 
 		$this->assertIsCallable( $cleanup );
-		$this->assertSame( $this->theme_slug, get_option( 'template' ) );
-		$this->assertSame( $this->theme_slug, get_option( 'stylesheet' ) );
-		$this->assertSame( $this->theme_name, get_option( 'current_theme' ) );
-		$this->assertSame( str_replace( WP_CONTENT_DIR, '', $this->theme_dir ), get_option( 'template_root' ) );
-		$this->assertSame( str_replace( WP_CONTENT_DIR, '', $this->theme_dir ), get_option( 'stylesheet_root' ) );
+		$this->assertSame( $this->theme_slug, $template );
+		$this->assertSame( $this->theme_slug, $stylesheet );
+		$this->assertSame( $this->theme_name, $current_theme );
+		$this->assertSame( str_replace( WP_CONTENT_DIR, '', $this->theme_dir ), $template_root );
+		$this->assertSame( str_replace( WP_CONTENT_DIR, '', $this->theme_dir ), $stylesheet_root );
 
 		$cleanup();
 	}

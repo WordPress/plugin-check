@@ -95,11 +95,11 @@ class Use_Minimal_Theme_Preparation implements Preparation {
 				if ( false !== $index ) {
 					array_splice( $wp_theme_directories, $index, 1 );
 					$wp_theme_directories = array_values( $wp_theme_directories );
+
+					// Force new directory scan to remove the test theme directory.
+					search_theme_directories( true );
 				}
 			}
-
-			// Force new directory scan to remove the test theme directory.
-			search_theme_directories( true );
 		};
 	}
 
