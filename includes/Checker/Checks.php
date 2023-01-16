@@ -15,7 +15,7 @@ use Exception;
  *
  * @since n.e.x.t
  */
-class Checks implements Preparation {
+class Checks {
 
 	/**
 	 * Context for the plugin to check.
@@ -46,7 +46,7 @@ class Checks implements Preparation {
 	 * @throws Exception Thrown when checks fail with critical error.
 	 */
 	public function run_all_checks() {
-		$result = new Check_Result( $this->main_context, $this->check_context );
+		$result = new Check_Result( $this->check_context );
 		$checks = $this->get_checks();
 
 		array_walk(
@@ -70,7 +70,7 @@ class Checks implements Preparation {
 	 * @throws Exception Thrown when check fails with critical error.
 	 */
 	public function run_single_check( $check ) {
-		$result = new Check_Result( $this->main_context, $this->check_context );
+		$result = new Check_Result( $this->check_context );
 		$checks = $this->get_checks();
 
 		// Look up the check based on the $check variable.
