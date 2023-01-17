@@ -1,11 +1,10 @@
 <?php
 /**
- * Tests for the Check_Context class.
+ * Tests for the Use_Minimal_Theme_Preparation class.
  *
  * @package plugin-check
  */
 
-use WordPress\Plugin_Check\Checker\Preparation;
 use WordPress\Plugin_Check\Checker\Preparations\Use_Minimal_Theme_Preparation;
 
 class Use_Minimal_Theme_Preparation_Tests extends WP_UnitTestCase {

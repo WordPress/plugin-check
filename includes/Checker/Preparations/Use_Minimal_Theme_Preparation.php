@@ -53,6 +53,8 @@ class Use_Minimal_Theme_Preparation implements Preparation {
 	 *
 	 * @since n.e.x.t
 	 *
+	 * @global array $wp_theme_directories
+	 *
 	 * @return callable Cleanup function to revert any changes made here.
 	 *
 	 * @throws Exception Thrown when preparation fails.
