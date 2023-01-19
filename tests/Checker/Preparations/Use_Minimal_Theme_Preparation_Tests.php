@@ -34,6 +34,7 @@ class Use_Minimal_Theme_Preparation_Tests extends WP_UnitTestCase {
 		$current_theme   = get_option( 'current_theme' );
 		$template_root   = get_option( 'template_root' );
 		$stylesheet_root = get_option( 'stylesheet_root' );
+		$cleanup();
 
 		$this->assertIsCallable( $cleanup );
 		$this->assertSame( $this->theme_slug, $template );
@@ -41,8 +42,6 @@ class Use_Minimal_Theme_Preparation_Tests extends WP_UnitTestCase {
 		$this->assertSame( $this->theme_name, $current_theme );
 		$this->assertSame( str_replace( WP_CONTENT_DIR, '', $this->theme_dir ), $template_root );
 		$this->assertSame( str_replace( WP_CONTENT_DIR, '', $this->theme_dir ), $stylesheet_root );
-
-		$cleanup();
 	}
 
 	public function test_get_theme_name() {
