@@ -24,7 +24,7 @@ class I18n_Usage_Check extends Abstract_PHP_CodeSniffer_Check {
 	public function get_args() {
 
 		return array(
-			'sniff' => 'WordPress.WP.I18n',
+			'sniffs' => 'WordPress.WP.I18n',
 		);
 	}
 }

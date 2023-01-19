@@ -29,12 +29,9 @@ class I18n_Usage_Check_Tests extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'sniff', $sniffs );
 		$this->assertEquals(
 			array(
-				'sniff' => 'WordPress.WP.I18n',
+				'sniffs' => 'WordPress.WP.I18n',
 			),
 			$sniffs
 		);
 	}
-
-
-
 }
