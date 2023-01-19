@@ -8,6 +8,7 @@
 namespace WordPress\Plugin_Check\Checker;
 
 use WordPress\Plugin_Check\Checker\Check_Context;
+use ReflectionClass;
 use Exception;
 
 /**
@@ -37,55 +38,35 @@ class Checks {
 	}
 
 	/**
-	 * Runs all checks against the plugin.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @return Check_Result Object containing all check results.
-	 *
-	 * @throws Exception Thrown when checks fail with critical error.
-	 */
-	public function run_all_checks() {
-		$result = new Check_Result( $this->check_context );
-		$checks = $this->get_checks();
-
-		array_walk(
-			$checks,
-			function( Check $check ) use ( $result ) {
-				$this->run_check_with_result( $check, $result );
-			}
-		);
-
-		return $result;
-	}
-
-	/**
 	 * Runs a single check against the plugin.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param string $check Check class name.
+	 * @param array $checks Ab array of Check class names to run.
 	 * @return Check_Result Object containing all check results.
 	 *
 	 * @throws Exception Thrown when check fails with critical error.
 	 */
-	public function run_single_check( $check ) {
-		$result = new Check_Result( $this->check_context );
-		$checks = $this->get_checks();
+	public function run_checks( array $checks ) {
+		$result     = new Check_Result( $this->check_context );
+		$all_checks = $this->get_checks();
 
-		// Look up the check based on the $check variable.
-		$check_index = array_search( $check, $checks, true );
-		if ( false === $check_index ) {
-			throw new Exception(
-				sprintf(
-					/* translators: %s: class name */
-					__( 'Invalid check class name %s.', 'plugin-check' ),
-					$check
-				)
-			);
-		}
+		// Create an array of Check objects to run based on the check names passed.
+		$checks_to_run = array_filter(
+			$all_checks,
+			function( $check ) use ( $checks ) {
+				$check_name = ( new ReflectionClass( $check ) )->getShortName();
+				return in_array( $check_name, $checks, true );
+			}
+		);
 
-		$this->run_check_with_result( $checks[ $check_index ], $result );
+		// Run the checks.
+		array_walk(
+			$checks_to_run,
+			function( Check $check ) use ( $result ) {
+				$this->run_check_with_result( $check, $result );
+			}
+		);
 
 		return $result;
 	}
