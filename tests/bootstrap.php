@@ -26,3 +26,6 @@ if ( false !== getenv( 'WP_TESTS_DIR' ) ) {
 
 // Start up the WP testing environment.
 require $_test_root . '/includes/bootstrap.php';
+
+// Load the plugin checker plugin, so the important constants and functions can be used in unit test.
+require_once TESTS_PLUGIN_DIR . '/plugin-check.php';
