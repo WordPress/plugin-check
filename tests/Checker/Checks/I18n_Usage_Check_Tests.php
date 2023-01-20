@@ -1,6 +1,6 @@
 <?php
 /**
- * Tests for the Check_Result class.
+ * Tests for the I18n_Usage_Check_Tests class.
  *
  * @package plugin-check
  */
