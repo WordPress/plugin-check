@@ -47,6 +47,19 @@
 	<rule ref="Squiz.Commenting.FunctionCommentThrowTag.Missing">
 		<exclude-pattern>tests/*</exclude-pattern>
 	</rule>
+	<rule ref="Squiz.Commenting.FileComment.MissingPackageTag">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.WP.I18n.MissingTranslatorsComment">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.WP.I18n.TextDomainMismatch">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.WP.I18n.NonSingularStringLiteralDomain">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+
 
 	<!-- Do not apply filename rules for unit tests -->
 	<rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
