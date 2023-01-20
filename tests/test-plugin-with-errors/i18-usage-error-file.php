@@ -6,10 +6,10 @@
 $city = 'Surat';
 
 printf(
-	__( 'Your city is %s.', 'test-plugin-check' ),
+	__( 'Your city is %s.', 'test-plugin-check-errors' ),
 	$city
 );
 
-$text_domain = 'test-plugin-check';
+$text_domain = 'test-plugin-check-errors';
 
 esc_html_e( 'Hello World!', $text_domain );

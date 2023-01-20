@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Test Plugin for Plugin Check
+ * Plugin Name: Test Plugin without errors for Plugin Check
  * Plugin URI: https://github.com/wordpress/plugin-check
  * Description: Plugin Check plugin from the WordPress Performance Team, a collection of tests to help improve plugin performance.
  * Requires at least: 6.0
