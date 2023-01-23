@@ -1,6 +1,6 @@
 <?php
 /**
- * Translation check class.
+ * Class WordPress\Plugin_Check\Checker\Checks\I18n_Usage_Check
  *
  * @package plugin-check
  */
@@ -8,7 +8,7 @@
 namespace WordPress\Plugin_Check\Checker\Checks;
 
 /**
- * Interface for a single check.
+ * Check for running WordPress internationalization sniffs.
  *
  * @since n.e.x.t
  */

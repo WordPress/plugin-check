@@ -26,10 +26,6 @@ class I18n_Usage_Check_Tests extends WP_UnitTestCase {
 
 		$sniffs = $this->i18n_usage_check->get_args();
 
-		$this->assertArrayHasKey( 'extensions', $sniffs );
-		$this->assertArrayHasKey( 'standard', $sniffs );
-		$this->assertArrayHasKey( 'sniffs', $sniffs );
-
 		$this->assertEquals(
 			array(
 				'extensions' => 'php',
