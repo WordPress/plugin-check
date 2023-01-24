@@ -8,7 +8,6 @@
 namespace WordPress\Plugin_Check\Checker;
 
 use WordPress\Plugin_Check\Checker\Check_Context;
-use ReflectionClass;
 use Exception;
 
 /**
@@ -38,11 +37,11 @@ class Checks {
 	}
 
 	/**
-	 * Runs a single check against the plugin.
+	 * Runs checks against the plugin.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param array $checks Ab array of Check class names to run.
+	 * @param array $checks An array of Check objects to run.
 	 * @return Check_Result Object containing all check results.
 	 *
 	 * @throws Exception Thrown when check fails with critical error.
@@ -53,10 +52,9 @@ class Checks {
 
 		// Create an array of Check objects to run based on the check names passed.
 		$checks_to_run = array_filter(
-			$all_checks,
-			function( $check ) use ( $checks ) {
-				$check_name = ( new ReflectionClass( $check ) )->getShortName();
-				return in_array( $check_name, $checks, true );
+			$checks,
+			function( $check ) use ( $all_checks ) {
+				return in_array( $check, $all_checks, true );
 			}
 		);
 

@@ -21,8 +21,8 @@ class Checks_Tests extends WP_UnitTestCase {
 
 	public function test_get_checks_returns_array_of_expected_checks() {
 		$expected = array(
-			new WordPress\Plugin_Check\Tests\Empty_Check(),
-			new WordPress\Plugin_Check\Tests\Error_Check(),
+			new WordPress\Plugin_Check\Test_Data\Empty_Check(),
+			new WordPress\Plugin_Check\Test_Data\Error_Check(),
 		);
 
 		add_filter(
@@ -39,18 +39,23 @@ class Checks_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_run_checks() {
-		$expected = array(
-			new WordPress\Plugin_Check\Tests\Empty_Check(),
+		$all_checks = array(
+			new WordPress\Plugin_Check\Test_Data\Empty_Check(),
+			new WordPress\Plugin_Check\Test_Data\Error_Check(),
+		);
+
+		$checks_to_run = array(
+			$all_checks[0],
 		);
 
 		add_filter(
 			'wp_plugin_check_checks',
-			function( $checks ) use ( $expected ) {
-				return $expected;
+			function( $checks ) use ( $all_checks ) {
+				return $all_checks;
 			}
 		);
 
-		$results = $this->checks->run_checks( array( 'Example_Check' ) );
+		$results = $this->checks->run_checks( $checks_to_run );
 
 		$this->assertInstanceOf( Check_Result::class, $results );
 		$this->assertEmpty( $results->get_warnings() );
@@ -58,18 +63,23 @@ class Checks_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_run_checks_with_error() {
-		$expected = array(
-			new WordPress\Plugin_Check\Tests\Error_Check(),
+		$all_checks = array(
+			new WordPress\Plugin_Check\Test_Data\Empty_Check(),
+			new WordPress\Plugin_Check\Test_Data\Error_Check(),
+		);
+
+		$checks_to_run = array(
+			$all_checks[1],
 		);
 
 		add_filter(
 			'wp_plugin_check_checks',
-			function( $checks ) use ( $expected ) {
-				return $expected;
+			function( $checks ) use ( $all_checks ) {
+				return $all_checks;
 			}
 		);
 
-		$results = $this->checks->run_checks( array( 'Error_Check' ) );
+		$results = $this->checks->run_checks( $checks_to_run );
 
 		$this->assertEmpty( $results->get_warnings() );
 		$this->assertNotEmpty( $results->get_errors() );
