@@ -78,5 +78,4 @@ function wp_plugin_check_display_composer_autoload_notice() {
 	echo '</p></div>';
 }
 
-
 wp_plugin_check_load();
