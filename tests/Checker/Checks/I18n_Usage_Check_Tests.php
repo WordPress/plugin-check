@@ -29,7 +29,7 @@ class I18n_Usage_Check_Tests extends WP_UnitTestCase {
 		$this->assertEquals(
 			array(
 				'extensions' => 'php',
-				'standard'   => 'WordPress,WordPress-Core,WordPress-Docs,WordPress-Extra',
+				'standard'   => 'WordPress',
 				'sniffs'     => 'WordPress.WP.I18n',
 			),
 			$sniffs
@@ -41,7 +41,7 @@ class I18n_Usage_Check_Tests extends WP_UnitTestCase {
 	 */
 	public function test_run_with_errors() {
 
-		$check_context = new Check_Context( WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'tests/test-plugin-with-errors/test-plugin-with-errors.php' );
+		$check_context = new Check_Context( TESTS_PLUGIN_DIR . '/tests/testdata/plugins/test-plugin-with-errors/test-plugin-with-errors.php' );
 
 		$check_result = new Check_Result( $check_context );
 
@@ -73,20 +73,19 @@ class I18n_Usage_Check_Tests extends WP_UnitTestCase {
 	 */
 	public function test_run_without_errors() {
 
-		$check_context = new Check_Context( WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'tests/test-plugin-without-errors/test-plugin-without-errors.php' );
+		$check_context = new Check_Context( TESTS_PLUGIN_DIR . '/tests/testdata/plugins/test-plugin-without-errors/test-plugin-without-errors.php' );
 
 		$check_result = new Check_Result( $check_context );
 
 		$this->i18n_usage_check->run( $check_result );
 
 		$errors = $check_result->get_errors();
-
-		$this->assertEmpty( $errors );
-		$this->assertEquals( 0, $check_result->get_error_count() );
-
 		$warnings = $check_result->get_warnings();
 
+		$this->assertEmpty( $errors );
 		$this->assertEmpty( $warnings );
+
+		$this->assertEquals( 0, $check_result->get_error_count() );
 		$this->assertEquals( 0, $check_result->get_warning_count() );
 	}
 
