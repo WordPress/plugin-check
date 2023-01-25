@@ -79,7 +79,7 @@ class I18n_Usage_Check_Tests extends WP_UnitTestCase {
 
 		$this->i18n_usage_check->run( $check_result );
 
-		$errors = $check_result->get_errors();
+		$errors   = $check_result->get_errors();
 		$warnings = $check_result->get_warnings();
 
 		$this->assertEmpty( $errors );
