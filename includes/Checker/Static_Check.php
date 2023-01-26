@@ -8,7 +8,7 @@
 namespace WordPress\Plugin_Check\Checker;
 
 /**
- * Interface for Static checks.
+ * Interface for static checks.
  *
  * @since n.e.x.t
  */

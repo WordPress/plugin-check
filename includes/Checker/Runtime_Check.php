@@ -8,7 +8,7 @@
 namespace WordPress\Plugin_Check\Checker;
 
 /**
- * Interface for Runtime checks.
+ * Interface for runtime checks.
  *
  * @since n.e.x.t
  */
