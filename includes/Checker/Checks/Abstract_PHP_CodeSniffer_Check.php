@@ -7,7 +7,7 @@
 
 namespace WordPress\Plugin_Check\Checker\Checks;
 
-use WordPress\Plugin_Check\Checker\Check;
+use WordPress\Plugin_Check\Checker\Static_Check;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use Exception;
 
@@ -16,7 +16,7 @@ use Exception;
  *
  * @since n.e.x.t
  */
-abstract class Abstract_PHP_CodeSniffer_Check implements Check {
+abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 
 	/**
 	 * List of allowed PHPCS arguments.
