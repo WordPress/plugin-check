@@ -8,18 +8,21 @@
 namespace WordPress\Plugin_Check\Checker;
 
 /**
- * Interface for the shared preparations.
+ * Interface for a check that relies on shared preparations.
  *
  * @since n.e.x.t
  */
 interface With_Shared_Preparations {
 
 	/**
-	 * Get list of preparation classes.
+	 * Gets the list of shared preparations.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return array Returns an array of preparation class names.
+	 * @return array Returns a map of $class_name => $constructor_args pairs.
+	 *
+	 * NOTE: The expected return value here a map of [class name] => [constructor arguments] pairs,
+	 *       If the class does not need any constructor arguments, it would just be an empty array.
 	 */
 	public function get_shared_preparations();
 }
