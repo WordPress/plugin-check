@@ -32,7 +32,7 @@ class Force_Single_Plugin_Preparation implements Preparation {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param string $plugin_basename Slug of the plugin.
+	 * @param string $plugin_basename Slug of the plugin, E.g. "akismet\akismet.php".
 	 */
 	public function __construct( $plugin_basename ) {
 
@@ -51,23 +51,16 @@ class Force_Single_Plugin_Preparation implements Preparation {
 	 * @throws Exception Thrown when preparation fails.
 	 */
 	public function prepare() {
-		// Override the theme slug and name.
-		add_filter( 'template', array( $this, 'get_theme_slug' ) );
-		add_filter( 'stylesheet', array( $this, 'get_theme_slug' ) );
-		add_filter( 'pre_option_template', array( $this, 'get_theme_slug' ) );
-		add_filter( 'pre_option_stylesheet', array( $this, 'get_theme_slug' ) );
-		add_filter( 'pre_option_current_theme', array( $this, 'get_theme_name' ) );
 
-		// Override the theme directory.
-		add_filter( 'pre_option_template_root', array( $this, 'get_theme_root' ) );
-		add_filter( 'pre_option_stylesheet_root', array( $this, 'get_theme_root' ) );
+		// Check if the plugin exists.
+		if ( validate_plugin( $this->plugin_basename ) ) {
 
-		// Register the custom themes directory if relevant.
-		if ( ! empty( $this->themes_dir ) ) {
-			register_theme_directory( $this->themes_dir );
-
-			// Force new directory scan to ensure the test theme directory is available.
-			search_theme_directories( true );
+			throw new Exception(
+				sprintf(
+					'Plugin is not exists at %1$s',
+					$this->plugin_basename
+				)
+			);
 		}
 
 		// Return the cleanup function.
@@ -94,5 +87,20 @@ class Force_Single_Plugin_Preparation implements Preparation {
 				}
 			}
 		};
+	}
+
+	/**
+	 * Filter active plugins.
+	 *
+	 * @param array $active_plugins List of active plugins.
+	 *
+	 * @return void
+	 */
+	public function filter_active_plugins( $active_plugins ) {
+
+		if ( in_array( $this->plugin_basename, $active_plugins, true ) ) {
+
+			// $active_plugins
+		}
 	}
 }
