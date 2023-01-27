@@ -52,12 +52,15 @@ class Force_Single_Plugin_Preparation implements Preparation {
 	 */
 	public function prepare() {
 
+		$valid_plugin = validate_plugin( $this->plugin_basename );
+
 		// Check if the plugin exists.
-		if ( validate_plugin( $this->plugin_basename ) ) {
+		if ( is_wp_error( $valid_plugin ) ) {
 
 			throw new Exception(
 				sprintf(
-					'Plugin is not exists at %1$s',
+					'%1$s %2$s',
+					__( 'Plugin is not exists at', 'plugin-check' ),
 					$this->plugin_basename
 				)
 			);
