@@ -30,5 +30,10 @@
     "psr-4": {
       "WordPress\\Plugin_Check\\": "includes/"
     }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "WordPress\\Plugin_Check\\Test_Data\\": "tests/testdata"
+    }
   }
 }
