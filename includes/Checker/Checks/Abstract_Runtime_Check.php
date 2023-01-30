@@ -7,7 +7,7 @@
 
 namespace WordPress\Plugin_Check\Checker\Checks;
 
-use WordPress\Plugin_Check\Checker\Check;
+use WordPress\Plugin_Check\Checker\Runtime_Check;
 use WordPress\Plugin_Check\Checker\Preparation;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use Exception;
@@ -17,7 +17,7 @@ use Exception;
  *
  * @since n.e.x.t
  */
-abstract class Abstract_Runtime_Check implements Check, Preparation {
+abstract class Abstract_Runtime_Check implements Runtime_Check, Preparation {
 
 	/**
 	 * Runs preparation step for the environment and returns a closure as a cleanup function.
