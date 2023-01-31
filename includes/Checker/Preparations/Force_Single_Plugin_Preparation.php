@@ -66,29 +66,14 @@ class Force_Single_Plugin_Preparation implements Preparation {
 			);
 		}
 
+		add_filter( 'option_active_plugins', array( $this, 'filter_active_plugins' ) );
+		add_filter( 'default_option_active_plugins', array( $this, 'filter_active_plugins' ) );
+
 		// Return the cleanup function.
 		return function() {
-			global $wp_theme_directories;
 
-			remove_filter( 'template', array( $this, 'get_theme_slug' ) );
-			remove_filter( 'stylesheet', array( $this, 'get_theme_slug' ) );
-			remove_filter( 'pre_option_template', array( $this, 'get_theme_slug' ) );
-			remove_filter( 'pre_option_stylesheet', array( $this, 'get_theme_slug' ) );
-			remove_filter( 'pre_option_current_theme', array( $this, 'get_theme_name' ) );
-
-			remove_filter( 'pre_option_template_root', array( $this, 'get_theme_root' ) );
-			remove_filter( 'pre_option_stylesheet_root', array( $this, 'get_theme_root' ) );
-
-			if ( ! empty( $this->themes_dir ) ) {
-				$index = array_search( untrailingslashit( $this->themes_dir ), $wp_theme_directories, true );
-				if ( false !== $index ) {
-					array_splice( $wp_theme_directories, $index, 1 );
-					$wp_theme_directories = array_values( $wp_theme_directories );
-
-					// Force new directory scan to remove the test theme directory.
-					search_theme_directories( true );
-				}
-			}
+			remove_filter( 'option_active_plugins', array( $this, 'filter_active_plugins' ) );
+			remove_filter( 'default_option_active_plugins', array( $this, 'filter_active_plugins' ) );
 		};
 	}
 
@@ -97,13 +82,18 @@ class Force_Single_Plugin_Preparation implements Preparation {
 	 *
 	 * @param array $active_plugins List of active plugins.
 	 *
-	 * @return void
+	 * @return array List of active plugins.
 	 */
-	public function filter_active_plugins( $active_plugins ) {
+	public function filter_active_plugins( $active_plugins = array() ) {
 
 		if ( in_array( $this->plugin_basename, $active_plugins, true ) ) {
 
-			// $active_plugins
+			return array(
+				$this->plugin_basename,
+				'plugin-check/plugin-check.php', // At the moment it is added static, we can update this with constant.
+			);
 		}
+
+		return $active_plugins;
 	}
 }
