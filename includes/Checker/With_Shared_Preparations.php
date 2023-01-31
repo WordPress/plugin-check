@@ -19,10 +19,8 @@ interface With_Shared_Preparations {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return array Returns a map of $class_name => $constructor_args pairs.
-	 *
-	 * NOTE: The expected return value here a map of [class name] => [constructor arguments] pairs,
-	 *       If the class does not need any constructor arguments, it would just be an empty array.
+	 * @return array Returns a map of $class_name => $constructor_args pairs. If the class does not
+	 *               need any constructor arguments, it would just be an empty array.
 	 */
 	public function get_shared_preparations();
 }
