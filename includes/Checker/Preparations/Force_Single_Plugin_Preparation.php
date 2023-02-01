@@ -11,7 +11,7 @@ use WordPress\Plugin_Check\Checker\Preparation;
 use Exception;
 
 /**
- * Class for the preparation step to force the plugin to be checks as the only active plugin.
+ * Class for the preparation to force the plugin to be checked as the only active plugin.
  *
  * This ensures the plugin is checked as much in isolation as possible.
  *
