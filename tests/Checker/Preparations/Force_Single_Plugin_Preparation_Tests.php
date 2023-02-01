@@ -13,10 +13,6 @@ use Exception;
 
 class Force_Single_Plugin_Preparation_Tests extends WP_UnitTestCase {
 
-	public function set_up() {
-
-		parent::set_up();
-	}
 
 	/**
 	 * @covers Force_Single_Plugin_Preparation::prepare().
