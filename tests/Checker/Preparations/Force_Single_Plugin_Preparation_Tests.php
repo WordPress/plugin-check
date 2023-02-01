@@ -24,19 +24,15 @@ class Force_Single_Plugin_Preparation_Tests extends WP_UnitTestCase {
 	public function test_prepare_plugin_exists() {
 
 		$preparation = new Force_Single_Plugin_Preparation( 'akismet/akismet.php' );
-
-		$message = '';
+		$message     = '';
 
 		try {
-
 			$preparation->prepare();
-
 		} catch ( Exception $e ) {
-
 			$message = $e->getMessage();
 		}
 
-		$this->assertEquals( 'Plugin is not exists at akismet/akismet.php', $message );
+		$this->assertEquals( 'The plugin akismet/akismet.php does not exists', $message );
 	}
 
 	/**
