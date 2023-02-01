@@ -31,7 +31,7 @@ interface Check_Runner {
 	/**
 	 * Run the requested checks against the plugin context and return the results.
 	 *
-	 * @return Check_Result Returns the check results.
+	 * @return Check_Result Object containing all check results.
 	 */
 	public function run();
 
