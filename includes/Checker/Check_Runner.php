@@ -24,7 +24,7 @@ interface Check_Runner {
 	public function is_plugin_check();
 
 	/**
-	 * Handles running of the universal preparations depending on which checks requested.
+	 * Handles running the universal preparations depending on the requested checks.
 	 */
 	public function prepare();
 
