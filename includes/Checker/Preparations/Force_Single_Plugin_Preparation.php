@@ -59,6 +59,7 @@ class Force_Single_Plugin_Preparation implements Preparation {
 
 			throw new Exception(
 				sprintf(
+					// translators: plugin basename.
 					__( 'The plugin %s does not exists', 'plugin-check' ),
 					$this->plugin_basename
 				)
