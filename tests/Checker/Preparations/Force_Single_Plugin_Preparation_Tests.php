@@ -13,10 +13,6 @@ use Exception;
 
 class Force_Single_Plugin_Preparation_Tests extends WP_UnitTestCase {
 
-
-	/**
-	 * @covers Force_Single_Plugin_Preparation::prepare().
-	 */
 	public function test_prepare_plugin_exists() {
 
 		$preparation = new Force_Single_Plugin_Preparation( 'akismet/akismet.php' );
@@ -31,11 +27,6 @@ class Force_Single_Plugin_Preparation_Tests extends WP_UnitTestCase {
 		$this->assertEquals( 'The plugin akismet/akismet.php does not exists', $message );
 	}
 
-	/**
-	 * @covers Force_Single_Plugin_Preparation::prepare().
-	 *
-	 * @throws Exception Exception.
-	 */
 	public function test_prepare() {
 
 		$preparation = new Force_Single_Plugin_Preparation( 'plugin-check/plugin-check.php' );
@@ -67,9 +58,6 @@ class Force_Single_Plugin_Preparation_Tests extends WP_UnitTestCase {
 		);
 	}
 
-	/**
-	 * @covers Force_Single_Plugin_Preparation::filter_active_plugins().
-	 */
 	public function test_filter_active_plugins() {
 
 		$preparation = new Force_Single_Plugin_Preparation( 'wp-reset/wp-reset.php' );
