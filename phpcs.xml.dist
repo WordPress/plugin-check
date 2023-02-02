@@ -19,6 +19,8 @@
 	<file>./includes</file>
 	<file>./tests</file>
 
+	<exclude-pattern>*/tests/testdata/plugins/*</exclude-pattern>
+
 	<!-- Do not require docblocks for unit tests -->
 	<rule ref="Squiz.Commenting.FunctionComment.Missing">
 		<exclude-pattern>tests/*</exclude-pattern>
@@ -45,20 +47,6 @@
 		<exclude-pattern>tests/*</exclude-pattern>
 	</rule>
 	<rule ref="Squiz.Commenting.FunctionCommentThrowTag.Missing">
-		<exclude-pattern>tests/*</exclude-pattern>
-	</rule>
-	<rule ref="Squiz.Commenting.FileComment.MissingPackageTag">
-		<exclude-pattern>tests/*</exclude-pattern>
-	</rule>
-
-	<!-- Do not apply I18n rules for unit tests -->
-	<rule ref="WordPress.WP.I18n.MissingTranslatorsComment">
-		<exclude-pattern>tests/*</exclude-pattern>
-	</rule>
-	<rule ref="WordPress.WP.I18n.TextDomainMismatch">
-		<exclude-pattern>tests/*</exclude-pattern>
-	</rule>
-	<rule ref="WordPress.WP.I18n.NonSingularStringLiteralDomain">
 		<exclude-pattern>tests/*</exclude-pattern>
 	</rule>
 

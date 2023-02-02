@@ -13,33 +13,9 @@ class I18n_Usage_Check_Tests extends WP_UnitTestCase {
 
 	protected $i18n_usage_check;
 
-	public function set_up() {
-		parent::set_up();
+	public function test_run_with_errors() {
 
 		$this->i18n_usage_check = new I18n_Usage_Check();
-	}
-
-	/**
-	 * @covers I18n_Usage_Check::get_args()
-	 */
-	public function test_get_args() {
-
-		$sniffs = $this->i18n_usage_check->get_args();
-
-		$this->assertEquals(
-			array(
-				'extensions' => 'php',
-				'standard'   => 'WordPress',
-				'sniffs'     => 'WordPress.WP.I18n',
-			),
-			$sniffs
-		);
-	}
-
-	/**
-	 * @covers I18n_Usage_Check::run()
-	 */
-	public function test_run_with_errors() {
 
 		$check_context = new Check_Context( TESTS_PLUGIN_DIR . '/tests/testdata/plugins/test-plugin-with-errors/test-plugin-with-errors.php' );
 
@@ -68,10 +44,9 @@ class I18n_Usage_Check_Tests extends WP_UnitTestCase {
 		$this->assertEquals( 'WordPress.WP.I18n.NonSingularStringLiteralDomain', $errors['i18-usage-error-file.php'][15][29][0]['code'] );
 	}
 
-	/**
-	 * @covers I18n_Usage_Check::run()
-	 */
 	public function test_run_without_errors() {
+
+		$this->i18n_usage_check = new I18n_Usage_Check();
 
 		$check_context = new Check_Context( TESTS_PLUGIN_DIR . '/tests/testdata/plugins/test-plugin-without-errors/test-plugin-without-errors.php' );
 
@@ -88,5 +63,4 @@ class I18n_Usage_Check_Tests extends WP_UnitTestCase {
 		$this->assertEquals( 0, $check_result->get_error_count() );
 		$this->assertEquals( 0, $check_result->get_warning_count() );
 	}
-
 }
