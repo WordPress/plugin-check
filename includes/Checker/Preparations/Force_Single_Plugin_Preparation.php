@@ -48,7 +48,6 @@ class Force_Single_Plugin_Preparation implements Preparation {
 	 * @throws Exception Thrown when preparation fails.
 	 */
 	public function prepare() {
-
 		$valid_plugin = validate_plugin( $this->plugin_basename );
 
 		// Check if the plugin exists.
@@ -78,16 +77,14 @@ class Force_Single_Plugin_Preparation implements Preparation {
 	 * Filter active plugins.
 	 *
 	 * @param array $active_plugins List of active plugins.
-	 *
 	 * @return array List of active plugins.
 	 */
-	public function filter_active_plugins( $active_plugins = array() ) {
-
-		if ( in_array( $this->plugin_basename, $active_plugins, true ) ) {
+	public function filter_active_plugins( $active_plugins ) {
+		if ( is_array( $active_plugins ) && in_array( $this->plugin_basename, $active_plugins, true ) ) {
 
 			return array(
 				$this->plugin_basename,
-				'plugin-check/plugin-check.php', // At the moment it is added static, we can update this with constant.
+				plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE ),
 			);
 		}
 

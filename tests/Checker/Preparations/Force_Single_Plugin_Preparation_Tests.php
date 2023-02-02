@@ -47,8 +47,6 @@ class Force_Single_Plugin_Preparation_Tests extends WP_UnitTestCase {
 
 		$this->assertIsCallable( $cleanup );
 
-		$this->assertContains( 'plugin-check/plugin-check.php', $active_plugins );
-
 		$this->assertEquals(
 			array(
 				'plugin-check/plugin-check.php',
