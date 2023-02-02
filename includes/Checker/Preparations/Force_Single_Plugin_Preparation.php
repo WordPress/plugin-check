@@ -82,19 +82,13 @@ class Force_Single_Plugin_Preparation implements Preparation {
 	public function filter_active_plugins( $active_plugins ) {
 		if ( is_array( $active_plugins ) && in_array( $this->plugin_basename, $active_plugins, true ) ) {
 
-			$plugin_check_base_file = plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE );
-
-			if ( $this->plugin_basename === $plugin_check_base_file ) {
-
-				return array(
-					$this->plugin_basename,
-				);
-			}
-
-			return array(
+			$plugins = array(
 				$this->plugin_basename,
 				plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE ),
 			);
+
+			// Make sure no duplicate plugin files send in response.
+			return array_unique( $plugins );
 		}
 
 		return $active_plugins;
