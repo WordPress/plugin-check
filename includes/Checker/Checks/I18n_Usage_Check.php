@@ -22,7 +22,6 @@ class I18n_Usage_Check extends Abstract_PHP_CodeSniffer_Check {
 	 * @return array An associative array of PHPCS CLI arguments.
 	 */
 	public function get_args() {
-
 		return array(
 			'extensions' => 'php',
 			'standard'   => 'WordPress',
