@@ -13,29 +13,30 @@ use Exception;
 
 class Force_Single_Plugin_Preparation_Tests extends WP_UnitTestCase {
 
-//	public function test_prepare_plugin_exists() {
-//
-//		$preparation = new Force_Single_Plugin_Preparation( 'akismet/akismet.php' );
-//		$message     = '';
-//
-//		try {
-//			$preparation->prepare();
-//		} catch ( Exception $e ) {
-//			$message = $e->getMessage();
-//		}
-//
-//		$this->assertEquals( 'Invalid plugin akismet/akismet.php: Plugin file does not exist.', $message );
-//	}
+	protected $plugin_basename_file;
+
+	public function set_up() {
+		parent::set_up();
+
+		$this->plugin_basename_file = plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE );
+	}
+
+	public function test_prepare_plugin_exists() {
+
+		$preparation = new Force_Single_Plugin_Preparation( 'akismet/akismet.php' );
+
+		$this->expectException( 'Exception' );
+		$this->expectExceptionMessage( 'Invalid plugin akismet/akismet.php: Plugin file does not exist.' );
+		$preparation->prepare();
+	}
 
 	public function test_prepare() {
 
-		$plugin_check_base_file = plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE );
-
-		$preparation = new Force_Single_Plugin_Preparation( $plugin_check_base_file );
+		$preparation = new Force_Single_Plugin_Preparation( $this->plugin_basename_file );
 
 		$plugins = array(
 			'akismet/akismet.php',
-			$plugin_check_base_file,
+			$this->plugin_basename_file,
 			'wp-reset/wp-reset.php',
 		);
 
@@ -47,11 +48,9 @@ class Force_Single_Plugin_Preparation_Tests extends WP_UnitTestCase {
 
 		$cleanup();
 
-		$this->assertIsCallable( $cleanup );
-
-		$this->assertEquals(
+		$this->assertSame(
 			array(
-				$plugin_check_base_file,
+				$this->plugin_basename_file,
 			),
 			$active_plugins
 		);
@@ -63,18 +62,28 @@ class Force_Single_Plugin_Preparation_Tests extends WP_UnitTestCase {
 
 		$plugins = array(
 			'akismet/akismet.php',
-			'plugin-check/plugin-check.php',
+			$this->plugin_basename_file,
 			'wp-reset/wp-reset.php',
 		);
 
 		$active_plugins = $preparation->filter_active_plugins( $plugins );
 
-		$this->assertEquals(
+		$this->assertSame(
 			array(
 				'wp-reset/wp-reset.php',
-				'plugin-check/plugin-check.php',
+				$this->plugin_basename_file,
 			),
 			$active_plugins
 		);
+
+		$plugins = array(
+			'akismet/akismet.php',
+			$this->plugin_basename_file,
+			'test-plugin/test-plugin.php',
+		);
+
+		$active_plugins = $preparation->filter_active_plugins( $plugins );
+
+		$this->assertSame( $plugins, $active_plugins );
 	}
 }
