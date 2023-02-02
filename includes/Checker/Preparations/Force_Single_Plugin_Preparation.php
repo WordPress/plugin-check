@@ -69,7 +69,6 @@ class Force_Single_Plugin_Preparation implements Preparation {
 
 		// Return the cleanup function.
 		return function() {
-
 			remove_filter( 'option_active_plugins', array( $this, 'filter_active_plugins' ) );
 			remove_filter( 'default_option_active_plugins', array( $this, 'filter_active_plugins' ) );
 		};
