@@ -7,6 +7,8 @@
 
 namespace WordPress\Plugin_Check\Checker;
 
+use Exception;
+
 /**
  * Interface for runner classes like AJAX runner or CLI runner.
  *
@@ -15,7 +17,7 @@ namespace WordPress\Plugin_Check\Checker;
 interface Check_Runner {
 
 	/**
-	 * Determine if the current request is intended for the plugin checker.
+	 * Determines if the current request is intended for the plugin checker.
 	 *
 	 * @since n.e.x.t
 	 *
@@ -24,15 +26,24 @@ interface Check_Runner {
 	public function is_plugin_check();
 
 	/**
-	 * Handles running the universal preparations depending on the requested checks.
+	 * Prepares the environment for running the requested checks.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return callable Cleanup function to revert any changes made here.
+	 *
+	 * @throws Exception Thrown exception when preparation fails.
 	 */
 	public function prepare();
 
 	/**
-	 * Run the requested checks against the plugin context and return the results.
+	 * Runs the requested checks against the plugin context and returns the results.
+	 *
+	 * @since n.e.x.t
 	 *
 	 * @return Check_Result Object containing all check results.
+	 *
+	 * @throws Exception Thrown exception if a check fails.
 	 */
 	public function run();
-
 }
