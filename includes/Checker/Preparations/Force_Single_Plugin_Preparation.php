@@ -35,7 +35,6 @@ class Force_Single_Plugin_Preparation implements Preparation {
 	 * @param string $plugin_basename Slug of the plugin, E.g. "akismet\akismet.php".
 	 */
 	public function __construct( $plugin_basename ) {
-
 		$this->plugin_basename = $plugin_basename;
 	}
 
