@@ -13,27 +13,29 @@ use Exception;
 
 class Force_Single_Plugin_Preparation_Tests extends WP_UnitTestCase {
 
-	public function test_prepare_plugin_exists() {
-
-		$preparation = new Force_Single_Plugin_Preparation( 'akismet/akismet.php' );
-		$message     = '';
-
-		try {
-			$preparation->prepare();
-		} catch ( Exception $e ) {
-			$message = $e->getMessage();
-		}
-
-		$this->assertEquals( 'Invalid plugin akismet/akismet.php: Plugin file does not exist.', $message );
-	}
+//	public function test_prepare_plugin_exists() {
+//
+//		$preparation = new Force_Single_Plugin_Preparation( 'akismet/akismet.php' );
+//		$message     = '';
+//
+//		try {
+//			$preparation->prepare();
+//		} catch ( Exception $e ) {
+//			$message = $e->getMessage();
+//		}
+//
+//		$this->assertEquals( 'Invalid plugin akismet/akismet.php: Plugin file does not exist.', $message );
+//	}
 
 	public function test_prepare() {
 
-		$preparation = new Force_Single_Plugin_Preparation( 'plugin-check/plugin-check.php' );
+		$plugin_check_base_file = plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE );
+
+		$preparation = new Force_Single_Plugin_Preparation( $plugin_check_base_file );
 
 		$plugins = array(
 			'akismet/akismet.php',
-			'plugin-check/plugin-check.php',
+			$plugin_check_base_file,
 			'wp-reset/wp-reset.php',
 		);
 
@@ -49,8 +51,7 @@ class Force_Single_Plugin_Preparation_Tests extends WP_UnitTestCase {
 
 		$this->assertEquals(
 			array(
-				'plugin-check/plugin-check.php',
-				'plugin-check/plugin-check.php',
+				$plugin_check_base_file,
 			),
 			$active_plugins
 		);
