@@ -24,7 +24,7 @@ class Force_Single_Plugin_Preparation_Tests extends WP_UnitTestCase {
 			$message = $e->getMessage();
 		}
 
-		$this->assertEquals( 'The plugin akismet/akismet.php does not exists', $message );
+		$this->assertEquals( 'Invalid plugin akismet/akismet.php: Plugin file does not exist.', $message );
 	}
 
 	public function test_prepare() {
