@@ -45,7 +45,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	 *    @type string $exclude    A comma separated list of sniff codes to exclude from checks.
 	 * }
 	 */
-	abstract public function get_args();
+	abstract protected function get_args();
 
 	/**
 	 * Amends the given result by running the check on the associated plugin.
