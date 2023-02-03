@@ -30,6 +30,9 @@ class Force_Single_Plugin_Preparation_Tests extends WP_UnitTestCase {
 		$preparation->prepare();
 	}
 
+	/**
+	 * @throws Exception Throw exception.
+	 */
 	public function test_prepare() {
 
 		$preparation = new Force_Single_Plugin_Preparation( $this->plugin_basename_file );
@@ -46,14 +49,18 @@ class Force_Single_Plugin_Preparation_Tests extends WP_UnitTestCase {
 
 		$active_plugins = get_option( 'active_plugins' );
 
-		$cleanup();
-
 		$this->assertSame(
 			array(
 				$this->plugin_basename_file,
 			),
 			$active_plugins
 		);
+
+		$cleanup();
+
+		$active_plugins = get_option( 'active_plugins' );
+
+		$this->assertSame( $active_plugins, $plugins );
 	}
 
 	public function test_filter_active_plugins() {
