@@ -34,33 +34,25 @@ class Force_Single_Plugin_Preparation_Tests extends WP_UnitTestCase {
 	 * @throws Exception Throw exception.
 	 */
 	public function test_prepare() {
+		// Remove the WP tests active plugins filter which interfers with this test.
+		remove_filter( 'pre_option_active_plugins', 'wp_tests_options' );
 
-		$preparation = new Force_Single_Plugin_Preparation( $this->plugin_basename_file );
-
-		$plugins = array(
+		$preparation    = new Force_Single_Plugin_Preparation( $this->plugin_basename_file );
+		$active_plugins = array(
 			'akismet/akismet.php',
 			$this->plugin_basename_file,
 			'wp-reset/wp-reset.php',
 		);
 
-		update_option( 'active_plugins', $plugins );
+		update_option( 'active_plugins', $active_plugins );
 
 		$cleanup = $preparation->prepare();
-
-		$active_plugins = get_option( 'active_plugins' );
-
-		$this->assertSame(
-			array(
-				$this->plugin_basename_file,
-			),
-			$active_plugins
-		);
-
+		$before  = get_option( 'active_plugins' );
 		$cleanup();
+		$after = get_option( 'active_plugins' );
 
-		$active_plugins = get_option( 'active_plugins' );
-
-		$this->assertSame( $active_plugins, $plugins );
+		$this->assertSame( array( $this->plugin_basename_file ), $before );
+		$this->assertSame( $active_plugins, $after );
 	}
 
 	public function test_filter_active_plugins() {
