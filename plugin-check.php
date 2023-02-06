@@ -18,6 +18,7 @@
 define( 'WP_PLUGIN_CHECK_VERSION', 'n.e.x.t' );
 define( 'WP_PLUGIN_CHECK_MINIMUM_PHP', '5.6' );
 define( 'WP_PLUGIN_CHECK_PLUGIN_DIR_PATH', plugin_dir_path( __FILE__ ) );
+define( 'WP_PLUGIN_CHECK_MAIN_FILE', __FILE__ );
 
 /**
  * Checks basic requirements and loads the plugin.

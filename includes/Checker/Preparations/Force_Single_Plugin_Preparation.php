@@ -35,7 +35,6 @@ class Force_Single_Plugin_Preparation implements Preparation {
 	 * @param string $plugin_basename Slug of the plugin, E.g. "akismet\akismet.php".
 	 */
 	public function __construct( $plugin_basename ) {
-
 		$this->plugin_basename = $plugin_basename;
 	}
 
@@ -49,7 +48,6 @@ class Force_Single_Plugin_Preparation implements Preparation {
 	 * @throws Exception Thrown when preparation fails.
 	 */
 	public function prepare() {
-
 		$valid_plugin = validate_plugin( $this->plugin_basename );
 
 		// Check if the plugin exists.
@@ -57,9 +55,10 @@ class Force_Single_Plugin_Preparation implements Preparation {
 
 			throw new Exception(
 				sprintf(
-					// translators: plugin basename.
-					__( 'The plugin %s does not exists', 'plugin-check' ),
-					$this->plugin_basename
+					/* translators: 1: plugin basename, 2: error message */
+					__( 'Invalid plugin %1$s: %2$s', 'plugin-check' ),
+					$this->plugin_basename,
+					$valid_plugin->get_error_message()
 				)
 			);
 		}
@@ -69,7 +68,6 @@ class Force_Single_Plugin_Preparation implements Preparation {
 
 		// Return the cleanup function.
 		return function() {
-
 			remove_filter( 'option_active_plugins', array( $this, 'filter_active_plugins' ) );
 			remove_filter( 'default_option_active_plugins', array( $this, 'filter_active_plugins' ) );
 		};
@@ -79,16 +77,24 @@ class Force_Single_Plugin_Preparation implements Preparation {
 	 * Filter active plugins.
 	 *
 	 * @param array $active_plugins List of active plugins.
-	 *
 	 * @return array List of active plugins.
 	 */
-	public function filter_active_plugins( $active_plugins = array() ) {
+	public function filter_active_plugins( $active_plugins ) {
+		if ( is_array( $active_plugins ) && in_array( $this->plugin_basename, $active_plugins, true ) ) {
 
-		if ( in_array( $this->plugin_basename, $active_plugins, true ) ) {
+			$plugin_base_file = plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE );
+
+			// If the plugin-check is the only available plugin then return that one only.
+			if ( $this->plugin_basename === $plugin_base_file ) {
+
+				return array(
+					$plugin_base_file,
+				);
+			}
 
 			return array(
 				$this->plugin_basename,
-				'plugin-check/plugin-check.php', // At the moment it is added static, we can update this with constant.
+				$plugin_base_file,
 			);
 		}
 
