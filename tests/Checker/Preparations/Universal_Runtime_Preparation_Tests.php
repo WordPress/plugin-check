@@ -13,15 +13,10 @@ use WP_UnitTestCase;
 
 class Universal_Runtime_Preparation_Tests extends WP_UnitTestCase {
 
-	protected $plugin_basename_file;
-
-	public function set_up() {
-		parent::set_up();
-
-		$this->plugin_basename_file = plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE );
-	}
-
 	public function test_prepare() {
+
+		$plugin_basename_file = plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE );
+
 		// Remove the WP tests active plugins filter which interfers with this test.
 		remove_filter( 'pre_option_active_plugins', 'wp_tests_options' );
 
@@ -31,7 +26,7 @@ class Universal_Runtime_Preparation_Tests extends WP_UnitTestCase {
 
 		$plugins = array(
 			'akismet/akismet.php',
-			$this->plugin_basename_file,
+			$plugin_basename_file,
 			'wp-reset/wp-reset.php',
 		);
 
@@ -45,7 +40,7 @@ class Universal_Runtime_Preparation_Tests extends WP_UnitTestCase {
 
 		$active_plugins = get_option( 'active_plugins' );
 
-		$this->assertSame( array( $this->plugin_basename_file ), $active_plugins );
+		$this->assertSame( array( $plugin_basename_file ), $active_plugins );
 	}
 
 }
