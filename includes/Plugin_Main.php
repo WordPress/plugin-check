@@ -7,6 +7,8 @@
 
 namespace WordPress\Plugin_Check;
 
+use WordPress\Plugin_Check\CLI\Plugin_Check_Command;
+
 /**
  * Main class for the plugin.
  *
@@ -51,6 +53,9 @@ class Plugin_Main {
 	 * @since n.e.x.t
 	 */
 	public function add_hooks() {
-		// @TODO: Update to register CLI command to WordPress as part of issue #30
+
+		$plugin_command = new Plugin_Check_Command( $this->context );
+
+		\WP_CLI::add_command( 'plugin', $plugin_command );
 	}
 }
