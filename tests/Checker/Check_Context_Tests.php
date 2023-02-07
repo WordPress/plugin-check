@@ -12,7 +12,7 @@ class Check_Context_Tests extends WP_UnitTestCase {
 		parent::set_up();
 
 		$this->plugin_name   = basename( TESTS_PLUGIN_DIR );
-		$this->check_context = new Check_Context( WP_PLUGIN_DIR . '/' . plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE ) );
+		$this->check_context = new Check_Context( WP_PLUGIN_CHECK_MAIN_FILE );
 	}
 
 	public function test_basename() {
