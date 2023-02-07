@@ -57,7 +57,7 @@ class Universal_Runtime_Preparation implements Preparation {
 		$use_minimal_theme_preparation = new Use_Minimal_Theme_Preparation( 'wp-empty-theme', WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/test-content/themes' );
 		$cleanup_functions[]           = $use_minimal_theme_preparation->prepare();
 
-		$force_single_plugin_preparation = new Force_Single_Plugin_Preparation( 'plugin-check/plugin-check.php' );
+		$force_single_plugin_preparation = new Force_Single_Plugin_Preparation( $this->check_context->basename() );
 		$cleanup_functions[]             = $force_single_plugin_preparation->prepare();
 
 		// Return the cleanup function.

@@ -14,33 +14,32 @@ use WP_UnitTestCase;
 class Universal_Runtime_Preparation_Tests extends WP_UnitTestCase {
 
 	public function test_prepare() {
-
-		$plugin_basename_file = plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE );
-
-		// Remove the WP tests active plugins filter which interfers with this test.
-		remove_filter( 'pre_option_active_plugins', 'wp_tests_options' );
-
-		$check_context = new Check_Context( 'test-plugin/test-plugin.php' );
+		$check_context = new Check_Context( plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE ) );
 
 		$universal_runtime_preparation = new Universal_Runtime_Preparation( $check_context );
 
-		$plugins = array(
-			'akismet/akismet.php',
-			$plugin_basename_file,
-			'wp-reset/wp-reset.php',
-		);
-
-		update_option( 'active_plugins', $plugins );
-
 		$cleanup = $universal_runtime_preparation->prepare();
+
+		$this->assertTrue( has_filter( 'option_active_plugins' ) );
+		$this->assertTrue( has_filter( 'default_option_active_plugins' ) );
+		$this->assertTrue( has_filter( 'stylesheet' ) );
+		$this->assertTrue( has_filter( 'template' ) );
+		$this->assertTrue( has_filter( 'pre_option_template' ) );
+		$this->assertTrue( has_filter( 'pre_option_stylesheet' ) );
+		$this->assertTrue( has_filter( 'pre_option_current_theme' ) );
+		$this->assertTrue( has_filter( 'pre_option_template_root' ) );
+		$this->assertTrue( has_filter( 'pre_option_stylesheet_root' ) );
 
 		$cleanup();
 
-		$this->assertEquals( 'wp-empty-theme', get_option( 'template' ) );
-
-		$active_plugins = get_option( 'active_plugins' );
-
-		$this->assertSame( array( $plugin_basename_file ), $active_plugins );
+		$this->assertFalse( has_filter( 'option_active_plugins' ) );
+		$this->assertFalse( has_filter( 'default_option_active_plugins' ) );
+		$this->assertFalse( has_filter( 'stylesheet' ) );
+		$this->assertFalse( has_filter( 'template' ) );
+		$this->assertFalse( has_filter( 'pre_option_template' ) );
+		$this->assertFalse( has_filter( 'pre_option_stylesheet' ) );
+		$this->assertFalse( has_filter( 'pre_option_current_theme' ) );
+		$this->assertFalse( has_filter( 'pre_option_template_root' ) );
+		$this->assertFalse( has_filter( 'pre_option_stylesheet_root' ) );
 	}
-
 }
