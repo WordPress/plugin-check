@@ -10,7 +10,6 @@ namespace WordPress\Plugin_Check\Checker\Preparations;
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Preparation;
 use Exception;
-use function PHPUnit\Framework\callback;
 
 /**
  * Class handle all preparations required for when at least one `Runtime_Check` is being run.
@@ -39,7 +38,11 @@ class Universal_Runtime_Preparation implements Preparation {
 	}
 
 	/**
-	 * Runs the preparations for the theme and plugin. And returns a cleanup function.
+	 * Runs preparation step for the environment by modifying the plugins and theme to use,
+	 * and returns a closure as a cleanup function.
+	 *
+	 * This preparation needs to be called very early in the WordPress lifecycle, before
+	 * plugins are loaded, e.g. from a drop-in like `object-cache.php`.
 	 *
 	 * @since n.e.x.t
 	 *
@@ -61,8 +64,7 @@ class Universal_Runtime_Preparation implements Preparation {
 		return function () use ( $cleanup_functions ) {
 
 			foreach ( $cleanup_functions as $cleanup_function ) {
-
-				callback( $cleanup_function );
+				$cleanup_function();
 			}
 		};
 	}
