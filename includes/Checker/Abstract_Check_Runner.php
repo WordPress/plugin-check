@@ -9,6 +9,7 @@ namespace WordPress\Plugin_Check\Checker;
 
 use WordPress\Plugin_Check\Checker\Check_Runner;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Preparations\Universal_Runtime_Preparation;
 
 /**
  * Abstract Check Runner class.
@@ -24,6 +25,14 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @var Checks
 	 */
 	protected $checks;
+
+	/**
+	 * Instance of the Check_Context class.
+	 *
+	 * @since n.e.x.t
+	 * @var Check_Context
+	 */
+	protected $context;
 
 	/**
 	 * Array of Check instances to run.
@@ -43,7 +52,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	abstract public function is_plugin_check();
 
 	/**
-	 * Setup checks and preparations based on the request.
+	 * Setup the check context, checks and preparations based on the request.
 	 *
 	 * @since n.e.x.t
 	 */
@@ -60,7 +69,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 */
 	public function prepare() {
 		if ( ! $this->requires_universal_preparations( $this->checks_to_run ) ) {
-			$preparation = new Universal_Runtime_Preparation();
+			$preparation = new Universal_Runtime_Preparation( $this->context );
 			return $preparation->prepare();
 		}
 
@@ -91,9 +100,9 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param array $checks An array of check instances to run.
+	 * @param array $checks An array of Check instances to run.
 	 *
-	 * @return array An array of preparations to run.
+	 * @return array An array of reparations to run.
 	 */
 	private function get_shared_preparations( array $checks ) {
 		$shared_preparations = array();
@@ -105,12 +114,37 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 
 			$preparations = $check->get_shared_preparations();
 
-			foreach ( $preparations as $class => $parameters ) {
-				if ( ! isset( $shared_preparations[ $class ] ) ) {
-					$shared_preparations[ $class ] = $parameters;
+			foreach ( $preparations as $class => $args ) {
+				// Find the array keys for any existing shared preparation with the same class.
+				$existing_keys = array_keys( array_column( $shared_preparations, 'class' ), $class, true );
+
+				// Set a flag as to whether the checks preparation should be added to the shared preparations array.
+				$unique = true;
+
+				foreach ( $existing_keys as $key ) {
+					// If the shared preparation already exists with the same arguments.
+					if ( isset( $shared_preparations[ $key ]['args'] ) && $shared_preparations[ $key ]['args'] === $args ) {
+						$unique = false;
+					}
+				}
+
+				// If the shared preparation is unique, instantiate it and add to the shared preparations.
+				if ( $unique ) {
+					$shared_preparations[] = array(
+						'class' => $class,
+						'args'  => $args,
+					);
 				}
 			}
 		}
+
+		// Map over the shared preparations and instantiate the classes.
+		$shared_preparations = array_map(
+			function( $preparation ) {
+				return new $preparation['class']( ...$preparation['args'] );
+			},
+			$shared_preparations
+		);
 
 		return $shared_preparations;
 	}
