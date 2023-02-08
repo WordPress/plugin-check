@@ -77,6 +77,34 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	}
 
 	/**
+	 * Run the checks against the plugin.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return Check_Result
+	 */
+	public function run() {
+		$checks = $this->checks->get_checks( $this->checks_to_run );
+
+		$preparations = $this->get_shared_preparations( $checks );
+		$cleanups     = array();
+
+		foreach ( $preparations as $preparation ) {
+			$cleanups[] = $preparation->prepare();
+		}
+
+		$results = $this->checks->run_checks( $checks );
+
+		if ( ! empty( $cleanups ) ) {
+			foreach ( $cleanups as $cleanup ) {
+				$cleanup();
+			}
+		}
+
+		return $results;
+	}
+
+	/**
 	 * Determine if any of the checks requires the universal runtime preparation.
 	 *
 	 * @since n.e.x.t
@@ -115,20 +143,20 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			$preparations = $check->get_shared_preparations();
 
 			foreach ( $preparations as $class => $args ) {
-				// Find the array keys for any existing shared preparation with the same class.
+				// Find the array keys for any existing shared preparation with the same class name.
 				$existing_keys = array_keys( array_column( $shared_preparations, 'class' ), $class, true );
 
-				// Set a flag as to whether the checks preparation should be added to the shared preparations array.
+				// Set a flag to add the preparation to the shared preparations array.
 				$unique = true;
 
 				foreach ( $existing_keys as $key ) {
-					// If the shared preparation already exists with the same arguments.
+					// If the shared preparation already exists with the same parameters.
 					if ( isset( $shared_preparations[ $key ]['args'] ) && $shared_preparations[ $key ]['args'] === $args ) {
 						$unique = false;
 					}
 				}
 
-				// If the shared preparation is unique, instantiate it and add to the shared preparations.
+				// Add to the shared preparations if the shared preparation is unique.
 				if ( $unique ) {
 					$shared_preparations[] = array(
 						'class' => $class,
@@ -147,33 +175,5 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		);
 
 		return $shared_preparations;
-	}
-
-	/**
-	 * Run the checks against the plugin.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @return Check_Result
-	 */
-	public function run() {
-		$checks = $this->checks->get_checks( $this->checks_to_run );
-
-		$preparations = $this->get_shared_preparations( $checks );
-		$cleanups     = array();
-
-		foreach ( $preparations as $preparation ) {
-			$cleanups[] = $preparation->prepare();
-		}
-
-		$results = $this->checks->run_checks( $checks );
-
-		if ( ! empty( $cleanups ) ) {
-			foreach ( $cleanups as $cleanup ) {
-				$cleanup();
-			}
-		}
-
-		return $results;
 	}
 }
