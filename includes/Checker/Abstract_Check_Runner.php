@@ -7,9 +7,7 @@
 
 namespace WordPress\Plugin_Check\Checker;
 
-use WordPress\Plugin_Check\Checker\Check_Runner;
-use WordPress\Plugin_Check\Checker\Check_Result;
-use WordPress\Plugin_Check\Checker\Preparations\Universal_Runtime_Preparation;
+use Preparations\Universal_Runtime_Preparation;
 
 /**
  * Abstract Check Runner class.
