@@ -75,7 +75,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return Check_Result
+	 * @return Check_Result An object containing all check results.
 	 */
 	public function run() {
 		$checks       = $this->get_checks_to_run();
