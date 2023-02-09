@@ -52,14 +52,14 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	abstract public function is_plugin_check();
 
 	/**
-	 * Setup the check context, checks and preparations based on the request.
+	 * Sets up the check context, checks and preparations based on the request.
 	 *
 	 * @since n.e.x.t
 	 */
 	abstract protected function setup_checks();
 
 	/**
-	 * Prepare the environment for running the requested checks.
+	 * Prepares the environment for running the requested checks.
 	 *
 	 * @since n.e.x.t
 	 *
@@ -77,7 +77,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	}
 
 	/**
-	 * Run the checks against the plugin.
+	 * Runs the checks against the plugin.
 	 *
 	 * @since n.e.x.t
 	 *
@@ -90,7 +90,8 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		$cleanups     = array();
 
 		foreach ( $preparations as $preparation ) {
-			$cleanups[] = $preparation->prepare();
+			$instance   = new $preparation['class']( ...$preparation['args'] );
+			$cleanups[] = $instance->prepare();
 		}
 
 		$results = $this->checks->run_checks( $checks );
@@ -105,7 +106,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	}
 
 	/**
-	 * Determine if any of the checks requires the universal runtime preparation.
+	 * Determines if any of the checks requires the universal runtime preparation.
 	 *
 	 * @since n.e.x.t
 	 *
@@ -124,7 +125,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	}
 
 	/**
-	 * Return all shared preparations used by the checks to run.
+	 * Returns all shared preparations used by the checks to run.
 	 *
 	 * @since n.e.x.t
 	 *
@@ -143,36 +144,16 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			$preparations = $check->get_shared_preparations();
 
 			foreach ( $preparations as $class => $args ) {
-				// Find the array keys for any existing shared preparation with the same class name.
-				$existing_keys = array_keys( array_column( $shared_preparations, 'class' ), $class, true );
+				$key = $class . '::' . md5( json_encode( $args ) );
 
-				// Set a flag to add the preparation to the shared preparations array.
-				$unique = true;
-
-				foreach ( $existing_keys as $key ) {
-					// If the shared preparation already exists with the same parameters.
-					if ( isset( $shared_preparations[ $key ]['args'] ) && $shared_preparations[ $key ]['args'] === $args ) {
-						$unique = false;
-					}
-				}
-
-				// Add to the shared preparations if the shared preparation is unique.
-				if ( $unique ) {
-					$shared_preparations[] = array(
+				if ( ! isset( $shared_preparations[ $key ] ) ) {
+					$shared_preparations[ $key ] = array(
 						'class' => $class,
 						'args'  => $args,
 					);
 				}
 			}
 		}
-
-		// Map over the shared preparations and instantiate the classes.
-		$shared_preparations = array_map(
-			function( $preparation ) {
-				return new $preparation['class']( ...$preparation['args'] );
-			},
-			$shared_preparations
-		);
 
 		return $shared_preparations;
 	}
