@@ -27,6 +27,8 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 	public function test_add_page() {
 		global $_parent_pages;
 
+		$current_screen = get_current_screen();
+
 		$admin_user = self::factory()->user->create( array( 'role' => 'administrator' ) );
 		wp_set_current_user( $admin_user );
 		set_current_screen( 'dashboard' );
@@ -35,6 +37,8 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 
 		$this->assertArrayHasKey( 'plugin-check', $_parent_pages );
 		$this->assertEquals( 'tools.php', $_parent_pages['plugin-check'] );
+
+		set_current_screen( $current_screen );
 	}
 
 	public function test_get_plugins() {
