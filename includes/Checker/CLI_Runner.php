@@ -7,10 +7,6 @@
 
 namespace WordPress\Plugin_Check\Checker;
 
-use WordPress\Plugin_Check\Checker\Checks;
-use WordPress\Plugin_Check\Checker\Check_Context;
-use WordPress\Plugin_Check\Checker\Abstract_Check_Runner;
-
 /**
  * CLI Runner class.
  *
