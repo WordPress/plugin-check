@@ -31,9 +31,9 @@ class CLI_Runner extends Abstract_Check_Runner {
 		}
 
 		if (
-			$_SERVER['argv'][0] === 'wp' &&
-			$_SERVER['argv'][1] === 'plugin' &&
-			$_SERVER['argv'][2] === 'check'
+			'wp' === $_SERVER['argv'][0] &&
+			'plugin' === $_SERVER['argv'][1] &&
+			'check' === $_SERVER['argv'][2]
 		) {
 			return true;
 		}
@@ -62,8 +62,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 	 *
 	 * @return Checks
 	 */
-	protected function get_checks()
-	{
+	protected function get_checks() {
 		return new Checks( $this->get_plugin_main_file() );
 	}
 
@@ -86,19 +85,21 @@ class CLI_Runner extends Abstract_Check_Runner {
 	 * @return array An array of Check instances to run.
 	 */
 	protected function get_checks_to_run() {
-		$checks = [];
+		$checks = array();
 
-		foreach( $_SERVER['argv'] as $value ) {
-			if ( 0 <= strpos( $value, '--checks=' ) ) {
-				$checks = $value;
+		foreach ( $_SERVER['argv'] as $value ) {
+			if ( false !== strpos( $value, '--checks=' ) ) {
+				$checks = explode( ',', str_replace( '--checks=', '', $value ) );
 				break;
 			}
 		}
 
-		if ( ! empty( $checks ) ) {
-			$checks = explode( ',', $checks );
+		$all_checks = $this->get_checks()->get_checks();
+
+		if ( empty( $checks ) ) {
+			return $all_checks;
 		}
 
-		return $this->get_checks()->get_checks( $checks );
+		return array_intersect_key( $all_checks, array_flip( $checks ) );
 	}
 }

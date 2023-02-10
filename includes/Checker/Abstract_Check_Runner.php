@@ -7,7 +7,7 @@
 
 namespace WordPress\Plugin_Check\Checker;
 
-use Preparations\Universal_Runtime_Preparation;
+use WordPress\Plugin_Check\Checker\Preparations\Universal_Runtime_Preparation;
 
 /**
  * Abstract Check Runner class.
@@ -62,7 +62,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @throws Exception Thrown exception when preparation fails.
 	 */
 	public function prepare() {
-		if ( ! $this->requires_universal_preparations( $this->get_checks_to_run() ) ) {
+		if ( $this->requires_universal_preparations( $this->get_checks_to_run() ) ) {
 			$preparation = new Universal_Runtime_Preparation( $this->get_context() );
 			return $preparation->prepare();
 		}

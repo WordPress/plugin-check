@@ -54,7 +54,7 @@ class Checks {
 		$checks_to_run = array_filter(
 			$checks,
 			function( $check ) use ( $all_checks ) {
-				return in_array( $check, $all_checks, true );
+				return in_array( $check, $all_checks ); // phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict
 			}
 		);
 
