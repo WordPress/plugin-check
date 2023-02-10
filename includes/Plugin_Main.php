@@ -53,9 +53,9 @@ class Plugin_Main {
 	 * @since n.e.x.t
 	 */
 	public function add_hooks() {
-
-		$plugin_command = new Plugin_Check_Command( $this->context );
-
-		\WP_CLI::add_command( 'plugin', $plugin_command );
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			$plugin_command = new Plugin_Check_Command( $this->context );
+			\WP_CLI::add_command( 'plugin', $plugin_command );
+		}
 	}
 }
