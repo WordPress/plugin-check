@@ -58,7 +58,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 	 *
 	 * @return Checks
 	 */
-	protected function get_checks() {
+	protected function get_checks_instance() {
 		return new Checks( $this->get_plugin_main_file() );
 	}
 
@@ -69,7 +69,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 	 *
 	 * @return array An array of Check instances to run.
 	 */
-	protected function get_checks_to_run() {
+	protected function get_check_slugs_to_run() {
 		$checks = array();
 
 		foreach ( $_SERVER['argv'] as $value ) {
@@ -79,7 +79,19 @@ class CLI_Runner extends Abstract_Check_Runner {
 			}
 		}
 
-		$all_checks = $this->get_checks()->get_checks();
+		return $checks;
+	}
+
+	/**
+	 * Returns the Check instances to run.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array An array of Check instances.
+	 */
+	protected function get_checks_to_run() {
+		$check_slugs = $this->get_check_slugs_to_run();
+		$all_checks  = $this->get_checks_instance()->get_checks();
 
 		if ( empty( $checks ) ) {
 			return $all_checks;

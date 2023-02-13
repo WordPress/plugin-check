@@ -32,16 +32,16 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @return Checks An instances of the Checks class.
 	 */
-	abstract protected function get_checks();
+	abstract protected function get_checks_instance();
 
 	/**
-	 * Creates and returns an array of Check instances to run based on the request.
+	 * Returns an array of Check slugs to run based on the request.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return array An array of Check instances.
+	 * @return array An array of Check slugs.
 	 */
-	abstract protected function get_checks_to_run();
+	abstract protected function get_check_slugs_to_run();
 
 	/**
 	 * Prepares the environment for running the requested checks.
@@ -54,7 +54,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 */
 	public function prepare() {
 		if ( $this->requires_universal_preparations( $this->get_checks_to_run() ) ) {
-			$preparation = new Universal_Runtime_Preparation( $this->get_checks()->context() );
+			$preparation = new Universal_Runtime_Preparation( $this->get_checks_instance()->context() );
 			return $preparation->prepare();
 		}
 
@@ -78,7 +78,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			$cleanups[] = $instance->prepare();
 		}
 
-		$results = $this->get_checks()->run_checks( $checks );
+		$results = $this->get_checks_instance()->run_checks( $checks );
 
 		if ( ! empty( $cleanups ) ) {
 			foreach ( $cleanups as $cleanup ) {
@@ -113,7 +113,12 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @since n.e.x.t
 	 *
 	 * @param array $checks An array of Check instances to run.
-	 * @return array An array of reparations to run.
+	 * @return array {
+	 *      An array of Preparations to run where each item is an array with the class name and args.
+	 *
+	 *      @type string $class The full class name of the Preparation.
+	 *      @type array  $args  An array of parameters to pass to the class constructor.
+	 * }
 	 */
 	private function get_shared_preparations( array $checks ) {
 		$shared_preparations = array();
@@ -137,6 +142,6 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			}
 		}
 
-		return $shared_preparations;
+		return array_values( $shared_preparations );
 	}
 }

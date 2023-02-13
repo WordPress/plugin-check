@@ -116,18 +116,20 @@ class Checks {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return array List of plugin check class instances implementing the Check interface.
+	 * @return array An array map of check slugs to Check instances.
 	 */
 	public function get_checks() {
 		// TODO: Add checks once implemented.
-		$checks = array();
+		$checks = array(
+			'i18n-usage' => new Checks\I18n_Usage_Check(),
+		);
 
 		/**
 		 * Filters the available plugin check classes.
 		 *
 		 * @since n.e.x.t
 		 *
-		 * @param array $checks List of plugin check class instances implementing the Check interface.
+		 * @param array $checks An array map of check slugs to Check instances.
 		 */
 		return apply_filters( 'wp_plugin_check_checks', $checks );
 	}
