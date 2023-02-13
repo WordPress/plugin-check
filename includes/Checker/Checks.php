@@ -18,6 +18,14 @@ use Exception;
 class Checks {
 
 	/**
+	 * Array of all available Checks.
+	 *
+	 * @since n.e.x.t
+	 * @var array
+	 */
+	protected $checks;
+
+	/**
 	 * Context for the plugin to check.
 	 *
 	 * @since n.e.x.t
@@ -65,7 +73,7 @@ class Checks {
 		$checks_to_run = array_filter(
 			$checks,
 			function( $check ) use ( $all_checks ) {
-				return in_array( $check, $all_checks ); // phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict
+				return in_array( $check, $all_checks, true );
 			}
 		);
 
@@ -119,18 +127,22 @@ class Checks {
 	 * @return array An array map of check slugs to Check instances.
 	 */
 	public function get_checks() {
-		// TODO: Add checks once implemented.
-		$checks = array(
-			'i18n-usage' => new Checks\I18n_Usage_Check(),
-		);
+		if ( ! isset( $this->checks ) ) {
+			// TODO: Add checks once implemented.
+			$checks = array(
+				'i18n-usage' => new Checks\I18n_Usage_Check(),
+			);
 
-		/**
-		 * Filters the available plugin check classes.
-		 *
-		 * @since n.e.x.t
-		 *
-		 * @param array $checks An array map of check slugs to Check instances.
-		 */
-		return apply_filters( 'wp_plugin_check_checks', $checks );
+			/**
+			 * Filters the available plugin check classes.
+			 *
+			 * @since n.e.x.t
+			 *
+			 * @param array $checks An array map of check slugs to Check instances.
+			 */
+			$this->checks = apply_filters( 'wp_plugin_check_checks', $checks );
+		}
+
+		return $this->checks;
 	}
 }

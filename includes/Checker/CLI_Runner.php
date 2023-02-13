@@ -17,6 +17,14 @@ use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 class CLI_Runner extends Abstract_Check_Runner {
 
 	/**
+	 * An instances of the Checks class.
+	 *
+	 * @since n.e.x.t
+	 * @var Checks
+	 */
+	protected $checks;
+
+	/**
 	 * Checks if the current request is a CLI request for the Plugin Checker.
 	 *
 	 * @since n.e.x.t
@@ -40,23 +48,6 @@ class CLI_Runner extends Abstract_Check_Runner {
 	}
 
 	/**
-	 * Returns the plugin main file based on the request.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @return string The absolute path to the plugin main file.
-	 *
-	 * @throws Exception Thrown if an invalid basename or plugin slug is provided.
-	 */
-	private function get_plugin_main_file() {
-		// Get the plugin name from the command line arguments.
-		$plugin_slug = isset( $_SERVER['argv'][3] ) ? $_SERVER['argv'][3] : '';
-		$plugin_file = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin_slug );
-
-		return WP_PLUGIN_DIR . '/' . $plugin_file;
-	}
-
-	/**
 	 * Retruns an instance of the Checks class.
 	 *
 	 * @since n.e.x.t
@@ -66,7 +57,15 @@ class CLI_Runner extends Abstract_Check_Runner {
 	 * @throws Exception Thrown if the plugin main file cannot be found based on the CLI input.
 	 */
 	protected function get_checks_instance() {
-		return new Checks( $this->get_plugin_main_file() );
+		if ( ! isset( $this->checks ) ) {
+			// Get the plugin name from the command line arguments.
+			$plugin_slug = isset( $_SERVER['argv'][3] ) ? $_SERVER['argv'][3] : '';
+			$plugin_file = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin_slug );
+
+			$this->checks = new Checks( WP_PLUGIN_DIR . '/' . $plugin_file );
+		}
+
+		return $this->checks;
 	}
 
 	/**

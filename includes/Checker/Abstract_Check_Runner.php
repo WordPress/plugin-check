@@ -156,7 +156,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		$check_slugs = $this->get_check_slugs_to_run();
 		$all_checks  = $this->get_checks_instance()->get_checks();
 
-		if ( empty( $checks ) ) {
+		if ( empty( $check_slugs ) ) {
 			return $all_checks;
 		}
 
