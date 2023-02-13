@@ -37,6 +37,17 @@ class Checks {
 	}
 
 	/**
+	 * Returns the Check Context.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return Check_Context
+	 */
+	public function context() {
+		return $this->check_context;
+	}
+
+	/**
 	 * Runs checks against the plugin.
 	 *
 	 * @since n.e.x.t

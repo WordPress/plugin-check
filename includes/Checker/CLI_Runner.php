@@ -63,17 +63,6 @@ class CLI_Runner extends Abstract_Check_Runner {
 	}
 
 	/**
-	 * Returns an instance of the Check_Context class.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @return Check_Context
-	 */
-	protected function get_context() {
-		return new Check_Context( $this->get_plugin_main_file() );
-	}
-
-	/**
 	 * Returns an array of Check instances to run.
 	 *
 	 * @since n.e.x.t

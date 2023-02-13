@@ -35,15 +35,6 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	abstract protected function get_checks();
 
 	/**
-	 * Creates and returns the Check_Context for the plugin to check based on the request.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @return Check_Context The Check_Context for the plugin to check.
-	 */
-	abstract protected function get_context();
-
-	/**
 	 * Creates and returns an array of Check instances to run based on the request.
 	 *
 	 * @since n.e.x.t
@@ -63,7 +54,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 */
 	public function prepare() {
 		if ( $this->requires_universal_preparations( $this->get_checks_to_run() ) ) {
-			$preparation = new Universal_Runtime_Preparation( $this->get_context() );
+			$preparation = new Universal_Runtime_Preparation( $this->get_checks()->context() );
 			return $preparation->prepare();
 		}
 
