@@ -144,4 +144,22 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 
 		return array_values( $shared_preparations );
 	}
+
+	/**
+	 * Returns the Check instances to run.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array An array of Check instances.
+	 */
+	protected function get_checks_to_run() {
+		$check_slugs = $this->get_check_slugs_to_run();
+		$all_checks  = $this->get_checks_instance()->get_checks();
+
+		if ( empty( $checks ) ) {
+			return $all_checks;
+		}
+
+		return array_intersect_key( $all_checks, array_flip( $check_slugs ) );
+	}
 }
