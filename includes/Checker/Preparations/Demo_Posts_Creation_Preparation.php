@@ -21,7 +21,7 @@ class Demo_Posts_Creation_Preparation implements Preparation {
 	 * An array of posts data to create.
 	 *
 	 * @since n.e.x.t
-	 * @var arrat
+	 * @var array
 	 */
 	protected $posts;
 
