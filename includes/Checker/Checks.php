@@ -49,7 +49,7 @@ class Checks {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return Check_Context
+	 * @return Check_Context The plugin context that is being checked.
 	 */
 	public function context() {
 		return $this->check_context;
@@ -130,7 +130,7 @@ class Checks {
 		if ( ! isset( $this->checks ) ) {
 			// TODO: Add checks once implemented.
 			$checks = array(
-				'i18n-usage' => new Checks\I18n_Usage_Check(),
+				'i18n_usage' => new Checks\I18n_Usage_Check(),
 			);
 
 			/**

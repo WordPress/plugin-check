@@ -113,12 +113,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @since n.e.x.t
 	 *
 	 * @param array $checks An array of Check instances to run.
-	 * @return array {
-	 *      An array of Preparations to run where each item is an array with the class name and args.
-	 *
-	 *      @type string $class The full class name of the Preparation.
-	 *      @type array  $args  An array of parameters to pass to the class constructor.
-	 * }
+	 * @return array An array of Preparations to run where each item is an array with keys `class` and `args`.
 	 */
 	private function get_shared_preparations( array $checks ) {
 		$shared_preparations = array();
@@ -150,7 +145,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return array An array of Check instances.
+	 * @return array An array map of check slugs to Check instances.
 	 */
 	protected function get_checks_to_run() {
 		$check_slugs = $this->get_check_slugs_to_run();

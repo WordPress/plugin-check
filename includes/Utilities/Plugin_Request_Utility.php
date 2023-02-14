@@ -28,7 +28,7 @@ class Plugin_Request_Utility {
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 
 		if ( empty( $plugin_slug ) ) {
-			throw new Exception( 'Missing positional argument. Please provide the plugin slug as first positional argument.' );
+			throw new Exception( 'Invalid plugin slug: Plugin slug must not be empty.' );
 		}
 
 		$plugins = get_plugins();
@@ -41,7 +41,7 @@ class Plugin_Request_Utility {
 		if ( strpos( $plugin_slug, '/' ) ) {
 			throw new Exception(
 				sprintf(
-					'Invalid positional argument. Plugin with basename %s is not installed.',
+					'Invalid plugin basename: Plugin with basename %s is not installed.',
 					$plugin_slug
 				)
 			);
@@ -55,7 +55,7 @@ class Plugin_Request_Utility {
 
 		throw new Exception(
 			sprintf(
-				'Invalid positional argument. Plugin with slug %s is not installed.',
+				'Invalid plugin slug: Plugin with slug %s is not installed.',
 				$plugin_slug
 			)
 		);
