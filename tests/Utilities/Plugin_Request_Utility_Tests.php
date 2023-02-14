@@ -17,14 +17,14 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 
 	public function test_get_plugin_basename_from_input_with_empty_input() {
 		$this->expectException( 'Exception' );
-		$this->expectExceptionMessage( 'Missing positional argument. Please provide the plugin slug as first positional argument.' );
+		$this->expectExceptionMessage( 'Invalid plugin slug: Plugin slug must not be empty.' );
 
 		Plugin_Request_Utility::get_plugin_basename_from_input( '' );
 	}
 
 	public function test_get_plugin_basename_from_input_with_invalid_input() {
 		$this->expectException( 'Exception' );
-		$this->expectExceptionMessage( 'Invalid positional argument. Plugin with slug invalid is not installed.' );
+		$this->expectExceptionMessage( 'Invalid plugin slug: Plugin with slug invalid is not installed.' );
 
 		Plugin_Request_Utility::get_plugin_basename_from_input( 'invalid' );
 	}
