@@ -30,7 +30,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return Checks An instances of the Checks class.
+	 * @return Checks An instance of the Checks class.
 	 */
 	abstract protected function get_checks_instance();
 

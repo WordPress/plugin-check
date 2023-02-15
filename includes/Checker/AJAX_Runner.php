@@ -18,7 +18,7 @@ use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 class AJAX_Runner extends Abstract_Check_Runner {
 
 	/**
-	 * An instances of the Checks class.
+	 * An instance of the Checks class.
 	 *
 	 * @since n.e.x.t
 	 * @var Checks
@@ -45,11 +45,11 @@ class AJAX_Runner extends Abstract_Check_Runner {
 	}
 
 	/**
-	 * Retruns an instance of the Checks class.
+	 * Creates and returns an instance of the Checks class based on the request.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return Checks An instances of the Checks class.
+	 * @return Checks An instance of the Checks class.
 	 *
 	 * @throws Exception Thrown if the plugin main file cannot be found based on the AJAX input.
 	 */
@@ -69,7 +69,7 @@ class AJAX_Runner extends Abstract_Check_Runner {
 	}
 
 	/**
-	 * Returns an array of Check slugs to run.
+	 * Returns an array of Check slugs to run based on the request.
 	 *
 	 * @since n.e.x.t
 	 *
