@@ -29,7 +29,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return bool
+	 * @return bool Returns true if is an CLI request for the plugin check else false.
 	 */
 	public function is_plugin_check() {
 		if ( empty( $_SERVER['argv'] ) || 3 > count( $_SERVER['argv'] ) ) {
@@ -52,7 +52,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return Checks
+	 * @return Checks An instances of the Checks class.
 	 *
 	 * @throws Exception Thrown if the plugin main file cannot be found based on the CLI input.
 	 */
@@ -69,11 +69,11 @@ class CLI_Runner extends Abstract_Check_Runner {
 	}
 
 	/**
-	 * Returns an array of Check instances to run.
+	 * Returns an array of Check slugs to run.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return array An array of Check instances to run.
+	 * @return array An array of Check slugs to run.
 	 */
 	protected function get_check_slugs_to_run() {
 		$checks = array();

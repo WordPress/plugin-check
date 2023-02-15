@@ -12,9 +12,8 @@ class AJAX_Runner_Tests extends WP_UnitTestCase {
 
 	public function test_is_plugin_check_returns_true() {
 		// Mock the AJAX request.
-		$_SERVER['REQUEST_URI'] = '/admin-ajax.php?action=plugin_check_run_checks';
-		$_REQUEST['action']     = 'plugin_check_run_checks';
-		$_REQUEST['_wpnonce']   = wp_create_nonce( 'plugin_check_run_checks' );
+		add_filter( 'wp_doing_ajax', '__return_true' );
+		$_REQUEST['action'] = 'plugin_check_run_checks';
 
 		$runner = new AJAX_Runner();
 
@@ -22,17 +21,20 @@ class AJAX_Runner_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_is_plugin_check_returns_false() {
+		// Mock the AJAX request.
+		add_filter( 'wp_doing_ajax', '__return_true' );
+		$_REQUEST['action'] = 'a_different_ajax_request';
+
 		$runner = new AJAX_Runner();
 
 		$this->assertFalse( $runner->is_plugin_check() );
 	}
 
 	public function test_prepare_with_runtime_check() {
-		$_SERVER['REQUEST_URI'] = '/admin-ajax.php?action=plugin_check_run_checks';
-		$_REQUEST['action']     = 'plugin_check_run_checks';
-		$_REQUEST['_wpnonce']   = wp_create_nonce( 'plugin_check_run_checks' );
-		$_REQUEST['plugin']     = 'plugin-check';
-		$_REQUEST['checks']     = 'runtime_check';
+		add_filter( 'wp_doing_ajax', '__return_true' );
+		$_REQUEST['action'] = 'plugin_check_run_checks';
+		$_REQUEST['plugin'] = 'plugin-check';
+		$_REQUEST['checks'] = 'runtime_check';
 
 		add_filter(
 			'wp_plugin_check_checks',
@@ -61,11 +63,10 @@ class AJAX_Runner_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_prepare_with_static_check() {
-		$_SERVER['REQUEST_URI'] = '/admin-ajax.php?action=plugin_check_run_checks';
-		$_REQUEST['action']     = 'plugin_check_run_checks';
-		$_REQUEST['_wpnonce']   = wp_create_nonce( 'plugin_check_run_checks' );
-		$_REQUEST['plugin']     = 'plugin-check';
-		$_REQUEST['checks']     = 'empty_check';
+		add_filter( 'wp_doing_ajax', '__return_true' );
+		$_REQUEST['action'] = 'plugin_check_run_checks';
+		$_REQUEST['plugin'] = 'plugin-check';
+		$_REQUEST['checks'] = 'empty_check';
 
 		add_filter(
 			'wp_plugin_check_checks',
@@ -94,11 +95,10 @@ class AJAX_Runner_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_run() {
-		$_SERVER['REQUEST_URI'] = '/admin-ajax.php?action=plugin_check_run_checks';
-		$_REQUEST['action']     = 'plugin_check_run_checks';
-		$_REQUEST['_wpnonce']   = wp_create_nonce( 'plugin_check_run_checks' );
-		$_REQUEST['plugin']     = 'plugin-check';
-		$_REQUEST['checks']     = 'empty_check';
+		add_filter( 'wp_doing_ajax', '__return_true' );
+		$_REQUEST['action'] = 'plugin_check_run_checks';
+		$_REQUEST['plugin'] = 'plugin-check';
+		$_REQUEST['checks'] = 'empty_check';
 
 		add_filter(
 			'wp_plugin_check_checks',
@@ -119,11 +119,10 @@ class AJAX_Runner_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_run_with_errors() {
-		$_SERVER['REQUEST_URI'] = '/admin-ajax.php?action=plugin_check_run_checks';
-		$_REQUEST['action']     = 'plugin_check_run_checks';
-		$_REQUEST['_wpnonce']   = wp_create_nonce( 'plugin_check_run_checks' );
-		$_REQUEST['plugin']     = 'plugin-check';
-		$_REQUEST['checks']     = 'error_check';
+		add_filter( 'wp_doing_ajax', '__return_true' );
+		$_REQUEST['action'] = 'plugin_check_run_checks';
+		$_REQUEST['plugin'] = 'plugin-check';
+		$_REQUEST['checks'] = 'error_check';
 
 		add_filter(
 			'wp_plugin_check_checks',

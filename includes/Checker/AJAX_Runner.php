@@ -7,6 +7,7 @@
 
 namespace WordPress\Plugin_Check\Checker;
 
+use Exception;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 
 /**
@@ -29,18 +30,14 @@ class AJAX_Runner extends Abstract_Check_Runner {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return bool
+	 * @return bool Returns true if is an AJAX request for the plugin check else false.
 	 */
 	public function is_plugin_check() {
-		if ( 0 !== strpos( $_SERVER['REQUEST_URI'], '/admin-ajax.php' ) ) {
+		if ( ! wp_doing_ajax() ) {
 			return false;
 		}
 
 		if ( ! isset( $_REQUEST['action'] ) || 'plugin_check_run_checks' !== $_REQUEST['action'] ) {
-			return false;
-		}
-
-		if ( ! check_ajax_referer( 'plugin_check_run_checks' ) ) {
 			return false;
 		}
 
@@ -52,15 +49,18 @@ class AJAX_Runner extends Abstract_Check_Runner {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return Checks
+	 * @return Checks An instances of the Checks class.
 	 *
 	 * @throws Exception Thrown if the plugin main file cannot be found based on the AJAX input.
 	 */
 	protected function get_checks_instance() {
 		if ( ! isset( $this->checks ) ) {
+			if ( ! isset( $_REQUEST['plugin'] ) ) {
+				throw new Exception( 'Invalid plugin slug: Plugin slug must not be empty.' );
+			}
+
 			// Get the plugin name from the AJAX request.
-			$plugin_slug = isset( $_REQUEST['plugin'] ) ? $_REQUEST['plugin'] : '';
-			$plugin_file = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin_slug );
+			$plugin_file = Plugin_Request_Utility::get_plugin_basename_from_input( $_REQUEST['plugin'] );
 
 			$this->checks = new Checks( WP_PLUGIN_DIR . '/' . $plugin_file );
 		}
@@ -69,18 +69,18 @@ class AJAX_Runner extends Abstract_Check_Runner {
 	}
 
 	/**
-	 * Returns an array of Check instances to run.
+	 * Returns an array of Check slugs to run.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return array An array of Check instances to run.
+	 * @return array An array of Check slugs to run.
 	 */
 	protected function get_check_slugs_to_run() {
 		$checks = array();
 
 		if ( isset( $_REQUEST['checks'] ) ) {
 			// Checks are passed as a comma separated string.
-			$checks = explode( ',', $_REQUEST['checks'] );
+			$checks = wp_parse_list( $_REQUEST['checks'] );
 		}
 
 		return $checks;
