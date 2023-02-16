@@ -30,6 +30,15 @@ class AJAX_Runner_Tests extends WP_UnitTestCase {
 		$this->assertFalse( $runner->is_plugin_check() );
 	}
 
+	public function test_is_plugin_check_returns_false_not_ajax() {
+		// Mock the AJAX request.
+		add_filter( 'wp_doing_ajax', '__return_false' );
+
+		$runner = new AJAX_Runner();
+
+		$this->assertFalse( $runner->is_plugin_check() );
+	}
+
 	public function test_prepare_with_runtime_check() {
 		add_filter( 'wp_doing_ajax', '__return_true' );
 		$_REQUEST['action'] = 'plugin_check_run_checks';
