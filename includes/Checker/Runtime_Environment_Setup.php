@@ -27,7 +27,7 @@ class Runtime_Environment_Setup {
 		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 
 		// Set the new prefix.
-		$wpdb->set_prefix( 'wppc_' );
+		$prefix = $wpdb->set_prefix( 'wppc_' );
 
 		// Create and populate the test database tables if they do not exist.
 		if ( 'wppc_posts' !== $wpdb->get_var( "SHOW TABLES LIKE 'wppc_posts'" ) ) {
@@ -38,6 +38,8 @@ class Runtime_Environment_Setup {
 				false
 			);
 		}
+
+		$wpdb->set_prefix( $prefix );
 
 		// Create the object-cache.php file.
 		if ( $wp_filesystem || WP_Filesystem() ) {
