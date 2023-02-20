@@ -18,6 +18,14 @@ use Exception;
 class Checks {
 
 	/**
+	 * Array of all available Checks.
+	 *
+	 * @since n.e.x.t
+	 * @var array
+	 */
+	protected $checks;
+
+	/**
 	 * Context for the plugin to check.
 	 *
 	 * @since n.e.x.t
@@ -34,6 +42,17 @@ class Checks {
 	 */
 	public function __construct( $plugin_main_file ) {
 		$this->check_context = new Check_Context( $plugin_main_file );
+	}
+
+	/**
+	 * Returns the Check Context.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return Check_Context The plugin context that is being checked.
+	 */
+	public function context() {
+		return $this->check_context;
 	}
 
 	/**
@@ -105,19 +124,25 @@ class Checks {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return array List of plugin check class instances implementing the Check interface.
+	 * @return array An array map of check slugs to Check instances.
 	 */
 	public function get_checks() {
-		// TODO: Add checks once implemented.
-		$checks = array();
+		if ( ! isset( $this->checks ) ) {
+			// TODO: Add checks once implemented.
+			$checks = array(
+				'i18n_usage' => new Checks\I18n_Usage_Check(),
+			);
 
-		/**
-		 * Filters the available plugin check classes.
-		 *
-		 * @since n.e.x.t
-		 *
-		 * @param array $checks List of plugin check class instances implementing the Check interface.
-		 */
-		return apply_filters( 'wp_plugin_check_checks', $checks );
+			/**
+			 * Filters the available plugin check classes.
+			 *
+			 * @since n.e.x.t
+			 *
+			 * @param array $checks An array map of check slugs to Check instances.
+			 */
+			$this->checks = apply_filters( 'wp_plugin_check_checks', $checks );
+		}
+
+		return $this->checks;
 	}
 }
