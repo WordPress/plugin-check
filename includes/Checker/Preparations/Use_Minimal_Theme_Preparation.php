@@ -71,7 +71,7 @@ class Use_Minimal_Theme_Preparation implements Preparation {
 		add_filter( 'pre_option_template_root', array( $this, 'get_theme_root' ) );
 		add_filter( 'pre_option_stylesheet_root', array( $this, 'get_theme_root' ) );
 
-		// Register the custom themes directory if relevant.
+		// Registers the custom themes directory if relevant.
 		if ( ! empty( $this->themes_dir ) ) {
 			register_theme_directory( $this->themes_dir );
 
