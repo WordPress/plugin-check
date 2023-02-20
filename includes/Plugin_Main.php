@@ -53,7 +53,7 @@ class Plugin_Main {
 	 * @since n.e.x.t
 	 */
 	public function add_hooks() {
-		// @TODO: Update to registers CLI command to WordPress as part of issue #30
+		// @TODO: Update to register CLI command to WordPress as part of issue #30
 
 		$admin_page = new Admin_Page();
 		$admin_page->add_hooks();
