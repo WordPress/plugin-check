@@ -15,17 +15,23 @@ namespace WordPress\Plugin_Check\Admin;
 class Admin_Page {
 
 	/**
-	 * Initialize hooks.
+	 * Initializes hooks.
 	 */
 	public function add_hooks() {
 		add_action( 'admin_menu', array( $this, 'add_page' ) );
 	}
 
 	/**
-	 * Register the admin page under the tools menu.
+	 * Registers the admin page under the tools menu.
 	 */
 	public function add_page() {
-		add_management_page( __( 'Plugin Check', 'plugin-check' ), __( 'Plugin Check', 'plugin-check' ), 'activate_plugins', 'plugin-check', array( $this, 'render_page' ) );
+		add_management_page(
+			__( 'Plugin Check', 'plugin-check' ),
+			__( 'Plugin Check', 'plugin-check' ),
+			'activate_plugins',
+			'plugin-check',
+			array( $this, 'render_page' )
+		);
 	}
 
 	/**
@@ -33,7 +39,7 @@ class Admin_Page {
 	 *
 	 * @return array List of plugins.
 	 */
-	public function get_available_plugins() {
+	private function get_available_plugins() {
 
 		$available_plugins = get_plugins();
 

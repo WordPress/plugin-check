@@ -30,6 +30,7 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 		$current_screen = get_current_screen();
 
 		$admin_user = self::factory()->user->create( array( 'role' => 'administrator' ) );
+
 		wp_set_current_user( $admin_user );
 		set_current_screen( 'dashboard' );
 
@@ -41,7 +42,7 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 		set_current_screen( $current_screen );
 	}
 
-	public function test_get_plugins() {
+	public function test_render_page() {
 		$available_plugins      = get_plugins();
 		$plugin_check_base_name = plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE );
 
@@ -49,6 +50,15 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 			unset( $available_plugins[ $plugin_check_base_name ] );
 		}
 
-		$this->assertEquals( $available_plugins, $this->admin_page->get_available_plugins() );
+		ob_start();
+		$this->admin_page->render_page();
+		$output = ob_get_contents();
+		ob_end_clean();
+
+		$this->assertStringContainsString( 'Check the Plugin', $output );
+		$this->assertStringContainsString( ' id="plugin-check__plugins"', $output );
+		$this->assertStringContainsString( ' name="plugin_check_plugins"', $output );
+		$this->assertStringContainsString( 'Select Plugin', $output );
+		$this->assertStringNotContainsString( ' name="Check it!"', $output );
 	}
 }
