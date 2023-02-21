@@ -31,6 +31,10 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 
 		$admin_user = self::factory()->user->create( array( 'role' => 'administrator' ) );
 
+		if ( is_multisite() ) {
+			grant_super_admin( $admin_user );
+		}
+
 		wp_set_current_user( $admin_user );
 		set_current_screen( 'dashboard' );
 
