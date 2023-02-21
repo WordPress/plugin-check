@@ -10,6 +10,14 @@ use WordPress\Plugin_Check\Checker\Check_Result;
 
 class AJAX_Runner_Tests extends WP_UnitTestCase {
 
+	public function tear_down() {
+		// Force reset the database prefix after runner prepare method called.
+		global $wpdb;
+		$wpdb->set_prefix( 'wp_' );
+
+		parent::tear_down();
+	}
+
 	public function test_is_plugin_check_returns_true() {
 		// Mock the AJAX request.
 		add_filter( 'wp_doing_ajax', '__return_true' );

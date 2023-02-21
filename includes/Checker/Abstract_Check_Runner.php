@@ -55,7 +55,17 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	public function prepare() {
 		if ( $this->requires_universal_preparations( $this->get_checks_to_run() ) ) {
 			$preparation = new Universal_Runtime_Preparation( $this->get_checks_instance()->context() );
-			return $preparation->prepare();
+			$cleanup     = $preparation->prepare();
+
+			// Set the database prefix to use the demo tables.
+			global $wpdb;
+			$old_prefix = $wpdb->set_prefix( 'wppc_' );
+
+			return function() use ( $old_prefix, $cleanup ) {
+				global $wpdb;
+				$wpdb->set_prefix( $old_prefix );
+				$cleanup();
+			};
 		}
 
 		return function() {};
