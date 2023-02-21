@@ -19,24 +19,14 @@
  * This file respects any real object cache implementation the site may already
  * be using, and it is implemented in a way that there is no risk for breakage.
  *
- * If you do not want the Plugin Check plugin to place this file and thus be
- * limited to static checks, you can remove this file and set the following
- * constant (e.g. in wp-config.php):
- *
- *     define( 'WP_PLUGIN_CHECK_DISABLE_OBJECT_CACHE_DROPIN', true );
- *
  * @package plugin-check
  * @since n.e.x.t
  */
 
 // Set constant to be able to later check for whether this file was loaded.
-define( 'WP_PLUGIN_CHECK_PERFLAB_OBJECT_CACHE_DROPIN_VERSION', 1 );
+define( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION', 1 );
 
 function plugin_check_initialize_runner() {
-	if ( defined( 'WP_PLUGIN_CHECK_DISABLE_OBJECT_CACHE_DROPIN' ) && WP_PLUGIN_CHECK_DISABLE_OBJECT_CACHE_DROPIN ) {
-		return;
-	}
-
 	$plugins_dir = defined( 'WP_PLUGIN_DIR' ) ? WP_PLUGIN_DIR : WP_CONTENT_DIR . '/plugins';
 	$plugin_dir  = $plugins_dir . '/plugin-check/';
 	if ( ! file_exists( $plugin_dir . 'vendor/autoload.php' ) ) {
@@ -48,8 +38,6 @@ function plugin_check_initialize_runner() {
 	if ( class_exists( 'WordPress\Plugin_Check\Utilities\Plugin_Request_Utility' ) ) {
 		// Initialize the Check Runner class based on the request.
 		WordPress\Plugin_Check\Utilities\Plugin_Request_Utility::initialize_runner();
-
-		var_dump('initialize!');
 	}
 }
 plugin_check_initialize_runner();

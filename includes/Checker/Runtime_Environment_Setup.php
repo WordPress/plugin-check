@@ -18,8 +18,6 @@ class Runtime_Environment_Setup {
 	 * Sets up the WordPress environment for runtime checks
 	 *
 	 * @since n.e.x.t
-	 *
-	 * @return void
 	 */
 	public function setup() {
 		global $wpdb, $wp_filesystem;
@@ -27,7 +25,7 @@ class Runtime_Environment_Setup {
 		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 
 		// Set the new prefix.
-		$prefix = $wpdb->set_prefix( 'wppc_' );
+		$old_prefix = $wpdb->set_prefix( 'wppc_' );
 
 		// Create and populate the test database tables if they do not exist.
 		if ( 'wppc_posts' !== $wpdb->get_var( "SHOW TABLES LIKE 'wppc_posts'" ) ) {
@@ -39,7 +37,13 @@ class Runtime_Environment_Setup {
 			);
 		}
 
-		$wpdb->set_prefix( $prefix );
+		// Restore the old prefix.
+		$wpdb->set_prefix( $old_prefix );
+
+		// Return early if the plugin check object cache already exists.
+		if ( defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) && WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION ) {
+			return;
+		}
 
 		// Create the object-cache.php file.
 		if ( $wp_filesystem || WP_Filesystem() ) {
@@ -54,22 +58,26 @@ class Runtime_Environment_Setup {
 	 * Cleans up the runtime environment setup.
 	 *
 	 * @since n.e.x.t
-	 *
-	 * @return void
 	 */
 	public function cleanup() {
 		global $wpdb, $wp_filesystem;
 
 		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 
-		$prefix = $wpdb->set_prefix( 'wppc_' );
-		$tables = $wpdb->tables();
+		$old_prefix = $wpdb->set_prefix( 'wppc_' );
+		$tables     = $wpdb->tables();
 
 		foreach ( $tables as $table ) {
 			$wpdb->query( "DROP TABLE IF EXISTS `$table`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		}
 
-		$wpdb->set_prefix( $prefix );
+		// Restore the old prefix.
+		$wpdb->set_prefix( $old_prefix );
+
+		// Return early if the plugin check object cache does not exists.
+		if ( ! defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) || ! WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION ) {
+			return;
+		}
 
 		// Remove the object-cache.php file.
 		if ( $wp_filesystem || WP_Filesystem() ) {
