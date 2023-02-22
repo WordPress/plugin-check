@@ -40,19 +40,15 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 
 		$this->admin_page->add_page();
 
-		$this->assertArrayHasKey( 'plugin-check', $_parent_pages );
-		$this->assertEquals( 'tools.php', $_parent_pages['plugin-check'] );
+		$parent_pages = $_parent_pages;
 
 		set_current_screen( $current_screen );
+
+		$this->assertArrayHasKey( 'plugin-check', $parent_pages );
+		$this->assertEquals( 'tools.php', $parent_pages['plugin-check'] );
 	}
 
 	public function test_render_page() {
-		$available_plugins      = get_plugins();
-		$plugin_check_base_name = plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE );
-
-		if ( isset( $available_plugins[ $plugin_check_base_name ] ) ) {
-			unset( $available_plugins[ $plugin_check_base_name ] );
-		}
 
 		ob_start();
 		$this->admin_page->render_page();
@@ -63,6 +59,8 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 		$this->assertStringContainsString( ' id="plugin-check__plugins"', $output );
 		$this->assertStringContainsString( ' name="plugin_check_plugins"', $output );
 		$this->assertStringContainsString( 'Select Plugin', $output );
-		$this->assertStringNotContainsString( ' name="Check it!"', $output );
+		$this->assertStringContainsString( ' type="submit"', $output );
+		$this->assertStringContainsString( ' value="Check it!"', $output );
+		$this->assertStringNotContainsString( plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE ), $output );
 	}
 }
