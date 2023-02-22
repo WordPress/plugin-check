@@ -39,17 +39,41 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	 * @throws Exception Thrown when preparation fails.
 	 */
 	public function prepare() {
-
 		$orig_scripts = isset( $GLOBALS['wp_scripts'] ) ? $GLOBALS['wp_scripts'] : null;
 
 		return function() use ( $orig_scripts ) {
-
 			$GLOBALS['wp_scripts'] = $orig_scripts;
 		};
 	}
 
+	/**
+	 * Returns an array of shared preparations for the check.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array Returns a map of $class_name => $constructor_args pairs. If the class does not
+	 *               need any constructor arguments, it would just be an empty array.
+	 */
 	public function get_shared_preparations() {
-		// TODO: Implement get_shared_preparations() method.
+		$demo_posts = array_map(
+			function( $post_type ) {
+				if ( is_post_type_viewable( $post_type ) ) {
+					return array(
+						'post_title'   => "Demo {$post_type} post",
+						'post_content' => 'Test content',
+						'post_type'    => $post_type,
+						'post_status'  => 'publish',
+					);
+				}
+
+				return null;
+			},
+			get_post_types( array(), 'objects' )
+		);
+
+		return array(
+			'WordPress\Plugin_Check\Checker\Preparations\Demo_Post_Creation_Preparation' => array_filter( $demo_posts ),
+		);
 	}
 
 	/**
@@ -60,7 +84,6 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	 * @return array List of URL strings (either full URLs or paths).
 	 */
 	protected function get_urls() {
-
 		$urls = array( home_url() );
 
 		$viewable_post_types = array_filter(
@@ -102,7 +125,6 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	 *                   the check).
 	 */
 	protected function check_url( Check_Result $result, $url ) {
-
 		// Reset the WP_Scripts instance.
 		unset( $GLOBALS['wp_scripts'] );
 
