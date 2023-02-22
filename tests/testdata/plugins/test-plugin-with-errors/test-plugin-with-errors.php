@@ -16,3 +16,4 @@
  */
 
 include_once 'i18-usage-error-file.php';
+include_once 'enqueued-scripts-size-check.php';
