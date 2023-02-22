@@ -7,8 +7,6 @@
 
 namespace WordPress\Plugin_Check\Traits;
 
-use WordPress\Plugin_Check\Checker\Check_Result;
-
 trait URL_Aware {
 
 	/**
@@ -69,8 +67,8 @@ trait URL_Aware {
 	/**
 	 * Simulate all the urls like WP and run the cleanup function.
 	 *
-	 * @param array    $urls     List of urls.
-	 * @param callable $callback Callback.
+	 * @param array    $urls     An array of URLs to run.
+	 * @param callable $callback Callback function to run for each URL.
 	 *
 	 * @return void
 	 */
@@ -78,9 +76,8 @@ trait URL_Aware {
 		if ( ! empty( $urls ) ) {
 			foreach ( $urls as $url ) {
 				$this->go_to( $url );
+				$callback( $url );
 			}
 		}
-
-		$callback();
 	}
 }

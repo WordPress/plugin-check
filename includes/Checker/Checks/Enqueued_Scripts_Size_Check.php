@@ -57,22 +57,32 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	public function get_shared_preparations() {
 		$demo_posts = array_map(
 			function( $post_type ) {
-				if ( is_post_type_viewable( $post_type ) ) {
-					return array(
-						'post_title'   => "Demo {$post_type} post",
-						'post_content' => 'Test content',
-						'post_type'    => $post_type,
-						'post_status'  => 'publish',
-					);
-				}
-
-				return null;
+				return array(
+					'post_title'   => "Demo {$post_type} post",
+					'post_content' => 'Test content',
+					'post_type'    => $post_type,
+					'post_status'  => 'publish',
+				);
 			},
-			get_post_types( array(), 'objects' )
+			$this->get_viewable_post_types()
 		);
 
 		return array(
-			'WordPress\Plugin_Check\Checker\Preparations\Demo_Post_Creation_Preparation' => array_filter( $demo_posts ),
+			'WordPress\Plugin_Check\Checker\Preparations\Demo_Posts_Creation_Preparation' => array( $demo_posts ),
+		);
+	}
+
+	/**
+	 * Runs the check on the plugin and amends results.
+	 *
+	 * @param Check_Result $result The check results to amend and the plugin context.
+	 */
+	public function run( Check_Result $result ) {
+		$this->run_for_urls(
+			$this->get_urls(),
+			function ( $url ) use ( $result ) {
+				$this->check_url( $result, $url );
+			}
 		);
 	}
 
@@ -86,18 +96,11 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	protected function get_urls() {
 		$urls = array( home_url() );
 
-		$viewable_post_types = array_filter(
-			get_post_types( array(), 'objects' ),
-			function( $post_type ) {
-				return is_post_type_viewable( $post_type );
-			}
-		);
-
-		foreach ( $viewable_post_types as $post_type ) {
+		foreach ( $this->get_viewable_post_types() as $post_type ) {
 			$posts = get_posts(
 				array(
 					'posts_per_page' => 1,
-					'post_type'      => $post_type->name,
+					'post_type'      => $post_type,
 					'post_status'    => 'publish',
 				)
 			);
@@ -109,8 +112,18 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 		return $urls;
 	}
 
-	public function run( Check_Result $result ) {
-		// TODO: Implement run() method.
+	/**
+	 * Returns an array of viewable post type names.
+	 *
+	 * @return array An array of post type names.
+	 */
+	protected function get_viewable_post_types() {
+		return array_filter(
+			get_post_types(),
+			function( $post_type ) {
+				return is_post_type_viewable( $post_type );
+			}
+		);
 	}
 
 	/**
