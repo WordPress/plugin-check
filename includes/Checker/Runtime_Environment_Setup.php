@@ -74,7 +74,7 @@ class Runtime_Environment_Setup {
 		// Restore the old prefix.
 		$wpdb->set_prefix( $old_prefix );
 
-		// Return early if the plugin check object cache does not exists.
+		// Return early if the plugin check object cache does not exist.
 		if ( ! defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) || ! WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION ) {
 			return;
 		}

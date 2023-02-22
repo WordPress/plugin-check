@@ -12,9 +12,8 @@ class CLI_Runner_Tests extends WP_UnitTestCase {
 
 	public function tear_down() {
 		// Force reset the database prefix after runner prepare method called.
-		global $wpdb;
-		$wpdb->set_prefix( 'wp_' );
-
+		global $wpdb, $table_prefix;
+		$wpdb->set_prefix( $table_prefix );
 		parent::tear_down();
 	}
 
