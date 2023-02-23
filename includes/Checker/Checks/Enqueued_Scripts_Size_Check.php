@@ -10,6 +10,7 @@ namespace WordPress\Plugin_Check\Checker\Checks;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\With_Shared_Preparations;
 use WordPress\Plugin_Check\Traits\URL_Aware;
+use WordPress\Plugin_Check\Checker\Preparations\Demo_Posts_Creation_Preparation;
 use Exception;
 
 /**
@@ -24,15 +25,41 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	/**
 	 * Threshold for script size to surface a warning for.
 	 *
-	 * @since 1.0.0
+	 * @since n.e.x.t
 	 * @var int
 	 */
-	public $threshold_size = 300000;
+	private $threshold_size;
+
+	/**
+	 * List of viewable post types.
+	 *
+	 * @since n.e.x.t
+	 * @var array
+	 */
+	private $viewable_post_types;
+
+	/**
+	 * Set the threshold size for script sizes to surface warnings.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param integer $threshold_size The threshold in bytes for script size to surface warnings.
+	 */
+	public function __construct( $threshold_size = 300000 ) {
+		$this->threshold_size = $threshold_size;
+
+		$this->viewable_post_types = array_filter(
+			get_post_types(),
+			function( $post_type ) {
+				return is_post_type_viewable( $post_type );
+			}
+		);
+	}
 
 	/**
 	 * Runs this preparation step for the environment and returns a cleanup function.
 	 *
-	 * @since 1.0.0
+	 * @since n.e.x.t
 	 *
 	 * @return callable Cleanup function to revert any changes made here.
 	 *
@@ -46,7 +73,12 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 		$check->backup_globals();
 
 		return function() use ( $orig_scripts, $check ) {
-			$GLOBALS['wp_scripts'] = $orig_scripts;
+			if ( is_null( $orig_scripts ) ) {
+				unset( $GLOBALS['wp_scripts'] );
+			} else {
+				$GLOBALS['wp_scripts'] = $orig_scripts;
+			}
+
 			$check->restore_globals();
 		};
 	}
@@ -69,16 +101,18 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 					'post_status'  => 'publish',
 				);
 			},
-			$this->get_viewable_post_types()
+			$this->viewable_post_types
 		);
 
 		return array(
-			'WordPress\Plugin_Check\Checker\Preparations\Demo_Posts_Creation_Preparation' => array( $demo_posts ),
+			Demo_Posts_Creation_Preparation::class => array( $demo_posts ),
 		);
 	}
 
 	/**
 	 * Runs the check on the plugin and amends results.
+	 *
+	 * @since n.e.x.t
 	 *
 	 * @param Check_Result $result The check results to amend and the plugin context.
 	 */
@@ -94,14 +128,14 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	/**
 	 * Gets the list of URLs to run this check for.
 	 *
-	 * @since 1.0.0
+	 * @since n.e.x.t
 	 *
 	 * @return array List of URL strings (either full URLs or paths).
 	 */
 	protected function get_urls() {
 		$urls = array( home_url() );
 
-		foreach ( $this->get_viewable_post_types() as $post_type ) {
+		foreach ( $this->viewable_post_types as $post_type ) {
 			$posts = get_posts(
 				array(
 					'posts_per_page' => 1,
@@ -118,23 +152,9 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	}
 
 	/**
-	 * Returns an array of viewable post type names.
-	 *
-	 * @return array An array of post type names.
-	 */
-	protected function get_viewable_post_types() {
-		return array_filter(
-			get_post_types(),
-			function( $post_type ) {
-				return is_post_type_viewable( $post_type );
-			}
-		);
-	}
-
-	/**
 	 * Amends the given result by running the check for the given URL.
 	 *
-	 * @since 1.0.0
+	 * @since n.e.x.t
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 * @param string       $url    URL to run the check for.
@@ -169,6 +189,12 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 			// Get size of additional inline scripts.
 			if ( ! empty( $script->extra['after'] ) ) {
 				foreach ( $script->extra['after'] as $extra ) {
+					$script_size += ( is_string( $extra ) ) ? mb_strlen( $extra, '8bit' ) : 0;
+				}
+			}
+
+			if ( ! empty( $script->extra['before'] ) ) {
+				foreach ( $script->extra['before'] as $extra ) {
 					$script_size += ( is_string( $extra ) ) ? mb_strlen( $extra, '8bit' ) : 0;
 				}
 			}
