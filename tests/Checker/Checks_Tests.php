@@ -5,7 +5,6 @@
  * @package plugin-check
  */
 
-use Exception;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Checks;
 
