@@ -41,8 +41,13 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	public function prepare() {
 		$orig_scripts = isset( $GLOBALS['wp_scripts'] ) ? $GLOBALS['wp_scripts'] : null;
 
-		return function() use ( $orig_scripts ) {
+		// Backup the original values for the global state.
+		$check = $this;
+		$check->backup_globals();
+
+		return function() use ( $orig_scripts, $check ) {
 			$GLOBALS['wp_scripts'] = $orig_scripts;
+			$check->restore_globals();
 		};
 	}
 

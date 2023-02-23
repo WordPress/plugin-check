@@ -25,6 +25,30 @@ class Enqueued_Scripts_Size_Check_Tests extends WP_UnitTestCase {
 		}
 	}
 
+	public function test_prepare() {
+		// Create variables in global state.
+		$_GET['test_prepare']      = true;
+		$_POST['test_prepare']     = true;
+		$_SERVER['test_prepare']   = true;
+		$GLOBALS['current_screen'] = 'test_prepare';
+
+		$check   = new Enqueued_Scripts_Size_Check();
+		$cleanup = $check->prepare();
+
+		// Modify the variables in the global state.
+		$_GET['test_prepare']      = false;
+		$_POST['test_prepare']     = false;
+		$_SERVER['test_prepare']   = false;
+		$GLOBALS['current_screen'] = 'altered';
+
+		$cleanup();
+
+		$this->assertTrue( $_GET['test_prepare'] );
+		$this->assertTrue( $_POST['test_prepare'] );
+		$this->assertTrue( $_SERVER['test_prepare'] );
+		$this->assertSame( 'test_prepare', $GLOBALS['current_screen'] );
+	}
+
 	public function test_run_without_errors() {
 		$check         = new Enqueued_Scripts_Size_Check();
 		$check_context = new Check_Context( TESTS_PLUGIN_DIR . '/tests/testdata/plugins/test-plugin-without-errors/test-plugin-without-errors.php' );
