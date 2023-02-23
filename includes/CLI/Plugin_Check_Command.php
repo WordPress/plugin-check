@@ -7,6 +7,7 @@
 
 namespace WordPress\Plugin_Check\CLI;
 
+use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Plugin_Context;
 use Exception;
 
@@ -112,13 +113,46 @@ class Plugin_Check_Command {
 		$options          = $this->get_options( $assoc_args );
 		$plugin_base_file = $this->get_plugin_from_args( $args );
 
+		$cli_runner = new CLI_Runner();
+
 		try {
 
-			// TODO: Call `run()` method of the `CLI_Runner` class.
+			$result = $cli_runner->run();
 
 		} catch ( Exception $error ) {
 
 			\WP_CLI::error( $error->getMessage() );
+		}
+
+		// Get errors and warnings from the results.
+		$errors = array();
+		if ( empty( $assoc_args['ignore_errors'] ) ) {
+			$errors = $result->get_errors();
+		}
+		$warnings = array();
+		if ( empty( $assoc_args['ignore_warnings'] ) ) {
+			$warnings = $result->get_warnings();
+		}
+
+		// Get formatter.
+		$formatter = $this->get_formatter( $assoc_args );
+
+		// Print the formatted results.
+		// Go over all files with errors first and print them, combined with any warnings in the same file.
+		foreach ( $errors as $file_name => $file_errors ) {
+			$file_warnings = array();
+			if ( isset( $warnings[ $file_name ] ) ) {
+				$file_warnings = $warnings[ $file_name ];
+				unset( $warnings[ $file_name ] );
+			}
+			$file_results = $this->flatten_file_results( $file_errors, $file_warnings );
+			$this->display_results( $formatter, $file_name, $file_results );
+		}
+
+		// If there are any files left with only warnings, print those next.
+		foreach ( $warnings as $file_name => $file_warnings ) {
+			$file_results = $this->flatten_file_results( array(), $file_warnings );
+			$this->display_results( $formatter, $file_name, $file_results );
 		}
 	}
 
@@ -219,20 +253,103 @@ class Plugin_Check_Command {
 	}
 
 	/**
-	 * Get formatter class.
+	 * Gets the formatter instance to format check results.
 	 *
-	 * @param array $assoc_args List of the associative arguments.
+	 * @since 1.0.0
+	 *
+	 * @param array $assoc_args Associative arguments.
+	 * @return \WP_CLI\Formatter The formatter instance.
 	 */
 	protected function get_formatter( $assoc_args ) {
+
+		$default_fields = array(
+			'line',
+			'column',
+			'code',
+			'message',
+		);
+
+		// If both errors and warnings are included, display the type of each result too.
+		if ( empty( $assoc_args['ignore_errors'] ) && empty( $assoc_args['ignore_warnings'] ) ) {
+			$default_fields = array(
+				'line',
+				'column',
+				'type',
+				'code',
+				'message',
+			);
+		}
+
+		return new \WP_CLI\Formatter(
+			$assoc_args,
+			$default_fields
+		);
 	}
 
 	/**
-	 * Combining a files errors and warning into a single array and order them by file number.
+	 * Flattens and combines the given associative array of file errors and file warnings into a two-dimensional array.
 	 *
-	 * @param array $file_errors   List of errors.
-	 * @param array $file_warnings List of warnings.
+	 * @since 1.0.0
+	 *
+	 * @param array $file_errors   Errors from a Check_Result, for a specific file.
+	 * @param array $file_warnings Warnings from a Check_Result, for a specific file.
+	 * @return array Combined file results.
 	 */
 	protected function flatten_file_results( $file_errors, $file_warnings ) {
+		$file_results = array();
+
+		foreach ( $file_errors as $line => $line_errors ) {
+			foreach ( $line_errors as $column => $column_errors ) {
+				foreach ( $column_errors as $column_error ) {
+
+					$file_results[] = array_merge(
+						$column_error,
+						array(
+							'type'   => 'ERROR',
+							'line'   => $line,
+							'column' => $column,
+						)
+					);
+				}
+			}
+		}
+
+		foreach ( $file_warnings as $line => $line_warnings ) {
+			foreach ( $line_warnings as $column => $column_warnings ) {
+				foreach ( $column_warnings as $column_warning ) {
+
+					$file_results[] = array_merge(
+						$column_warning,
+						array(
+							'type'   => 'WARNING',
+							'line'   => $line,
+							'column' => $column,
+						)
+					);
+				}
+			}
+		}
+
+		usort(
+			$file_results,
+			function( $a, $b ) {
+				if ( $a['line'] < $b['line'] ) {
+					return -1;
+				}
+				if ( $a['line'] > $b['line'] ) {
+					return 1;
+				}
+				if ( $a['column'] < $b['column'] ) {
+					return -1;
+				}
+				if ( $a['column'] > $b['column'] ) {
+					return 1;
+				}
+				return 0;
+			}
+		);
+
+		return $file_results;
 	}
 
 	/**
@@ -243,6 +360,17 @@ class Plugin_Check_Command {
 	 * @param array             $file_results Results.
 	 */
 	protected function display_results( $formatter, $file_name, $file_results ) {
+		\WP_CLI::line(
+			sprintf(
+				'FILE: %s',
+				$file_name
+			)
+		);
+
+		$formatter->display_items( $file_results );
+
+		\WP_CLI::line();
+		\WP_CLI::line();
 	}
 
 	/**
