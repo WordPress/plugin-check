@@ -72,8 +72,9 @@ abstract class Runtime_Check_UnitTestCase extends WP_UnitTestCase {
 	 * @return Check_Result An object containing all check results.
 	 */
 	public function run_check( Check $check, Check_Context $context ) {
+		$results = new Check_Result( $context );
 		$cleanup = $this->prepare_environment( $check, $context );
-		$results = $check->run( new Check_Result( $context ) );
+		$check->run( $results );
 		$cleanup();
 
 		return $results;

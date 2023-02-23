@@ -5,13 +5,11 @@
  * @package plugin-check
  */
 
-use WordPress\Plugin_Check\Checker\Checks\Enqueued_Scripts_Size_Check;
-use WordPress\Plugin_Check\Checker\Preparations\Universal_Runtime_Preparation;
-use WordPress\Plugin_Check\Checker\Check_Context;
-use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Preparation;
+use WordPress\Plugin_Check\Checker\Checks\Enqueued_Scripts_Size_Check;
+use WordPress\Plugin_Check\Tests\TestCase\Runtime_Check_UnitTestCase;
 
-class Enqueued_Scripts_Size_Check_Tests extends WP_UnitTestCase {
+class Enqueued_Scripts_Size_Check_Tests extends Runtime_Check_UnitTestCase {
 
 	public function test_get_shared_preparations() {
 		$check        = new Enqueued_Scripts_Size_Check();
@@ -30,6 +28,8 @@ class Enqueued_Scripts_Size_Check_Tests extends WP_UnitTestCase {
 		$_GET['test_prepare']      = true;
 		$_POST['test_prepare']     = true;
 		$_SERVER['test_prepare']   = true;
+
+		$current_screen            = $GLOBALS['current_screen'];
 		$GLOBALS['current_screen'] = 'test_prepare';
 
 		$check   = new Enqueued_Scripts_Size_Check();
@@ -43,81 +43,76 @@ class Enqueued_Scripts_Size_Check_Tests extends WP_UnitTestCase {
 
 		$cleanup();
 
-		$this->assertTrue( $_GET['test_prepare'] );
-		$this->assertTrue( $_POST['test_prepare'] );
-		$this->assertTrue( $_SERVER['test_prepare'] );
-		$this->assertSame( 'test_prepare', $GLOBALS['current_screen'] );
+		$test_get     = $_GET['test_prepare'];
+		$test_post    = $_POST['test_prepare'];
+		$test_server  = $_SERVER['test_prepare'];
+		$test_globals = $GLOBALS['current_screen'];
+
+		// Restore the global state.
+		unset( $_GET['test_prepare'] );
+		unset( $_POST['test_prepare'] );
+		unset( $_SERVER['test_prepare'] );
+		$GLOBALS['current_screen'] = $current_screen;
+
+		$this->assertTrue( $test_get );
+		$this->assertTrue( $test_post );
+		$this->assertTrue( $test_server );
+		$this->assertSame( 'test_prepare', $test_globals );
 	}
 
 	public function test_run_without_errors() {
-		$check         = new Enqueued_Scripts_Size_Check();
-		$check_context = new Check_Context( TESTS_PLUGIN_DIR . '/tests/testdata/plugins/test-plugin-without-errors/test-plugin-without-errors.php' );
-		$check_result  = new Check_Result( $check_context );
-		$runtime_prep  = new Universal_Runtime_Preparation( $check_context );
+		// Load the test plugin.
+		require TESTS_PLUGIN_DIR . '/tests/testdata/plugins/test-plugin-enqueued-script-size-check/load.php';
 
-		// Run the required preparations.
-		$runtime_cleanup = $runtime_prep->prepare();
-		$shared_cleanup  = $this->run_shared_preperations( $check );
-		$check_cleanup   = $check->prepare();
+		$check   = new Enqueued_Scripts_Size_Check();
+		$context = $this->get_context( WP_PLUGIN_CHECK_MAIN_FILE );
+		$results = $this->run_check( $check, $context );
 
-		$check->run( $check_result );
-
-		// Cleanup preparations.
-		$check_cleanup();
-		$shared_cleanup();
-		$runtime_cleanup();
-
-		$errors   = $check_result->get_errors();
-		$warnings = $check_result->get_warnings();
+		$errors   = $results->get_errors();
+		$warnings = $results->get_warnings();
 
 		$this->assertEmpty( $errors );
 		$this->assertEmpty( $warnings );
 
-		$this->assertEquals( 0, $check_result->get_error_count() );
-		$this->assertEquals( 0, $check_result->get_warning_count() );
+		$this->assertEquals( 0, $results->get_error_count() );
+		$this->assertEquals( 0, $results->get_warning_count() );
 	}
 
 	public function test_run_with_errors() {
-		$check         = new Enqueued_Scripts_Size_Check();
-		$check_context = new Check_Context( TESTS_PLUGIN_DIR . '/tests/testdata/plugins/test-plugin-with-errors/test-plugin-with-errors.php' );
-		$check_result  = new Check_Result( $check_context );
-		$runtime_prep  = new Universal_Runtime_Preparation( $check_context );
+		// Load the test plugin.
+		require TESTS_PLUGIN_DIR . '/tests/testdata/plugins/test-plugin-enqueued-script-size-check/load.php';
 
-		// Run the required preparations.
-		$runtime_cleanup = $runtime_prep->prepare();
-		$shared_cleanup  = $this->run_shared_preperations( $check );
-		$check_cleanup   = $check->prepare();
+		// Test with low threshold to force warnings.
+		$check   = new Enqueued_Scripts_Size_Check( 1 );
+		$context = $this->get_context( WP_PLUGIN_CHECK_MAIN_FILE );
+		$results = $this->run_check( $check, $context );
 
-		$check->run( $check_result );
-
-		// Cleanup preparations.
-		$check_cleanup();
-		$shared_cleanup();
-		$runtime_cleanup();
-
-		$errors   = $check_result->get_errors();
-		$warnings = $check_result->get_warnings();
+		$errors   = $results->get_errors();
+		$warnings = $results->get_warnings();
 
 		$this->assertEmpty( $errors );
-		$this->assertEmpty( $warnings );
+		$this->assertNotEmpty( $warnings );
 
-		$this->assertEquals( 0, $check_result->get_error_count() );
-		$this->assertEquals( 0, $check_result->get_warning_count() );
+		$this->assertEquals( 0, $results->get_error_count() );
+		$this->assertEquals( 3, $results->get_warning_count() );
 	}
 
-	protected function run_shared_preperations( $check ) {
-		$preparations = $check->get_shared_preparations();
-		$cleanups     = array();
+	public function test_run_with_errors_for_inline_script() {
+		// Load the test plugin.
+		require TESTS_PLUGIN_DIR . '/tests/testdata/plugins/test-plugin-enqueued-script-size-check/load.php';
 
-		foreach ( $preparations as $class => $args ) {
-			$preparation = new $class( ...$args );
-			$cleanups    = $preparation->prepare();
-		}
+		// Test with threshold under the enqueued test-script.js byte size.
+		$check   = new Enqueued_Scripts_Size_Check( 20 );
+		$context = $this->get_context( WP_PLUGIN_CHECK_MAIN_FILE );
+		$results = $this->run_check( $check, $context );
 
-		return function() use ( $cleanups ) {
-			foreach ( $cleanups as $cleanup ) {
-				$cleanup();
-			}
-		};
+		$errors   = $results->get_errors();
+		$warnings = $results->get_warnings();
+
+		$this->assertEmpty( $errors );
+		$this->assertNotEmpty( $warnings );
+
+		$this->assertEquals( 0, $results->get_error_count() );
+		$this->assertEquals( 3, $results->get_warning_count() );
 	}
 }
