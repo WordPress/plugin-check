@@ -110,7 +110,7 @@ class Plugin_Check_Command {
 	 */
 	public function check( $args, $assoc_args ) {
 
-		$options          = $this->get_options( $assoc_args );
+		$assoc_args       = $this->get_options( $assoc_args );
 		$plugin_base_file = $this->get_plugin_from_args( $args );
 
 		$cli_runner = new CLI_Runner();
