@@ -5,10 +5,10 @@
 
 $city = 'Surat';
 
-printf(
+sprintf(
 	/* translators: %s: Name of a city */
 	__( 'Your city is %s.', 'test-plugin-check' ),
 	$city
 );
 
-esc_html_e( 'Hello World!', 'test-plugin-check' );
+esc_html__( 'Hello World!', 'test-plugin-check' );

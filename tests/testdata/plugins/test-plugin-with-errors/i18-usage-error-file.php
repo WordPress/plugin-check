@@ -5,11 +5,11 @@
 
 $city = 'Surat';
 
-printf(
+sprintf(
 	__( 'Your city is %s.', 'test-plugin-check-errors' ),
 	$city
 );
 
 $text_domain = 'test-plugin-check-errors';
 
-esc_html_e( 'Hello World!', $text_domain );
+esc_html__( 'Hello World!', $text_domain );
