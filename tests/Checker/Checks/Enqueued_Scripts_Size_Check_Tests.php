@@ -25,9 +25,9 @@ class Enqueued_Scripts_Size_Check_Tests extends Runtime_Check_UnitTestCase {
 
 	public function test_prepare() {
 		// Create variables in global state.
-		$_GET['test_prepare']      = true;
-		$_POST['test_prepare']     = true;
-		$_SERVER['test_prepare']   = true;
+		$_GET['test_prepare']    = true;
+		$_POST['test_prepare']   = true;
+		$_SERVER['test_prepare'] = true;
 
 		$current_screen            = $GLOBALS['current_screen'];
 		$GLOBALS['current_screen'] = 'test_prepare';
