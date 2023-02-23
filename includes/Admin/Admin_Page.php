@@ -19,6 +19,7 @@ class Admin_Page {
 	 */
 	public function add_hooks() {
 		add_action( 'admin_menu', array( $this, 'add_page' ) );
+		add_filter( 'plugin_action_links', array( $this, 'filter_plugin_action_links' ), 10, 2 );
 	}
 
 	/**
@@ -63,6 +64,29 @@ class Admin_Page {
 
 		$available_plugins = $this->get_available_plugins();
 
+		$selected_plugin_basename = filter_input( INPUT_GET, 'plugin', FILTER_SANITIZE_STRING );
+
 		require_once WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/admin-page.php';
+	}
+
+	/**
+	 * Add "check this plugin" link in the plugins list table.
+	 *
+	 * @param array  $actions     List of actions.
+	 * @param string $plugin_file Plugin main file.
+	 * @return array
+	 */
+	public function filter_plugin_action_links( $actions, $plugin_file ) {
+
+		if ( is_plugin_active( $plugin_file ) ) {
+
+			$actions[] = sprintf(
+				'<a href="%1$s">%2$s</a>',
+				esc_url( admin_url() . 'tools.php?page=plugin-check&plugin=' . $plugin_file ),
+				esc_html__( 'Check this plugin', 'plugin-check' )
+			);
+		}
+
+		return $actions;
 	}
 }
