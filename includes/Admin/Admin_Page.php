@@ -69,6 +69,6 @@ class Admin_Page {
 	public function render_page() {
 		$available_plugins = $this->get_available_plugins();
 
-		require_once WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/admin-page.php';
+		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/admin-page.php';
 	}
 }
