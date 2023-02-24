@@ -58,22 +58,22 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 
 		// Create the basic information required get_available_plugins.
 		$expected_plugins = array(
-			"hello.php" => array(
-				"Name" => "Hello Dolly",
+			'hello.php'            => array(
+				'Name' => 'Hello Dolly',
 			),
-			"akismet/akismet.php" => array(
-				"Name" => "Akistmet",
+			'akismet/akismet.php'  => array(
+				'Name' => 'Akistmet',
 			),
-			"Fake-plugin/load.php" => array(
-				"Name" => "Fake Plugin",
+			'Fake-plugin/load.php' => array(
+				'Name' => 'Fake Plugin',
 			),
 		);
 
 		// Include the Plugin Checker plugin.
-		$expected_plugins[ plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE ) ] = array( "Name" => "Plugin Checker" );
+		$expected_plugins[ plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE ) ] = array( 'Name' => 'Plugin Checker' );
 
-		// Set the expected plugins in the cache,
-		$wp_object_cache->add( 'plugins', array( "" => $expected_plugins ), 'plugins' );
+		// Set the expected plugins in the cache.
+		$wp_object_cache->add( 'plugins', array( '' => $expected_plugins ), 'plugins' );
 
 		// Render the admin page.
 		ob_start();
@@ -104,8 +104,8 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 		$original_cache  = $wp_object_cache;
 		$wp_object_cache = new WP_Object_Cache();
 
-		// Set the expected plugins to be empty in the cache,
-		$wp_object_cache->add( 'plugins', array( "" => array() ), 'plugins' );
+		// Set the expected plugins to be empty in the cache.
+		$wp_object_cache->add( 'plugins', array( '' => array() ), 'plugins' );
 
 		// Render the admin page.
 		ob_start();
