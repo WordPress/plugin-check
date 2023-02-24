@@ -8,6 +8,7 @@
 namespace WordPress\Plugin_Check;
 
 use WordPress\Plugin_Check\CLI\Plugin_Check_Command;
+use WordPress\Plugin_Check\Admin\Admin_Page;
 
 /**
  * Main class for the plugin.
@@ -53,9 +54,13 @@ class Plugin_Main {
 	 * @since n.e.x.t
 	 */
 	public function add_hooks() {
+
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			$plugin_command = new Plugin_Check_Command( $this->context );
 			\WP_CLI::add_command( 'plugin', $plugin_command );
 		}
+
+		$admin_page = new Admin_Page();
+		$admin_page->add_hooks();
 	}
 }
