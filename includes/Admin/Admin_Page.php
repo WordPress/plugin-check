@@ -16,6 +16,8 @@ class Admin_Page {
 
 	/**
 	 * Initializes hooks.
+	 *
+	 * @since n.e.x.t
 	 */
 	public function add_hooks() {
 		add_action( 'admin_menu', array( $this, 'add_page' ) );
@@ -23,6 +25,8 @@ class Admin_Page {
 
 	/**
 	 * Registers the admin page under the tools menu.
+	 *
+	 * @since n.e.x.t
 	 */
 	public function add_page() {
 		add_management_page(
@@ -37,10 +41,11 @@ class Admin_Page {
 	/**
 	 * Returns the list of plugins.
 	 *
-	 * @return array List of plugins.
+	 * @since n.e.x.t
+	 *
+	 * @return array List of available plugins.
 	 */
 	private function get_available_plugins() {
-
 		$available_plugins = get_plugins();
 
 		if ( empty( $available_plugins ) ) {
@@ -58,9 +63,10 @@ class Admin_Page {
 
 	/**
 	 * Render the "Plugin Check" page.
+	 *
+	 * @since n.e.x.t
 	 */
 	public function render_page() {
-
 		$available_plugins = $this->get_available_plugins();
 
 		require_once WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/admin-page.php';
