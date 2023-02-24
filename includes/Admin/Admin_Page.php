@@ -78,7 +78,7 @@ class Admin_Page {
 	 */
 	public function filter_plugin_action_links( $actions, $plugin_file ) {
 
-		if ( is_plugin_active( $plugin_file ) ) {
+		if ( current_user_can( 'activate_plugins' ) ) {
 
 			$actions[] = sprintf(
 				'<a href="%1$s">%2$s</a>',

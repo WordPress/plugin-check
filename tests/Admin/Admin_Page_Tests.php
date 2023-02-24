@@ -67,9 +67,17 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 
 	public function test_filter_plugin_action_links() {
 
-		$action_links = $this->admin_page->filter_plugin_action_links( array(), 'test-plugin/test-plugin.php' );
+		$current_screen = get_current_screen();
 
-		$this->assertEmpty( $action_links );
+		$admin_user = self::factory()->user->create( array( 'role' => 'administrator' ) );
+
+		if ( is_multisite() ) {
+			grant_super_admin( $admin_user );
+		}
+
+		wp_set_current_user( $admin_user );
+
+		$this->admin_page->add_page();
 
 		$base_file = plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE );
 
