@@ -10,6 +10,7 @@ namespace WordPress\Plugin_Check\CLI;
 use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Plugin_Context;
 use Exception;
+use WP_CLI\ExitException;
 
 /**
  * Plugin check command.
@@ -47,6 +48,8 @@ class Plugin_Check_Command {
 
 	/**
 	 * Constructor.
+	 *
+	 * @since n.e.x.t
 	 *
 	 * @param Plugin_Context $plugin_context Plugin context.
 	 */
@@ -102,6 +105,8 @@ class Plugin_Check_Command {
 	 *   wp plugin check akismet --format=json
 	 *
 	 * @subcommand check
+	 *
+	 * @since n.e.x.t
 	 *
 	 * @param array $args List of the positional arguments.
 	 * @param array $assoc_args List of the associative arguments.
@@ -160,6 +165,8 @@ class Plugin_Check_Command {
 	/**
 	 * Get plugin main file.
 	 *
+	 * @since n.e.x.t
+	 *
 	 * @param array $args List of the positional arguments.
 	 * @return string Relative path of the plugin main file.
 	 *
@@ -210,11 +217,16 @@ class Plugin_Check_Command {
 
 		return $plugin_base_file;
 	}
+
 	/**
 	 * Validate associative arguments.
 	 *
+	 * @since n.e.x.t
+	 *
 	 * @param array $assoc_args List of the associative arguments.
 	 * @return array List of the associative arguments.
+	 *
+	 * @throws \WP_CLI\ExitException Show error if plugin not found.
 	 */
 	protected function get_options( $assoc_args ) {
 
@@ -255,7 +267,7 @@ class Plugin_Check_Command {
 	/**
 	 * Gets the formatter instance to format check results.
 	 *
-	 * @since 1.0.0
+	 * @since n.e.x.t
 	 *
 	 * @param array $assoc_args Associative arguments.
 	 * @return \WP_CLI\Formatter The formatter instance.
@@ -290,7 +302,7 @@ class Plugin_Check_Command {
 	/**
 	 * Flattens and combines the given associative array of file errors and file warnings into a two-dimensional array.
 	 *
-	 * @since 1.0.0
+	 * @since n.e.x.t
 	 *
 	 * @param array $file_errors   Errors from a Check_Result, for a specific file.
 	 * @param array $file_warnings Warnings from a Check_Result, for a specific file.
@@ -356,6 +368,8 @@ class Plugin_Check_Command {
 	/**
 	 * Display results.
 	 *
+	 * @since n.e.x.t
+	 *
 	 * @param \WP_CLI\Formatter $formatter    Formatter class.
 	 * @param string            $file_name    File name.
 	 * @param array             $file_results Results.
@@ -377,6 +391,8 @@ class Plugin_Check_Command {
 	/**
 	 * Converts a plugin basename back into a friendly slug.
 	 *
+	 * @since n.e.x.t
+	 *
 	 * @param string $basename Plugin basename.
 	 * @return string Plugin slug.
 	 */
@@ -392,6 +408,8 @@ class Plugin_Check_Command {
 
 	/**
 	 * Gets all available plugins.
+	 *
+	 * @since n.e.x.t
 	 *
 	 * Uses the same filter core uses in plugins.php to determine which plugins
 	 * should be available to manage through the WP_Plugins_List_Table class.
