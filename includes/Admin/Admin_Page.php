@@ -72,6 +72,8 @@ class Admin_Page {
 	/**
 	 * Add "check this plugin" link in the plugins list table.
 	 *
+	 * @since n.e.x.t
+	 *
 	 * @param array  $actions     List of actions.
 	 * @param string $plugin_file Plugin main file.
 	 * @return array
