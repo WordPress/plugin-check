@@ -110,8 +110,9 @@ class Plugin_Check_Command {
 	 */
 	public function check( $args, $assoc_args ) {
 
-		$assoc_args       = $this->get_options( $assoc_args );
-		$plugin_base_file = $this->get_plugin_from_args( $args );
+		$assoc_args = $this->get_options( $assoc_args );
+
+		$this->get_plugin_from_args( $args );
 
 		$cli_runner = new CLI_Runner();
 
@@ -126,11 +127,11 @@ class Plugin_Check_Command {
 
 		// Get errors and warnings from the results.
 		$errors = array();
-		if ( empty( $assoc_args['ignore_errors'] ) ) {
+		if ( empty( $assoc_args['ignore-errors'] ) ) {
 			$errors = $result->get_errors();
 		}
 		$warnings = array();
-		if ( empty( $assoc_args['ignore_warnings'] ) ) {
+		if ( empty( $assoc_args['ignore-warnings'] ) ) {
 			$warnings = $result->get_warnings();
 		}
 
@@ -221,7 +222,6 @@ class Plugin_Check_Command {
 			'checks'          => 'all',
 			'flag'            => 'stable',
 			'format'          => 'table',
-			'fields'          => 'all',
 			'ignore-warnings' => false,
 			'ignore-errors'   => false,
 		);
@@ -268,6 +268,7 @@ class Plugin_Check_Command {
 			'code',
 			'message',
 		);
+		$default_fields = wp_parse_args( $assoc_args['fields'], $default_fields );
 
 		// If both errors and warnings are included, display the type of each result too.
 		if ( empty( $assoc_args['ignore_errors'] ) && empty( $assoc_args['ignore_warnings'] ) ) {
