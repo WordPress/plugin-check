@@ -10,7 +10,8 @@ namespace WordPress\Plugin_Check\CLI;
 use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Plugin_Context;
 use Exception;
-use WP_CLI\ExitException;
+use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
+use WP_CLI;
 
 /**
  * Plugin check command.
@@ -20,6 +21,7 @@ class Plugin_Check_Command {
 	/**
 	 * Plugin context.
 	 *
+	 * @since n.e.x.t
 	 * @var Plugin_Context
 	 */
 	protected $plugin_context;
@@ -27,6 +29,7 @@ class Plugin_Check_Command {
 	/**
 	 * Output format type.
 	 *
+	 * @since n.e.x.t
 	 * @var string[]
 	 */
 	protected $output_formats = array(
@@ -38,6 +41,7 @@ class Plugin_Check_Command {
 	/**
 	 * Check flags.
 	 *
+	 * @since n.e.x.t
 	 * @var string[]
 	 */
 	protected $check_flags = array(
@@ -117,9 +121,10 @@ class Plugin_Check_Command {
 
 		$assoc_args = $this->get_options( $assoc_args );
 
-		$this->get_plugin_from_args( $args );
+		Plugin_Request_Utility::get_plugin_basename_from_input( $args[0] );
+		Plugin_Request_Utility::initialize_runner();
 
-		$cli_runner = new CLI_Runner();
+		$cli_runner = Plugin_Request_Utility::get_runner();
 
 		try {
 
@@ -127,7 +132,7 @@ class Plugin_Check_Command {
 
 		} catch ( Exception $error ) {
 
-			\WP_CLI::error( $error->getMessage() );
+			WP_CLI::error( $error->getMessage() );
 		}
 
 		// Get errors and warnings from the results.
@@ -163,62 +168,6 @@ class Plugin_Check_Command {
 	}
 
 	/**
-	 * Get plugin main file.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @param array $args List of the positional arguments.
-	 * @return string Relative path of the plugin main file.
-	 *
-	 * @throws \WP_CLI\ExitException Show error if plugin not found.
-	 */
-	protected function get_plugin_from_args( $args ) {
-		$plugin_slug = $args[0];
-
-		$available_plugins = $this->get_all_plugins();
-
-		$plugin_base_file = '';
-
-		if ( ! empty( $available_plugins ) ) {
-			foreach ( $available_plugins as $available_plugin_base_file => $available_plugin ) {
-				if ( $this->get_plugin_name( $available_plugin_base_file ) === $plugin_slug ) {
-
-					$plugin_base_file = $available_plugin_base_file;
-
-					break;
-				}
-			}
-		}
-
-		if ( empty( $plugin_base_file ) ) {
-
-			\WP_CLI::error(
-				sprintf(
-				/* translators: 1: plugin basename */
-					__( '"%1$s" plugin not exists.', 'plugin-check' ),
-					$plugin_slug
-				)
-			);
-		}
-
-		$plugin_valid = validate_plugin( $plugin_base_file );
-
-		if ( is_wp_error( $plugin_valid ) ) {
-
-			\WP_CLI::error(
-				sprintf(
-				/* translators: 1: plugin basename, 2: error message */
-					__( 'Invalid plugin "%1$s": %2$s', 'plugin-check' ),
-					$plugin_slug,
-					$plugin_valid->get_error_message()
-				)
-			);
-		}
-
-		return $plugin_base_file;
-	}
-
-	/**
 	 * Validate associative arguments.
 	 *
 	 * @since n.e.x.t
@@ -226,7 +175,7 @@ class Plugin_Check_Command {
 	 * @param array $assoc_args List of the associative arguments.
 	 * @return array List of the associative arguments.
 	 *
-	 * @throws \WP_CLI\ExitException Show error if plugin not found.
+	 * @throws WP_CLI\ExitException Show error if plugin not found.
 	 */
 	protected function get_options( $assoc_args ) {
 
@@ -241,7 +190,7 @@ class Plugin_Check_Command {
 
 		if ( ! in_array( $options['flag'], $this->check_flags, true ) ) {
 
-			\WP_CLI::error(
+			WP_CLI::error(
 				sprintf(
 					// translators: 1. Check flags.
 					__( 'Invalid flag argument, valid value will be one of [%1$s]', 'plugin-check' ),
@@ -252,7 +201,7 @@ class Plugin_Check_Command {
 
 		if ( ! in_array( $options['format'], $this->output_formats, true ) ) {
 
-			\WP_CLI::error(
+			WP_CLI::error(
 				sprintf(
 					// translators: 1. Output formats.
 					__( 'Invalid format argument, valid value will be one of [%1$s]', 'plugin-check' ),
@@ -270,7 +219,7 @@ class Plugin_Check_Command {
 	 * @since n.e.x.t
 	 *
 	 * @param array $assoc_args Associative arguments.
-	 * @return \WP_CLI\Formatter The formatter instance.
+	 * @return WP_CLI\Formatter The formatter instance.
 	 */
 	protected function get_formatter( $assoc_args ) {
 
@@ -293,7 +242,7 @@ class Plugin_Check_Command {
 			);
 		}
 
-		return new \WP_CLI\Formatter(
+		return new WP_CLI\Formatter(
 			$assoc_args,
 			$default_fields
 		);
@@ -370,12 +319,12 @@ class Plugin_Check_Command {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param \WP_CLI\Formatter $formatter    Formatter class.
+	 * @param WP_CLI\Formatter $formatter    Formatter class.
 	 * @param string            $file_name    File name.
 	 * @param array             $file_results Results.
 	 */
 	protected function display_results( $formatter, $file_name, $file_results ) {
-		\WP_CLI::line(
+		WP_CLI::line(
 			sprintf(
 				'FILE: %s',
 				$file_name
@@ -384,8 +333,8 @@ class Plugin_Check_Command {
 
 		$formatter->display_items( $file_results );
 
-		\WP_CLI::line();
-		\WP_CLI::line();
+		WP_CLI::line();
+		WP_CLI::line();
 	}
 
 	/**
@@ -404,20 +353,5 @@ class Plugin_Check_Command {
 		}
 
 		return $name;
-	}
-
-	/**
-	 * Gets all available plugins.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * Uses the same filter core uses in plugins.php to determine which plugins
-	 * should be available to manage through the WP_Plugins_List_Table class.
-	 *
-	 * @return array
-	 */
-	private function get_all_plugins() {
-
-		return apply_filters( 'all_plugins', get_plugins() );
 	}
 }

@@ -8,6 +8,7 @@
 namespace WordPress\Plugin_Check\Utilities;
 
 use Exception;
+use WordPress\Plugin_Check\Checker\Abstract_Check_Runner;
 use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Checker\AJAX_Runner;
 
