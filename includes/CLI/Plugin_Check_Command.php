@@ -320,8 +320,8 @@ class Plugin_Check_Command {
 	 * @since n.e.x.t
 	 *
 	 * @param WP_CLI\Formatter $formatter    Formatter class.
-	 * @param string            $file_name    File name.
-	 * @param array             $file_results Results.
+	 * @param string           $file_name    File name.
+	 * @param array            $file_results Results.
 	 */
 	protected function display_results( $formatter, $file_name, $file_results ) {
 		WP_CLI::line(
