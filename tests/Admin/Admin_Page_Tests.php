@@ -124,9 +124,6 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 
 		$base_file = plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE );
 
-		/** Editor check */
-		$editor = self::factory()->user->create( array( 'role' => 'editor' ) );
-		wp_set_current_user( $editor );
 		$action_links = $this->admin_page->filter_plugin_action_links( array(), $base_file );
 		$this->assertEmpty( $action_links );
 

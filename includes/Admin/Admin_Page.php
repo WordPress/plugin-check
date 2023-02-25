@@ -76,13 +76,13 @@ class Admin_Page {
 	}
 
 	/**
-	 * Add "check this plugin" link in the plugins list table.
+	 * Adds "check this plugin" link in the plugins list table.
 	 *
 	 * @since n.e.x.t
 	 *
 	 * @param array  $actions     List of actions.
 	 * @param string $plugin_file Plugin main file.
-	 * @return array
+	 * @return array The modified list of actions.
 	 */
 	public function filter_plugin_action_links( $actions, $plugin_file ) {
 
