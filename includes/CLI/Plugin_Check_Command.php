@@ -336,22 +336,4 @@ class Plugin_Check_Command {
 		WP_CLI::line();
 		WP_CLI::line();
 	}
-
-	/**
-	 * Converts a plugin basename back into a friendly slug.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @param string $basename Plugin basename.
-	 * @return string Plugin slug.
-	 */
-	public function get_plugin_name( $basename ) {
-		if ( false === strpos( $basename, '/' ) ) {
-			$name = basename( $basename, '.php' );
-		} else {
-			$name = dirname( $basename );
-		}
-
-		return $name;
-	}
 }
