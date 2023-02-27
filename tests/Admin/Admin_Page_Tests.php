@@ -53,24 +53,6 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 		$this->assertEquals( 10, has_action( 'admin_enqueue_scripts', array( $this->admin_page, 'enqueue_scripts' ) ) );
 	}
 
-	public function test_enqueue_scripts() {
-
-		$current_screen = get_current_screen();
-
-		$admin_user = self::factory()->user->create( array( 'role' => 'administrator' ) );
-
-		if ( is_multisite() ) {
-			grant_super_admin( $admin_user );
-		}
-
-		wp_set_current_user( $admin_user );
-		set_current_screen( 'dashboard' );
-
-		$this->admin_page->add_hooks();
-
-		set_current_screen( $current_screen );
-	}
-
 	public function test_render_page() {
 		global $wp_object_cache;
 
