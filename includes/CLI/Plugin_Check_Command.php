@@ -121,14 +121,11 @@ class Plugin_Check_Command {
 
 		$assoc_args = $this->get_options( $assoc_args );
 
-		Plugin_Request_Utility::get_plugin_basename_from_input( $args[0] );
-		Plugin_Request_Utility::initialize_runner();
-
-		$cli_runner = Plugin_Request_Utility::get_runner();
-
 		try {
 
-			$result = $cli_runner->run();
+			Plugin_Request_Utility::initialize_runner();
+			$cli_runner = Plugin_Request_Utility::get_runner();
+			$result     = $cli_runner->run();
 
 		} catch ( Exception $error ) {
 
@@ -229,7 +226,10 @@ class Plugin_Check_Command {
 			'code',
 			'message',
 		);
-		$default_fields = wp_parse_args( $assoc_args['fields'], $default_fields );
+
+		if ( isset( $assoc_args['fields'] ) ) {
+			$default_fields = wp_parse_args( $assoc_args['fields'], $default_fields );
+		}
 
 		// If both errors and warnings are included, display the type of each result too.
 		if ( empty( $assoc_args['ignore_errors'] ) && empty( $assoc_args['ignore_warnings'] ) ) {
