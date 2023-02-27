@@ -56,7 +56,7 @@ class Admin_AJAX {
 
 		wp_send_json_success(
 			array(
-				'message' => 'Verified',
+				'message' => 'Verified!',
 			)
 		);
 	}

@@ -20,10 +20,19 @@
 			}
 		)
 		.then(
-			( response ) => { console.log( response ); }
+			( response ) => {
+				if ( ! response.ok ) {
+
+					throw new Error(`[${response.message}]`);
+				}
+
+				return response.json();
+			}
 		)
 		.then(
-			( data ) => { console.log( data ); }
+			( data ) => {
+				console.log( data.data.message );
+			}
 		)
 		.catch(
 			( error ) => { console.log( error ); }
