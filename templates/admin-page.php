@@ -17,12 +17,12 @@
 
 			<form>
 				<h2>
-					<label class="title" for="plugin-check__plugins">
+					<label class="title" for="pc_plugins">
 						<?php esc_html_e( 'Check the Plugin', 'plugin-check' ); ?>
 					</label>
 				</h2>
 
-				<select id="plugin-check__plugins" name="plugin_check_plugins">
+				<select id="pc_plugins" name="plugin_check_plugins">
 					<option><?php esc_html_e( 'Select Plugin', 'plugin-check' ); ?></option>
 					<?php foreach ( $available_plugins as $plugin_basename => $available_plugin ) { ?>
 						<option value="<?php echo esc_attr( $plugin_basename ); ?>">
@@ -31,7 +31,7 @@
 					<?php } ?>
 				</select>
 
-				<input type="submit" value="<?php esc_attr_e( 'Check it!', 'plugin-check' ); ?>" />
+				<input type="button" value="<?php esc_attr_e( 'Check it!', 'plugin-check' ); ?>" id="pc_check_it" />
 			</form>
 
 		<?php } else { ?>
