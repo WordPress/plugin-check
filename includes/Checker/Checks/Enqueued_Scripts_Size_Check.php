@@ -170,8 +170,8 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 		// directly. This is discouraged, but some plugins or themes are still doing it.
 		ob_start();
 		wp_enqueue_scripts();
-		wp_head();
-		wp_footer();
+		wp_scripts()->do_head_items();
+		wp_scripts()->do_footer_items();
 		ob_get_clean();
 
 		$plugin_scripts     = array();
