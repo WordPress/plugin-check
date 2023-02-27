@@ -7,6 +7,8 @@
 
 namespace WordPress\Plugin_Check;
 
+use WordPress\Plugin_Check\Admin\Admin_Page;
+
 /**
  * Main class for the plugin.
  *
@@ -52,5 +54,8 @@ class Plugin_Main {
 	 */
 	public function add_hooks() {
 		// @TODO: Update to register CLI command to WordPress as part of issue #30
+
+		$admin_page = new Admin_Page();
+		$admin_page->add_hooks();
 	}
 }
