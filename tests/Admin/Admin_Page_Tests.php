@@ -21,8 +21,16 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 
 	public function test_add_hooks() {
 		$this->admin_page->add_hooks();
-		$this->assertEquals( 10, has_action( 'admin_menu', array( $this->admin_page, 'add_page' ) ) );
-		$this->assertEquals( 10, has_filter( 'plugin_action_links', array( $this->admin_page, 'filter_plugin_action_links' ) ) );
+
+		$admin_menu_hook         = 'admin_menu';
+		$plugin_action_link_hook = 'plugin_action_links';
+		if ( is_multisite() ) {
+			$admin_menu_hook         = 'network_admin_menu';
+			$plugin_action_link_hook = 'network_admin_plugin_action_links';
+		}
+
+		$this->assertEquals( 10, has_action( $admin_menu_hook, array( $this->admin_page, 'add_page' ) ) );
+		$this->assertEquals( 10, has_filter( $plugin_action_link_hook, array( $this->admin_page, 'filter_plugin_action_links' ) ) );
 	}
 
 	public function test_add_page() {
@@ -46,7 +54,13 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 		set_current_screen( $current_screen );
 
 		$this->assertArrayHasKey( 'plugin-check', $parent_pages );
-		$this->assertEquals( 'tools.php', $parent_pages['plugin-check'] );
+
+		$expected_parent_page = 'tools.php';
+		if ( is_multisite() ) {
+			$expected_parent_page = 'settings.php';
+		}
+
+		$this->assertEquals( $expected_parent_page, $parent_pages['plugin-check'] );
 	}
 
 	public function test_initialize_page() {
@@ -140,10 +154,22 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 		wp_set_current_user( $admin_user );
 		$action_links = $this->admin_page->filter_plugin_action_links( array(), $base_file );
 
+		$url = admin_url( 'tools.php' );
+		if ( is_multisite() ) {
+			$url = network_admin_url( 'settings.php' );
+		}
+		$action_link = add_query_arg(
+			array(
+				'page'   => 'plugin-check',
+				'plugin' => $base_file,
+			),
+			$url
+		);
+
 		$this->assertEquals(
 			sprintf(
 				'<a href="%1$s">%2$s</a>',
-				esc_url( admin_url() . 'tools.php?page=plugin-check&plugin=' . $base_file ),
+				esc_url( $action_link ),
 				esc_html__( 'Check this plugin', 'plugin-check' )
 			),
 			$action_links[0]

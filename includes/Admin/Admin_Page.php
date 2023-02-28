@@ -37,8 +37,16 @@ class Admin_Page {
 	 * @since n.e.x.t
 	 */
 	public function add_hooks() {
-		add_action( 'admin_menu', array( $this, 'add_page' ) );
-		add_filter( 'plugin_action_links', array( $this, 'filter_plugin_action_links' ), 10, 2 );
+
+		$admin_menu_hook         = 'admin_menu';
+		$plugin_action_link_hook = 'plugin_action_links';
+		if ( is_multisite() ) {
+			$admin_menu_hook         = 'network_admin_menu';
+			$plugin_action_link_hook = 'network_admin_plugin_action_links';
+		}
+
+		add_action( $admin_menu_hook, array( $this, 'add_page' ) );
+		add_filter( $plugin_action_link_hook, array( $this, 'filter_plugin_action_links' ), 10, 2 );
 
 		$this->admin_ajax->add_hooks();
 	}
@@ -49,13 +57,27 @@ class Admin_Page {
 	 * @since n.e.x.t
 	 */
 	public function add_page() {
-		$hook = add_management_page(
-			__( 'Plugin Check', 'plugin-check' ),
-			__( 'Plugin Check', 'plugin-check' ),
-			'activate_plugins',
-			'plugin-check',
-			array( $this, 'render_page' )
-		);
+
+		if ( is_multisite() ) {
+
+			$hook = add_submenu_page(
+				'settings.php',
+				__( 'Plugin Check', 'plugin-check' ),
+				__( 'Plugin Check', 'plugin-check' ),
+				'activate_plugins',
+				'plugin-check',
+				array( $this, 'render_page' )
+			);
+		} else {
+
+			$hook = add_management_page(
+				__( 'Plugin Check', 'plugin-check' ),
+				__( 'Plugin Check', 'plugin-check' ),
+				'activate_plugins',
+				'plugin-check',
+				array( $this, 'render_page' )
+			);
+		}
 
 		add_action( "load-{$hook}", array( $this, 'initialize_page' ) );
 	}
@@ -138,9 +160,21 @@ class Admin_Page {
 
 		if ( current_user_can( 'activate_plugins' ) ) {
 
+			$url = admin_url( 'tools.php' );
+			if ( is_multisite() ) {
+				$url = network_admin_url( 'settings.php' );
+			}
+			$action_link = add_query_arg(
+				array(
+					'page'   => 'plugin-check',
+					'plugin' => $plugin_file,
+				),
+				$url
+			);
+
 			$actions[] = sprintf(
 				'<a href="%1$s">%2$s</a>',
-				esc_url( admin_url() . 'tools.php?page=plugin-check&plugin=' . $plugin_file ),
+				esc_url( $action_link ),
 				esc_html__( 'Check this plugin', 'plugin-check' )
 			);
 		}
