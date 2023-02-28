@@ -23,6 +23,7 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 	public function test_add_hooks() {
 		$this->admin_page->add_hooks();
 		$this->assertEquals( 10, has_action( 'admin_menu', array( $this->admin_page, 'add_page' ) ) );
+		$this->assertEquals( 10, has_filter( 'plugin_action_links', array( $this->admin_page, 'filter_plugin_action_links' ) ) );
 	}
 
 	public function test_add_page() {
@@ -117,5 +118,31 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'No plugins available.', $output );
 		$this->assertStringNotContainsString( '<select id="plugin-check__plugins"', $output );
+	}
+
+	public function test_filter_plugin_action_links() {
+
+		$base_file = plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE );
+
+		$action_links = $this->admin_page->filter_plugin_action_links( array(), $base_file );
+		$this->assertEmpty( $action_links );
+
+		/** Administrator check */
+		$admin_user = self::factory()->user->create( array( 'role' => 'administrator' ) );
+
+		if ( is_multisite() ) {
+			grant_super_admin( $admin_user );
+		}
+		wp_set_current_user( $admin_user );
+		$action_links = $this->admin_page->filter_plugin_action_links( array(), $base_file );
+
+		$this->assertEquals(
+			sprintf(
+				'<a href="%1$s">%2$s</a>',
+				esc_url( admin_url() . 'tools.php?page=plugin-check&plugin=' . $base_file ),
+				esc_html__( 'Check this plugin', 'plugin-check' )
+			),
+			$action_links[0]
+		);
 	}
 }
