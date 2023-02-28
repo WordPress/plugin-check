@@ -7,7 +7,7 @@
 
 namespace WordPress\Plugin_Check\Checker;
 
-use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
+use Exception;
 
 /**
  * CLI Runner class.
@@ -52,20 +52,21 @@ class CLI_Runner extends Abstract_Check_Runner {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return Checks An instance of the Checks class.
+	 * @return string The plugin basename.
 	 *
-	 * @throws Exception Thrown if the plugin main file cannot be found based on the CLI input.
+	 * @throws Exception Thrown if the plugin basename is invalid.
 	 */
-	protected function get_checks_instance() {
-		if ( ! isset( $this->checks ) ) {
-			// Get the plugin name from the command line arguments.
-			$plugin_slug = isset( $_SERVER['argv'][3] ) ? $_SERVER['argv'][3] : '';
-			$plugin_file = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin_slug );
+	protected function determine_plugin_basename() {
+		// Get the plugin name from the command line arguments.
+		$plugin_slug = isset( $_SERVER['argv'][3] ) ? $_SERVER['argv'][3] : '';
 
-			$this->checks = new Checks( WP_PLUGIN_DIR . '/' . $plugin_file );
+		if ( empty( $plugin_slug ) ) {
+			throw new Exception(
+				__( 'Invalid plugin slug: Plugin slug must not be empty.', 'plugin-check' )
+			);
 		}
 
-		return $this->checks;
+		return $plugin_slug;
 	}
 
 	/**
@@ -75,7 +76,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 	 *
 	 * @return array An array of Check slugs to run.
 	 */
-	protected function get_check_slugs_to_run() {
+	protected function determine_check_slugs_to_run() {
 		$checks = array();
 
 		foreach ( $_SERVER['argv'] as $value ) {

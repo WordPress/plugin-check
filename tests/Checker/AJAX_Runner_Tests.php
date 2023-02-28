@@ -157,4 +157,52 @@ class AJAX_Runner_Tests extends WP_UnitTestCase {
 		$this->assertEmpty( $results->get_warnings() );
 		$this->assertNotEmpty( $results->get_errors() );
 	}
+
+	public function test_runner_initialized_early_throws_plugin_basename_exception() {
+		global $wp_actions;
+
+		$this->expectException( 'Exception' );
+		$this->expectExceptionMessage( 'Invalid plugin basename: The plugin basename does not match the original request.' );
+
+		add_filter( 'wp_doing_ajax', '__return_true' );
+		$_REQUEST['action'] = 'plugin_check_run_checks';
+		$_REQUEST['plugin'] = 'plugin-check';
+		$_REQUEST['checks'] = 'empty_check';
+
+		$muplugins_loaded = $wp_actions['muplugins_loaded'];
+		unset( $wp_actions['muplugins_loaded'] );
+
+		$runner = new AJAX_Runner();
+
+		$wp_actions['muplugins_loaded'] = $muplugins_loaded;
+
+		$runner->set_plugin_basename( 'invalid-plugin' );
+
+		$runner->prepare();
+		$runner->run();
+	}
+
+	public function test_runner_initialized_early_throws_checks_exception() {
+		global $wp_actions;
+
+		$this->expectException( 'Exception' );
+		$this->expectExceptionMessage( 'Invalid checks: The checks to run do not match the original request.' );
+
+		add_filter( 'wp_doing_ajax', '__return_true' );
+		$_REQUEST['action'] = 'plugin_check_run_checks';
+		$_REQUEST['plugin'] = 'plugin-check';
+		$_REQUEST['checks'] = 'empty_check';
+
+		$muplugins_loaded = $wp_actions['muplugins_loaded'];
+		unset( $wp_actions['muplugins_loaded'] );
+
+		$runner = new AJAX_Runner();
+
+		$wp_actions['muplugins_loaded'] = $muplugins_loaded;
+
+		$runner->set_check_slugs_to_run( array( 'runtime_check' ) );
+
+		$runner->prepare();
+		$runner->run();
+	}
 }

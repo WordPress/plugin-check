@@ -7,6 +7,8 @@
 
 namespace WordPress\Plugin_Check\Checker;
 
+use Exception;
+use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 use WordPress\Plugin_Check\Checker\Preparations\Universal_Runtime_Preparation;
 
 /**
@@ -41,6 +43,14 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	protected $plugin_basename;
 
 	/**
+	 * An instance of the Checks class.
+	 *
+	 * @since n.e.x.t
+	 * @var Checks
+	 */
+	protected $checks;
+
+	/**
 	 * Determines if the current request is intended for the plugin checker.
 	 *
 	 * @since n.e.x.t
@@ -50,13 +60,13 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	abstract public function is_plugin_check();
 
 	/**
-	 * Creates and returns an instance of the Checks class based on the request.
+	 * Returns the plugin basename based on the request.
 	 *
 	 * @since n.e.x.t
 	 *
 	 * @return Checks An instance of the Checks class.
 	 */
-	abstract protected function get_checks_instance();
+	abstract protected function determine_plugin_basename();
 
 	/**
 	 * Returns an array of Check slugs to run based on the request.
@@ -65,7 +75,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @return array An array of Check slugs.
 	 */
-	abstract protected function get_check_slugs_to_run();
+	abstract protected function determine_check_slugs_to_run();
 
 	/**
 	 * Sets whether the runner class was initialized early.
@@ -221,5 +231,62 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		}
 
 		return array_intersect_key( $all_checks, array_flip( $check_slugs ) );
+	}
+
+	/**
+	 * Creates and returns the Check instance.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return Checks An instance of the Checks class.
+	 *
+	 * @throws Exception Thrown if the plugin main file does not match the original request.
+	 */
+	protected function get_checks_instance() {
+		if ( isset( $this->checks ) ) {
+			return $this->checks;
+		}
+
+		// Determine the plugin basename from the request.
+		$plugin_basename = $this->determine_plugin_basename();
+
+		if ( $this->initialized_early && isset( $this->plugin_basename ) ) {
+			// Compare the plugin basename to see if there was an error.
+			if ( $this->plugin_basename !== $plugin_basename ) {
+				throw new Exception(
+					__( 'Invalid plugin basename: The plugin basename does not match the original request.', 'plugin-check' )
+				);
+			}
+		}
+
+		$plugin_file  = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin_basename );
+		$this->checks = new Checks( WP_PLUGIN_DIR . '/' . $plugin_file );
+
+		return $this->checks;
+	}
+
+	/**
+	 * Returns the check slugs to run.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array An array of check slugs to run.
+	 *
+	 * @throws Exception Thrown if the checks do not match those in the original request.
+	 */
+	protected function get_check_slugs_to_run() {
+		// Determine the check slugs from the request.
+		$check_slugs = $this->determine_check_slugs_to_run();
+
+		if ( $this->initialized_early && isset( $this->check_slugs ) ) {
+			// Compare the plugin basename to see if there was an error.
+			if ( $this->check_slugs !== $check_slugs ) {
+				throw new Exception(
+					__( 'Invalid checks: The checks to run do not match the original request.', 'plugin-check' )
+				);
+			}
+		}
+
+		return $check_slugs;
 	}
 }
