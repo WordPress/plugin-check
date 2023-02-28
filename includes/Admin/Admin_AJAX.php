@@ -17,9 +17,21 @@ class Admin_AJAX {
 	/**
 	 * Nonce key.
 	 *
+	 * @since n.e.x.t
 	 * @var string
 	 */
-	private $nonce_key = '95854-random-admin-check-plugin-check-3845962';
+	private $nonce_key;
+
+	/**
+	 * Constructor.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param string $nonce_key Nonce key.
+	 */
+	public function __construct( $nonce_key ) {
+		$this->nonce_key = $nonce_key;
+	}
 
 	/**
 	 * Initializes hooks.

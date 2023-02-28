@@ -2,7 +2,9 @@
 	const checkItButton = document.getElementById( 'pc_check_it' );
 	const pluginsList   = document.getElementById( 'pc_plugins' );
 
-	checkItButton.addEventListener( 'click', () => {
+	checkItButton.addEventListener( 'click', (e) => {
+
+		e.preventDefault();
 
 		const pluginCheckData = new FormData();
 
@@ -12,7 +14,7 @@
 		pluginCheckData.append( 'plugin', pluginsList.value );
 
 		fetch(
-			data.ajaxUrl,
+			ajaxurl,
 			{
 				method: 'POST',
 				credentials: 'same-origin',

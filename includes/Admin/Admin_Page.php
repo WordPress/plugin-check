@@ -28,7 +28,7 @@ class Admin_Page {
 	 * @since n.e.x.t
 	 */
 	public function __construct() {
-		$this->admin_ajax = new Admin_AJAX();
+		$this->admin_ajax = new Admin_AJAX( 'run-check-via-check-it-button' );
 	}
 
 	/**
