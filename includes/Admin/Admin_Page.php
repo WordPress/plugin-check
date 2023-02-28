@@ -44,7 +44,7 @@ class Admin_Page {
 	}
 
 	/**
-	 * Registers the admin page under the tools menu.
+	 * Registers the admin page under the tools' menu.
 	 *
 	 * @since n.e.x.t
 	 */

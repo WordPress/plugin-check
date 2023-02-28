@@ -16,7 +16,7 @@ class Admin_AJAX_Tests extends WP_UnitTestCase {
 
 	public function set_up() {
 		parent::set_up();
-		$this->admin_ajax = new Admin_AJAX();
+		$this->admin_ajax = new Admin_AJAX( 'run-check-via-check-it-button' );
 	}
 
 	public function test_add_hooks() {
@@ -26,7 +26,7 @@ class Admin_AJAX_Tests extends WP_UnitTestCase {
 
 	public function test_get_nonce() {
 		$this->assertNotFalse(
-			wp_verify_nonce( $this->admin_ajax->get_nonce(), '95854-random-admin-check-plugin-check-3845962' )
+			wp_verify_nonce( $this->admin_ajax->get_nonce(), 'run-check-via-check-it-button' )
 		);
 	}
 }
