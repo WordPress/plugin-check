@@ -17,6 +17,30 @@ use WordPress\Plugin_Check\Checker\Preparations\Universal_Runtime_Preparation;
 abstract class Abstract_Check_Runner implements Check_Runner {
 
 	/**
+	 * True if the class was initialized early in the WordPress load process.
+	 *
+	 * @since n.e.x.t
+	 * @var bool
+	 */
+	protected $initialized_early;
+
+	/**
+	 * The check slugs to run.
+	 *
+	 * @since n.e.x.t
+	 * @var array
+	 */
+	protected $check_slugs;
+
+	/**
+	 * The plugin basename to check.
+	 *
+	 * @since n.e.x.t
+	 * @var string
+	 */
+	protected $plugin_basename;
+
+	/**
 	 * Determines if the current request is intended for the plugin checker.
 	 *
 	 * @since n.e.x.t
@@ -42,6 +66,37 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @return array An array of Check slugs.
 	 */
 	abstract protected function get_check_slugs_to_run();
+
+	/**
+	 * Sets whether the runner class was initialized early.
+	 *
+	 * @since n.e.x.t
+	 */
+	public function __construct() {
+		$this->initialized_early = ! did_action( 'muplugins_loaded' );
+	}
+
+	/**
+	 * Sets the check slugs to be run.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param array $check_slugs An array of check slugs to be run.
+	 */
+	public function set_check_slugs_to_run( array $check_slugs ) {
+		$this->check_slugs = $check_slugs;
+	}
+
+	/**
+	 * Sets the plugin basename to be checked.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param string $plugin_basename The plugin basename to be checked.
+	 */
+	public function set_plugin_basename( $plugin_basename ) {
+		$this->plugin_basename = $plugin_basename;
+	}
 
 	/**
 	 * Prepares the environment for running the requested checks.
