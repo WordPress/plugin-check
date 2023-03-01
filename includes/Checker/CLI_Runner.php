@@ -48,15 +48,15 @@ class CLI_Runner extends Abstract_Check_Runner {
 	}
 
 	/**
-	 * Creates and returns an instance of the Checks class based on the request.
+	 * Returns the plugin parameter based on the request.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return string The plugin basename.
+	 * @return string The plugin slug.
 	 *
-	 * @throws Exception Thrown if the plugin basename is invalid.
+	 * @throws Exception Thrown if the plugin slug is invalid.
 	 */
-	protected function determine_plugin_basename() {
+	protected function get_plugin_param() {
 		// Get the plugin name from the command line arguments.
 		$plugin_slug = isset( $_SERVER['argv'][3] ) ? $_SERVER['argv'][3] : '';
 
@@ -76,7 +76,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 	 *
 	 * @return array An array of Check slugs to run.
 	 */
-	protected function determine_check_slugs_to_run() {
+	protected function get_check_slugs_param() {
 		$checks = array();
 
 		foreach ( $_SERVER['argv'] as $value ) {

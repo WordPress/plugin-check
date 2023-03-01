@@ -162,7 +162,7 @@ class AJAX_Runner_Tests extends WP_UnitTestCase {
 		global $wp_actions;
 
 		$this->expectException( 'Exception' );
-		$this->expectExceptionMessage( 'Invalid plugin basename: The plugin basename does not match the original request.' );
+		$this->expectExceptionMessage( 'Invalid plugin: The plugin slug does not match the original request.' );
 
 		add_filter( 'wp_doing_ajax', '__return_true' );
 		$_REQUEST['action'] = 'plugin_check_run_checks';
@@ -176,7 +176,7 @@ class AJAX_Runner_Tests extends WP_UnitTestCase {
 
 		$wp_actions['muplugins_loaded'] = $muplugins_loaded;
 
-		$runner->set_plugin_basename( 'invalid-plugin' );
+		$runner->set_plugin_slug( 'invalid-plugin' );
 
 		$runner->prepare();
 		$runner->run();
@@ -200,7 +200,7 @@ class AJAX_Runner_Tests extends WP_UnitTestCase {
 
 		$wp_actions['muplugins_loaded'] = $muplugins_loaded;
 
-		$runner->set_check_slugs_to_run( array( 'runtime_check' ) );
+		$runner->set_check_slugs( array( 'runtime_check' ) );
 
 		$runner->prepare();
 		$runner->run();

@@ -35,12 +35,12 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	protected $check_slugs;
 
 	/**
-	 * The plugin basename to check.
+	 * The plugin slug to check.
 	 *
 	 * @since n.e.x.t
 	 * @var string
 	 */
-	protected $plugin_basename;
+	protected $plugin_slug;
 
 	/**
 	 * An instance of the Checks class.
@@ -60,13 +60,13 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	abstract public function is_plugin_check();
 
 	/**
-	 * Returns the plugin basename based on the request.
+	 * Returns the plugin parameter based on the request.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return Checks An instance of the Checks class.
+	 * @return string The plugin paramater from the request.
 	 */
-	abstract protected function determine_plugin_basename();
+	abstract protected function get_plugin_param();
 
 	/**
 	 * Returns an array of Check slugs to run based on the request.
@@ -75,7 +75,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @return array An array of Check slugs.
 	 */
-	abstract protected function determine_check_slugs_to_run();
+	abstract protected function get_check_slugs_param();
 
 	/**
 	 * Sets whether the runner class was initialized early.
@@ -92,20 +92,42 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @since n.e.x.t
 	 *
 	 * @param array $check_slugs An array of check slugs to be run.
+	 *
+	 * @throws Exception Thrown if the checks do not match those in the original request.
 	 */
-	public function set_check_slugs_to_run( array $check_slugs ) {
+	public function set_check_slugs( array $check_slugs ) {
+		if ( $this->initialized_early ) {
+			// Compare the check slugs to see if there was an error.
+			if ( $check_slugs !== $this->get_check_slugs_param() ) {
+				throw new Exception(
+					__( 'Invalid checks: The checks to run do not match the original request.', 'plugin-check' )
+				);
+			}
+		}
+
 		$this->check_slugs = $check_slugs;
 	}
 
 	/**
-	 * Sets the plugin basename to be checked.
+	 * Sets the plugin slug to be checked.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param string $plugin_basename The plugin basename to be checked.
+	 * @param string $plugin_slug The plugin slug to be checked.
+	 *
+	 * @throws Exception Thrown if the plugin main file does not match the original request.
 	 */
-	public function set_plugin_basename( $plugin_basename ) {
-		$this->plugin_basename = $plugin_basename;
+	public function set_plugin_slug( $plugin_slug ) {
+		if ( $this->initialized_early ) {
+			// Compare the plugin parameter to see if there was an error.
+			if ( $plugin_slug !== $this->get_plugin_param() ) {
+				throw new Exception(
+					__( 'Invalid plugin: The plugin slug does not match the original request.', 'plugin-check' )
+				);
+			}
+		}
+
+		$this->plugin_slug = $plugin_slug;
 	}
 
 	/**
@@ -223,7 +245,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @return array An array map of check slugs to Check instances.
 	 */
 	protected function get_checks_to_run() {
-		$check_slugs = $this->get_check_slugs_to_run();
+		$check_slugs = $this->get_check_slugs();
 		$all_checks  = $this->get_checks_instance()->get_checks();
 
 		if ( empty( $check_slugs ) ) {
@@ -240,27 +262,16 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @return Checks An instance of the Checks class.
 	 *
-	 * @throws Exception Thrown if the plugin main file does not match the original request.
+	 * @throws Exception Thrown if the plugin slug is invalid.
 	 */
 	protected function get_checks_instance() {
 		if ( isset( $this->checks ) ) {
 			return $this->checks;
 		}
 
-		// Determine the plugin basename from the request.
-		$plugin_basename = $this->determine_plugin_basename();
-
-		if ( $this->initialized_early && isset( $this->plugin_basename ) ) {
-			// Compare the plugin basename to see if there was an error.
-			if ( $this->plugin_basename !== $plugin_basename ) {
-				throw new Exception(
-					__( 'Invalid plugin basename: The plugin basename does not match the original request.', 'plugin-check' )
-				);
-			}
-		}
-
-		$plugin_file  = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin_basename );
-		$this->checks = new Checks( WP_PLUGIN_DIR . '/' . $plugin_file );
+		$plugin_slug     = isset( $this->plugin_slug ) ? $this->plugin_slug : $this->get_plugin_param();
+		$plugin_basename = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin_slug );
+		$this->checks    = new Checks( WP_PLUGIN_DIR . '/' . $plugin_basename );
 
 		return $this->checks;
 	}
@@ -271,22 +282,12 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @since n.e.x.t
 	 *
 	 * @return array An array of check slugs to run.
-	 *
-	 * @throws Exception Thrown if the checks do not match those in the original request.
 	 */
-	protected function get_check_slugs_to_run() {
-		// Determine the check slugs from the request.
-		$check_slugs = $this->determine_check_slugs_to_run();
-
-		if ( $this->initialized_early && isset( $this->check_slugs ) ) {
-			// Compare the plugin basename to see if there was an error.
-			if ( $this->check_slugs !== $check_slugs ) {
-				throw new Exception(
-					__( 'Invalid checks: The checks to run do not match the original request.', 'plugin-check' )
-				);
-			}
+	protected function get_check_slugs() {
+		if ( isset( $this->check_slugs ) ) {
+			return $this->check_slugs;
 		}
 
-		return $check_slugs;
+		return $this->get_check_slugs_param();
 	}
 }
