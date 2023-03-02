@@ -35,12 +35,12 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	protected $check_slugs;
 
 	/**
-	 * The plugin slug to check.
+	 * The plugin slug or basename to check.
 	 *
 	 * @since n.e.x.t
 	 * @var string
 	 */
-	protected $plugin_slug;
+	protected $plugin;
 
 	/**
 	 * An instance of the Checks class.
@@ -109,25 +109,25 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	}
 
 	/**
-	 * Sets the plugin slug to be checked.
+	 * Sets the plugin slug or basename to be checked.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param string $plugin_slug The plugin slug to be checked.
+	 * @param string $plugin The plugin slug or basename to be checked.
 	 *
-	 * @throws Exception Thrown if the plugin main file does not match the original request.
+	 * @throws Exception Thrown if the plugin set does not match the original request parameter.
 	 */
-	public function set_plugin_slug( $plugin_slug ) {
+	public function set_plugin( $plugin ) {
 		if ( $this->initialized_early ) {
 			// Compare the plugin parameter to see if there was an error.
-			if ( $plugin_slug !== $this->get_plugin_param() ) {
+			if ( $plugin !== $this->get_plugin_param() ) {
 				throw new Exception(
-					__( 'Invalid plugin: The plugin slug does not match the original request.', 'plugin-check' )
+					__( 'Invalid plugin: The plugin set does not match the original request parameter.', 'plugin-check' )
 				);
 			}
 		}
 
-		$this->plugin_slug = $plugin_slug;
+		$this->plugin = $plugin;
 	}
 
 	/**
@@ -269,8 +269,8 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			return $this->checks;
 		}
 
-		$plugin_slug     = isset( $this->plugin_slug ) ? $this->plugin_slug : $this->get_plugin_param();
-		$plugin_basename = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin_slug );
+		$plugin          = isset( $this->plugin ) ? $this->plugin : $this->get_plugin_param();
+		$plugin_basename = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin );
 		$this->checks    = new Checks( WP_PLUGIN_DIR . '/' . $plugin_basename );
 
 		return $this->checks;

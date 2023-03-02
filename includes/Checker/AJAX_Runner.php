@@ -44,18 +44,18 @@ class AJAX_Runner extends Abstract_Check_Runner {
 	}
 
 	/**
-	 * Returns the plugin slug based on the request.
+	 * Returns the plugin parameter based on the request.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return string The plugin slug.
+	 * @return string The plugin parameter.
 	 *
-	 * @throws Exception Thrown if the plugin slug is invalid.
+	 * @throws Exception Thrown if the plugin parameter is empty.
 	 */
 	protected function get_plugin_param() {
 		if ( ! isset( $_REQUEST['plugin'] ) ) {
 			throw new Exception(
-				__( 'Invalid plugin slug: Plugin slug must not be empty.', 'plugin-check' )
+				__( 'Invalid plugin: Plugin parameter must not be empty.', 'plugin-check' )
 			);
 		}
 

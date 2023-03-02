@@ -162,7 +162,7 @@ class AJAX_Runner_Tests extends WP_UnitTestCase {
 		global $wp_actions;
 
 		$this->expectException( 'Exception' );
-		$this->expectExceptionMessage( 'Invalid plugin: The plugin slug does not match the original request.' );
+		$this->expectExceptionMessage( 'Invalid plugin: The plugin set does not match the original request parameter.' );
 
 		add_filter( 'wp_doing_ajax', '__return_true' );
 		$_REQUEST['action'] = 'plugin_check_run_checks';
@@ -176,7 +176,7 @@ class AJAX_Runner_Tests extends WP_UnitTestCase {
 
 		$wp_actions['muplugins_loaded'] = $muplugins_loaded;
 
-		$runner->set_plugin_slug( 'invalid-plugin' );
+		$runner->set_plugin( 'invalid-plugin' );
 
 		$runner->prepare();
 		$runner->run();
