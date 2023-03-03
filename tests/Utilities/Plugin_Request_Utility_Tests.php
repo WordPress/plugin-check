@@ -57,4 +57,78 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 
 		$this->assertInstanceOf( AJAX_Runner::class, $runner );
 	}
+
+	public function test_destroy_runner_with_cli() {
+		global $wpdb, $table_prefix;
+
+		$_SERVER['argv'] = array(
+			'wp',
+			'plugin',
+			'check',
+			'plugin-check',
+			'--checks=runtime-check',
+		);
+
+		add_filter(
+			'wp_plugin_check_checks',
+			function( $checks ) {
+				return array(
+					'runtime-check' => new WordPress\Plugin_Check\Test_Data\Runtime_Check(),
+				);
+			}
+		);
+
+		Plugin_Request_Utility::initialize_runner();
+
+		// Determine if one of the Universal_Runtume_Preparation was run.
+		$prepared = has_filter( 'option_active_plugins' );
+
+		Plugin_Request_Utility::destroy_runner();
+
+		// Determine if the cleanup function was run.
+		$cleanup = ! has_filter( 'option_active_plugins' );
+		$runner  = Plugin_Request_Utility::get_runner();
+
+		unset( $_SERVER['argv'] );
+		$wpdb->set_prefix( $table_prefix );
+
+		$this->assertTrue( $prepared );
+		$this->assertTrue( $cleanup );
+		$this->assertNull( $runner );
+	}
+
+	public function test_destroy_runner_with_ajax() {
+		global $wpdb, $table_prefix;
+
+		add_filter( 'wp_doing_ajax', '__return_true' );
+		$_REQUEST['action'] = 'plugin_check_run_checks';
+		$_REQUEST['plugin'] = 'plugin-check';
+		$_REQUEST['checks'] = 'runtime_check';
+
+		add_filter(
+			'wp_plugin_check_checks',
+			function( $checks ) {
+				return array(
+					'runtime_check' => new WordPress\Plugin_Check\Test_Data\Runtime_Check(),
+				);
+			}
+		);
+
+		Plugin_Request_Utility::initialize_runner();
+
+		// Determine if one of the Universal_Runtume_Preparation was run.
+		$prepared = has_filter( 'option_active_plugins' );
+
+		Plugin_Request_Utility::destroy_runner();
+
+		// Determine if the cleanup function was run.
+		$cleanup = ! has_filter( 'option_active_plugins' );
+		$runner  = Plugin_Request_Utility::get_runner();
+
+		$wpdb->set_prefix( $table_prefix );
+
+		$this->assertTrue( $prepared );
+		$this->assertTrue( $cleanup );
+		$this->assertNull( $runner );
+	}
 }
