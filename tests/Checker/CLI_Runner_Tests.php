@@ -161,4 +161,58 @@ class CLI_Runner_Tests extends WP_UnitTestCase {
 		$this->assertEmpty( $results->get_warnings() );
 		$this->assertNotEmpty( $results->get_errors() );
 	}
+
+	public function test_runner_initialized_early_throws_plugin_basename_exception() {
+		global $wp_actions;
+
+		$this->expectException( 'Exception' );
+		$this->expectExceptionMessage( 'Invalid plugin: The plugin set does not match the original request parameter.' );
+
+		$_SERVER['argv'] = array(
+			'wp',
+			'plugin',
+			'check',
+			'plugin-check',
+			'--checks=error-check',
+		);
+
+		$muplugins_loaded = $wp_actions['muplugins_loaded'];
+		unset( $wp_actions['muplugins_loaded'] );
+
+		$runner = new CLI_Runner();
+
+		$wp_actions['muplugins_loaded'] = $muplugins_loaded;
+
+		$runner->set_plugin( 'invalid-plugin' );
+
+		$runner->prepare();
+		$runner->run();
+	}
+
+	public function test_runner_initialized_early_throws_checks_exception() {
+		global $wp_actions;
+
+		$this->expectException( 'Exception' );
+		$this->expectExceptionMessage( 'Invalid checks: The checks to run do not match the original request.' );
+
+		$_SERVER['argv'] = array(
+			'wp',
+			'plugin',
+			'check',
+			'plugin-check',
+			'--checks=error-check',
+		);
+
+		$muplugins_loaded = $wp_actions['muplugins_loaded'];
+		unset( $wp_actions['muplugins_loaded'] );
+
+		$runner = new CLI_Runner();
+
+		$wp_actions['muplugins_loaded'] = $muplugins_loaded;
+
+		$runner->set_check_slugs( array( 'runtime_check' ) );
+
+		$runner->prepare();
+		$runner->run();
+	}
 }

@@ -8,7 +8,6 @@
 namespace WordPress\Plugin_Check\Checker;
 
 use Exception;
-use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 
 /**
  * AJAX Runner class.
@@ -45,27 +44,22 @@ class AJAX_Runner extends Abstract_Check_Runner {
 	}
 
 	/**
-	 * Creates and returns an instance of the Checks class based on the request.
+	 * Returns the plugin parameter based on the request.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return Checks An instance of the Checks class.
+	 * @return string The plugin parameter.
 	 *
-	 * @throws Exception Thrown if the plugin main file cannot be found based on the AJAX input.
+	 * @throws Exception Thrown if the plugin parameter is empty.
 	 */
-	protected function get_checks_instance() {
-		if ( ! isset( $this->checks ) ) {
-			if ( ! isset( $_REQUEST['plugin'] ) ) {
-				throw new Exception( 'Invalid plugin slug: Plugin slug must not be empty.' );
-			}
-
-			// Get the plugin name from the AJAX request.
-			$plugin_file = Plugin_Request_Utility::get_plugin_basename_from_input( $_REQUEST['plugin'] );
-
-			$this->checks = new Checks( WP_PLUGIN_DIR . '/' . $plugin_file );
+	protected function get_plugin_param() {
+		if ( ! isset( $_REQUEST['plugin'] ) ) {
+			throw new Exception(
+				__( 'Invalid plugin: Plugin parameter must not be empty.', 'plugin-check' )
+			);
 		}
 
-		return $this->checks;
+		return sanitize_text_field( $_REQUEST['plugin'] );
 	}
 
 	/**
@@ -75,7 +69,7 @@ class AJAX_Runner extends Abstract_Check_Runner {
 	 *
 	 * @return array An array of Check slugs to run.
 	 */
-	protected function get_check_slugs_to_run() {
+	protected function get_check_slugs_param() {
 		$checks = array();
 
 		if ( isset( $_REQUEST['checks'] ) ) {
