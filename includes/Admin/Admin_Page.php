@@ -32,7 +32,7 @@ class Admin_Page {
 	}
 
 	/**
-	 * Initializes hooks.
+	 * Registers WordPress hooks for the admin page.
 	 *
 	 * @since n.e.x.t
 	 */
@@ -70,7 +70,7 @@ class Admin_Page {
 	}
 
 	/**
-	 * Load check's script.
+	 * Loads the check's script.
 	 *
 	 * @since n.e.x.t
 	 */
@@ -113,7 +113,7 @@ class Admin_Page {
 	}
 
 	/**
-	 * Render the "Plugin Check" page.
+	 * Renders the "Plugin Check" page.
 	 *
 	 * @since n.e.x.t
 	 */
@@ -135,9 +135,7 @@ class Admin_Page {
 	 * @return array The modified list of actions.
 	 */
 	public function filter_plugin_action_links( $actions, $plugin_file ) {
-
 		if ( current_user_can( 'activate_plugins' ) ) {
-
 			$actions[] = sprintf(
 				'<a href="%1$s">%2$s</a>',
 				esc_url( admin_url() . 'tools.php?page=plugin-check&plugin=' . $plugin_file ),

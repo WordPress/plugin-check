@@ -8,7 +8,7 @@
 namespace WordPress\Plugin_Check\Admin;
 
 /**
- * Class is handling admin tools page functionality.
+ * Class to handle the Admin AJAX requests.
  *
  * @since n.e.x.t
  */
@@ -23,7 +23,7 @@ class Admin_AJAX {
 	private $nonce_key;
 
 	/**
-	 * Constructor.
+	 * Sets the nonce key for verification.
 	 *
 	 * @since n.e.x.t
 	 *
@@ -34,35 +34,32 @@ class Admin_AJAX {
 	}
 
 	/**
-	 * Initializes hooks.
+	 * Registers WordPress hooks for the Admin AJAX.
 	 *
 	 * @since n.e.x.t
 	 */
 	public function add_hooks() {
-		add_action( 'wp_ajax_plugin_check_run_check', array( $this, 'run_check' ) );
+		add_action( 'wp_ajax_plugin_check_run_checks', array( $this, 'run_checks' ) );
 	}
 
 	/**
-	 * Create nonce and send it.
+	 * Creates and returns the nonce.
 	 *
 	 * @since n.e.x.t
 	 */
 	public function get_nonce() {
-
 		return wp_create_nonce( $this->nonce_key );
 	}
 
 	/**
-	 * Run check.
+	 * Run checks.
 	 *
 	 * @since n.e.x.t
 	 */
-	public function run_check() {
-
+	public function run_checks() {
 		$nonce = filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_STRING );
 
 		if ( ! wp_verify_nonce( $nonce, $this->nonce_key ) ) {
-
 			wp_send_json_error();
 		}
 
