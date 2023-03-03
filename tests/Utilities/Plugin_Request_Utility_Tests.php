@@ -131,4 +131,11 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		$this->assertTrue( $cleanup );
 		$this->assertNull( $runner );
 	}
+
+	public function test_destroy_runner_with_no_runner() {
+		Plugin_Request_Utility::destroy_runner();
+		$runner = Plugin_Request_Utility::get_runner();
+
+		$this->assertNull( $runner );
+	}
 }

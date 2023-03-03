@@ -122,7 +122,10 @@ class Plugin_Request_Utility {
 	 */
 	public static function destroy_runner() {
 		// Run the cleanup functions.
-		call_user_func( self::$cleanup );
+		if ( isset( self::$cleanup ) ) {
+			call_user_func( self::$cleanup );
+		}
+
 		static::$runner = null;
 	}
 }
