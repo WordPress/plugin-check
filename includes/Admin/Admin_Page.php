@@ -28,7 +28,7 @@ class Admin_Page {
 	 * @since n.e.x.t
 	 */
 	public function __construct() {
-		$this->admin_ajax = new Admin_AJAX( 'run-check-via-check-it-button' );
+		$this->admin_ajax = new Admin_AJAX();
 	}
 
 	/**
@@ -75,7 +75,13 @@ class Admin_Page {
 	 * @since n.e.x.t
 	 */
 	public function enqueue_scripts() {
-		wp_enqueue_script( 'plugin-check-admin', WP_PLUGIN_CHECK_PLUGIN_DIR_URL . 'assets/js/plugin-check-admin.js', array(), '1.0.0', true );
+		wp_enqueue_script(
+			'plugin-check-admin',
+			WP_PLUGIN_CHECK_PLUGIN_DIR_URL . 'assets/js/plugin-check-admin.js',
+			array(),
+			WP_PLUGIN_CHECK_VERSION,
+			true
+		);
 
 		wp_add_inline_script(
 			'plugin-check-admin',
