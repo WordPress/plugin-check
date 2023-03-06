@@ -39,14 +39,14 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 		wp_set_current_user( $admin_user );
 		set_current_screen( 'dashboard' );
 
-		$this->admin_page->add_page();
-
+		$page_hook    = $this->admin_page->add_page();
 		$parent_pages = $_parent_pages;
 
 		set_current_screen( $current_screen );
 
 		$this->assertArrayHasKey( 'plugin-check', $parent_pages );
 		$this->assertEquals( 'tools.php', $parent_pages['plugin-check'] );
+		$this->assertNotFalse( has_action( "load-{$page_hook}", array( $this->admin_page, 'initialize_page' ) ) );
 	}
 
 	public function test_initialize_page() {

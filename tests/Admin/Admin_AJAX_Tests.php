@@ -16,7 +16,7 @@ class Admin_AJAX_Tests extends WP_UnitTestCase {
 
 	public function set_up() {
 		parent::set_up();
-		$this->admin_ajax = new Admin_AJAX( 'run-check-via-check-it-button' );
+		$this->admin_ajax = new Admin_AJAX();
 	}
 
 	public function test_add_hooks() {
@@ -26,7 +26,7 @@ class Admin_AJAX_Tests extends WP_UnitTestCase {
 
 	public function test_get_nonce() {
 		$this->assertNotFalse(
-			wp_verify_nonce( $this->admin_ajax->get_nonce(), 'run-check-via-check-it-button' )
+			wp_verify_nonce( $this->admin_ajax->get_nonce(), Admin_AJAX::NONCE_KEY )
 		);
 	}
 }
