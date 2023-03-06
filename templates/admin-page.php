@@ -13,32 +13,32 @@
 
 	<div class="plugin-check-content">
 
-		<?php if ( ! empty( $available_plugins ) ) { ?>
+		<?php if ( ! empty( $available_plugins ) ) : ?>
 
 			<form>
 				<h2>
-					<label class="title" for="pc_plugins">
+					<label class="title" for="plugin-check__plugins-dropdown">
 						<?php esc_html_e( 'Check the Plugin', 'plugin-check' ); ?>
 					</label>
 				</h2>
 
-				<select id="pc_plugins" name="plugin_check_plugins">
+				<select id="plugin-check__plugins-dropdown" name="plugin_check_plugins">
 					<option><?php esc_html_e( 'Select Plugin', 'plugin-check' ); ?></option>
-					<?php foreach ( $available_plugins as $plugin_basename => $available_plugin ) { ?>
+					<?php foreach ( $available_plugins as $plugin_basename => $available_plugin ) : ?>
 						<option value="<?php echo esc_attr( $plugin_basename ); ?>"<?php selected( $selected_plugin_basename, $plugin_basename ); ?>>
 							<?php echo esc_html( $available_plugin['Name'] ); ?>
 						</option>
-					<?php } ?>
+					<?php endforeach; ?>
 				</select>
 
-				<input type="submit" value="<?php esc_attr_e( 'Check it!', 'plugin-check' ); ?>" id="pc_check_it" />
+				<input type="submit" value="<?php esc_attr_e( 'Check it!', 'plugin-check' ); ?>" id="plugin-check__submit" />
 			</form>
 
-		<?php } else { ?>
+		<?php else : ?>
 
 			<h2><?php esc_html_e( 'No plugins available.', 'plugin-check' ); ?></h2>
 
-		<?php } ?>
+		<?php endif; ?>
 	</div>
 
 </div>

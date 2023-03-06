@@ -1,6 +1,12 @@
 ( function ( data ) {
-	const checkItButton = document.getElementById( 'pc_check_it' );
-	const pluginsList   = document.getElementById( 'pc_plugins' );
+	const checkItButton = document.getElementById( 'plugin-check__submit' );
+	const pluginsList   = document.getElementById( 'plugin-check__plugins-dropdown' );
+
+	// Return early if the elements cannot be found on the page.
+	if ( ! checkItButton || ! pluginsList ) {
+		console.error( 'Missing form elements on page' );
+		return;
+	}
 
 	checkItButton.addEventListener( 'click', (e) => {
 		e.preventDefault();
@@ -13,7 +19,7 @@
 		pluginCheckData.append( 'plugin', pluginsList.value );
 
 		fetch(
-			ajaxurl,
+			data.ajaxUrl,
 			{
 				method: 'POST',
 				credentials: 'same-origin',
@@ -22,20 +28,20 @@
 		)
 		.then(
 			( response ) => {
-				if ( ! response.ok ) {
-					throw new Error(`[${response.message}]`);
-				}
-
 				return response.json();
 			}
 		)
 		.then(
 			( data ) => {
-				console.log( data.data.message );
+				if ( ! data.success ) {
+					throw new Error( data.data[0].message );
+				}
+
+				console.log('data', data.data.message );
 			}
 		)
 		.catch(
-			( error ) => { console.log( error ); }
+			( error ) => { console.error( error ); }
 		);
 
 	} );

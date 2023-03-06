@@ -7,6 +7,8 @@
 
 namespace WordPress\Plugin_Check\Admin;
 
+use WP_Error;
+
 /**
  * Class to handle the Admin AJAX requests.
  *
@@ -48,13 +50,16 @@ class Admin_AJAX {
 	public function run_checks() {
 		$nonce = filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_STRING );
 
-		if ( ! wp_verify_nonce( $nonce, $this->nonce_key ) ) {
-			wp_send_json_error();
+		if ( ! wp_verify_nonce( $nonce, self::NONCE_KEY ) ) {
+			wp_send_json_error(
+				new WP_Error( 403, __( 'Invalid nonce', 'plugin-check' ) ),
+				403
+			);
 		}
 
 		wp_send_json_success(
 			array(
-				'message' => 'Verified!',
+				'message' => __( 'Verified!', 'plugin-check' ),
 			)
 		);
 	}
