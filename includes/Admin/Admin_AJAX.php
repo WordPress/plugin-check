@@ -20,18 +20,7 @@ class Admin_AJAX {
 	 * @since n.e.x.t
 	 * @var string
 	 */
-	private $nonce_key;
-
-	/**
-	 * Sets the nonce key for verification.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @param string $nonce_key Nonce key.
-	 */
-	public function __construct( $nonce_key ) {
-		$this->nonce_key = $nonce_key;
-	}
+	const NONCE_KEY = 'plugin-check-run-checks';
 
 	/**
 	 * Registers WordPress hooks for the Admin AJAX.
@@ -48,7 +37,7 @@ class Admin_AJAX {
 	 * @since n.e.x.t
 	 */
 	public function get_nonce() {
-		return wp_create_nonce( $this->nonce_key );
+		return wp_create_nonce( self::NONCE_KEY );
 	}
 
 	/**
