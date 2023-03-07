@@ -7,10 +7,9 @@
 
 namespace WordPress\Plugin_Check\CLI;
 
-use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Plugin_Context;
-use Exception;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
+use Exception;
 use WP_CLI;
 
 /**
@@ -39,25 +38,13 @@ class Plugin_Check_Command {
 	);
 
 	/**
-	 * Check flags.
-	 *
-	 * @since n.e.x.t
-	 * @var string[]
-	 */
-	protected $check_flags = array(
-		'stable',
-		'beta',
-		'experimental',
-	);
-
-	/**
 	 * Constructor.
 	 *
 	 * @since n.e.x.t
 	 *
 	 * @param Plugin_Context $plugin_context Plugin context.
 	 */
-	public function __construct( $plugin_context ) {
+	public function __construct( Plugin_Context $plugin_context ) {
 		$this->plugin_context = $plugin_context;
 	}
 
@@ -71,16 +58,6 @@ class Plugin_Check_Command {
 	 *
 	 * [--checks]
 	 * : Only runs checks provided as an argument in comma-separated values, e.g. enqueued-scripts, escaping. Otherwise runs all checks.
-	 *
-	 * [--flag]
-	 * : Limit the checks being executed according to their flags, e.g. stable, beta or experimental. Default is stable.
-	 * ---
-	 * default: stable
-	 * options:
-	 *   - stable
-	 *   - beta
-	 *   - experimental
-	 * ---
 	 *
 	 * [--format]
 	 * : Format to display the results. Options are table, csv, and json. The default will be a table.
@@ -122,13 +99,11 @@ class Plugin_Check_Command {
 		$assoc_args = $this->get_options( $assoc_args );
 
 		try {
-
 			Plugin_Request_Utility::initialize_runner();
 			$cli_runner = Plugin_Request_Utility::get_runner();
 			$result     = $cli_runner->run();
 
 		} catch ( Exception $error ) {
-
 			WP_CLI::error( $error->getMessage() );
 		}
 
@@ -178,23 +153,11 @@ class Plugin_Check_Command {
 
 		$options = array(
 			'checks'          => 'all',
-			'flag'            => 'stable',
 			'format'          => 'table',
 			'ignore-warnings' => false,
 			'ignore-errors'   => false,
 		);
 		$options = wp_parse_args( $assoc_args, $options );
-
-		if ( ! in_array( $options['flag'], $this->check_flags, true ) ) {
-
-			WP_CLI::error(
-				sprintf(
-					// translators: 1. Check flags.
-					__( 'Invalid flag argument, valid value will be one of [%1$s]', 'plugin-check' ),
-					implode( ', ', $this->check_flags )
-				)
-			);
-		}
 
 		if ( ! in_array( $options['format'], $this->output_formats, true ) ) {
 
