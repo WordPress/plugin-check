@@ -7,6 +7,8 @@
 
 namespace WordPress\Plugin_Check\Checker;
 
+use Exception;
+use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 use WordPress\Plugin_Check\Checker\Preparations\Universal_Runtime_Preparation;
 
 /**
@@ -15,6 +17,38 @@ use WordPress\Plugin_Check\Checker\Preparations\Universal_Runtime_Preparation;
  * @since n.e.x.t
  */
 abstract class Abstract_Check_Runner implements Check_Runner {
+
+	/**
+	 * True if the class was initialized early in the WordPress load process.
+	 *
+	 * @since n.e.x.t
+	 * @var bool
+	 */
+	protected $initialized_early;
+
+	/**
+	 * The check slugs to run.
+	 *
+	 * @since n.e.x.t
+	 * @var array
+	 */
+	protected $check_slugs;
+
+	/**
+	 * The plugin slug or basename to check.
+	 *
+	 * @since n.e.x.t
+	 * @var string
+	 */
+	protected $plugin;
+
+	/**
+	 * An instance of the Checks class.
+	 *
+	 * @since n.e.x.t
+	 * @var Checks
+	 */
+	protected $checks;
 
 	/**
 	 * Determines if the current request is intended for the plugin checker.
@@ -26,13 +60,13 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	abstract public function is_plugin_check();
 
 	/**
-	 * Creates and returns an instance of the Checks class based on the request.
+	 * Returns the plugin parameter based on the request.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return Checks An instance of the Checks class.
+	 * @return string The plugin paramater from the request.
 	 */
-	abstract protected function get_checks_instance();
+	abstract protected function get_plugin_param();
 
 	/**
 	 * Returns an array of Check slugs to run based on the request.
@@ -41,7 +75,60 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @return array An array of Check slugs.
 	 */
-	abstract protected function get_check_slugs_to_run();
+	abstract protected function get_check_slugs_param();
+
+	/**
+	 * Sets whether the runner class was initialized early.
+	 *
+	 * @since n.e.x.t
+	 */
+	public function __construct() {
+		$this->initialized_early = ! did_action( 'muplugins_loaded' );
+	}
+
+	/**
+	 * Sets the check slugs to be run.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param array $check_slugs An array of check slugs to be run.
+	 *
+	 * @throws Exception Thrown if the checks do not match those in the original request.
+	 */
+	public function set_check_slugs( array $check_slugs ) {
+		if ( $this->initialized_early ) {
+			// Compare the check slugs to see if there was an error.
+			if ( $check_slugs !== $this->get_check_slugs_param() ) {
+				throw new Exception(
+					__( 'Invalid checks: The checks to run do not match the original request.', 'plugin-check' )
+				);
+			}
+		}
+
+		$this->check_slugs = $check_slugs;
+	}
+
+	/**
+	 * Sets the plugin slug or basename to be checked.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param string $plugin The plugin slug or basename to be checked.
+	 *
+	 * @throws Exception Thrown if the plugin set does not match the original request parameter.
+	 */
+	public function set_plugin( $plugin ) {
+		if ( $this->initialized_early ) {
+			// Compare the plugin parameter to see if there was an error.
+			if ( $plugin !== $this->get_plugin_param() ) {
+				throw new Exception(
+					__( 'Invalid plugin: The plugin set does not match the original request parameter.', 'plugin-check' )
+				);
+			}
+		}
+
+		$this->plugin = $plugin;
+	}
 
 	/**
 	 * Prepares the environment for running the requested checks.
@@ -158,7 +245,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @return array An array map of check slugs to Check instances.
 	 */
 	protected function get_checks_to_run() {
-		$check_slugs = $this->get_check_slugs_to_run();
+		$check_slugs = $this->get_check_slugs();
 		$all_checks  = $this->get_checks_instance()->get_checks();
 
 		if ( empty( $check_slugs ) ) {
@@ -166,5 +253,41 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		}
 
 		return array_intersect_key( $all_checks, array_flip( $check_slugs ) );
+	}
+
+	/**
+	 * Creates and returns the Check instance.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return Checks An instance of the Checks class.
+	 *
+	 * @throws Exception Thrown if the plugin slug is invalid.
+	 */
+	protected function get_checks_instance() {
+		if ( isset( $this->checks ) ) {
+			return $this->checks;
+		}
+
+		$plugin          = isset( $this->plugin ) ? $this->plugin : $this->get_plugin_param();
+		$plugin_basename = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin );
+		$this->checks    = new Checks( WP_PLUGIN_DIR . '/' . $plugin_basename );
+
+		return $this->checks;
+	}
+
+	/**
+	 * Returns the check slugs to run.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array An array of check slugs to run.
+	 */
+	protected function get_check_slugs() {
+		if ( isset( $this->check_slugs ) ) {
+			return $this->check_slugs;
+		}
+
+		return $this->get_check_slugs_param();
 	}
 }

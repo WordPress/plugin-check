@@ -115,4 +115,18 @@ class Plugin_Request_Utility {
 
 		return null;
 	}
+
+	/**
+	 * Runs the cleanup functions and destroys the runner.
+	 *
+	 * @since n.e.x.t
+	 */
+	public static function destroy_runner() {
+		// Run the cleanup functions.
+		if ( isset( self::$cleanup ) ) {
+			call_user_func( self::$cleanup );
+		}
+
+		static::$runner = null;
+	}
 }
