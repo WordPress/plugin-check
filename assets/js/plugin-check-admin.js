@@ -28,16 +28,20 @@
 		)
 		.then(
 			( response ) => {
+				if ( ! response.ok ) {
+					throw new Error( `${response.status}: ${response.statusText}` );
+				}
+
 				return response.json();
 			}
 		)
 		.then(
 			( data ) => {
-				if ( ! data.success ) {
-					throw new Error( data.data[0].message );
+				if ( ! data.success && ( ! data.data || ! data.data.message ) ) {
+					throw new Error( 'Response contains no data' );
 				}
 
-				console.log('data', data.data.message );
+				console.log( data.data.message );
 			}
 		)
 		.catch(

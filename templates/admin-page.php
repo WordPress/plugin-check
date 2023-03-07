@@ -13,7 +13,7 @@
 
 	<div class="plugin-check-content">
 
-		<?php if ( ! empty( $available_plugins ) ) : ?>
+		<?php if ( ! empty( $available_plugins ) ) { ?>
 
 			<form>
 				<h2>
@@ -24,21 +24,21 @@
 
 				<select id="plugin-check__plugins-dropdown" name="plugin_check_plugins">
 					<option><?php esc_html_e( 'Select Plugin', 'plugin-check' ); ?></option>
-					<?php foreach ( $available_plugins as $plugin_basename => $available_plugin ) : ?>
+					<?php foreach ( $available_plugins as $plugin_basename => $available_plugin ) { ?>
 						<option value="<?php echo esc_attr( $plugin_basename ); ?>"<?php selected( $selected_plugin_basename, $plugin_basename ); ?>>
 							<?php echo esc_html( $available_plugin['Name'] ); ?>
 						</option>
-					<?php endforeach; ?>
+					<?php } ?>
 				</select>
 
 				<input type="submit" value="<?php esc_attr_e( 'Check it!', 'plugin-check' ); ?>" id="plugin-check__submit" />
 			</form>
 
-		<?php else : ?>
+		<?php } else { ?>
 
 			<h2><?php esc_html_e( 'No plugins available.', 'plugin-check' ); ?></h2>
 
-		<?php endif; ?>
+		<?php } ?>
 	</div>
 
 </div>

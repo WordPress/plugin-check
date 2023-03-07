@@ -52,7 +52,7 @@ class Admin_AJAX {
 
 		if ( ! wp_verify_nonce( $nonce, self::NONCE_KEY ) ) {
 			wp_send_json_error(
-				new WP_Error( 403, __( 'Invalid nonce', 'plugin-check' ) ),
+				new WP_Error( 'invalid-nonce', __( 'Invalid nonce', 'plugin-check' ) ),
 				403
 			);
 		}
