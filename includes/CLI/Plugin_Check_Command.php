@@ -9,6 +9,7 @@ namespace WordPress\Plugin_Check\CLI;
 
 use WordPress\Plugin_Check\Plugin_Context;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
+use WordPress\Plugin_Check\Checker\CLI_Runner;
 use Exception;
 use WP_CLI;
 
@@ -82,7 +83,7 @@ class Plugin_Check_Command {
 	 * ## EXAMPLES
 	 *
 	 *   wp plugin check akismet
-	 *   wp plugin check akismet --check=escaping
+	 *   wp plugin check akismet --checks=escaping
 	 *   wp plugin check akismet --format=json
 	 *
 	 * @subcommand check
@@ -95,14 +96,25 @@ class Plugin_Check_Command {
 	 * @throws Exception Throws exception.
 	 */
 	public function check( $args, $assoc_args ) {
+		// Get options based on the CLI arguments.
+		$options = $this->get_options( $assoc_args );
 
-		$assoc_args = $this->get_options( $assoc_args );
+		// Create the plugin and checks array from CLI arguments.
+		$plugin  = isset( $args[0] ) ? $args[0] : '';
+		$checks  = wp_parse_list( $options['checks'] );
 
+		// Get the CLI Runner.
+		$runner  = Plugin_Request_Utility::get_runner();
+
+		if ( is_null( $runner ) ) {
+			$runner = new CLI_Runner();
+			$runner->set_plugin( $plugin );
+			$runner->set_check_slugs( $checks );
+		}
+
+		// Run checks against the plugin.
 		try {
-			Plugin_Request_Utility::initialize_runner();
-			$cli_runner = Plugin_Request_Utility::get_runner();
-			$result     = $cli_runner->run();
-
+			$result = $runner->run();
 		} catch ( Exception $error ) {
 			WP_CLI::error( $error->getMessage() );
 		}
@@ -150,17 +162,16 @@ class Plugin_Check_Command {
 	 * @throws WP_CLI\ExitException Show error if plugin not found.
 	 */
 	protected function get_options( $assoc_args ) {
-
-		$options = array(
-			'checks'          => 'all',
+		$defaults = array(
+			'checks'          => '',
 			'format'          => 'table',
 			'ignore-warnings' => false,
 			'ignore-errors'   => false,
 		);
-		$options = wp_parse_args( $assoc_args, $options );
+
+		$options = wp_parse_args( $assoc_args, $defaults );
 
 		if ( ! in_array( $options['format'], $this->output_formats, true ) ) {
-
 			WP_CLI::error(
 				sprintf(
 					// translators: 1. Output formats.
@@ -182,7 +193,6 @@ class Plugin_Check_Command {
 	 * @return WP_CLI\Formatter The formatter instance.
 	 */
 	protected function get_formatter( $assoc_args ) {
-
 		$default_fields = array(
 			'line',
 			'column',
