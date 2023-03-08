@@ -100,11 +100,11 @@ class Plugin_Check_Command {
 		$options = $this->get_options( $assoc_args );
 
 		// Create the plugin and checks array from CLI arguments.
-		$plugin  = isset( $args[0] ) ? $args[0] : '';
-		$checks  = wp_parse_list( $options['checks'] );
+		$plugin = isset( $args[0] ) ? $args[0] : '';
+		$checks = wp_parse_list( $options['checks'] );
 
 		// Get the CLI Runner.
-		$runner  = Plugin_Request_Utility::get_runner();
+		$runner = Plugin_Request_Utility::get_runner();
 
 		if ( is_null( $runner ) ) {
 			$runner = new CLI_Runner();
