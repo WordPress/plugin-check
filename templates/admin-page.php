@@ -25,7 +25,7 @@
 				<select id="plugin-check__plugins" name="plugin_check_plugins">
 					<option><?php esc_html_e( 'Select Plugin', 'plugin-check' ); ?></option>
 					<?php foreach ( $available_plugins as $plugin_basename => $available_plugin ) { ?>
-						<option value="<?php echo esc_attr( $plugin_basename ); ?>">
+						<option value="<?php echo esc_attr( $plugin_basename ); ?>"<?php selected( $selected_plugin_basename, $plugin_basename ); ?>>
 							<?php echo esc_html( $available_plugin['Name'] ); ?>
 						</option>
 					<?php } ?>
