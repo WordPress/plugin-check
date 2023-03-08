@@ -37,10 +37,22 @@
 		)
 		.then(
 			( data ) => {
-				if ( ! data.success && ( ! data.data || ! data.data.message ) ) {
+				if ( ! data.success ) {
+					// // If not successful and no message in the response.
+					if ( ! data.data || ! data.data[0].message ) {
+						throw new Error( 'Response contains no data' );
+					}
+
+					// If not successful and there is a message in the response.
+					throw new Error( data.data[0].message );
+				}
+
+				// If the response is successful and there is no message in the response.
+				if ( ! data.data || ! data.data.message ) {
 					throw new Error( 'Response contains no data' );
 				}
 
+				// If the response is successful and there is a message in the response.
 				console.log( data.data.message );
 			}
 		)
