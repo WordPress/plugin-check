@@ -31,7 +31,7 @@
 					<?php } ?>
 				</select>
 
-				<input type="submit" value="<?php esc_attr_e( 'Check it!', 'plugin-check' ); ?>" id="plugin-check__submit" />
+				<input type="submit" value="<?php esc_attr_e( 'Check it!', 'plugin-check' ); ?>" id="plugin-check__submit" class="button" />
 			</form>
 
 		<?php } else { ?>

@@ -43,7 +43,7 @@ class Admin_AJAX {
 	}
 
 	/**
-	 * Run checks.
+	 * Runs checks.
 	 *
 	 * @since n.e.x.t
 	 */
