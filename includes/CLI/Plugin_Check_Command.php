@@ -50,17 +50,17 @@ class Plugin_Check_Command {
 	}
 
 	/**
-	 * Run plugin check.
+	 * Runs plugin check.
 	 *
 	 * ## OPTIONS
 	 *
-	 * [<plugin>]
+	 * <plugin>
 	 * : The plugin to check. Plugin name.
 	 *
-	 * [--checks]
+	 * [--checks=<checks>]
 	 * : Only runs checks provided as an argument in comma-separated values, e.g. enqueued-scripts, escaping. Otherwise runs all checks.
 	 *
-	 * [--format]
+	 * [--format=<format>]
 	 * : Format to display the results. Options are table, csv, and json. The default will be a table.
 	 * ---
 	 * default: table
@@ -70,7 +70,7 @@ class Plugin_Check_Command {
 	 *   - json
 	 * ---
 	 *
-	 * [--fields]
+	 * [--fields=<fields>]
 	 * : Limit displayed results to a subset of fields provided.
 	 *
 	 * [--ignore-warnings]
@@ -90,7 +90,7 @@ class Plugin_Check_Command {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param array $args List of the positional arguments.
+	 * @param array $args       List of the positional arguments.
 	 * @param array $assoc_args List of the associative arguments.
 	 *
 	 * @throws Exception Throws exception.
@@ -152,7 +152,7 @@ class Plugin_Check_Command {
 	}
 
 	/**
-	 * Validate associative arguments.
+	 * Validates the associative arguments.
 	 *
 	 * @since n.e.x.t
 	 *
@@ -288,7 +288,7 @@ class Plugin_Check_Command {
 	}
 
 	/**
-	 * Display results.
+	 * Displays the results.
 	 *
 	 * @since n.e.x.t
 	 *
