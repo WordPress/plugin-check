@@ -28,15 +28,15 @@
 		)
 		.then(
 			( response ) => {
-				if ( ! response.ok ) {
-					throw new Error( `${response.status}: ${response.statusText}` );
-				}
-
 				return response.json();
 			}
 		)
 		.then(
 			( data ) => {
+				if ( ! data ) {
+					throw new Error( 'Response contains no data' );
+				}
+
 				if ( ! data.success ) {
 					// // If not successful and no message in the response.
 					if ( ! data.data || ! data.data[0].message ) {
