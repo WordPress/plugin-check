@@ -91,7 +91,7 @@ class Admin_Page {
 			'plugin-check-admin',
 			'const PLUGIN_CHECK = ' . json_encode(
 				array(
-					'nonce'   => $this->admin_ajax->get_nonce(),
+					'nonce' => $this->admin_ajax->get_nonce(),
 				)
 			),
 			'before'
