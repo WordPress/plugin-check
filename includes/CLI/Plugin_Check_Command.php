@@ -106,14 +106,22 @@ class Plugin_Check_Command {
 		// Get the CLI Runner.
 		$runner = Plugin_Request_Utility::get_runner();
 
+		// Create the runner if not already initialized.
 		if ( is_null( $runner ) ) {
 			$runner = new CLI_Runner();
-			$runner->set_plugin( $plugin );
-			$runner->set_check_slugs( $checks );
+		}
+
+		// Make sure we are using the correct runner instance.
+		if ( ! ( $runner instanceof CLI_Runner ) ) {
+			WP_CLI::error(
+				__( 'CLI Runner was not initialized correctly.', 'plugin-check' )
+			);
 		}
 
 		// Run checks against the plugin.
 		try {
+			$runner->set_plugin( $plugin );
+			$runner->set_check_slugs( $checks );
 			$result = $runner->run();
 		} catch ( Exception $error ) {
 			WP_CLI::error( $error->getMessage() );
