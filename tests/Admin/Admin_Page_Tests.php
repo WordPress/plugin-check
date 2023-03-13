@@ -8,7 +8,6 @@
 namespace Admin;
 
 use WordPress\Plugin_Check\Admin\Admin_Page;
-use WP_Object_Cache;
 use WP_UnitTestCase;
 
 class Admin_Page_Tests extends WP_UnitTestCase {
@@ -40,14 +39,19 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 		wp_set_current_user( $admin_user );
 		set_current_screen( 'dashboard' );
 
-		$this->admin_page->add_page();
-
+		$page_hook    = $this->admin_page->add_page();
 		$parent_pages = $_parent_pages;
 
 		set_current_screen( $current_screen );
 
 		$this->assertArrayHasKey( 'plugin-check', $parent_pages );
 		$this->assertEquals( 'tools.php', $parent_pages['plugin-check'] );
+		$this->assertNotFalse( has_action( "load-{$page_hook}", array( $this->admin_page, 'initialize_page' ) ) );
+	}
+
+	public function test_initialize_page() {
+		$this->admin_page->initialize_page();
+		$this->assertEquals( 10, has_action( 'admin_enqueue_scripts', array( $this->admin_page, 'enqueue_scripts' ) ) );
 	}
 
 	public function test_render_page() {
