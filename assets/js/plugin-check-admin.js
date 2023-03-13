@@ -19,7 +19,7 @@
 		pluginCheckData.append( 'plugin', pluginsList.value );
 
 		fetch(
-			data.ajaxUrl,
+			ajaxurl,
 			{
 				method: 'POST',
 				credentials: 'same-origin',
