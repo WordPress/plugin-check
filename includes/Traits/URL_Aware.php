@@ -32,6 +32,18 @@ trait URL_Aware {
 	);
 
 	/**
+	 * List of relevant WP global variables to modify.
+	 *
+	 * @since n.e.x.t
+	 * @var array
+	 */
+	private $wp_globals = array(
+		'wp_query',
+		'wp_the_query',
+		'wp',
+	);
+
+	/**
 	 * Array of original values for the global state.
 	 *
 	 * @since n.e.x.t
@@ -57,20 +69,12 @@ trait URL_Aware {
 		);
 
 		$global_vars = array();
+		$global_keys = array_merge( $this->query_globals, $this->wp_globals );
 
-		foreach ( $this->query_globals as $query_global ) {
+		foreach ( $global_keys as $query_global ) {
 			if ( isset( $GLOBALS[ $query_global ] ) ) {
 				$global_vars[ $query_global ] = $GLOBALS[ $query_global ];
 			}
-		}
-		if ( isset( $GLOBALS['wp_query'] ) ) {
-			$global_vars['wp_query'] = $GLOBALS['wp_query'];
-		}
-		if ( isset( $GLOBALS['wp_the_query'] ) ) {
-			$global_vars['wp_the_query'] = $GLOBALS['wp_the_query'];
-		}
-		if ( isset( $GLOBALS['wp'] ) ) {
-			$global_vars['wp'] = $GLOBALS['wp'];
 		}
 
 		$this->global_values['global_vars'] = $global_vars;
@@ -87,28 +91,14 @@ trait URL_Aware {
 		$_SERVER = $this->global_values['server'];
 
 		$global_vars = $this->global_values['global_vars'];
+		$global_keys = array_merge( $this->query_globals, $this->wp_globals );
 
-		foreach ( $this->query_globals as $query_global ) {
+		foreach ( $global_keys as $query_global ) {
 			if ( isset( $global_vars[ $query_global ] ) ) {
 				$GLOBALS[ $query_global ] = $global_vars[ $query_global ];
 			} else {
 				unset( $GLOBALS[ $query_global ] );
 			}
-		}
-		if ( isset( $global_vars['wp_query'] ) ) {
-			$GLOBALS['wp_query'] = $global_vars['wp_query'];
-		} else {
-			unset( $GLOBALS['wp_query'] );
-		}
-		if ( isset( $global_vars['wp_the_query'] ) ) {
-			$GLOBALS['wp_the_query'] = $global_vars['wp_the_query'];
-		} else {
-			unset( $GLOBALS['wp_the_query'] );
-		}
-		if ( isset( $global_vars['wp'] ) ) {
-			$GLOBALS['wp'] = $global_vars['wp'];
-		} else {
-			unset( $GLOBALS['wp'] );
 		}
 	}
 
