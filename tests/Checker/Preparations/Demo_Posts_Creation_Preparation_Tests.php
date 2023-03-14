@@ -61,6 +61,7 @@ class Demo_Posts_Creation_Preparation_Tests extends WP_UnitTestCase {
 		$this->expectException( 'Exception' );
 		$this->expectExceptionMessage( 'Content, title, and excerpt are empty.' );
 
-		$preparation->prepare();
+		$cleanup = $preparation->prepare();
+		$cleanup();
 	}
 }

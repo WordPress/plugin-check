@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Test Plugin with Errors for Plugin Check
+ * Plugin Name: Test Plugin i18n usage with Errors for Plugin Check
  * Plugin URI: https://github.com/wordpress/plugin-check
  * Description: Plugin Check plugin from the WordPress Performance Team, a collection of tests to help improve plugin performance.
  * Requires at least: 6.0
@@ -15,4 +15,19 @@
  * @package test-plugin-check-errors
  */
 
-include_once 'i18-usage-error-file.php';
+/**
+ * File contains errors related to i18n translation issues.
+ */
+
+$city = 'Surat';
+
+// This will cause a WordPress.WP.I18n.MissingTranslatorsComment error as it has no translators comment.
+sprintf(
+	__( 'Your city is %s.', 'test-plugin-check-errors' ),
+	$city
+);
+
+$text_domain = 'test-plugin-check-errors';
+
+// This will cause a WordPress.WP.I18n.NonSingularStringLiteralDomain error as a variable is used for the text-domain.
+esc_html__( 'Hello World!', $text_domain );
