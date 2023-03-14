@@ -34,7 +34,7 @@
   "autoload-dev": {
     "psr-4": {
       "WordPress\\Plugin_Check\\Test_Data\\": "tests/testdata",
-      "WordPress\\Plugin_Check\\Tests\\": "tests/utils"
+      "WordPress\\Plugin_Check\\Test_Utils\\": "tests/utils"
     }
   }
 }

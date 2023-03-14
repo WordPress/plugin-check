@@ -5,13 +5,14 @@
  * @package plugin-check
  */
 
-namespace WordPress\Plugin_Check\Tests\TestCase;
+namespace WordPress\Plugin_Check\Test_Utils\TestCase;
 
 use WP_UnitTestCase;
 use WordPress\Plugin_Check\Checker\Check;
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Runtime_Check;
+use WordPress\Plugin_Check\Checker\Preparation;
 use WordPress\Plugin_Check\Checker\With_Shared_Preparations;
 use WordPress\Plugin_Check\Checker\Preparations\Universal_Runtime_Preparation;
 
@@ -52,7 +53,9 @@ abstract class Runtime_Check_UnitTestCase extends WP_UnitTestCase {
 		}
 
 		// Prepare the check.
-		$cleanups[] = $check->prepare();
+		if ( $check instanceof Preparation ) {
+			$cleanups[] = $check->prepare();
+		}
 
 		// Return the cleanup function.
 		return function() use ( $cleanups ) {
@@ -71,10 +74,16 @@ abstract class Runtime_Check_UnitTestCase extends WP_UnitTestCase {
 	 * @param Check_Context $context The check context for the plugin to be checked.
 	 * @return Check_Result An object containing all check results.
 	 */
-	public function run_check( Check $check, Check_Context $context ) {
+	protected function run_check( Check $check, Check_Context $context ) {
 		$results = new Check_Result( $context );
 		$cleanup = $this->prepare_environment( $check, $context );
-		$check->run( $results );
+
+		try {
+			$check->run( $results );
+		} catch ( \Exception $e ) {
+			$cleanup();
+			throw $e;
+		}
 		$cleanup();
 
 		return $results;
