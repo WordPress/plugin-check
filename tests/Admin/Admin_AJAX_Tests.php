@@ -22,6 +22,7 @@ class Admin_AJAX_Tests extends WP_UnitTestCase {
 	public function test_add_hooks() {
 		$this->admin_ajax->add_hooks();
 		$this->assertEquals( 10, has_action( 'wp_ajax_plugin_check_run_checks', array( $this->admin_ajax, 'run_checks' ) ) );
+		$this->assertEquals( 10, has_action( 'wp_ajax_plugin_check_get_checks_to_run', array( $this->admin_ajax, 'get_checks_to_run' ) ) );
 	}
 
 	public function test_get_nonce() {
