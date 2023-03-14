@@ -44,7 +44,7 @@
 		)
 		.then(
 			( data ) => {
-				console.log( 'plugin_check_get_checks_to_run', data );
+				console.log( data );
 
 				if ( ! data.data || ! data.data.plugin || ! data.data.checks ) {
 					throw new Error( 'Plugin and Checks are missing from the response.' );
@@ -101,7 +101,7 @@
 				}
 
 				// If the response is successful and there is a message in the response.
-				console.log( 'plugin_check_run_checks', data.data.message );
+				console.log( data.data.message );
 			}
 		)
 		.catch(
