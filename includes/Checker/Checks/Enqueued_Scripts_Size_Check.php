@@ -43,7 +43,7 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param integer $threshold_size The threshold in bytes for script size to surface warnings.
+	 * @param int $threshold_size The threshold in bytes for script size to surface warnings.
 	 */
 	public function __construct( $threshold_size = 300000 ) {
 		$this->threshold_size = $threshold_size;
@@ -69,17 +69,16 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 		$orig_scripts = isset( $GLOBALS['wp_scripts'] ) ? $GLOBALS['wp_scripts'] : null;
 
 		// Backup the original values for the global state.
-		$check = $this;
-		$check->backup_globals();
+		$this->backup_globals();
 
-		return function() use ( $orig_scripts, $check ) {
+		return function() use ( $orig_scripts ) {
 			if ( is_null( $orig_scripts ) ) {
 				unset( $GLOBALS['wp_scripts'] );
 			} else {
 				$GLOBALS['wp_scripts'] = $orig_scripts;
 			}
 
-			$check->restore_globals();
+			$this->restore_globals();
 		};
 	}
 
@@ -219,7 +218,7 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 						size_format( $this->threshold_size )
 					),
 					array(
-						'code' => 'EnqueuedScripts',
+						'code' => 'EnqueuedScriptsSize.ScriptSizeGreaterThanThreshold',
 						'file' => $plugin_script['path'],
 					)
 				);
