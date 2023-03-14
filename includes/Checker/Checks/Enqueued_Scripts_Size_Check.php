@@ -130,6 +130,8 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	 * @since n.e.x.t
 	 *
 	 * @return array List of URL strings (either full URLs or paths).
+	 *
+	 * @throws Exception Thrown when a post type URL cannot be retrieved.
 	 */
 	protected function get_urls() {
 		$urls = array( home_url() );
@@ -139,12 +141,21 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 				array(
 					'posts_per_page' => 1,
 					'post_type'      => $post_type,
-					'post_status'    => 'publish',
+					'post_status'    => array( 'publish', 'inherit' ),
 				)
 			);
-			if ( isset( $posts[0] ) ) {
-				$urls[] = get_permalink( $posts[0] );
+
+			if ( ! isset( $posts[0] ) ) {
+				throw new Exception(
+					sprintf(
+						/* translators: %s: The Post Type name. */
+						__( 'Unable to retrieve post URL for post type: %s', 'plugin-check' ),
+						$post_type
+					)
+				);
 			}
+
+			$urls[] = get_permalink( $posts[0] );
 		}
 
 		return $urls;
