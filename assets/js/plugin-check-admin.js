@@ -1,4 +1,4 @@
-( function ( data ) {
+( function ( pluginCheck ) {
 	const checkItButton = document.getElementById( 'plugin-check__submit' );
 	const pluginsList   = document.getElementById( 'plugin-check__plugins-dropdown' );
 
@@ -8,23 +8,37 @@
 		return;
 	}
 
-	// Create a state object for the plugin checker.
-	const pluginChecker = {
-		plugin: false,
-		checks_to_run: [],
-	};
-
 	checkItButton.addEventListener( 'click', ( e ) => {
 		e.preventDefault();
 
+		getChecksToRun()
+		.then( runChecks )
+		.then(
+			( data ) => {
+				console.log( data.message );
+			}
+		)
+		.catch(
+			( error ) => {
+				console.error( error );
+			}
+		);
+	} );
+
+	/**
+	 * Get the Checks to run.
+	 *
+	 * @since n.e.x.t
+	 */
+	function getChecksToRun() {
 		// Collect the data to pass along for generating a check results.
 		const pluginCheckData = new FormData();
-		pluginCheckData.append( 'nonce', data.nonce );
+		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append( 'plugin', pluginsList.value );
 		pluginCheckData.append( 'checks', [] );
 		pluginCheckData.append( 'action', 'plugin_check_get_checks_to_run' );
 
-		fetch(
+		return fetch(
 			ajaxurl,
 			{
 				method: 'POST',
@@ -37,30 +51,17 @@
 				return response.json();
 			}
 		)
+		.then( handleDataErrors )
 		.then(
 			( data ) => {
-				return handleDataErrors( data );
-			}
-		)
-		.then(
-			( data ) => {
-				console.log( data );
-
 				if ( ! data.data || ! data.data.plugin || ! data.data.checks ) {
 					throw new Error( 'Plugin and Checks are missing from the response.' );
 				}
 
-				// Store the plugin and checks to run to be used later.
-				pluginChecker.plugin = data.data.plugin;
-				pluginChecker.checks = data.data.checks;
-
-				runChecks();
+				return data.data;
 			}
-		)
-		.catch(
-			( error ) => { console.error( error ) }
 		);
-	} );
+	}
 
 
 	/**
@@ -68,14 +69,14 @@
 	 *
 	 * @since n.e.x.t
 	 */
-	function runChecks() {
+	function runChecks( data ) {
 		const pluginCheckData = new FormData();
-		pluginCheckData.append( 'nonce', data.nonce );
-		pluginCheckData.append( 'plugin', pluginChecker.plugin );
-		pluginCheckData.append( 'checks', pluginChecker.checks );
+		pluginCheckData.append( 'nonce', pluginCheck.nonce );
+		pluginCheckData.append( 'plugin', data.plugin );
+		pluginCheckData.append( 'checks', data.checks );
 		pluginCheckData.append( 'action', 'plugin_check_run_checks' );
 
-		fetch(
+		return fetch(
 			ajaxurl,
 			{
 				method: 'POST',
@@ -88,11 +89,7 @@
 				return response.json();
 			}
 		)
-		.then(
-			( data ) => {
-				return handleDataErrors(data);
-			}
-		)
+		.then( handleDataErrors )
 		.then(
 			( data ) => {
 				// If the response is successful and there is no message in the response.
@@ -100,12 +97,8 @@
 					throw new Error( 'Response contains no data' );
 				}
 
-				// If the response is successful and there is a message in the response.
-				console.log( data.data.message );
+				return data.data;
 			}
-		)
-		.catch(
-			( error ) => { console.error( error ); }
 		);
 	}
 
