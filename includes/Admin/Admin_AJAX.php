@@ -78,27 +78,34 @@ class Admin_AJAX {
 		$checks_instance = new Checks( WP_PLUGIN_DIR . '/' . $plugin_basename );
 		$all_checks      = $checks_instance->get_checks();
 
-		// Filter checks to run based on the request.
-		$checks_to_run = empty( $checks ) ? $all_checks : array_intersect_key( $all_checks, array_flip( $checks ) );
+		// If specific checks are requested to run.
+		if ( ! empty( $checks ) ) {
+			// Get the check instances based on the requested checks.
+			$checks_to_run = array_intersect_key( $all_checks, array_flip( $checks ) );
 
-		// If the plugin is inactive and there are runtime checks.
-		if ( ! $plugin_active && $this->has_runtime_check( $checks_to_run ) ) {
-			// If specific checks were requested, return an error.
-			if ( ! empty( $checks ) ) {
+			// Return an error if at least 1 runtime check is requested to run against an inactive plugin.
+			if ( ! $plugin_active && $this->has_runtime_check( $checks_to_run ) ) {
 				wp_send_json_error(
 					new WP_Error(
+						'inactive-plugin',
 						__( 'Runtime checks cannot be run against inactive plugins.', 'plugin-check' )
-					)
+					),
+					403
 				);
 			}
+		} else {
+			// Run all checks for the plugin.
+			$checks_to_run = $all_checks;
 
-			// If all checks are requested, filter out any runtime checks.
-			$checks_to_run = array_filter(
-				$checks_to_run,
-				function ( $check ) {
-					return ! $check instanceof Runtime_Check;
-				}
-			);
+			// Only run static checks if the plugin is inactive.
+			if ( ! $plugin_active ) {
+				$checks_to_run = array_filter(
+					$checks_to_run,
+					function ( $check ) {
+						return ! $check instanceof Runtime_Check;
+					}
+				);
+			}
 		}
 
 		wp_send_json_success(
