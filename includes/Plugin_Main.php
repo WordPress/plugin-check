@@ -54,12 +54,11 @@ class Plugin_Main {
 	 * @since n.e.x.t
 	 */
 	public function add_hooks() {
+		// Setup the CLI command.
+		$context = $this->context();
+		require_once WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'cli.php';
 
-		if ( defined( 'WP_CLI' ) && WP_CLI ) {
-			$plugin_command = new Plugin_Check_Command( $this->context );
-			\WP_CLI::add_command( 'plugin', $plugin_command );
-		}
-
+		// Create the Admin page.
 		$admin_page = new Admin_Page();
 		$admin_page->add_hooks();
 	}
