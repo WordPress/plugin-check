@@ -8,6 +8,9 @@
 namespace WordPress\Plugin_Check\CLI;
 
 use WordPress\Plugin_Check\Plugin_Context;
+use WordPress\Plugin_Check\Checker\Checks;
+use WordPress\Plugin_Check\Checker\Runtime_Check;
+use WordPress\Plugin_Check\Checker\Runtime_Environment_Setup;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 use WordPress\Plugin_Check\Checker\CLI_Runner;
 use Exception;
@@ -103,6 +106,46 @@ class Plugin_Check_Command {
 		$plugin = isset( $args[0] ) ? $args[0] : '';
 		$checks = wp_parse_list( $options['checks'] );
 
+		try {
+			// Attempt to get the plugin basename based on the request.
+			$plugin_basename = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin );
+			$checks_instance = new Checks( WP_PLUGIN_DIR . '/' . $plugin_basename );
+			$all_checks      = $checks_instance->get_checks();
+			$plugin_active   = is_plugin_active( $plugin_basename );
+
+			// If specific checks are requested to run.
+			if ( ! empty( $checks ) ) {
+				// Get the check instances based on the requested checks.
+				$checks_to_run = array_intersect_key( $all_checks, array_flip( $checks ) );
+
+				// Return an error if at least 1 runtime check is requested to run against an inactive plugin.
+				if ( ! $plugin_active && $this->has_runtime_check( $checks_to_run ) ) {
+					throw new Exception( __( 'Runtime checks cannot be run against inactive plugins.', 'plugin-check' ) );
+				}
+			} else {
+				// Run all checks for the plugin.
+				$checks_to_run = $all_checks;
+
+				// Only run static checks if the plugin is inactive.
+				if ( ! $plugin_active ) {
+					$checks_to_run = array_filter(
+						$checks_to_run,
+						function ( $check ) {
+							return ! $check instanceof Runtime_Check;
+						}
+					);
+				}
+			}
+		} catch ( Exception $error ) {
+			WP_CLI::error( $error->getMessage() );
+		}
+
+		if ( $this->has_runtime_check( $checks_to_run ) ) {
+			WP_CLI::line( __( 'Setup runtime environment.', 'plugin-check' ) );
+			$runtime_setup = new Runtime_Environment_Setup();
+			$runtime_setup->setup();
+		}
+
 		// Get the CLI Runner.
 		$runner = Plugin_Request_Utility::get_runner();
 
@@ -124,7 +167,21 @@ class Plugin_Check_Command {
 			$runner->set_check_slugs( $checks );
 			$result = $runner->run();
 		} catch ( Exception $error ) {
+			Plugin_Request_Utility::destroy_runner();
+
+			if ( isset( $runtime_setup ) ) {
+				$runtime_setup->cleanup();
+				WP_CLI::line( __( 'Cleanup runtime environment.', 'plugin-check' ) );
+			}
+
 			WP_CLI::error( $error->getMessage() );
+		}
+
+		Plugin_Request_Utility::destroy_runner();
+
+		if ( isset( $runtime_setup ) ) {
+			$runtime_setup->cleanup();
+			WP_CLI::line( __( 'Cleanup runtime environment.', 'plugin-check' ) );
 		}
 
 		// Get errors and warnings from the results.
@@ -316,5 +373,23 @@ class Plugin_Check_Command {
 
 		WP_CLI::line();
 		WP_CLI::line();
+	}
+
+	/**
+	 * Check for a Runtime_Check in a list of checks
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param array $checks An array of Check instances.
+	 * @return bool True if a Runtime_Check exists in the array, false if not.
+	 */
+	protected function has_runtime_check( array $checks ) {
+		foreach ( $checks as $check ) {
+			if ( $check instanceof Runtime_Check ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
