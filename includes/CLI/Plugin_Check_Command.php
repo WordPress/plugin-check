@@ -164,7 +164,7 @@ class Plugin_Check_Command {
 		// Run checks against the plugin.
 		try {
 			$runner->set_plugin( $plugin );
-			$runner->set_check_slugs( $checks );
+			$runner->set_check_slugs( array_keys( $checks_to_run ) );
 			$result = $runner->run();
 		} catch ( Exception $error ) {
 			Plugin_Request_Utility::destroy_runner();
