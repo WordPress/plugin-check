@@ -9,8 +9,10 @@ namespace WordPress\Plugin_Check\Admin;
 
 use WP_Error;
 use Exception;
+use WordPress\Plugin_Check\Checker\AJAX_Runner;
 use WordPress\Plugin_Check\Checker\Checks;
 use WordPress\Plugin_Check\Checker\Runtime_Check;
+use WordPress\Plugin_Check\Checker\Runtime_Environment_Setup;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 /**
  * Class to handle the Admin AJAX requests.
@@ -33,6 +35,7 @@ class Admin_AJAX {
 	 * @since n.e.x.t
 	 */
 	public function add_hooks() {
+		add_action( 'wp_ajax_plugin_check_setup_environment', array( $this, 'setup_environment' ) );
 		add_action( 'wp_ajax_plugin_check_get_checks_to_run', array( $this, 'get_checks_to_run' ) );
 		add_action( 'wp_ajax_plugin_check_run_checks', array( $this, 'run_checks' ) );
 	}
@@ -44,6 +47,61 @@ class Admin_AJAX {
 	 */
 	public function get_nonce() {
 		return wp_create_nonce( self::NONCE_KEY );
+	}
+
+	/**
+	 * Handles the AJAX request to setup the runtime environment if needed.
+	 *
+	 * @since n.e.x.t
+	 */
+	public function setup_environment() {
+		// Verify the nonce before continuing.
+		$valid_nonce = $this->verify_nonce( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_STRING ) );
+
+		if ( is_wp_error( $valid_nonce ) ) {
+			wp_send_json_error( $valid_nonce, 403 );
+		}
+
+		$runner = Plugin_Request_Utility::get_runner();
+
+		if ( is_null( $runner ) ) {
+			$runner = new AJAX_Runner();
+		}
+
+		// Make sure we are using the correct runner instance.
+		if ( ! ( $runner instanceof AJAX_Runner ) ) {
+			wp_send_json_error(
+				new WP_Error( 'invalid-runner', __( 'AJAX Runner was not initialized correctly.', 'plugin-check' ) ),
+				500
+			);
+		}
+
+		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
+		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_STRING );
+
+		try {
+			$runner->set_check_slugs( $checks );
+			$runner->set_plugin( $plugin );
+		} catch ( Exception $error ) {
+			wp_send_json_error(
+				new WP_Error( 'invalid-request', $error->getMessage() ),
+				400
+			);
+		}
+
+		$message = __( 'No runtime checks, runtime environment was not setup.', 'plugin-check' );
+
+		if ( $runner->has_runtime_check() ) {
+			$runtime = new Runtime_Environment_Setup();
+			$runtime->setup();
+			$message = __( 'Runtime environment setup successful.', 'plugin-check' );
+		}
+
+		wp_send_json_success(
+			array(
+				'message' => $message,
+			)
+		);
 	}
 
 	/**
@@ -68,7 +126,7 @@ class Admin_AJAX {
 		} catch ( Exception $error ) {
 			wp_send_json_error(
 				new WP_Error( 'invalid-plugin', $error->getMessage() ),
-				403
+				400
 			);
 		}
 
@@ -90,7 +148,7 @@ class Admin_AJAX {
 						'inactive-plugin',
 						__( 'Runtime checks cannot be run against inactive plugins.', 'plugin-check' )
 					),
-					403
+					400
 				);
 			}
 		} else {
