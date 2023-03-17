@@ -130,7 +130,8 @@ class Checks {
 		if ( ! isset( $this->checks ) ) {
 			// TODO: Add checks once implemented.
 			$checks = array(
-				'i18n_usage' => new Checks\I18n_Usage_Check(),
+				'i18n_usage'            => new Checks\I18n_Usage_Check(),
+				'enqueued_scripts_size' => new Checks\Enqueued_Scripts_Size_Check(),
 			);
 
 			/**
