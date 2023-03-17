@@ -11,7 +11,8 @@
 	checkItButton.addEventListener( 'click', ( e ) => {
 		e.preventDefault();
 
-		getChecksToRun()
+		setupEnvironment()
+		.then( getChecksToRun )
 		.then( runChecks )
 		.then(
 			( data ) => {
@@ -24,6 +25,46 @@
 			}
 		);
 	} );
+
+	/**
+	 * Setup the runtime environment if needed.
+	 *
+	 * @since n.e.x.t
+	 */
+	function setupEnvironment() {
+		// Setup the form data to post.
+		const pluginCheckData = new FormData();
+		pluginCheckData.append( 'nonce', pluginCheck.nonce );
+		pluginCheckData.append( 'plugin', pluginsList.value );
+		pluginCheckData.append( 'checks', [] );
+		pluginCheckData.append( 'action', 'plugin_check_setup_environment' );
+
+		return fetch(
+			ajaxurl,
+			{
+				method: 'POST',
+				credentials: 'same-origin',
+				body: pluginCheckData
+			}
+		)
+		.then(
+			( response ) => {
+				return response.json();
+			}
+		)
+		.then( handleDataErrors )
+		.then(
+			( data ) => {
+				if ( ! data.data || ! data.data.message ) {
+					throw new Error( 'Response contains no data.' );
+				}
+
+				console.log( data.data.message );
+
+				return data.data;
+			}
+		);
+	}
 
 	/**
 	 * Get the Checks to run.
