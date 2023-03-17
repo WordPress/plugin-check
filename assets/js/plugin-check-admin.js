@@ -11,9 +11,10 @@
 	checkItButton.addEventListener( 'click', ( e ) => {
 		e.preventDefault();
 
-		setupEnvironment()
-		.then( getChecksToRun )
+		getChecksToRun()
+		.then( setupEnvironment )
 		.then( runChecks )
+		.then( cleanupEnvironment )
 		.then(
 			( data ) => {
 				console.log( data.message );
@@ -31,12 +32,12 @@
 	 *
 	 * @since n.e.x.t
 	 */
-	function setupEnvironment() {
+	function setupEnvironment( data ) {
 		// Setup the form data to post.
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
-		pluginCheckData.append( 'plugin', pluginsList.value );
-		pluginCheckData.append( 'checks', [] );
+		pluginCheckData.append( 'plugin', data.plugin );
+		pluginCheckData.append( 'checks', data.checks );
 		pluginCheckData.append( 'action', 'plugin_check_setup_environment' );
 
 		return fetch(
@@ -65,6 +66,44 @@
 			}
 		);
 	}
+
+	/**
+	 * Cleanup the runtime environment.
+	 *
+	 * @since n.e.x.t
+	 */
+		function cleanupEnvironment( data ) {
+			const pluginCheckData = new FormData();
+			pluginCheckData.append( 'nonce', pluginCheck.nonce );
+			pluginCheckData.append( 'action', 'plugin_check_cleanup_environment' );
+
+			return fetch(
+				ajaxurl,
+				{
+					method: 'POST',
+					credentials: 'same-origin',
+					body: pluginCheckData
+				}
+			)
+			.then(
+				( response ) => {
+					return response.json();
+				}
+			)
+			.then( handleDataErrors )
+			.then(
+				( data ) => {
+					if ( ! data.data || ! data.data.message ) {
+						throw new Error( 'Response contains no data.' );
+					}
+
+					console.log( data.data.message );
+
+					return data.data;
+				}
+			);
+		}
+
 
 	/**
 	 * Get the Checks to run.
