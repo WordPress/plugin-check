@@ -72,37 +72,37 @@
 	 *
 	 * @since n.e.x.t
 	 */
-		function cleanupEnvironment( data ) {
-			const pluginCheckData = new FormData();
-			pluginCheckData.append( 'nonce', pluginCheck.nonce );
-			pluginCheckData.append( 'action', 'plugin_check_cleanup_environment' );
+	function cleanupEnvironment( data ) {
+		const pluginCheckData = new FormData();
+		pluginCheckData.append( 'nonce', pluginCheck.nonce );
+		pluginCheckData.append( 'action', 'plugin_check_cleanup_environment' );
 
-			return fetch(
-				ajaxurl,
-				{
-					method: 'POST',
-					credentials: 'same-origin',
-					body: pluginCheckData
+		return fetch(
+			ajaxurl,
+			{
+				method: 'POST',
+				credentials: 'same-origin',
+				body: pluginCheckData
+			}
+		)
+		.then(
+			( response ) => {
+				return response.json();
+			}
+		)
+		.then( handleDataErrors )
+		.then(
+			( data ) => {
+				if ( ! data.data || ! data.data.message ) {
+					throw new Error( 'Response contains no data.' );
 				}
-			)
-			.then(
-				( response ) => {
-					return response.json();
-				}
-			)
-			.then( handleDataErrors )
-			.then(
-				( data ) => {
-					if ( ! data.data || ! data.data.message ) {
-						throw new Error( 'Response contains no data.' );
-					}
 
-					console.log( data.data.message );
+				console.log( data.data.message );
 
-					return data.data;
-				}
-			);
-		}
+				return data.data;
+			}
+		);
+	}
 
 
 	/**

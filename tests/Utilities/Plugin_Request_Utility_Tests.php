@@ -47,6 +47,9 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		);
 
 		Plugin_Request_Utility::initialize_runner();
+
+		do_action( 'muplugins_loaded' );
+
 		$runner = Plugin_Request_Utility::get_runner();
 
 		unset( $_SERVER['argv'] );
@@ -60,6 +63,9 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		$_REQUEST['plugin'] = 'plugin-check';
 
 		Plugin_Request_Utility::initialize_runner();
+
+		do_action( 'muplugins_loaded' );
+
 		$runner = Plugin_Request_Utility::get_runner();
 
 		$this->assertInstanceOf( AJAX_Runner::class, $runner );
@@ -86,6 +92,8 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		);
 
 		Plugin_Request_Utility::initialize_runner();
+
+		do_action( 'muplugins_loaded' );
 
 		// Determine if one of the Universal_Runtume_Preparation was run.
 		$prepared = has_filter( 'option_active_plugins' );
@@ -122,6 +130,8 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		);
 
 		Plugin_Request_Utility::initialize_runner();
+
+		do_action( 'muplugins_loaded' );
 
 		// Determine if one of the Universal_Runtume_Preparation was run.
 		$prepared = has_filter( 'option_active_plugins' );

@@ -93,9 +93,14 @@ class Plugin_Request_Utility {
 
 		foreach ( $runners as $runner ) {
 			if ( $runner->is_plugin_check() ) {
-				// @TODO: Handle the cleanup function in later issue with shutdown action or method that returns cleanup functions.
-				static::$cleanup = $runner->prepare();
-				static::$runner  = $runner;
+				add_action(
+					'muplugins_loaded',
+					function() use ( $runner ) {
+						static::$cleanup = $runner->prepare();
+						static::$runner  = $runner;
+					}
+				);
+
 				break;
 			}
 		}
