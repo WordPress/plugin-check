@@ -251,6 +251,8 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @since n.e.x.t
 	 *
 	 * @return array An array map of check slugs to Check instances.
+	 *
+	 * @throws Exception Thrown exception when a runtime check is requested and the plugin inactive.
 	 */
 	public function get_checks_to_run() {
 		$check_slugs   = $this->get_check_slugs();

@@ -69,7 +69,7 @@ class Admin_AJAX {
 
 		try {
 			$checks_to_run = $runner->get_checks_to_run();
-		} catch( Exception $error ) {
+		} catch ( Exception $error ) {
 			wp_send_json_error(
 				new WP_Error( 'invalid-checks', $error->getMessage() ),
 				403
