@@ -106,46 +106,6 @@ class Plugin_Check_Command {
 		$plugin = isset( $args[0] ) ? $args[0] : '';
 		$checks = wp_parse_list( $options['checks'] );
 
-		try {
-			// Attempt to get the plugin basename based on the request.
-			$plugin_basename = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin );
-			$checks_instance = new Checks( WP_PLUGIN_DIR . '/' . $plugin_basename );
-			$all_checks      = $checks_instance->get_checks();
-			$plugin_active   = is_plugin_active( $plugin_basename );
-
-			// If specific checks are requested to run.
-			if ( ! empty( $checks ) ) {
-				// Get the check instances based on the requested checks.
-				$checks_to_run = array_intersect_key( $all_checks, array_flip( $checks ) );
-
-				// Return an error if at least 1 runtime check is requested to run against an inactive plugin.
-				if ( ! $plugin_active && $this->has_runtime_check( $checks_to_run ) ) {
-					throw new Exception( __( 'Runtime checks cannot be run against inactive plugins.', 'plugin-check' ) );
-				}
-			} else {
-				// Run all checks for the plugin.
-				$checks_to_run = $all_checks;
-
-				// Only run static checks if the plugin is inactive.
-				if ( ! $plugin_active ) {
-					$checks_to_run = array_filter(
-						$checks_to_run,
-						function ( $check ) {
-							return ! $check instanceof Runtime_Check;
-						}
-					);
-				}
-			}
-		} catch ( Exception $error ) {
-			WP_CLI::error( $error->getMessage() );
-		}
-
-		if ( $this->has_runtime_check( $checks_to_run ) ) {
-			WP_CLI::line( __( 'Setup runtime environment.', 'plugin-check' ) );
-			$runtime_setup = new Runtime_Environment_Setup();
-			$runtime_setup->setup();
-		}
-
 		// Get the CLI Runner.
 		$runner = Plugin_Request_Utility::get_runner();
 
@@ -161,10 +121,23 @@ class Plugin_Check_Command {
 			);
 		}
 
+		try {
+			$runner->set_check_slugs( $checks );
+			$runner->set_plugin( $plugin );
+
+			$checks_to_run = $runner->get_checks_to_run();
+		} catch ( Exception $error ) {
+			WP_CLI::error( $error->getMessage() );
+		}
+
+		if ( $this->has_runtime_check( $checks_to_run ) ) {
+			WP_CLI::line( __( 'Setup runtime environment.', 'plugin-check' ) );
+			$runtime_setup = new Runtime_Environment_Setup();
+			$runtime_setup->setup();
+		}
+
 		// Run checks against the plugin.
 		try {
-			$runner->set_plugin( $plugin );
-			$runner->set_check_slugs( array_keys( $checks_to_run ) );
 			$result = $runner->run();
 		} catch ( Exception $error ) {
 			Plugin_Request_Utility::destroy_runner();

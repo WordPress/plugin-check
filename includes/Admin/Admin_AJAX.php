@@ -9,6 +9,7 @@ namespace WordPress\Plugin_Check\Admin;
 
 use WP_Error;
 use Exception;
+use WordPress\Plugin_Check\Checker\AJAX_Runner;
 use WordPress\Plugin_Check\Checker\Checks;
 use WordPress\Plugin_Check\Checker\Runtime_Check;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
@@ -59,53 +60,20 @@ class Admin_AJAX {
 			wp_send_json_error( $valid_nonce, 403 );
 		}
 
-		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
+		$checks = wp_parse_list( filter_input( INPUT_POST, 'checks', FILTER_SANITIZE_STRING ) );
 		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_STRING );
 
-		// Attempt to get the plugin basename based on the request.
+		$runner = new AJAX_Runner();
+		$runner->set_check_slugs( $checks );
+		$runner->set_plugin( $plugin );
+
 		try {
-			$plugin_basename = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin );
-		} catch ( Exception $error ) {
+			$checks_to_run = $runner->get_checks_to_run();
+		} catch( Exception $error ) {
 			wp_send_json_error(
-				new WP_Error( 'invalid-plugin', $error->getMessage() ),
+				new WP_Error( 'invalid-checks', $error->getMessage() ),
 				403
 			);
-		}
-
-		$plugin_active = is_plugin_active( $plugin_basename );
-
-		// Create the checks instance.
-		$checks_instance = new Checks( WP_PLUGIN_DIR . '/' . $plugin_basename );
-		$all_checks      = $checks_instance->get_checks();
-
-		// If specific checks are requested to run.
-		if ( ! empty( $checks ) ) {
-			// Get the check instances based on the requested checks.
-			$checks_to_run = array_intersect_key( $all_checks, array_flip( $checks ) );
-
-			// Return an error if at least 1 runtime check is requested to run against an inactive plugin.
-			if ( ! $plugin_active && $this->has_runtime_check( $checks_to_run ) ) {
-				wp_send_json_error(
-					new WP_Error(
-						'inactive-plugin',
-						__( 'Runtime checks cannot be run against inactive plugins.', 'plugin-check' )
-					),
-					403
-				);
-			}
-		} else {
-			// Run all checks for the plugin.
-			$checks_to_run = $all_checks;
-
-			// Only run static checks if the plugin is inactive.
-			if ( ! $plugin_active ) {
-				$checks_to_run = array_filter(
-					$checks_to_run,
-					function ( $check ) {
-						return ! $check instanceof Runtime_Check;
-					}
-				);
-			}
 		}
 
 		wp_send_json_success(

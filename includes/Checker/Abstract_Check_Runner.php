@@ -35,7 +35,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	protected $check_slugs;
 
 	/**
-	 * The plugin slug or basename to check.
+	 * The plugin parameter.
 	 *
 	 * @since n.e.x.t
 	 * @var string
@@ -49,6 +49,14 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @var Checks
 	 */
 	protected $checks;
+
+	/**
+	 * The plugin slug or basename to check.
+	 *
+	 * @since n.e.x.t
+	 * @var string
+	 */
+	protected $plugin_basename;
 
 	/**
 	 * Determines if the current request is intended for the plugin checker.
@@ -140,7 +148,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @throws Exception Thrown exception when preparation fails.
 	 */
 	public function prepare() {
-		if ( $this->requires_universal_preparations( $this->get_checks_to_run() ) ) {
+		if ( $this->has_runtime_check( $this->get_checks_to_run() ) ) {
 			$preparation = new Universal_Runtime_Preparation( $this->get_checks_instance()->context() );
 			$cleanup     = $preparation->prepare();
 
@@ -187,14 +195,14 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	}
 
 	/**
-	 * Determines if any of the checks requires the universal runtime preparation.
+	 * Determines if any of the checks contains at least one runtime check.
 	 *
 	 * @since n.e.x.t
 	 *
 	 * @param array $checks An array of check instances to run.
-	 * @return bool Returns true if one or more checks requires the universal runtime preparation.
+	 * @return bool Returns true if one or more checks contains at least one runtime check.
 	 */
-	protected function requires_universal_preparations( array $checks ) {
+	protected function has_runtime_check( array $checks ) {
 		foreach ( $checks as $check ) {
 			if ( $check instanceof Runtime_Check ) {
 				return true;
@@ -244,15 +252,35 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @return array An array map of check slugs to Check instances.
 	 */
-	protected function get_checks_to_run() {
-		$check_slugs = $this->get_check_slugs();
-		$all_checks  = $this->get_checks_instance()->get_checks();
+	public function get_checks_to_run() {
+		$check_slugs   = $this->get_check_slugs();
+		$all_checks    = $this->get_checks_instance()->get_checks();
+		$plugin_active = is_plugin_active( $this->get_plugin_basename() );
 
-		if ( empty( $check_slugs ) ) {
-			return $all_checks;
+		if ( ! empty( $check_slugs ) ) {
+			// Get the check instances based on the requested checks.
+			$checks_to_run = array_intersect_key( $all_checks, array_flip( $check_slugs ) );
+
+			// Return an error if at least 1 runtime check is requested to run against an inactive plugin.
+			if ( ! $plugin_active && $this->has_runtime_check( $checks_to_run ) ) {
+				throw new Exception( __( 'Runtime checks cannot be run against inactive plugins.', 'plugin-check' ) );
+			}
+		} else {
+			// Run all checks for the plugin.
+			$checks_to_run = $all_checks;
+
+			// Only run static checks if the plugin is inactive.
+			if ( ! $plugin_active ) {
+				$checks_to_run = array_filter(
+					$checks_to_run,
+					function ( $check ) {
+						return ! $check instanceof Runtime_Check;
+					}
+				);
+			}
 		}
 
-		return array_intersect_key( $all_checks, array_flip( $check_slugs ) );
+		return $checks_to_run;
 	}
 
 	/**
@@ -269,8 +297,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			return $this->checks;
 		}
 
-		$plugin          = isset( $this->plugin ) ? $this->plugin : $this->get_plugin_param();
-		$plugin_basename = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin );
+		$plugin_basename = $this->get_plugin_basename();
 		$this->checks    = new Checks( WP_PLUGIN_DIR . '/' . $plugin_basename );
 
 		return $this->checks;
@@ -289,5 +316,21 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		}
 
 		return $this->get_check_slugs_param();
+	}
+
+	/**
+	 * Returns the plugin basename.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return string
+	 */
+	protected function get_plugin_basename() {
+		if ( ! isset( $this->plugin_basename ) ) {
+			$plugin                = isset( $this->plugin ) ? $this->plugin : $this->get_plugin_param();
+			$this->plugin_basename = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin );
+		}
+
+		return $this->plugin_basename;
 	}
 }
