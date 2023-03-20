@@ -91,7 +91,7 @@ class Admin_AJAX {
 
 		$message = __( 'No runtime checks, runtime environment was not setup.', 'plugin-check' );
 
-		if ( $runner->has_runtime_check() ) {
+		if ( $this->has_runtime_check( $runner->get_checks_to_run() ) ) {
 			$runtime = new Runtime_Environment_Setup();
 			$runtime->setup();
 			$message = __( 'Runtime environment setup successful.', 'plugin-check' );

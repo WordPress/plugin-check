@@ -140,7 +140,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @throws Exception Thrown exception when preparation fails.
 	 */
 	public function prepare() {
-		if ( $this->has_runtime_check() ) {
+		if ( $this->has_runtime_check( $this->get_checks_to_run() ) ) {
 			$preparation = new Universal_Runtime_Preparation( $this->get_checks_instance()->context() );
 			$cleanup     = $preparation->prepare();
 
@@ -191,10 +191,11 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @since n.e.x.t
 	 *
+	 * @param array $checks An array of check instances to run.
 	 * @return bool Returns true if one or more checks is a runtime check.
 	 */
-	public function has_runtime_check() {
-		foreach ( $this->get_checks_to_run() as $check ) {
+	protected function has_runtime_check( array $checks ) {
+		foreach ( $checks as $check ) {
 			if ( $check instanceof Runtime_Check ) {
 				return true;
 			}
@@ -243,7 +244,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @return array An array map of check slugs to Check instances.
 	 */
-	protected function get_checks_to_run() {
+	public function get_checks_to_run() {
 		$check_slugs = $this->get_check_slugs();
 		$all_checks  = $this->get_checks_instance()->get_checks();
 
