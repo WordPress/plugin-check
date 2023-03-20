@@ -11,6 +11,13 @@ use WordPress\Plugin_Check\Checker\AJAX_Runner;
 
 class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 
+	public function tear_down() {
+		// Force reset the database prefix after runner prepare method called.
+		global $wpdb, $table_prefix;
+		$wpdb->set_prefix( $table_prefix );
+		parent::tear_down();
+	}
+
 	public function test_get_plugin_basename_from_input() {
 		$plugin = Plugin_Request_Utility::get_plugin_basename_from_input( 'plugin-check' );
 
