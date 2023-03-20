@@ -82,6 +82,7 @@ class Admin_AJAX {
 		try {
 			$runner->set_check_slugs( $checks );
 			$runner->set_plugin( $plugin );
+			$checks_to_run = $runner->get_checks_to_run();
 		} catch ( Exception $error ) {
 			wp_send_json_error(
 				new WP_Error( 'invalid-request', $error->getMessage() ),
@@ -91,7 +92,7 @@ class Admin_AJAX {
 
 		$message = __( 'No runtime checks, runtime environment was not setup.', 'plugin-check' );
 
-		if ( $this->has_runtime_check( $runner->get_checks_to_run() ) ) {
+		if ( $this->has_runtime_check( $checks_to_run ) ) {
 			$runtime = new Runtime_Environment_Setup();
 			$runtime->setup();
 			$message = __( 'Runtime environment setup successful.', 'plugin-check' );
