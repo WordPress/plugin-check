@@ -263,16 +263,24 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			// Get the check instances based on the requested checks.
 			$checks_to_run = array_intersect_key( $all_checks, array_flip( $check_slugs ) );
 
-			// Return an error if at least 1 runtime check is requested to run against an inactive plugin.
-			if ( ! $plugin_active && $this->has_runtime_check( $checks_to_run ) ) {
-				throw new Exception( __( 'Runtime checks cannot be run against inactive plugins.', 'plugin-check' ) );
+			// Check the following conditions if at least one runtime check is requested.
+			if ( $this->has_runtime_check( $checks_to_run ) ) {
+				// Throw an error if the plugin is not active.
+				if ( ! $plugin_active ) {
+					throw new Exception( __( 'Runtime checks cannot be run against inactive plugins.', 'plugin-check' ) );
+				}
+
+				// Throw and error if the runner was not initialized early and the runtime environment was not set up.
+				if ( ! $this->initialized_early ) {
+					throw new Exception( __( 'Runtime checks cannot be run as the runtime environment was not set up.', 'plugin-check' ) );
+				}
 			}
 		} else {
 			// Run all checks for the plugin.
 			$checks_to_run = $all_checks;
 
-			// Only run static checks if the plugin is inactive.
-			if ( ! $plugin_active ) {
+			// Only run static checks if the plugin is inactive or the runtime environment was not set up.
+			if ( ! $plugin_active || ! $this->initialized_early ) {
 				$checks_to_run = array_filter(
 					$checks_to_run,
 					function ( $check ) {
