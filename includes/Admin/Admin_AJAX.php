@@ -35,8 +35,8 @@ class Admin_AJAX {
 	 * @since n.e.x.t
 	 */
 	public function add_hooks() {
-		add_action( 'wp_ajax_plugin_check_cleanup_environment', array( $this, 'cleanup_environment' ) );
-		add_action( 'wp_ajax_plugin_check_setup_environment', array( $this, 'setup_environment' ) );
+		add_action( 'wp_ajax_plugin_check_clean_up_environment', array( $this, 'clean_up_environment' ) );
+		add_action( 'wp_ajax_plugin_check_set_up_environment', array( $this, 'set_up_environment' ) );
 		add_action( 'wp_ajax_plugin_check_get_checks_to_run', array( $this, 'get_checks_to_run' ) );
 		add_action( 'wp_ajax_plugin_check_run_checks', array( $this, 'run_checks' ) );
 	}
@@ -55,7 +55,7 @@ class Admin_AJAX {
 	 *
 	 * @since n.e.x.t
 	 */
-	public function setup_environment() {
+	public function set_up_environment() {
 		// Verify the nonce before continuing.
 		$valid_nonce = $this->verify_nonce( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_STRING ) );
 
@@ -112,7 +112,7 @@ class Admin_AJAX {
 	 *
 	 * @since n.e.x.t
 	 */
-	public function cleanup_environment() {
+	public function clean_up_environment() {
 		global $wpdb;
 
 		// Verify the nonce before continuing.

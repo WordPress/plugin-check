@@ -38,7 +38,7 @@
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append( 'plugin', data.plugin );
 		pluginCheckData.append( 'checks', data.checks );
-		pluginCheckData.append( 'action', 'plugin_check_setup_environment' );
+		pluginCheckData.append( 'action', 'plugin_check_set_up_environment' );
 
 		return fetch(
 			ajaxurl,
@@ -75,7 +75,7 @@
 	function cleanupEnvironment( data ) {
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
-		pluginCheckData.append( 'action', 'plugin_check_cleanup_environment' );
+		pluginCheckData.append( 'action', 'plugin_check_clean_up_environment' );
 
 		return fetch(
 			ajaxurl,
