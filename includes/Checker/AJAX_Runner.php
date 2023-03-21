@@ -74,7 +74,7 @@ class AJAX_Runner extends Abstract_Check_Runner {
 
 		if ( isset( $_REQUEST['checks'] ) ) {
 			// Checks are passed as a comma separated string.
-			$checks = wp_parse_list( $_REQUEST['checks'] );
+			$checks = array_filter( $_REQUEST['checks'] );
 		}
 
 		return $checks;

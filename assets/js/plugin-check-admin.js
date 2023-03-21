@@ -33,12 +33,14 @@
 	 * @since n.e.x.t
 	 */
 	function setupEnvironment( data ) {
-		// Setup the form data to post.
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append( 'plugin', data.plugin );
-		pluginCheckData.append( 'checks', data.checks );
 		pluginCheckData.append( 'action', 'plugin_check_set_up_environment' );
+
+		for (var i = 0; i < data.checks.length; i++) {
+			pluginCheckData.append('checks[]', data.checks[i]);
+		}
 
 		return fetch(
 			ajaxurl,
@@ -111,11 +113,10 @@
 	 * @since n.e.x.t
 	 */
 	function getChecksToRun() {
-		// Collect the data to pass along for generating a check results.
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append( 'plugin', pluginsList.value );
-		pluginCheckData.append( 'checks', [] );
+		pluginCheckData.append( 'checks[]', [] );
 		pluginCheckData.append( 'action', 'plugin_check_get_checks_to_run' );
 
 		return fetch(
@@ -153,8 +154,11 @@
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append( 'plugin', data.plugin );
-		pluginCheckData.append( 'checks', data.checks );
 		pluginCheckData.append( 'action', 'plugin_check_run_checks' );
+
+		for (var i = 0; i < data.checks.length; i++) {
+			pluginCheckData.append('checks[]', data.checks[i]);
+		}
 
 		return fetch(
 			ajaxurl,

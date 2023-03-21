@@ -118,7 +118,7 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		add_filter( 'wp_doing_ajax', '__return_true' );
 		$_REQUEST['action'] = 'plugin_check_run_checks';
 		$_REQUEST['plugin'] = 'plugin-check';
-		$_REQUEST['checks'] = 'runtime_check';
+		$_REQUEST['checks'] = array( 'runtime_check' );
 
 		add_filter(
 			'wp_plugin_check_checks',
