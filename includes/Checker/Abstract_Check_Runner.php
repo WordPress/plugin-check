@@ -51,7 +51,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	protected $checks;
 
 	/**
-	 * The plugin slug or basename to check.
+	 * The plugin basename to check.
 	 *
 	 * @since n.e.x.t
 	 * @var string
@@ -325,9 +325,9 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return string
+	 * @return string The plugin basename to check.
 	 */
-	protected function get_plugin_basename() {
+	public function get_plugin_basename() {
 		if ( ! isset( $this->plugin_basename ) ) {
 			$plugin                = isset( $this->plugin ) ? $this->plugin : $this->get_plugin_param();
 			$this->plugin_basename = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin );

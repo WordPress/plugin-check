@@ -63,12 +63,26 @@ class Admin_AJAX {
 		$checks = wp_parse_list( filter_input( INPUT_POST, 'checks', FILTER_SANITIZE_STRING ) );
 		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_STRING );
 
-		$runner = new AJAX_Runner();
-		$runner->set_check_slugs( $checks );
-		$runner->set_plugin( $plugin );
+		$runner = Plugin_Request_Utility::get_runner();
+
+		if ( is_null( $runner ) ) {
+			$runner = new AJAX_Runner();
+		}
+
+		// Make sure we are using the correct runner instance.
+		if ( ! ( $runner instanceof AJAX_Runner ) ) {
+			wp_send_json_error(
+				new WP_Error( 'invalid-runner', __( 'AJAX Runner was not initialized correctly.', 'plugin-check' ) ),
+				403
+			);
+		}
 
 		try {
-			$checks_to_run = $runner->get_checks_to_run();
+			$runner->set_check_slugs( $checks );
+			$runner->set_plugin( $plugin );
+
+			$plugin_basename = $runner->get_plugin_basename();
+			$checks_to_run   = $runner->get_checks_to_run();
 		} catch ( Exception $error ) {
 			wp_send_json_error(
 				new WP_Error( 'invalid-checks', $error->getMessage() ),
@@ -78,7 +92,7 @@ class Admin_AJAX {
 
 		wp_send_json_success(
 			array(
-				'plugin' => $plugin,
+				'plugin' => $plugin_basename,
 				'checks' => array_keys( $checks_to_run ),
 			)
 		);
