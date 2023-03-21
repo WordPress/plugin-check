@@ -47,6 +47,8 @@ class AJAX_Runner_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_prepare_with_runtime_check() {
+		global $wp_actions;
+
 		add_filter( 'wp_doing_ajax', '__return_true' );
 		$_REQUEST['action'] = 'plugin_check_run_checks';
 		$_REQUEST['plugin'] = 'plugin-check';
@@ -61,8 +63,13 @@ class AJAX_Runner_Tests extends WP_UnitTestCase {
 			}
 		);
 
+		$muplugins_loaded = $wp_actions['muplugins_loaded'];
+		unset( $wp_actions['muplugins_loaded'] );
+
 		$runner  = new AJAX_Runner();
 		$cleanup = $runner->prepare();
+
+		$wp_actions['muplugins_loaded'] = $muplugins_loaded;
 
 		$this->assertIsCallable( $cleanup );
 
