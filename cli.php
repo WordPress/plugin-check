@@ -41,8 +41,18 @@ WP_CLI::add_command( 'plugin', $plugin_command );
 WP_CLI::add_hook(
 	'before_wp_load',
 	function() {
-		if ( ! file_exists( ABSPATH . 'wp-content/object-cache.php' ) ) {
-			copy(  __DIR__ . '/object-cache.copy.php', ABSPATH . 'wp-content/object-cache.php' );
+		if ( empty( $_SERVER['argv'] ) || 3 > count( $_SERVER['argv'] ) ) {
+			return;
+		}
+
+		if (
+			'wp' === substr( $_SERVER['argv'][0], -2 ) &&
+			'plugin' === $_SERVER['argv'][1] &&
+			'check' === $_SERVER['argv'][2]
+		) {
+			if ( ! file_exists( ABSPATH . 'wp-content/object-cache.php' ) ) {
+				copy(  __DIR__ . '/object-cache.copy.php', ABSPATH . 'wp-content/object-cache.php' );
+			}
 		}
 	}
 );
