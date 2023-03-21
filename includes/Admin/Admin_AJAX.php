@@ -60,7 +60,7 @@ class Admin_AJAX {
 			wp_send_json_error( $valid_nonce, 403 );
 		}
 
-		$checks = wp_parse_list( filter_input( INPUT_POST, 'checks', FILTER_SANITIZE_STRING ) );
+		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
 		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_STRING );
 
 		$runner = Plugin_Request_Utility::get_runner();
