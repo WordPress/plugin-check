@@ -12,9 +12,9 @@
 		e.preventDefault();
 
 		getChecksToRun()
-		.then( setupEnvironment )
+		.then( setUpEnvironment )
 		.then( runChecks )
-		.then( cleanupEnvironment )
+		.then( cleanUpEnvironment )
 		.then(
 			( data ) => {
 				console.log( data.message );
@@ -32,7 +32,7 @@
 	 *
 	 * @since n.e.x.t
 	 */
-	function setupEnvironment( data ) {
+	function setUpEnvironment( data ) {
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append( 'plugin', data.plugin );
@@ -74,7 +74,7 @@
 	 *
 	 * @since n.e.x.t
 	 */
-	function cleanupEnvironment( data ) {
+	function cleanUpEnvironment( data ) {
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append( 'action', 'plugin_check_clean_up_environment' );
