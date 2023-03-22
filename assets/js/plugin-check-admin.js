@@ -39,7 +39,7 @@
 		pluginCheckData.append( 'action', 'plugin_check_set_up_environment' );
 
 		for (var i = 0; i < data.checks.length; i++) {
-			pluginCheckData.append('checks[]', data.checks[i]);
+			pluginCheckData.append( 'checks[]', data.checks[ i ] );
 		}
 
 		return fetch(
@@ -116,7 +116,6 @@
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append( 'plugin', pluginsList.value );
-		pluginCheckData.append( 'checks[]', [] );
 		pluginCheckData.append( 'action', 'plugin_check_get_checks_to_run' );
 
 		return fetch(
@@ -157,7 +156,7 @@
 		pluginCheckData.append( 'action', 'plugin_check_run_checks' );
 
 		for (var i = 0; i < data.checks.length; i++) {
-			pluginCheckData.append('checks[]', data.checks[i]);
+			pluginCheckData.append( 'checks[]', data.checks[ i ] );
 		}
 
 		return fetch(

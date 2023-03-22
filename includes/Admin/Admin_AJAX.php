@@ -76,7 +76,7 @@ class Admin_AJAX {
 			);
 		}
 
-		$checks = array_filter( filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY ) );
+		$checks = isset( $_REQUEST['checks'] ) ? array_filter( $_REQUEST['checks'] ) : array();
 		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_STRING );
 
 		try {
@@ -157,7 +157,7 @@ class Admin_AJAX {
 			wp_send_json_error( $valid_nonce, 403 );
 		}
 
-		$checks = array_filter( filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY ) );
+		$checks = isset( $_REQUEST['checks'] ) ? array_filter( $_REQUEST['checks'] ) : array();
 		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_STRING );
 
 		// Attempt to get the plugin basename based on the request.
