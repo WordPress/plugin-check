@@ -149,15 +149,24 @@
 	 *
 	 * @since n.e.x.t
 	 */
-	function runChecks( data ) {
-		const pluginCheckData = new FormData();
-		pluginCheckData.append( 'nonce', pluginCheck.nonce );
-		pluginCheckData.append( 'plugin', data.plugin );
-		pluginCheckData.append( 'action', 'plugin_check_run_checks' );
+	async function runChecks( data ) {
+		const results = [];
 
 		for (var i = 0; i < data.checks.length; i++) {
-			pluginCheckData.append( 'checks[]', data.checks[ i ] );
+			let result = await runCheck( data.plugin, data.checks[ i ] );
+			results.push( result );
 		}
+
+		console.log( results );
+	}
+
+	function runCheck( plugin, check ) {
+		const pluginCheckData = new FormData();
+		pluginCheckData.append( 'nonce', pluginCheck.nonce );
+		pluginCheckData.append( 'plugin', plugin );
+		pluginCheckData.append( 'checks[]', check );
+		pluginCheckData.append( 'action', 'plugin_check_run_checks' );
+
 
 		return fetch(
 			ajaxurl,
