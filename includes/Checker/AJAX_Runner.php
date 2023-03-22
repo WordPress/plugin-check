@@ -70,13 +70,6 @@ class AJAX_Runner extends Abstract_Check_Runner {
 	 * @return array An array of Check slugs to run.
 	 */
 	protected function get_check_slugs_param() {
-		$checks = array();
-
-		if ( isset( $_REQUEST['checks'] ) ) {
-			// Checks are passed as a comma separated string.
-			$checks = array_filter( $_REQUEST['checks'] );
-		}
-
-		return $checks;
+		return filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
 	}
 }
