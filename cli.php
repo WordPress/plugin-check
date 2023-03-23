@@ -8,6 +8,9 @@
  * @since n.e.x.t
  */
 
+use WordPress\Plugin_Check\Plugin_Context;
+use WordPress\Plugin_Check\CLI\Plugin_Check_Command;
+
 if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) {
 	return;
 }
@@ -16,7 +19,7 @@ if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) {
 if ( ! class_exists( 'WordPress\Plugin_Check\CLI\Plugin_Check_Command' ) ) {
 	// Check the autoload file exists.
 	if ( ! file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
-		WP_CLI::error( 'Plugin Check autoloaded not found.' );
+		WP_CLI::error( 'Plugin Check autoloader not found.' );
 		return;
 	}
 
@@ -25,11 +28,11 @@ if ( ! class_exists( 'WordPress\Plugin_Check\CLI\Plugin_Check_Command' ) ) {
 }
 
 if ( ! isset( $context ) ) {
-	$context = new WordPress\Plugin_Check\Plugin_Context( __DIR__ . '/plugin-check.php' );
+	$context = new Plugin_Context( __DIR__ . '/plugin-check.php' );
 }
 
 // Create the CLI command instance and add to WP CLI.
-$plugin_command = new WordPress\Plugin_Check\CLI\Plugin_Check_Command( $context );
+$plugin_command = new Plugin_Check_Command( $context );
 WP_CLI::add_command( 'plugin', $plugin_command );
 
 
@@ -51,7 +54,9 @@ WP_CLI::add_hook(
 			'check' === $_SERVER['argv'][2]
 		) {
 			if ( ! file_exists( ABSPATH . 'wp-content/object-cache.php' ) ) {
-				copy(  __DIR__ . '/object-cache.copy.php', ABSPATH . 'wp-content/object-cache.php' );
+				if ( ! copy(  __DIR__ . '/object-cache.copy.php', ABSPATH . 'wp-content/object-cache.php' ) ) {
+					WP_CLI::error( 'Unable to copy object-cache.php file.' );
+				}
 			}
 		}
 	}

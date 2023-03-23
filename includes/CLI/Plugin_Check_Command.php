@@ -8,7 +8,6 @@
 namespace WordPress\Plugin_Check\CLI;
 
 use WordPress\Plugin_Check\Plugin_Context;
-use WordPress\Plugin_Check\Checker\Checks;
 use WordPress\Plugin_Check\Checker\Runtime_Check;
 use WordPress\Plugin_Check\Checker\Runtime_Environment_Setup;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
@@ -349,7 +348,7 @@ class Plugin_Check_Command {
 	}
 
 	/**
-	 * Check for a Runtime_Check in a list of checks
+	 * Checks for a Runtime_Check in a list of checks.
 	 *
 	 * @since n.e.x.t
 	 *
