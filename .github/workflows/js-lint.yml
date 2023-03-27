@@ -31,4 +31,4 @@ jobs:
         run: npm ci
 
       - name: JS Lint
-        run: npm run lint:js
+        run: npm run lint-js
