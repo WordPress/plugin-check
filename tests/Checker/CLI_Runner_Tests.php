@@ -39,6 +39,8 @@ class CLI_Runner_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_prepare_with_runtime_check() {
+		global $wp_actions;
+
 		$_SERVER['argv'] = array(
 			'wp',
 			'plugin',
@@ -56,8 +58,13 @@ class CLI_Runner_Tests extends WP_UnitTestCase {
 			}
 		);
 
+		$muplugins_loaded = $wp_actions['muplugins_loaded'];
+		unset( $wp_actions['muplugins_loaded'] );
+
 		$runner  = new CLI_Runner();
 		$cleanup = $runner->prepare();
+
+		$wp_actions['muplugins_loaded'] = $muplugins_loaded;
 
 		$this->assertIsCallable( $cleanup );
 

@@ -37,7 +37,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 		}
 
 		if (
-			'wp' === $_SERVER['argv'][0] &&
+			'wp' === substr( $_SERVER['argv'][0], -2 ) &&
 			'plugin' === $_SERVER['argv'][1] &&
 			'check' === $_SERVER['argv'][2]
 		) {
