@@ -11,6 +11,8 @@
   },
   "scripts": {
     "wp-env": "wp-env",
+    "format": "wp-scripts format --extensions=js,jsx",
+    "lint:js": "wp-scripts lint-js",
     "prelint-php": "wp-env run composer 'install --no-interaction'",
     "lint-php": "wp-env run composer run-script lint",
     "pretest-php": "wp-env run composer 'install --no-interaction'",
