@@ -72,7 +72,7 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_destroy_runner_with_cli() {
-		global $wpdb, $table_prefix;
+		global $wpdb, $table_prefix, $wp_actions;
 
 		$_SERVER['argv'] = array(
 			'wp',
@@ -91,6 +91,9 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 			}
 		);
 
+		$muplugins_loaded = $wp_actions['muplugins_loaded'];
+		unset( $wp_actions['muplugins_loaded'] );
+
 		Plugin_Request_Utility::initialize_runner();
 
 		do_action( 'muplugins_loaded' );
@@ -105,6 +108,7 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		$runner  = Plugin_Request_Utility::get_runner();
 
 		unset( $_SERVER['argv'] );
+		$wp_actions['muplugins_loaded'] = $muplugins_loaded;
 		$wpdb->set_prefix( $table_prefix );
 
 		$this->assertTrue( $prepared );
@@ -113,7 +117,7 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_destroy_runner_with_ajax() {
-		global $wpdb, $table_prefix;
+		global $wpdb, $table_prefix, $wp_actions;
 
 		add_filter( 'wp_doing_ajax', '__return_true' );
 		$_REQUEST['action'] = 'plugin_check_run_checks';
@@ -129,6 +133,9 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 			}
 		);
 
+		$muplugins_loaded = $wp_actions['muplugins_loaded'];
+		unset( $wp_actions['muplugins_loaded'] );
+
 		Plugin_Request_Utility::initialize_runner();
 
 		do_action( 'muplugins_loaded' );
@@ -143,6 +150,7 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		$runner  = Plugin_Request_Utility::get_runner();
 
 		$wpdb->set_prefix( $table_prefix );
+		$wp_actions['muplugins_loaded'] = $muplugins_loaded;
 
 		$this->assertTrue( $prepared );
 		$this->assertTrue( $cleanup );

@@ -8,6 +8,8 @@
 namespace WordPress\Plugin_Check\CLI;
 
 use WordPress\Plugin_Check\Plugin_Context;
+use WordPress\Plugin_Check\Checker\Runtime_Check;
+use WordPress\Plugin_Check\Checker\Runtime_Environment_Setup;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 use WordPress\Plugin_Check\Checker\CLI_Runner;
 use Exception;
@@ -118,13 +120,40 @@ class Plugin_Check_Command {
 			);
 		}
 
-		// Run checks against the plugin.
 		try {
-			$runner->set_plugin( $plugin );
 			$runner->set_check_slugs( $checks );
-			$result = $runner->run();
+			$runner->set_plugin( $plugin );
+
+			$checks_to_run = $runner->get_checks_to_run();
 		} catch ( Exception $error ) {
 			WP_CLI::error( $error->getMessage() );
+		}
+
+		if ( $this->has_runtime_check( $checks_to_run ) ) {
+			WP_CLI::line( __( 'Setting up runtime environment.', 'plugin-check' ) );
+			$runtime_setup = new Runtime_Environment_Setup();
+			$runtime_setup->setup();
+		}
+
+		// Run checks against the plugin.
+		try {
+			$result = $runner->run();
+		} catch ( Exception $error ) {
+			Plugin_Request_Utility::destroy_runner();
+
+			if ( isset( $runtime_setup ) ) {
+				$runtime_setup->cleanup();
+				WP_CLI::line( __( 'Cleaning up runtime environment.', 'plugin-check' ) );
+			}
+
+			WP_CLI::error( $error->getMessage() );
+		}
+
+		Plugin_Request_Utility::destroy_runner();
+
+		if ( isset( $runtime_setup ) ) {
+			$runtime_setup->cleanup();
+			WP_CLI::line( __( 'Cleaning up runtime environment.', 'plugin-check' ) );
 		}
 
 		// Get errors and warnings from the results.
@@ -316,5 +345,23 @@ class Plugin_Check_Command {
 
 		WP_CLI::line();
 		WP_CLI::line();
+	}
+
+	/**
+	 * Checks for a Runtime_Check in a list of checks.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param array $checks An array of Check instances.
+	 * @return bool True if a Runtime_Check exists in the array, false if not.
+	 */
+	protected function has_runtime_check( array $checks ) {
+		foreach ( $checks as $check ) {
+			if ( $check instanceof Runtime_Check ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
