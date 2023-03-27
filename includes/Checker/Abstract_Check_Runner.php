@@ -195,12 +195,12 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	}
 
 	/**
-	 * Determines if any of the checks contains at least one runtime check.
+	 * Determines if any of the checks are a runtime check.
 	 *
 	 * @since n.e.x.t
 	 *
 	 * @param array $checks An array of check instances to run.
-	 * @return bool Returns true if one or more checks contains at least one runtime check.
+	 * @return bool Returns true if one or more checks is a runtime check.
 	 */
 	protected function has_runtime_check( array $checks ) {
 		foreach ( $checks as $check ) {

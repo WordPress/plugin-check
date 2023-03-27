@@ -12,7 +12,9 @@
 		e.preventDefault();
 
 		getChecksToRun()
+		.then( setUpEnvironment )
 		.then( runChecks )
+		.then( cleanUpEnvironment )
 		.then(
 			( data ) => {
 				console.log( data.message );
@@ -26,16 +28,94 @@
 	} );
 
 	/**
+	 * Setup the runtime environment if needed.
+	 *
+	 * @since n.e.x.t
+	 */
+	function setUpEnvironment( data ) {
+		const pluginCheckData = new FormData();
+		pluginCheckData.append( 'nonce', pluginCheck.nonce );
+		pluginCheckData.append( 'plugin', data.plugin );
+		pluginCheckData.append( 'action', 'plugin_check_set_up_environment' );
+
+		for (var i = 0; i < data.checks.length; i++) {
+			pluginCheckData.append( 'checks[]', data.checks[ i ] );
+		}
+
+		return fetch(
+			ajaxurl,
+			{
+				method: 'POST',
+				credentials: 'same-origin',
+				body: pluginCheckData
+			}
+		)
+		.then(
+			( response ) => {
+				return response.json();
+			}
+		)
+		.then( handleDataErrors )
+		.then(
+			( data ) => {
+				if ( ! data.data || ! data.data.message ) {
+					throw new Error( 'Response contains no data.' );
+				}
+
+				console.log( data.data.message );
+
+				return data.data;
+			}
+		);
+	}
+
+	/**
+	 * Cleanup the runtime environment.
+	 *
+	 * @since n.e.x.t
+	 */
+	function cleanUpEnvironment( data ) {
+		const pluginCheckData = new FormData();
+		pluginCheckData.append( 'nonce', pluginCheck.nonce );
+		pluginCheckData.append( 'action', 'plugin_check_clean_up_environment' );
+
+		return fetch(
+			ajaxurl,
+			{
+				method: 'POST',
+				credentials: 'same-origin',
+				body: pluginCheckData
+			}
+		)
+		.then(
+			( response ) => {
+				return response.json();
+			}
+		)
+		.then( handleDataErrors )
+		.then(
+			( data ) => {
+				if ( ! data.data || ! data.data.message ) {
+					throw new Error( 'Response contains no data.' );
+				}
+
+				console.log( data.data.message );
+
+				return data.data;
+			}
+		);
+	}
+
+
+	/**
 	 * Get the Checks to run.
 	 *
 	 * @since n.e.x.t
 	 */
 	function getChecksToRun() {
-		// Collect the data to pass along for generating a check results.
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append( 'plugin', pluginsList.value );
-		pluginCheckData.append( 'checks', [] );
 		pluginCheckData.append( 'action', 'plugin_check_get_checks_to_run' );
 
 		return fetch(
@@ -73,8 +153,11 @@
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append( 'plugin', data.plugin );
-		pluginCheckData.append( 'checks', data.checks );
 		pluginCheckData.append( 'action', 'plugin_check_run_checks' );
+
+		for (var i = 0; i < data.checks.length; i++) {
+			pluginCheckData.append( 'checks[]', data.checks[ i ] );
+		}
 
 		return fetch(
 			ajaxurl,
