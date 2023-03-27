@@ -1,6 +1,8 @@
 ( function ( pluginCheck ) {
 	const checkItButton = document.getElementById( 'plugin-check__submit' );
-	const pluginsList   = document.getElementById( 'plugin-check__plugins-dropdown' );
+	const pluginsList = document.getElementById(
+		'plugin-check__plugins-dropdown'
+	);
 
 	// Return early if the elements cannot be found on the page.
 	if ( ! checkItButton || ! pluginsList ) {
@@ -12,17 +14,13 @@
 		e.preventDefault();
 
 		getChecksToRun()
-		.then( runChecks )
-		.then(
-			( data ) => {
+			.then( runChecks )
+			.then( ( data ) => {
 				console.log( data.message );
-			}
-		)
-		.catch(
-			( error ) => {
+			} )
+			.catch( ( error ) => {
 				console.error( error );
-			}
-		);
+			} );
 	} );
 
 	/**
@@ -38,35 +36,30 @@
 		pluginCheckData.append( 'checks', [] );
 		pluginCheckData.append( 'action', 'plugin_check_get_checks_to_run' );
 
-		return fetch(
-			ajaxurl,
-			{
-				method: 'POST',
-				credentials: 'same-origin',
-				body: pluginCheckData
-			}
-		)
-		.then(
-			( response ) => {
+		return fetch( ajaxurl, {
+			method: 'POST',
+			credentials: 'same-origin',
+			body: pluginCheckData,
+		} )
+			.then( ( response ) => {
 				return response.json();
-			}
-		)
-		.then( handleDataErrors )
-		.then(
-			( data ) => {
+			} )
+			.then( handleDataErrors )
+			.then( ( data ) => {
 				if ( ! data.data || ! data.data.plugin || ! data.data.checks ) {
-					throw new Error( 'Plugin and Checks are missing from the response.' );
+					throw new Error(
+						'Plugin and Checks are missing from the response.'
+					);
 				}
 
 				return data.data;
-			}
-		);
+			} );
 	}
-
 
 	/**
 	 * Run Checks.
 	 *
+	 * @param {Object} data Data object with props passed to form data.
 	 * @since n.e.x.t
 	 */
 	function runChecks( data ) {
@@ -76,30 +69,23 @@
 		pluginCheckData.append( 'checks', data.checks );
 		pluginCheckData.append( 'action', 'plugin_check_run_checks' );
 
-		return fetch(
-			ajaxurl,
-			{
-				method: 'POST',
-				credentials: 'same-origin',
-				body: pluginCheckData
-			}
-		)
-		.then(
-			( response ) => {
+		return fetch( ajaxurl, {
+			method: 'POST',
+			credentials: 'same-origin',
+			body: pluginCheckData,
+		} )
+			.then( ( response ) => {
 				return response.json();
-			}
-		)
-		.then( handleDataErrors )
-		.then(
-			( data ) => {
+			} )
+			.then( handleDataErrors )
+			.then( ( responseData ) => {
 				// If the response is successful and there is no message in the response.
-				if ( ! data.data || ! data.data.message ) {
+				if ( ! responseData.data || ! responseData.data.message ) {
 					throw new Error( 'Response contains no data' );
 				}
 
-				return data.data;
-			}
-		);
+				return responseData.data;
+			} );
 	}
 
 	/**
@@ -117,15 +103,14 @@
 
 		if ( ! data.success ) {
 			// If not successful and no message in the response.
-			if ( ! data.data || ! data.data[0].message ) {
+			if ( ! data.data || ! data.data[ 0 ].message ) {
 				throw new Error( 'Response contains no data' );
 			}
 
 			// If not successful and there is a message in the response.
-			throw new Error( data.data[0].message );
+			throw new Error( data.data[ 0 ].message );
 		}
 
 		return data;
 	}
-
 } )( PLUGIN_CHECK ); /* global PLUGIN_CHECK */
