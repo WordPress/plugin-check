@@ -82,7 +82,14 @@ class Force_Single_Plugin_Preparation implements Preparation {
 	public function filter_active_plugins( $active_plugins ) {
 		if ( is_array( $active_plugins ) && in_array( $this->plugin_basename, $active_plugins, true ) ) {
 
-			$plugin_base_file = plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE );
+			if ( defined( 'WP_PLUGIN_CHECK_MAIN_FILE' ) ) {
+				$plugin_check_file = WP_PLUGIN_CHECK_MAIN_FILE;
+			} else {
+				$plugins_dir       = defined( 'WP_PLUGIN_DIR' ) ? WP_PLUGIN_DIR : WP_CONTENT_DIR . '/plugins';
+				$plugin_check_file = $plugins_dir . '/plugin-check/plugin-check.php';
+			}
+
+			$plugin_base_file = plugin_basename( $plugin_check_file );
 
 			// If the plugin-check is the only available plugin then return that one only.
 			if ( $this->plugin_basename === $plugin_base_file ) {

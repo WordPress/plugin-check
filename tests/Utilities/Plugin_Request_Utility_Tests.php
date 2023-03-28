@@ -47,6 +47,9 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		);
 
 		Plugin_Request_Utility::initialize_runner();
+
+		do_action( 'muplugins_loaded' );
+
 		$runner = Plugin_Request_Utility::get_runner();
 
 		unset( $_SERVER['argv'] );
@@ -60,13 +63,16 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		$_REQUEST['plugin'] = 'plugin-check';
 
 		Plugin_Request_Utility::initialize_runner();
+
+		do_action( 'muplugins_loaded' );
+
 		$runner = Plugin_Request_Utility::get_runner();
 
 		$this->assertInstanceOf( AJAX_Runner::class, $runner );
 	}
 
 	public function test_destroy_runner_with_cli() {
-		global $wpdb, $table_prefix;
+		global $wpdb, $table_prefix, $wp_actions;
 
 		$_SERVER['argv'] = array(
 			'wp',
@@ -85,7 +91,12 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 			}
 		);
 
+		$muplugins_loaded = $wp_actions['muplugins_loaded'];
+		unset( $wp_actions['muplugins_loaded'] );
+
 		Plugin_Request_Utility::initialize_runner();
+
+		do_action( 'muplugins_loaded' );
 
 		// Determine if one of the Universal_Runtume_Preparation was run.
 		$prepared = has_filter( 'option_active_plugins' );
@@ -97,6 +108,7 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		$runner  = Plugin_Request_Utility::get_runner();
 
 		unset( $_SERVER['argv'] );
+		$wp_actions['muplugins_loaded'] = $muplugins_loaded;
 		$wpdb->set_prefix( $table_prefix );
 
 		$this->assertTrue( $prepared );
@@ -105,12 +117,12 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_destroy_runner_with_ajax() {
-		global $wpdb, $table_prefix;
+		global $wpdb, $table_prefix, $wp_actions;
 
 		add_filter( 'wp_doing_ajax', '__return_true' );
 		$_REQUEST['action'] = 'plugin_check_run_checks';
 		$_REQUEST['plugin'] = 'plugin-check';
-		$_REQUEST['checks'] = 'runtime_check';
+		$_REQUEST['checks'] = array( 'runtime_check' );
 
 		add_filter(
 			'wp_plugin_check_checks',
@@ -121,7 +133,12 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 			}
 		);
 
+		$muplugins_loaded = $wp_actions['muplugins_loaded'];
+		unset( $wp_actions['muplugins_loaded'] );
+
 		Plugin_Request_Utility::initialize_runner();
+
+		do_action( 'muplugins_loaded' );
 
 		// Determine if one of the Universal_Runtume_Preparation was run.
 		$prepared = has_filter( 'option_active_plugins' );
@@ -133,6 +150,7 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		$runner  = Plugin_Request_Utility::get_runner();
 
 		$wpdb->set_prefix( $table_prefix );
+		$wp_actions['muplugins_loaded'] = $muplugins_loaded;
 
 		$this->assertTrue( $prepared );
 		$this->assertTrue( $cleanup );

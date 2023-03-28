@@ -47,10 +47,12 @@ class AJAX_Runner_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_prepare_with_runtime_check() {
+		global $wp_actions;
+
 		add_filter( 'wp_doing_ajax', '__return_true' );
 		$_REQUEST['action'] = 'plugin_check_run_checks';
 		$_REQUEST['plugin'] = 'plugin-check';
-		$_REQUEST['checks'] = 'runtime_check';
+		$_REQUEST['checks'] = array( 'runtime_check' );
 
 		add_filter(
 			'wp_plugin_check_checks',
@@ -61,8 +63,13 @@ class AJAX_Runner_Tests extends WP_UnitTestCase {
 			}
 		);
 
+		$muplugins_loaded = $wp_actions['muplugins_loaded'];
+		unset( $wp_actions['muplugins_loaded'] );
+
 		$runner  = new AJAX_Runner();
 		$cleanup = $runner->prepare();
+
+		$wp_actions['muplugins_loaded'] = $muplugins_loaded;
 
 		$this->assertIsCallable( $cleanup );
 
@@ -82,7 +89,7 @@ class AJAX_Runner_Tests extends WP_UnitTestCase {
 		add_filter( 'wp_doing_ajax', '__return_true' );
 		$_REQUEST['action'] = 'plugin_check_run_checks';
 		$_REQUEST['plugin'] = 'plugin-check';
-		$_REQUEST['checks'] = 'empty_check';
+		$_REQUEST['checks'] = array( 'empty_check' );
 
 		add_filter(
 			'wp_plugin_check_checks',
@@ -114,7 +121,7 @@ class AJAX_Runner_Tests extends WP_UnitTestCase {
 		add_filter( 'wp_doing_ajax', '__return_true' );
 		$_REQUEST['action'] = 'plugin_check_run_checks';
 		$_REQUEST['plugin'] = 'plugin-check';
-		$_REQUEST['checks'] = 'empty_check';
+		$_REQUEST['checks'] = array( 'empty_check' );
 
 		add_filter(
 			'wp_plugin_check_checks',
@@ -138,7 +145,7 @@ class AJAX_Runner_Tests extends WP_UnitTestCase {
 		add_filter( 'wp_doing_ajax', '__return_true' );
 		$_REQUEST['action'] = 'plugin_check_run_checks';
 		$_REQUEST['plugin'] = 'plugin-check';
-		$_REQUEST['checks'] = 'error_check';
+		$_REQUEST['checks'] = array( 'error_check' );
 
 		add_filter(
 			'wp_plugin_check_checks',
@@ -167,7 +174,7 @@ class AJAX_Runner_Tests extends WP_UnitTestCase {
 		add_filter( 'wp_doing_ajax', '__return_true' );
 		$_REQUEST['action'] = 'plugin_check_run_checks';
 		$_REQUEST['plugin'] = 'plugin-check';
-		$_REQUEST['checks'] = 'empty_check';
+		$_REQUEST['checks'] = array( 'empty_check' );
 
 		$muplugins_loaded = $wp_actions['muplugins_loaded'];
 		unset( $wp_actions['muplugins_loaded'] );
@@ -191,7 +198,7 @@ class AJAX_Runner_Tests extends WP_UnitTestCase {
 		add_filter( 'wp_doing_ajax', '__return_true' );
 		$_REQUEST['action'] = 'plugin_check_run_checks';
 		$_REQUEST['plugin'] = 'plugin-check';
-		$_REQUEST['checks'] = 'empty_check';
+		$_REQUEST['checks'] = array( 'empty_check' );
 
 		$muplugins_loaded = $wp_actions['muplugins_loaded'];
 		unset( $wp_actions['muplugins_loaded'] );

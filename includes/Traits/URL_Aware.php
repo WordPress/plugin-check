@@ -154,7 +154,27 @@ trait URL_Aware {
 		$GLOBALS['wp']->public_query_vars  = $public_query_vars;
 		$GLOBALS['wp']->private_query_vars = $private_query_vars;
 
-		_cleanup_query_vars();
+		// Clean up query vars.
+		foreach ( $GLOBALS['wp']->public_query_vars as $v ) {
+			unset( $GLOBALS[ $v ] );
+		}
+
+		foreach ( $GLOBALS['wp']->private_query_vars as $v ) {
+			unset( $GLOBALS[ $v ] );
+		}
+
+		// Set up query vars for taxonomies and post types.
+		foreach ( get_taxonomies( array(), 'objects' ) as $t ) {
+			if ( $t->publicly_queryable && ! empty( $t->query_var ) ) {
+				$GLOBALS['wp']->add_query_var( $t->query_var );
+			}
+		}
+
+		foreach ( get_post_types( array(), 'objects' ) as $t ) {
+			if ( is_post_type_viewable( $t ) && ! empty( $t->query_var ) ) {
+				$GLOBALS['wp']->add_query_var( $t->query_var );
+			}
+		}
 
 		$GLOBALS['wp']->main( $parts['query'] );
 	}

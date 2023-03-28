@@ -1,4 +1,3 @@
-
 <?php
 /**
  * Plugin Name: Plugin Check Object Cache Drop-In
