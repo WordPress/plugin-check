@@ -137,10 +137,8 @@
 
 		for ( let i = 0; i < data.checks.length; i++ ) {
 			const result = await runCheck( data.plugin, data.checks[ i ] );
-			results.push( result );
+			console.log( result );
 		}
-
-		console.log( results );
 	}
 
 	/**
