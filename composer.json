@@ -21,7 +21,8 @@
   },
   "scripts": {
     "lint": "phpcs --standard=phpcs.xml.dist",
-    "test": "phpunit -c phpunit.xml.dist --verbose"
+    "test": "phpunit -c phpunit.xml.dist --verbose",
+    "phpstan": "phpstan analyse --memory-limit=2048M"
   },
   "config": {
     "allow-plugins": {

@@ -14,6 +14,7 @@
     "lint-js": "wp-scripts lint-js",
     "format-js": "npm run lint-js -- --fix",
     "prelint-php": "wp-env run composer 'install --no-interaction'",
+    "phpstan": "wp-env run composer run-script phpstan",
     "lint-php": "wp-env run composer run-script lint",
     "pretest-php": "wp-env run composer 'install --no-interaction'",
     "test-php": "wp-env run phpunit 'phpunit -c /var/www/html/wp-content/plugins/plugin-check/phpunit.xml.dist --verbose'",
