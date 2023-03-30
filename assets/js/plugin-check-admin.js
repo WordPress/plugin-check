@@ -1,17 +1,21 @@
 ( function ( pluginCheck ) {
 	const checkItButton = document.getElementById( 'plugin-check__submit' );
+	const resultsContainer = document.getElementById( 'plugin-check__results' );
 	const pluginsList = document.getElementById(
 		'plugin-check__plugins-dropdown'
 	);
 
 	// Return early if the elements cannot be found on the page.
-	if ( ! checkItButton || ! pluginsList ) {
+	if ( ! checkItButton || ! pluginsList || ! resultsContainer ) {
 		console.error( 'Missing form elements on page' );
 		return;
 	}
 
 	checkItButton.addEventListener( 'click', ( e ) => {
 		e.preventDefault();
+
+		// Empty the results container.
+		resultsContainer.innerText = '';
 
 		getChecksToRun()
 			.then( setUpEnvironment )
@@ -138,8 +142,8 @@
 	 */
 	async function runChecks( data ) {
 		for ( let i = 0; i < data.checks.length; i++ ) {
-			const result = await runCheck( data.plugin, data.checks[ i ] );
-			console.log( result );
+			const results = await runCheck( data.plugin, data.checks[ i ] );
+			renderResults( results );
 		}
 	}
 
@@ -202,5 +206,90 @@
 		}
 
 		return data;
+	}
+
+	/**
+	 * Renders results for each check on the page.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param {Object} results The results object.
+	 */
+	function renderResults( results ) {
+		const { errors, warnings } = results;
+
+		// Render errors and warnings for files.
+		for ( const file in errors ) {
+			if ( warnings[ file ] ) {
+				renderFileResults( file, errors[ file ], warnings[ file ] );
+				delete warnings[ file ];
+			} else {
+				renderFileResults( file, errors[ file ], [] );
+			}
+		}
+
+		// Render remaining files with only warnings.
+		for ( const file in warnings ) {
+			renderFileResults( file, [], warnings[ file ] );
+		}
+	}
+
+	/**
+	 * Renders the file results table.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param {string} file     The file name for the results.
+	 * @param {Object} errors   The file errors.
+	 * @param {Object} warnings The file warnings.
+	 */
+	function renderFileResults( file, errors, warnings ) {
+		const tableTemplate = wp.template( 'plugin-check-results-table' );
+		const rowTemplate = wp.template( 'plugin-check-results-row' );
+		const index = Date.now();
+
+		// Render the file table.
+		resultsContainer.innerHTML += tableTemplate( { file, index } );
+		const resultsTable = document.getElementById(
+			'plugin-check__results-body-' + index
+		);
+
+		// Loop over each result by the line, column and messages.
+		for ( const line in errors ) {
+			for ( const column in errors[ line ] ) {
+				for ( let i = 0; i < errors[ line ][ column ].length; i++ ) {
+					const message = errors[ line ][ column ][ i ].message;
+					const code = errors[ line ][ column ][ i ].code;
+
+					resultsTable.innerHTML += rowTemplate( {
+						line,
+						column,
+						file,
+						type: 'ERROR',
+						message,
+						code,
+					} );
+				}
+			}
+		}
+
+		// Loop over each result by the line, column and messages.
+		for ( const line in warnings ) {
+			for ( const column in warnings[ line ] ) {
+				for ( let i = 0; i < warnings[ line ][ column ].length; i++ ) {
+					const message = warnings[ line ][ column ][ i ].message;
+					const code = warnings[ line ][ column ][ i ].code;
+
+					resultsTable.innerHTML += rowTemplate( {
+						line,
+						column,
+						file,
+						type: 'WARNING',
+						message,
+						code,
+					} );
+				}
+			}
+		}
 	}
 } )( PLUGIN_CHECK ); /* global PLUGIN_CHECK */

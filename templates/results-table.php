@@ -1,6 +1,14 @@
 <script type="text/template" id="tmpl-plugin-check-results-table">
-	<table id="plugin-check__results-table">
+	<table id="plugin-check__results-table-{{data.index}}" class="plugin-check__results-table">
 		<thead>
+			<tr>
+				<td>
+					FILE:
+				</td>
+				<td colspan="4">
+					{{ data.file }}
+				</td>
+			</tr>
 			<tr>
 				<td>
 					Line
@@ -19,6 +27,6 @@
 				</td>
 			</tr>
 		</thead>
-		<tbody id="plugin-check__results-body"></tbody>
+		<tbody id="plugin-check__results-body-{{data.index}}"></tbody>
 	</table>
 </script>
