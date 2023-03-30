@@ -47,8 +47,6 @@ class Admin_Page {
 	 * Registers the admin page under the tools menu.
 	 *
 	 * @since n.e.x.t
-	 *
-	 * @return string The hook identifier for the admin page.
 	 */
 	public function add_page() {
 		$hook = add_management_page(
@@ -60,8 +58,6 @@ class Admin_Page {
 		);
 
 		add_action( "load-{$hook}", array( $this, 'initialize_page' ) );
-
-		return $hook;
 	}
 
 	/**
