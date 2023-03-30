@@ -71,6 +71,7 @@ class Admin_Page {
 	 */
 	public function initialize_page() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+		add_action( 'admin_footer', array( $this, 'admin_footer' ) );
 	}
 
 	/**
@@ -82,7 +83,9 @@ class Admin_Page {
 		wp_enqueue_script(
 			'plugin-check-admin',
 			WP_PLUGIN_CHECK_PLUGIN_DIR_URL . 'assets/js/plugin-check-admin.js',
-			array(),
+			array(
+				'wp-util',
+			),
 			WP_PLUGIN_CHECK_VERSION,
 			true
 		);
@@ -153,5 +156,15 @@ class Admin_Page {
 		}
 
 		return $actions;
+	}
+
+	/**
+	 * Render the results table templates in the footer.
+	 *
+	 * @since n.e.x.t
+	 */
+	public function admin_footer() {
+		include_once WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/results-table.php';
+		include_once WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/results-row.php';
 	}
 }
