@@ -28,8 +28,9 @@
 	/**
 	 * Setup the runtime environment if needed.
 	 *
-	 * @param {Object} data Data object with props passed to form data.
 	 * @since n.e.x.t
+	 *
+	 * @param {Object} data Data object with props passed to form data.
 	 */
 	function setUpEnvironment( data ) {
 		const pluginCheckData = new FormData();
@@ -65,6 +66,8 @@
 	 * Cleanup the runtime environment.
 	 *
 	 * @since n.e.x.t
+	 *
+	 * @return {Object} The response data.
 	 */
 	function cleanUpEnvironment() {
 		const pluginCheckData = new FormData();
@@ -129,8 +132,9 @@
 	/**
 	 * Run Checks.
 	 *
-	 * @param {Object} data The response data.
 	 * @since n.e.x.t
+	 *
+	 * @param {Object} data The response data.
 	 */
 	async function runChecks( data ) {
 		const results = [];
@@ -144,9 +148,10 @@
 	/**
 	 * Run a single check.
 	 *
+	 * @since n.e.x.t
+	 *
 	 * @param {string} plugin The plugin to check.
 	 * @param {string} check  The check to run.
-	 * @since n.e.x.t
 	 * @return {Object} The check results.
 	 */
 	function runCheck( plugin, check ) {
