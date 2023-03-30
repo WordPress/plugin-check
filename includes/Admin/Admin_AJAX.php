@@ -223,7 +223,8 @@ class Admin_AJAX {
 			);
 		}
 
-		$checks = isset( $_REQUEST['checks'] ) ? array_filter( $_REQUEST['checks'] ) : array();
+		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
+		$checks = is_null( $checks ) ? array() : $checks;
 		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_STRING );
 
 		try {
@@ -239,9 +240,9 @@ class Admin_AJAX {
 
 		wp_send_json_success(
 			array(
-				'results' => $this->format_results( $results ),
-				'checks'  => $checks,
-				'message' => __( 'Checks run successfully', 'plugin-check' ),
+				'message'  => __( 'Checks run successfully', 'plugin-check' ),
+				'errors'   => $results->get_errors(),
+				'warnings' => $results->get_warnings(),
 			)
 		);
 	}
@@ -278,108 +279,5 @@ class Admin_AJAX {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Format results for the AJAX response.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @param Check_Result $results The Check Results containing errors and warnings.
-	 *
-	 * @return array An array of results.
-	 */
-	protected function format_results( Check_Result $results ) {
-		// Get errors and warnings from the results.
-		$errors      = $results->get_errors();
-		$warnings    = $results->get_warnings();
-		$all_results = array();
-
-		// Go over all files with errors first and print them, combined with any warnings in the same file.
-		foreach ( $errors as $file_name => $file_errors ) {
-			$file_warnings = array();
-
-			if ( isset( $warnings[ $file_name ] ) ) {
-				$file_warnings = $warnings[ $file_name ];
-				unset( $warnings[ $file_name ] );
-			}
-
-			$file_results = $this->flatten_file_results( $file_name, $file_errors, $file_warnings );
-			$all_results  = array_merge( $all_results, $file_results );
-		}
-
-		// If there are any files left with only warnings, print those next.
-		foreach ( $warnings as $file_name => $file_warnings ) {
-			$file_results = $this->flatten_file_results( $file_name, array(), $file_warnings );
-			$all_results  = array_merge( $all_results, $file_results );
-		}
-
-		return $all_results;
-	}
-
-	/**
-	 * Flattens and combines the given associative array of file errors and file warnings into a two-dimensional array.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @param array $file_name     The file name for the errors.
-	 * @param array $file_errors   Errors from a Check_Result, for a the file.
-	 * @param array $file_warnings Warnings from a Check_Result, for a the file.
-	 * @return array Combined file results.
-	 */
-	protected function flatten_file_results( $file_name, $file_errors, $file_warnings ) {
-		$file_results = array();
-
-		foreach ( $file_errors as $line => $line_errors ) {
-			foreach ( $line_errors as $column => $column_errors ) {
-				foreach ( $column_errors as $column_error ) {
-					$file_results[] = array(
-						'code'    => $column_error['code'],
-						'message' => $column_error['message'],
-						'file'    => $file_name,
-						'type'    => 'WARNING',
-						'line'    => $line,
-						'column'  => $column,
-					);
-				}
-			}
-		}
-
-		foreach ( $file_warnings as $line => $line_warnings ) {
-			foreach ( $line_warnings as $column => $column_warnings ) {
-				foreach ( $column_warnings as $column_warning ) {
-
-					$file_results[] = array(
-						'code'    => $column_warning['code'],
-						'message' => $column_warning['message'],
-						'file'    => $file_name,
-						'type'    => 'WARNING',
-						'line'    => $line,
-						'column'  => $column,
-					);
-				}
-			}
-		}
-
-		usort(
-			$file_results,
-			function( $a, $b ) {
-				if ( $a['line'] < $b['line'] ) {
-					return -1;
-				}
-				if ( $a['line'] > $b['line'] ) {
-					return 1;
-				}
-				if ( $a['column'] < $b['column'] ) {
-					return -1;
-				}
-				if ( $a['column'] > $b['column'] ) {
-					return 1;
-				}
-				return 0;
-			}
-		);
-
-		return $file_results;
 	}
 }
