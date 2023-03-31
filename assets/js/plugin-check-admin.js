@@ -249,7 +249,6 @@
 	 */
 	function renderFileResults( file, errors, warnings ) {
 		const tableTemplate = wp.template( 'plugin-check-results-table' );
-		const rowTemplate = wp.template( 'plugin-check-results-row' );
 		const index = Date.now();
 
 		// Render the file table.
@@ -258,37 +257,34 @@
 			'plugin-check__results-body-' + index
 		);
 
-		// Loop over each result by the line, column and messages.
-		for ( const line in errors ) {
-			for ( const column in errors[ line ] ) {
-				for ( let i = 0; i < errors[ line ][ column ].length; i++ ) {
-					const message = errors[ line ][ column ][ i ].message;
-					const code = errors[ line ][ column ][ i ].code;
+		// Render results to the table.
+		renderResultRows( 'ERROR', errors, resultsTable );
+		renderResultRows( 'WARNING', warnings, resultsTable );
+	}
 
-					resultsTable.innerHTML += rowTemplate( {
-						line,
-						column,
-						file,
-						type: 'ERROR',
-						message,
-						code,
-					} );
-				}
-			}
-		}
+	/**
+	 * Renders a result row onto the file table.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param {string} type    The result type. Either ERROR or WARNING.
+	 * @param {Object} results The results object.
+	 * @param {Object} table   The HTML table to append a result row to.
+	 */
+	function renderResultRows( type, results, table ) {
+		const rowTemplate = wp.template( 'plugin-check-results-row' );
 
 		// Loop over each result by the line, column and messages.
-		for ( const line in warnings ) {
-			for ( const column in warnings[ line ] ) {
-				for ( let i = 0; i < warnings[ line ][ column ].length; i++ ) {
-					const message = warnings[ line ][ column ][ i ].message;
-					const code = warnings[ line ][ column ][ i ].code;
+		for ( const line in results ) {
+			for ( const column in results[ line ] ) {
+				for ( let i = 0; i < results[ line ][ column ].length; i++ ) {
+					const message = results[ line ][ column ][ i ].message;
+					const code = results[ line ][ column ][ i ].code;
 
-					resultsTable.innerHTML += rowTemplate( {
+					table.innerHTML += rowTemplate( {
 						line,
 						column,
-						file,
-						type: 'WARNING',
+						type,
 						message,
 						code,
 					} );
