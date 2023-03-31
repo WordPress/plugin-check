@@ -138,8 +138,12 @@
 	 */
 	async function runChecks( data ) {
 		for ( let i = 0; i < data.checks.length; i++ ) {
-			const result = await runCheck( data.plugin, data.checks[ i ] );
-			console.log( result );
+			try {
+				const result = await runCheck( data.plugin, data.checks[ i ] );
+				console.log( result );
+			} catch ( e ) {
+				// Ignore for now.
+			}
 		}
 	}
 
