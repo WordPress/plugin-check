@@ -9,6 +9,7 @@ namespace WordPress\Plugin_Check\Admin;
 
 use Exception;
 use WordPress\Plugin_Check\Checker\AJAX_Runner;
+use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Runtime_Check;
 use WordPress\Plugin_Check\Checker\Runtime_Environment_Setup;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
@@ -208,9 +209,40 @@ class Admin_AJAX {
 			wp_send_json_error( $valid_nonce, 403 );
 		}
 
+		$runner = Plugin_Request_Utility::get_runner();
+
+		if ( is_null( $runner ) ) {
+			$runner = new AJAX_Runner();
+		}
+
+		// Make sure we are using the correct runner instance.
+		if ( ! ( $runner instanceof AJAX_Runner ) ) {
+			wp_send_json_error(
+				new WP_Error( 'invalid-runner', __( 'AJAX Runner was not initialized correctly.', 'plugin-check' ) ),
+				500
+			);
+		}
+
+		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
+		$checks = is_null( $checks ) ? array() : $checks;
+		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_STRING );
+
+		try {
+			$runner->set_check_slugs( $checks );
+			$runner->set_plugin( $plugin );
+			$results = $runner->run();
+		} catch ( Exception $error ) {
+			wp_send_json_error(
+				new WP_Error( 'invalid-request', $error->getMessage() ),
+				400
+			);
+		}
+
 		wp_send_json_success(
 			array(
-				'message' => __( 'Verified!', 'plugin-check' ),
+				'message'  => __( 'Checks run successfully', 'plugin-check' ),
+				'errors'   => $results->get_errors(),
+				'warnings' => $results->get_warnings(),
 			)
 		);
 	}

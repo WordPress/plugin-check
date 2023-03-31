@@ -28,8 +28,9 @@
 	/**
 	 * Setup the runtime environment if needed.
 	 *
-	 * @param {Object} data Data object with props passed to form data.
 	 * @since n.e.x.t
+	 *
+	 * @param {Object} data Data object with props passed to form data.
 	 */
 	function setUpEnvironment( data ) {
 		const pluginCheckData = new FormData();
@@ -65,6 +66,8 @@
 	 * Cleanup the runtime environment.
 	 *
 	 * @since n.e.x.t
+	 *
+	 * @return {Object} The response data.
 	 */
 	function cleanUpEnvironment() {
 		const pluginCheckData = new FormData();
@@ -129,18 +132,36 @@
 	/**
 	 * Run Checks.
 	 *
-	 * @param {Object} data The response data.
 	 * @since n.e.x.t
+	 *
+	 * @param {Object} data The response data.
 	 */
-	function runChecks( data ) {
+	async function runChecks( data ) {
+		for ( let i = 0; i < data.checks.length; i++ ) {
+			try {
+				const result = await runCheck( data.plugin, data.checks[ i ] );
+				console.log( result );
+			} catch ( e ) {
+				// Ignore for now.
+			}
+		}
+	}
+
+	/**
+	 * Run a single check.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param {string} plugin The plugin to check.
+	 * @param {string} check  The check to run.
+	 * @return {Object} The check results.
+	 */
+	function runCheck( plugin, check ) {
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
-		pluginCheckData.append( 'plugin', data.plugin );
+		pluginCheckData.append( 'plugin', plugin );
+		pluginCheckData.append( 'checks[]', check );
 		pluginCheckData.append( 'action', 'plugin_check_run_checks' );
-
-		for ( let i = 0; i < data.checks.length; i++ ) {
-			pluginCheckData.append( 'checks[]', data.checks[ i ] );
-		}
 
 		return fetch( ajaxurl, {
 			method: 'POST',
