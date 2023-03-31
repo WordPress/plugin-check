@@ -142,8 +142,12 @@
 	 */
 	async function runChecks( data ) {
 		for ( let i = 0; i < data.checks.length; i++ ) {
-			const results = await runCheck( data.plugin, data.checks[ i ] );
-			renderResults( results );
+			try {
+				const results = await runCheck( data.plugin, data.checks[ i ] );
+				renderResults( results );
+			} catch ( e ) {
+				// Ignore for now.
+			}
 		}
 	}
 
