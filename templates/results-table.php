@@ -1,32 +1,26 @@
 <script type="text/template" id="tmpl-plugin-check-results-table">
-	<table id="plugin-check__results-table-{{data.index}}" class="plugin-check__results-table">
+	<h4><?php esc_html_e( 'FILE:', 'plugin-check' ); ?> {{ data.file }}</h4>
+	<table id="plugin-check__results-table-{{data.index}}" class="widefat plugin-check__results-table">
 		<thead>
 			<tr>
 				<td>
-					FILE:
-				</td>
-				<td colspan="4">
-					{{ data.file }}
-				</td>
-			</tr>
-			<tr>
-				<td>
-					Line
+					<?php esc_html_e( 'Line', 'plugin-check' ); ?>
 				</td>
 				<td>
-					Column
+					<?php esc_html_e( 'Column', 'plugin-check' ); ?>
 				</td>
 				<td>
-					Type
+					<?php esc_html_e( 'Type', 'plugin-check' ); ?>
 				</td>
 				<td>
-					Code
+					<?php esc_html_e( 'Code', 'plugin-check' ); ?>
 				</td>
 				<td>
-					Message
+					<?php esc_html_e( 'Message', 'plugin-check' ); ?>
 				</td>
 			</tr>
 		</thead>
 		<tbody id="plugin-check__results-body-{{data.index}}"></tbody>
 	</table>
+	<br>
 </script>
