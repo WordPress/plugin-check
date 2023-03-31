@@ -23,6 +23,8 @@
 			.then( cleanUpEnvironment )
 			.then( ( data ) => {
 				console.log( data.message );
+
+				resultsContainer.innerHTML += 'Checks complete';
 			} )
 			.catch( ( error ) => {
 				console.error( error );

@@ -164,7 +164,7 @@ class Admin_Page {
 	 * @since n.e.x.t
 	 */
 	public function admin_footer() {
-		include_once WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/results-table.php';
-		include_once WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/results-row.php';
+		require_once WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/results-table.php';
+		require_once WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/results-row.php';
 	}
 }
