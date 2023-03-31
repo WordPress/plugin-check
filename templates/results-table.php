@@ -1,6 +1,6 @@
 <script type="text/template" id="tmpl-plugin-check-results-table">
 	<h4><?php esc_html_e( 'FILE:', 'plugin-check' ); ?> {{ data.file }}</h4>
-	<table id="plugin-check__results-table-{{data.index}}" class="widefat plugin-check__results-table">
+	<table id="plugin-check__results-table-{{data.index}}" class="widefat striped plugin-check__results-table">
 		<thead>
 			<tr>
 				<td>
