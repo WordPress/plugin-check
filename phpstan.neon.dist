@@ -1,6 +1,7 @@
 parameters:
   level: 5
   paths:
+    - plugin-check.php
     - includes/
   bootstrapFiles:
     - tests/phpstan/bootstrap.php
