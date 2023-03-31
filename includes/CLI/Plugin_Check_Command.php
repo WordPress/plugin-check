@@ -7,12 +7,12 @@
 
 namespace WordPress\Plugin_Check\CLI;
 
-use WordPress\Plugin_Check\Plugin_Context;
+use Exception;
+use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Checker\Runtime_Check;
 use WordPress\Plugin_Check\Checker\Runtime_Environment_Setup;
+use WordPress\Plugin_Check\Plugin_Context;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
-use WordPress\Plugin_Check\Checker\CLI_Runner;
-use Exception;
 use WP_CLI;
 
 /**

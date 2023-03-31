@@ -5,8 +5,8 @@
  * @package plugin-check
  */
 
-use WordPress\Plugin_Check\Checker\Preparation;
 use WordPress\Plugin_Check\Checker\Checks\Enqueued_Scripts_Size_Check;
+use WordPress\Plugin_Check\Checker\Preparation;
 use WordPress\Plugin_Check\Test_Utils\TestCase\Runtime_Check_UnitTestCase;
 
 class Enqueued_Scripts_Size_Check_Tests extends Runtime_Check_UnitTestCase {

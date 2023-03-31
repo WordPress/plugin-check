@@ -5,9 +5,9 @@
  * @package plugin-check
  */
 
-use WordPress\Plugin_Check\Checker\Checks\I18n_Usage_Check;
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Checks\I18n_Usage_Check;
 
 class I18n_Usage_Check_Tests extends WP_UnitTestCase {
 

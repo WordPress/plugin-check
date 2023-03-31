@@ -7,10 +7,10 @@
 
 namespace WordPress\Plugin_Check\Checker\Checks;
 
-use WordPress\Plugin_Check\Checker\Runtime_Check;
-use WordPress\Plugin_Check\Checker\Preparation;
-use WordPress\Plugin_Check\Checker\Check_Result;
 use Exception;
+use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Preparation;
+use WordPress\Plugin_Check\Checker\Runtime_Check;
 
 /**
  * Check for running one or more PHP CodeSniffer sniffs.

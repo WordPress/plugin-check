@@ -7,12 +7,12 @@
 
 namespace WordPress\Plugin_Check\Admin;
 
-use WP_Error;
 use Exception;
 use WordPress\Plugin_Check\Checker\AJAX_Runner;
 use WordPress\Plugin_Check\Checker\Runtime_Check;
 use WordPress\Plugin_Check\Checker\Runtime_Environment_Setup;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
+use WP_Error;
 
 /**
  * Class to handle the Admin AJAX requests.

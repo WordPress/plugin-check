@@ -7,7 +7,6 @@
 
 namespace WordPress\Plugin_Check;
 
-use WordPress\Plugin_Check\CLI\Plugin_Check_Command;
 use WordPress\Plugin_Check\Admin\Admin_Page;
 
 /**
