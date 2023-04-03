@@ -71,6 +71,7 @@ class Admin_Page {
 	 */
 	public function initialize_page() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+		add_action( 'admin_footer', array( $this, 'admin_footer' ) );
 	}
 
 	/**
@@ -82,7 +83,9 @@ class Admin_Page {
 		wp_enqueue_script(
 			'plugin-check-admin',
 			WP_PLUGIN_CHECK_PLUGIN_DIR_URL . 'assets/js/plugin-check-admin.js',
-			array(),
+			array(
+				'wp-util',
+			),
 			WP_PLUGIN_CHECK_VERSION,
 			true
 		);
@@ -153,5 +156,45 @@ class Admin_Page {
 		}
 
 		return $actions;
+	}
+
+	/**
+	 * Render the results table templates in the footer.
+	 *
+	 * @since n.e.x.t
+	 */
+	public function admin_footer() {
+		ob_start();
+		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/results-table.php';
+		$results_table_template = ob_get_clean();
+		wp_print_inline_script_tag(
+			$results_table_template,
+			array(
+				'id'   => 'tmpl-plugin-check-results-table',
+				'type' => 'text/template',
+			)
+		);
+
+		ob_start();
+		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/results-row.php';
+		$results_row_template = ob_get_clean();
+		wp_print_inline_script_tag(
+			$results_row_template,
+			array(
+				'id'   => 'tmpl-plugin-check-results-row',
+				'type' => 'text/template',
+			)
+		);
+
+		ob_start();
+		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/results-complete.php';
+		$results_row_template = ob_get_clean();
+		wp_print_inline_script_tag(
+			$results_row_template,
+			array(
+				'id'   => 'tmpl-plugin-check-results-complete',
+				'type' => 'text/template',
+			)
+		);
 	}
 }

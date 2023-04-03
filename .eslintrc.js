@@ -3,7 +3,7 @@ module.exports = {
 	extends: [ 'plugin:@wordpress/eslint-plugin/recommended' ],
 	plugins: [ 'import' ],
 	globals: {
-		wp: 'off',
+		wp: 'readonly',
 		ajaxurl: 'readonly',
 		FormData: 'readonly',
 	},
