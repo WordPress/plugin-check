@@ -248,7 +248,8 @@
 			renderFileResults( file, [], warnings[ file ] );
 		}
 
-		resultsContainer.innerHTML += '<p>' + wp.i18n.__( 'Checks complete', 'plugin-check' ) + '</p>';
+		resultsContainer.innerHTML +=
+			'<p>' + wp.i18n.__( 'Checks complete', 'plugin-check' ) + '</p>';
 	}
 
 	/**

@@ -164,7 +164,26 @@ class Admin_Page {
 	 * @since n.e.x.t
 	 */
 	public function admin_footer() {
-		require_once WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/results-table.php';
-		require_once WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/results-row.php';
+		ob_start();
+		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/results-table.php';
+		$results_table_template = ob_get_clean();
+		wp_print_inline_script_tag(
+			$results_table_template,
+			array(
+				'id'   => 'tmpl-plugin-check-results-table',
+				'type' => 'text/template',
+			)
+		);
+
+		ob_start();
+		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/results-row.php';
+		$results_row_template = ob_get_clean();
+		wp_print_inline_script_tag(
+			$results_row_template,
+			array(
+				'id'   => 'tmpl-plugin-check-results-row',
+				'type' => 'text/template',
+			)
+		);
 	}
 }
