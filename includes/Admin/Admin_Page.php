@@ -185,5 +185,16 @@ class Admin_Page {
 				'type' => 'text/template',
 			)
 		);
+
+		ob_start();
+		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/results-complete.php';
+		$results_row_template = ob_get_clean();
+		wp_print_inline_script_tag(
+			$results_row_template,
+			array(
+				'id'   => 'tmpl-plugin-check-results-complete',
+				'type' => 'text/template',
+			)
+		);
 	}
 }
