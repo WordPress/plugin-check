@@ -16,8 +16,7 @@
 	checkItButton.addEventListener( 'click', ( e ) => {
 		e.preventDefault();
 
-		// Empty the results container.
-		resultsContainer.innerText = '';
+		resetResults();
 		spinner.classList.add( 'is-active' );
 
 		getChecksToRun()
@@ -26,14 +25,22 @@
 			.then( cleanUpEnvironment )
 			.then( ( data ) => {
 				console.log( data.message );
-
-				resultsContainer.innerHTML += 'Checks complete';
 				spinner.classList.remove( 'is-active' );
 			} )
 			.catch( ( error ) => {
 				console.error( error );
 			} );
 	} );
+
+	/**
+	 * Reset the results container.
+	 *
+	 * @since n.e.x.t
+	 */
+	function resetResults() {
+		// Empty the results container.
+		resultsContainer.innerText = '';
+	}
 
 	/**
 	 * Setup the runtime environment if needed.
@@ -97,8 +104,6 @@
 				if ( ! responseData.data || ! responseData.data.message ) {
 					throw new Error( 'Response contains no data.' );
 				}
-
-				console.log( responseData.data.message );
 
 				return responseData.data;
 			} );
@@ -242,6 +247,8 @@
 		for ( const file in warnings ) {
 			renderFileResults( file, [], warnings[ file ] );
 		}
+
+		resultsContainer.innerHTML += '<p>' + wp.i18n.__( 'Checks complete', 'plugin-check' ) + '</p>';
 	}
 
 	/**
