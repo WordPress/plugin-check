@@ -32,6 +32,7 @@
 				</select>
 
 				<input type="submit" value="<?php esc_attr_e( 'Check it!', 'plugin-check' ); ?>" id="plugin-check__submit" class="button button-primary" />
+				<span id="plugin-check__spinner" class="spinner" style="float: none;"></span>
 			</form>
 
 		<?php } else { ?>

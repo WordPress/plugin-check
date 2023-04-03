@@ -1,6 +1,7 @@
 ( function ( pluginCheck ) {
 	const checkItButton = document.getElementById( 'plugin-check__submit' );
 	const resultsContainer = document.getElementById( 'plugin-check__results' );
+	const spinner = document.getElementById( 'plugin-check__spinner' );
 	const pluginsList = document.getElementById(
 		'plugin-check__plugins-dropdown'
 	);
@@ -16,6 +17,7 @@
 
 		// Empty the results container.
 		resultsContainer.innerText = '';
+		spinner.classList.add( 'is-active' );
 
 		getChecksToRun()
 			.then( setUpEnvironment )
@@ -25,6 +27,7 @@
 				console.log( data.message );
 
 				resultsContainer.innerHTML += 'Checks complete';
+				spinner.classList.remove( 'is-active' );
 			} )
 			.catch( ( error ) => {
 				console.error( error );
