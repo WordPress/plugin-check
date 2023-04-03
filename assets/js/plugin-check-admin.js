@@ -17,6 +17,7 @@
 		e.preventDefault();
 
 		resetResults();
+		checkItButton.disabled = true;
 		spinner.classList.add( 'is-active' );
 
 		getChecksToRun()
@@ -25,10 +26,13 @@
 			.then( cleanUpEnvironment )
 			.then( ( data ) => {
 				console.log( data.message );
-				spinner.classList.remove( 'is-active' );
+
+				resetForm();
 			} )
 			.catch( ( error ) => {
 				console.error( error );
+
+				resetForm();
 			} );
 	} );
 
@@ -40,6 +44,16 @@
 	function resetResults() {
 		// Empty the results container.
 		resultsContainer.innerText = '';
+	}
+
+	/**
+	 * Resets the form controls once checks have completed or failed.
+	 *
+	 * @since n.e.x.t
+	 */
+	function resetForm() {
+		spinner.classList.remove( 'is-active' );
+		checkItButton.disabled = false;
 	}
 
 	/**
