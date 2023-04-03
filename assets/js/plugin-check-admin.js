@@ -5,9 +5,10 @@
 	const pluginsList = document.getElementById(
 		'plugin-check__plugins-dropdown'
 	);
+	const templates = {};
 
 	// Return early if the elements cannot be found on the page.
-	if ( ! checkItButton || ! pluginsList || ! resultsContainer ) {
+	if ( ! checkItButton || ! pluginsList || ! resultsContainer || ! spinner ) {
 		console.error( 'Missing form elements on page' );
 		return;
 	}
@@ -253,11 +254,13 @@
 	 * @param {Object} warnings The file warnings.
 	 */
 	function renderFileResults( file, errors, warnings ) {
-		const tableTemplate = wp.template( 'plugin-check-results-table' );
 		const index = Date.now();
 
 		// Render the file table.
-		resultsContainer.innerHTML += tableTemplate( { file, index } );
+		resultsContainer.innerHTML += renderTemplate(
+			'plugin-check-results-table',
+			{ file, index }
+		);
 		const resultsTable = document.getElementById(
 			'plugin-check__results-body-' + index
 		);
@@ -277,8 +280,6 @@
 	 * @param {Object} table   The HTML table to append a result row to.
 	 */
 	function renderResultRows( type, results, table ) {
-		const rowTemplate = wp.template( 'plugin-check-results-row' );
-
 		// Loop over each result by the line, column and messages.
 		for ( const line in results ) {
 			for ( const column in results[ line ] ) {
@@ -286,15 +287,35 @@
 					const message = results[ line ][ column ][ i ].message;
 					const code = results[ line ][ column ][ i ].code;
 
-					table.innerHTML += rowTemplate( {
-						line,
-						column,
-						type,
-						message,
-						code,
-					} );
+					table.innerHTML += renderTemplate(
+						'plugin-check-results-row',
+						{
+							line,
+							column,
+							type,
+							message,
+							code,
+						}
+					);
 				}
 			}
 		}
+	}
+
+	/**
+	 * Renders the template with data.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param {string} templateSlug The template slug
+	 * @param {Object} data         Template data.
+	 * @return {string} Template HTML.
+	 */
+	function renderTemplate( templateSlug, data ) {
+		if ( ! templates[ templateSlug ] ) {
+			templates[ templateSlug ] = wp.template( templateSlug );
+		}
+		const template = templates[ templateSlug ];
+		return template( data );
 	}
 } )( PLUGIN_CHECK ); /* global PLUGIN_CHECK */
