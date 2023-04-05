@@ -15,63 +15,51 @@ use WordPressdotorg\Plugin_Directory\Readme\Parser as Readme_Parser;
 include __DIR__ . '/message.php';
 include __DIR__ . '/checks/check-base.php';
 
-class Plugin {
-	static function instance() {
-		static $instance;
-
-		return $instance ?? ( $instance = new self );
+/**
+ * Run all checks against a plugin.
+ */
+function run_all_checks( $args ) {
+	if ( is_string( $args ) ) {
+		$args = [
+			'path' => $args
+		];
 	}
 
-	private function __construct() {
-	}
+	$args = wp_parse_args(
+		$args,
+		[
+			'path'        => '',
+			'slug'        => '',
+			'readme'      => false,
+			'headers'     => false,
+			'plugin_file' => false,
+		]
+	);
 
-	public function run( $args ) {
-		if ( is_string( $args ) && is_dir( $args ) ) {
-			$args = [
-				'path' => $args
-			];
-		}
+	$args['path'] = trailingslashit( $args['path'] );
+	$args['slug'] = $args['slug'] ?: basename( $args['path'] );
 
-		$args = wp_parse_args(
-			$args,
-			[
-				'path' => '',
-				'slug' => '',
-			]
-		);
+	$top_level_files = glob( $args['path'] . '*' );
 
-		$path      = trailingslashit( $args['path'] );
-		$slug      = $args['slug'] ?: basename( $path );
-		$all_files = glob( $path );
-
-		$readme    = false;
-		$headers   = false;
-		$php_files = preg_grep( '!\.php$!i', $all_files );
+	if ( ! $args['headers'] ) {
+		$php_files = preg_grep( '!\.php$!i', $top_level_files );
 		foreach ( $php_files as $plugin_file ) {
 			$file_headers = get_plugin_data( $plugin_file, false, false );
 
 			if ( ! empty( $file_headers['Name'] ) ) {
-				$headers = $file_headers;
+				$args['headers']     = $file_headers;
+				$args['plugin_file'] = $plugin_file;
 				break;
 			}
 		}
-
-		$readme_file = preg_grep( '!^readme.(txt|md)$!i', $all_files )[0] ?? false;
-		if ( $readme_file ) {
-			$readme = new Readme_Parser( $readme_file );
-		}
-
-		$args = compact(
-			'readme',
-			'headers',
-			'plugin_file',
-			'path',
-			'slug',
-		);
-
-		return Checks\Check_Base::run_checks( $args );
 	}
 
-}
+	if ( ! $args['readme'] ) {
+		$readme_files = preg_grep( '!(^|/)readme.(txt|md)$!i', $top_level_files );
+		if ( $readme_files ) {
+			$args['readme'] = new Readme_Parser( array_shift( $readme_files ) );
+		}
+	}
 
-Plugin::instance();
+	return Checks\Check_Base::run_checks( $args ) ?: true;
+}
