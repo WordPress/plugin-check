@@ -85,6 +85,8 @@ abstract class Check_Base {
 
 			if ( is_wp_error( $result ) ) {
 				$this->errors[] = $result;
+			} elseif ( is_array( $result ) && is_wp_error( $result[0] ) ) {
+				$this->errors = array_merge( $this->errors, $result );
 			}
 		}
 	}
