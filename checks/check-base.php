@@ -1,12 +1,14 @@
 <?php
 namespace WordPressdotorg\Plugin_Check\Checks;
-use WordPressdotorg\Plugin_Check\Notice;
+use WordPressdotorg\Plugin_Check\{Error, Guideline_Violation, Message, Notice, Warning};
 
 abstract class Check_Base {
 	public $args      = [];
 	public $post      = null;
 	public $readme    = null;
+	public $headers   = null;
 	public $file_path = null;
+	public $slug      = null;
 
 	public $errors = null;
 
@@ -22,9 +24,9 @@ abstract class Check_Base {
 	 * @return WP_Error The result of the checks.
 	 */
 	public static function run_checks( $args = [] ) {
-		// Get all the checks from the checks directory.
+		// Get all the checks from the current directory.
 		$files = array_diff(
-			glob( __DIR__ . '/class-*.php' ),
+			glob( __DIR__ . '/*.php' ),
 			[ __FILE__ ]
 		);
 
