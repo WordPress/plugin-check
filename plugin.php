@@ -12,51 +12,24 @@
 namespace WordPressdotorg\Plugin_Check;
 use WordPressdotorg\Plugin_Directory\Readme\Parser as Readme_Parser;
 
-$_SERVER['HTTP_HOST'] = 'wordpress.org';
-$_SERVER['REQUEST_URI'] = '/plugins/';
-include '../../../wp-load.php';
-
 include __DIR__ . '/message.php';
-include __DIR__ . '/check-base.php';
+include __DIR__ . '/checks/check-base.php';
 
 class Plugin {
-	public $checks = array();
-
 	static function instance() {
 		static $instance;
+
 		return $instance ?? ( $instance = new self );
 	}
 
 	private function __construct() {
 	}
 
-	protected function load_checks() {
-		foreach ( glob( __DIR__ . '/checks/*' ) as $file ) {
-			$name  = ucwords( str_replace( ['.', '-'], ' ', basename( $file, '.php' ) ) );
-			$check = include $file;
-
-			if ( !( $check instanceof \Closure ) ) {
-				$check = false;
-				$class = __NAMESPACE__ . '\\Checks\\' . $name;
-				if ( method_exists( $class, '__invoke' ) ) {
-					$check = new $class;
-
-					// Classes can define the test name, as either a class const or as a property.
-					$name = $check->name();
-				}
-			}
-
-			if ( $check ) {
-				$this->checks[ $name ] = $check;
-			}
-		}
-
-		return (bool) $this->checks;
-	}
-
 	public function run( $args ) {
 		if ( is_string( $args ) && is_dir( $args ) ) {
-			$args = [ 'path' => $args ];
+			$args = [
+				'path' => $args
+			];
 		}
 
 		$args = wp_parse_args(
@@ -69,8 +42,6 @@ class Plugin {
 
 		$path = trailingslashit( $args['path'] );
 		$slug = $args['slug'] ?: basename( $path );
-
-		$this->load_checks();
 
 		$readme    = false;
 		$headers   = false;
@@ -91,36 +62,16 @@ class Plugin {
 		}
 
 		$args = compact(
-			'readme', 'headers',
+			'readme',
+			'headers',
 			'plugin_file',
-			'path', 'slug',
+			'path',
+			'slug',
 		);
 
-		$messages = [];
-
-		foreach ( $this->checks as $name => $check ) {
-			$check_messages = $check( $args );
-
-			if ( ! $check_messages ) {
-				$check_messages = new Notice( "The $name check returned false." );
-			}
-
-			if ( is_wp_error( $check_messages ) ) {
-				$check_messages = [ $check_messages ];
-			}
-
-			if ( is_array( $check_messages ) ) {
-				$messages = array_merge( $messages, $check_messages );
-			}
-		}
-
-		return $messages;
+		return Checks\Check_Base::run_checks( $args );
 	}
 
 }
 
-$check = Plugin::instance();
-
-var_dump(
-	$check->run( __DIR__ )
-);
+Plugin::instance();
