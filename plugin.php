@@ -12,6 +12,7 @@
 namespace WordPressdotorg\Plugin_Check;
 use WordPressdotorg\Plugin_Directory\Readme\Parser as Readme_Parser;
 
+include __DIR__ . '/export.php';
 include __DIR__ . '/message.php';
 include __DIR__ . '/checks/check-base.php';
 
