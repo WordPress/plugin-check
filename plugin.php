@@ -64,7 +64,10 @@ function run_all_checks( $args ) {
 
 	if ( ! $args['readme'] ) {
 		$readme_files = preg_grep( '!(^|/)readme.(txt|md)$!i', $top_level_files );
-		if ( $readme_files ) {
+		if ( ! class_exists( '\WordPressdotorg\Plugin_Directory\Readme\Parser' ) && file_exists( __DIR__ . '/readme-parser.php' ) ) {
+			require_once __DIR__ . '/readme-parser.php';
+		}
+		if ( $readme_files && class_exists( '\WordPressdotorg\Plugin_Directory\Readme\Parser' ) ) {
 			$args['readme'] = new Readme_Parser( array_shift( $readme_files ) );
 		}
 	}
