@@ -7,8 +7,6 @@ require dirname( __DIR__, 4 ) . '/wp-load.php';
 
 include_once dirname( __DIR__ ) . '/plugin.php';
 
-$check = Plugin::instance();
-
 var_dump(
-	$check->run( dirname( __DIR__ ) )
+	run_all_checks( dirname( __DIR__ ) )
 );
