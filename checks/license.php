@@ -18,6 +18,11 @@ class License extends Check_Base {
 
 	public function check_license_meets_requirements() {
 		$license = $this->readme->license ?? '';
+
+		// Cleanup the license identifier a bit.
+		$license = str_ireplace( [ 'License URI:', 'License:' ], '', $license );
+		$license = trim( $license, ' .' );
+
 		if ( ! $license ) {
 			return;
 		}
