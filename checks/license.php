@@ -4,7 +4,7 @@ use WordPressdotorg\Plugin_Check\{Error, Guideline_Violation, Message, Notice, W
 
 class License extends Check_Base {
 	public function check_license_present() {
-		if ( empty( $this->readme->license ) ) {
+		if ( $this->readme && empty( $this->readme->license ) ) {
 			return new Error(
 				'no_license',
 				__( 'Error: No license defined.', 'wporg-plugins' ) . ' ' . sprintf(
