@@ -2,39 +2,88 @@
 namespace WordPressdotorg\Plugin_Check\Checks;
 use WordPressdotorg\Plugin_Check\Notice;
 
-class Check_Base {
-	public function __invoke( $args ) {
-		$messages = [];
+abstract class Check_Base {
+	public $args      = [];
+	public $post      = null;
+	public $readme    = null;
+	public $file_path = null;
 
-		foreach ( get_class_methods( $this ) as $method ) {
-			if ( ! str_starts_with( $method, 'check_' ) ) {
-				continue;
+	public $errors = null;
+
+	/**
+	 * Run all the checks against various plugin.
+	 *
+	 * @param array $args {
+	 *   @type WP_Post $post      The plugin post.
+	 *   @type Parser  $readme    The plugin readme.
+	 *   @type string  $file_path Path to the plugin file.
+	 * }
+	 *
+	 * @return WP_Error The result of the checks.
+	 */
+	public static function run_checks( $args = [] ) {
+		// Get all the checks from the checks directory.
+		$files = array_diff(
+			glob( __DIR__ . '/class-*.php' ),
+			[ __FILE__ ]
+		);
+
+		foreach ( $files as $file ) {
+			include_once $file;
+		}
+
+		$plugin_checks = array_values(
+			array_diff(
+				preg_grep( '!^' . preg_quote( __NAMESPACE__, '!' ) . '!', get_declared_classes() ),
+				[ __CLASS__ ]
+			)
+		);
+
+		/**
+		 * Filter the list of checks to run.
+		 *
+		 * @param array $plugin_checks The list of checks to run.
+		 * @param array $args          The arguments passed to the checks.
+		 */
+		$plugin_checks = apply_filters( 'plugin_checks', $plugin_checks, $args );
+
+		$check_results = [];
+		foreach ( $plugin_checks as $checker ) {
+			$check_results = array_merge(
+				$check_results,
+				( new $checker( $args ) )->errors
+			);
+		}
+
+		return $check_results;
+	}
+
+	/**
+	 * Private Constructor. See self::run_checks();
+	 *
+	 * @ignore
+	 */
+	protected function __construct( $args = [] ) {
+		$this->errors = [];
+		$this->args   = $args;
+
+		foreach ( $args as $v => $k ) {
+			if ( property_exists( $this, $v ) ) {
+				$this->$v = $k;
 			}
+		}
 
-			$result = $this->$method( $args );
+		$methods = preg_grep( '/^check_/', get_class_methods( $this ) );
 
-			if ( ! $result ) {
-				$short_name = substr( $method, 6 );
-				$result     = new Notice( $this->name() . ' ' . $short_name . ' returned false.' );
+		foreach ( $methods as $check ) {
+			$result = $this->$check();
+			if ( false === $result ) {
+				$result = new Error( "failed_{$check}", "Failed {$check}." );
 			}
 
 			if ( is_wp_error( $result ) ) {
-				$messages[] = $result;
+				$this->errors[] = $result;
 			}
 		}
-
-		return $messages;
 	}
-
-	public function name() {
-		if ( defined( get_class( $this ) . '::NAME' ) ) {
-			return $this::NAME;
-		}
-
-		if ( isset( $this->name ) ) {
-			return $this->name;
-		}
-
-		return str_replace( __NAMESPACE__, '', get_class( $this ) );
- 	}
 }
