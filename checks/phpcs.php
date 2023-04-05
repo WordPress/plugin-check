@@ -1,6 +1,6 @@
 <?php
 namespace WordPressdotorg\Plugin_Check\Checks;
-use const WordPressdotorg\Plugin_Check\PLUGIN_DIR;
+use const WordPressdotorg\Plugin_Check\{ PLUGIN_DIR, HAS_VENDOR };
 use WordPressdotorg\Plugin_Check\{Error, Guideline_Violation, Message, Notice, Warning};
 use WordPressdotorg\Plugin_Check\PHPCS;
 
@@ -14,6 +14,13 @@ class PHPCS_Checks extends Check_Base {
 	];
 
 	function check_against_phpcs() {
+		if ( ! HAS_VENDOR ) {
+			return new Notice(
+				'phpcs_not_tested',
+				'PHP CS rulesets have not been tested, as the vendor directory is missing. Perhaps you need to run <code>`composer install`</code>.'
+			);
+		}
+
 		return $this->run_phpcs_standard(
 			__DIR__ . '/phpcs/plugin-check.xml'
 		);

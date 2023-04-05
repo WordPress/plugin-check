@@ -17,10 +17,12 @@ include __DIR__ . '/export.php';
 include __DIR__ . '/message.php';
 include __DIR__ . '/checks/check-base.php';
 
-if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+define(
+	__NAMESPACE__ . '\HAS_VENDOR',
+	file_exists( __DIR__ . '/vendor/autoload.php' )
+);
+if ( HAS_VENDOR ) {
 	include __DIR__ . '/vendor/autoload.php';
-} else {
-	define( __NAMESPACE__ . '\NO_VENDOR', true );
 }
 
 /**
