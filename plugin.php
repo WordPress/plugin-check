@@ -17,6 +17,13 @@ include __DIR__ . '/message.php';
 include __DIR__ . '/checks/check-base.php';
 
 /**
+ * Load the Administration UI.
+ */
+add_action( 'admin_menu', function() {
+	require __DIR__ . '/admin/admin.php';
+}, 1 );
+
+/**
  * Run all checks against a plugin.
  */
 function run_all_checks( $args ) {
