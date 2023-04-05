@@ -7,7 +7,7 @@ abstract class Check_Base {
 	public $post      = null;
 	public $readme    = null;
 	public $headers   = null;
-	public $file_path = null;
+	public $path      = null;
 	public $slug      = null;
 
 	public $errors = null;

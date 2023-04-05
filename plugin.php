@@ -40,12 +40,13 @@ class Plugin {
 			]
 		);
 
-		$path = trailingslashit( $args['path'] );
-		$slug = $args['slug'] ?: basename( $path );
+		$path      = trailingslashit( $args['path'] );
+		$slug      = $args['slug'] ?: basename( $path );
+		$all_files = glob( $path );
 
 		$readme    = false;
 		$headers   = false;
-		$php_files = glob( $path . '*.php' );
+		$php_files = preg_grep( '!\.php$!i', $all_files );
 		foreach ( $php_files as $plugin_file ) {
 			$file_headers = get_plugin_data( $plugin_file, false, false );
 
@@ -55,8 +56,7 @@ class Plugin {
 			}
 		}
 
-		// TODO: Move away from glob() due to case sensitivity.
-		$readme_file = glob( $path . '{readme,README}.{txt,md}', GLOB_BRACE )[0] ?? false;
+		$readme_file = preg_grep( '!^readme.(txt|md)$!i', $all_files )[0] ?? false;
 		if ( $readme_file ) {
 			$readme = new Readme_Parser( $readme_file );
 		}
