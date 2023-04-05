@@ -11,10 +11,17 @@
 
 namespace WordPressdotorg\Plugin_Check;
 use WordPressdotorg\Plugin_Directory\Readme\Parser as Readme_Parser;
+const PLUGIN_DIR = __DIR__;
 
 include __DIR__ . '/export.php';
 include __DIR__ . '/message.php';
 include __DIR__ . '/checks/check-base.php';
+
+if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+	include __DIR__ . '/vendor/autoload.php';
+} else {
+	define( __NAMESPACE__ . '\NO_VENDOR', true );
+}
 
 /**
  * Load the Administration UI.
