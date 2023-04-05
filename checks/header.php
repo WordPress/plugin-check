@@ -1,9 +1,8 @@
 <?php
 namespace WordPressdotorg\Plugin_Check\Checks;
+use WordPressdotorg\Plugin_Check\{Error, Guideline_Violation, Message, Notice, Warning};
 
 class Header extends Check_Base {
-	const NAME = 'Header Checks';
-
 	function check_textdomain( $args ) {
 		$return = array();
 
@@ -12,9 +11,10 @@ class Header extends Check_Base {
 			! empty( $args['headers']['TextDomain'] ) &&
 			$args['slug'] !== $args['headers']['TextDomain']
 		) {
-			$return[] = new Warning( "TextDomain header in plugin file does not match slug." );
+			return new Warning(
+				'textdomain_mismatch',
+				'TextDomain header in plugin file does not match slug.'
+			);
 		}
-
-		return $return ?: true;
 	}
 }
