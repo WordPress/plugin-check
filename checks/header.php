@@ -5,12 +5,17 @@ use WordPressdotorg\Plugin_Check\{Error, Guideline_Violation, Message, Notice, W
 class Header extends Check_Base {
 	function check_textdomain() {
 		if (
-			isset( $this->slug, $this->headers['TextDomain'] ) &&
+			! empty( $this->slug ) &&
+			! empty( $this->headers['TextDomain'] ) &&
 			$this->slug !== $this->headers['TextDomain']
 		) {
 			return new Warning(
 				'textdomain_mismatch',
-				'TextDomain header in plugin file does not match slug.'
+				sprintf(
+					'TextDomain header in plugin file does not match slug. Found %s, expected %s.',
+					'<code>' . esc_html( $this->headers['TextDomain'] ) . '</code>',
+					'<code>' . esc_html( $this->slug ) . '</code>'
+				)
 			);
 		}
 	}
