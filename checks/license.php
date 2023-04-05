@@ -7,7 +7,7 @@ class License extends Check_Base {
 		if ( $this->readme && empty( $this->readme->license ) ) {
 			return new Error(
 				'no_license',
-				__( 'Error: No license defined.', 'wporg-plugins' ) . ' ' . sprintf(
+				__( 'No license defined.', 'wporg-plugins' ) . ' ' . sprintf(
 					/* translators: 1: readme.txt */
 					__( 'Your plugin has no license declared. Please update your %1$s with a GPLv2 (or later) compatible license.', 'wporg-plugins' ),
 					'<code>readme.txt</code>'
@@ -31,7 +31,7 @@ class License extends Check_Base {
 		if ( ! preg_match( '/^([a-z0-9\-\+\.]+)(\sor\s([a-z0-9\-\+\.]+))*$/i', $license ) ) {
 			return new Warning(
 				'invalid_license',
-				__( 'Error: Invalid license.', 'wporg-plugins' ) . ' ' . sprintf(
+				__( 'Invalid license specified.', 'wporg-plugins' ) . ' ' . sprintf(
 					/* translators: 1: readme.txt */
 					__( 'Your plugin has an invalid license declared. Please update your %1$s with a valid SPDX license identifier.', 'wporg-plugins' ),
 					'<code>readme.txt</code>'
