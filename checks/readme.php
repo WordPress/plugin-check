@@ -2,7 +2,7 @@
 namespace WordPressdotorg\Plugin_Check\Checks;
 use WordPressdotorg\Plugin_Check\{Error, Guideline_Violation, Message, Notice, Warning};
 
-class License extends Check_Base {
+class Readme extends Check_Base {
 	public function check_license_present() {
 		if ( $this->readme && empty( $this->readme->license ) ) {
 			return new Error(
@@ -34,6 +34,35 @@ class License extends Check_Base {
 				__( 'Invalid license specified.', 'wporg-plugins' ) . ' ' . sprintf(
 					/* translators: 1: readme.txt */
 					__( 'Your plugin has an invalid license declared. Please update your %1$s with a valid SPDX license identifier.', 'wporg-plugins' ),
+					'<code>readme.txt</code>'
+				)
+			);
+		}
+	}
+
+	public function check_stable_tag() {
+		if ( ! $this->readme ) {
+			return;
+		}
+
+		$stable_tag = $this->readme->stable_tag ?? '';
+
+		if ( 'trunk' === $stable_tag ) {
+			return new Notice(
+				'trunk_stable_tag',
+				"It's recommended not to use 'Stable Tag: trunk'."
+			);
+		}
+
+		if (
+			$stable_tag && ! empty( $this->headers['Version'] ) &&
+			$stable_tag != $this->headers['Version']
+		) {
+			return new Warning(
+				'stable_tag_mismatch',
+				__( 'Stable tag does not match the plugin version.', 'wporg-plugins' ) . ' ' . sprintf(
+					/* translators: 1: readme.txt */
+					__( 'The Stable Tag in your %1$s file does not match the version in your main plugin file.', 'wporg-plugins' ),
 					'<code>readme.txt</code>'
 				)
 			);
