@@ -93,7 +93,7 @@ class PHPCS_Checks extends Check_Base {
 				$return[] = new $notice_class(
 					$message['source'],
 					sprintf(
-						'%s Line %d of file %s.<br>%s<br>%s',
+						'%s Line %d of file %s.<br>%s.<br>%s',
 						"<strong>{$message['source']}</strong>",
 						$message['line'],
 						$filename,
