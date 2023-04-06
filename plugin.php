@@ -50,6 +50,7 @@ function run_all_checks( $args ) {
 			'readme'      => false,
 			'headers'     => false,
 			'plugin_file' => false,
+			'files'       => [],
 		]
 	);
 
@@ -79,6 +80,16 @@ function run_all_checks( $args ) {
 		if ( $readme_files && class_exists( '\WordPressdotorg\Plugin_Directory\Readme\Parser' ) ) {
 			$args['readme'] = new Readme_Parser( array_shift( $readme_files ) );
 		}
+	}
+
+	if ( ! $args['files'] ) {
+		$args['files'] = [];
+		foreach ( new \RecursiveIteratorIterator( new \RecursiveDirectoryIterator( $args['path'] ) ) as $file ) {
+			if ( $file->isFile() ) {
+				$args['files'][] = substr( $file->getPathname(), strlen( $args['path'] ) );
+			}
+		}
+		sort( $args['files'] );
 	}
 
 	return Checks\Check_Base::run_checks( $args ) ?: true;

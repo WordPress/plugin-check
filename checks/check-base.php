@@ -9,6 +9,7 @@ abstract class Check_Base {
 	public $headers   = null;
 	public $path      = null;
 	public $slug      = null;
+	public $files     = [];
 
 	public $errors = null;
 
