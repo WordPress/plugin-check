@@ -178,13 +178,19 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		$preparations = $this->get_shared_preparations( $checks );
 		$cleanups     = array();
 
+		// Prepare the universal runtime preparations if required.
+		$cleanups[] = $this->prepare();
+
+		// Prepare all shared preparations.
 		foreach ( $preparations as $preparation ) {
 			$instance   = new $preparation['class']( ...$preparation['args'] );
 			$cleanups[] = $instance->prepare();
 		}
 
+		// Run checks and return the results.
 		$results = $this->get_checks_instance()->run_checks( $checks );
 
+		// Cleanup all preparations.
 		if ( ! empty( $cleanups ) ) {
 			foreach ( $cleanups as $cleanup ) {
 				$cleanup();

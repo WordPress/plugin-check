@@ -93,14 +93,7 @@ class Plugin_Request_Utility {
 
 		foreach ( $runners as $runner ) {
 			if ( $runner->is_plugin_check() ) {
-				add_action(
-					'muplugins_loaded',
-					function() use ( $runner ) {
-						static::$cleanup = $runner->prepare();
-						static::$runner  = $runner;
-					}
-				);
-
+				static::$runner = $runner;
 				break;
 			}
 		}
@@ -127,11 +120,6 @@ class Plugin_Request_Utility {
 	 * @since n.e.x.t
 	 */
 	public static function destroy_runner() {
-		// Run the cleanup functions.
-		if ( isset( self::$cleanup ) ) {
-			call_user_func( self::$cleanup );
-		}
-
 		static::$runner = null;
 	}
 }
