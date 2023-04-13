@@ -132,7 +132,7 @@ class Admin_Page {
 	public function render_page() {
 		$available_plugins = $this->get_available_plugins();
 
-		$selected_plugin_basename = filter_input( INPUT_GET, 'plugin', FILTER_SANITIZE_STRING );
+		$selected_plugin_basename = filter_input( INPUT_GET, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/admin-page.php';
 	}
