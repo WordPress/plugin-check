@@ -25,10 +25,10 @@ class Runtime_Environment_Setup {
 		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 
 		// Set the new prefix.
-		$old_prefix = $wpdb->set_prefix( 'wppc_' );
+		$old_prefix = $wpdb->set_prefix( 'wp_pc_' );
 
 		// Create and populate the test database tables if they do not exist.
-		if ( 'wppc_posts' !== $wpdb->get_var( "SHOW TABLES LIKE 'wppc_posts'" ) ) {
+		if ( 'wp_pc_posts' !== $wpdb->get_var( "SHOW TABLES LIKE 'wp_pc_posts'" ) ) {
 			wp_install(
 				'Plugin Check',
 				'plugincheck',
@@ -64,7 +64,7 @@ class Runtime_Environment_Setup {
 
 		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 
-		$old_prefix = $wpdb->set_prefix( 'wppc_' );
+		$old_prefix = $wpdb->set_prefix( 'wp_pc_' );
 		$tables     = $wpdb->tables();
 
 		foreach ( $tables as $table ) {

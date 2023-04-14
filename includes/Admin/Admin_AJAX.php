@@ -123,12 +123,12 @@ class Admin_AJAX {
 		}
 
 		// Set the new prefix.
-		$old_prefix = $wpdb->set_prefix( 'wppc_' );
+		$old_prefix = $wpdb->set_prefix( 'wp_pc_' );
 
 		$message = __( 'Runtime environment was not prepared, cleanup was not run.', 'plugin-check' );
 
 		// Test if the runtime environment tables exist.
-		if ( 'wppc_posts' === $wpdb->get_var( "SHOW TABLES LIKE 'wppc_posts'" ) || defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) ) {
+		if ( 'wp_pc_posts' === $wpdb->get_var( "SHOW TABLES LIKE 'wp_pc_posts'" ) || defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) ) {
 			$runtime = new Runtime_Environment_Setup();
 			$runtime->cleanup();
 			$message = __( 'Runtime environment cleanup successful.', 'plugin-check' );
