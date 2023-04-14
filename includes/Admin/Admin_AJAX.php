@@ -30,15 +30,47 @@ class Admin_AJAX {
 	const NONCE_KEY = 'plugin-check-run-checks';
 
 	/**
+	 * Clean up Runtime Environment action name.
+	 *
+	 * @since n.e.x.t
+	 * @var string
+	 */
+	const ACTION_CLEAN_UP_ENVIRONMENT = 'plugin_check_clean_up_environment';
+
+	/**
+	 * Set up Runtime Environment action name.
+	 *
+	 * @since n.e.x.t
+	 * @var string
+	 */
+	const ACTION_SET_UP_ENVIRONMENT = 'plugin_check_set_up_environment';
+
+	/**
+	 * Get Checks to run action name.
+	 *
+	 * @since n.e.x.t
+	 * @var string
+	 */
+	const ACTION_GET_CHECKS_TO_RUN = 'plugin_check_get_checks_to_run';
+
+	/**
+	 * Run Checks action name.
+	 *
+	 * @since n.e.x.t
+	 * @var string
+	 */
+	const ACTION_RUN_CHECKS = 'plugin_check_run_checks';
+
+	/**
 	 * Registers WordPress hooks for the Admin AJAX.
 	 *
 	 * @since n.e.x.t
 	 */
 	public function add_hooks() {
-		add_action( 'wp_ajax_plugin_check_clean_up_environment', array( $this, 'clean_up_environment' ) );
-		add_action( 'wp_ajax_plugin_check_set_up_environment', array( $this, 'set_up_environment' ) );
-		add_action( 'wp_ajax_plugin_check_get_checks_to_run', array( $this, 'get_checks_to_run' ) );
-		add_action( 'wp_ajax_plugin_check_run_checks', array( $this, 'run_checks' ) );
+		add_action( 'wp_ajax_' . self::ACTION_CLEAN_UP_ENVIRONMENT, array( $this, 'clean_up_environment' ) );
+		add_action( 'wp_ajax_' . self::ACTION_SET_UP_ENVIRONMENT, array( $this, 'set_up_environment' ) );
+		add_action( 'wp_ajax_' . self::ACTION_GET_CHECKS_TO_RUN, array( $this, 'get_checks_to_run' ) );
+		add_action( 'wp_ajax_' . self::ACTION_RUN_CHECKS, array( $this, 'run_checks' ) );
 	}
 
 	/**
