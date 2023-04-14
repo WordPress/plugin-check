@@ -57,10 +57,10 @@ class Admin_AJAX {
 	 */
 	public function set_up_environment() {
 		// Verify the nonce before continuing.
-		$valid_nonce = $this->verify_nonce( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_STRING ) );
+		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_STRING ) );
 
-		if ( is_wp_error( $valid_nonce ) ) {
-			wp_send_json_error( $valid_nonce, 403 );
+		if ( is_wp_error( $valid_request ) ) {
+			wp_send_json_error( $valid_request, 403 );
 		}
 		$runner = Plugin_Request_Utility::get_runner();
 
@@ -116,10 +116,10 @@ class Admin_AJAX {
 		global $wpdb;
 
 		// Verify the nonce before continuing.
-		$valid_nonce = $this->verify_nonce( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_STRING ) );
+		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_STRING ) );
 
-		if ( is_wp_error( $valid_nonce ) ) {
-			wp_send_json_error( $valid_nonce, 403 );
+		if ( is_wp_error( $valid_request ) ) {
+			wp_send_json_error( $valid_request, 403 );
 		}
 
 		// Set the new prefix.
@@ -151,10 +151,10 @@ class Admin_AJAX {
 	 */
 	public function get_checks_to_run() {
 		// Verify the nonce before continuing.
-		$valid_nonce = $this->verify_nonce( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_STRING ) );
+		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_STRING ) );
 
-		if ( is_wp_error( $valid_nonce ) ) {
-			wp_send_json_error( $valid_nonce, 403 );
+		if ( is_wp_error( $valid_request ) ) {
+			wp_send_json_error( $valid_request, 403 );
 		}
 
 		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
@@ -202,10 +202,10 @@ class Admin_AJAX {
 	 */
 	public function run_checks() {
 		// Verify the nonce before continuing.
-		$valid_nonce = $this->verify_nonce( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_STRING ) );
+		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_STRING ) );
 
-		if ( is_wp_error( $valid_nonce ) ) {
-			wp_send_json_error( $valid_nonce, 403 );
+		if ( is_wp_error( $valid_request ) ) {
+			wp_send_json_error( $valid_request, 403 );
 		}
 
 		$runner = Plugin_Request_Utility::get_runner();
@@ -247,23 +247,27 @@ class Admin_AJAX {
 	}
 
 	/**
-	 * Verify the nonce passed in the request.
+	 * Verify the request.
 	 *
 	 * @since n.e.x.t
 	 *
 	 * @param string $nonce The request nonce passed.
 	 * @return bool|WP_Error True if the nonce is valid. WP_Error if invalid.
 	 */
-	protected function verify_nonce( $nonce ) {
+	protected function verify_request( $nonce ) {
 		if ( ! wp_verify_nonce( $nonce, self::NONCE_KEY ) ) {
-			new WP_Error( 'invalid-nonce', __( 'Invalid nonce', 'plugin-check' ) );
+			return new WP_Error( 'invalid-nonce', __( 'Invalid nonce', 'plugin-check' ) );
+		}
+
+		if ( ! current_user_can( 'activate_plugins' )  ) {
+			return new WP_Error( 'invalid-permissions', __( 'Invalid user permissions, you are not allowed to perform this request.', 'plugin-check' ) );
 		}
 
 		return true;
 	}
 
 	/**
-	 * Check for a Runtime_Check in a list of checks
+	 * Check for a Runtime_Check in a list of checks.
 	 *
 	 * @since n.e.x.t
 	 *
