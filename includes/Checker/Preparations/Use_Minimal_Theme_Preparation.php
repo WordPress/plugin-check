@@ -7,8 +7,8 @@
 
 namespace WordPress\Plugin_Check\Checker\Preparations;
 
-use WordPress\Plugin_Check\Checker\Preparation;
 use Exception;
+use WordPress\Plugin_Check\Checker\Preparation;
 
 /**
  * Class for the preparation step to force usage of a minimal theme.

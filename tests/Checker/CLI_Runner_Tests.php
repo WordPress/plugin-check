@@ -5,8 +5,8 @@
  * @package plugin-check
  */
 
-use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\CLI_Runner;
 
 class CLI_Runner_Tests extends WP_UnitTestCase {
 

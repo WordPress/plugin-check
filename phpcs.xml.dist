@@ -65,4 +65,35 @@
 	<rule ref="PHPCompatibility.FunctionDeclarations.NewReturnTypeDeclarations.boolFound">
 		<exclude-pattern>tests/utils/*</exclude-pattern>
 	</rule>
+
+	<!-- Disallows grouped use declarations. -->
+	<rule ref="SlevomatCodingStandard.Namespaces.DisallowGroupUse" />
+	<!-- Disallows leading backslash in use statement. -->
+	<rule ref="SlevomatCodingStandard.Namespaces.UseDoesNotStartWithBackslash" />
+	<!-- Checks whether uses at the top of a file are alphabetically sorted. -->
+	<rule ref="SlevomatCodingStandard.Namespaces.AlphabeticallySortedUses" />
+
+	<!-- Prohibits uses from the same namespace. -->
+	<rule ref="SlevomatCodingStandard.Namespaces.UseFromSameNamespace" />
+	<!-- Looks for unused imports from other namespaces. -->
+	<rule ref="SlevomatCodingStandard.Namespaces.UnusedUses">
+	<properties>
+	  <property name="searchAnnotations" value="true" />
+	</properties>
+	</rule>
+	<!-- All references to functions, classes and constants should import using a use statement. -->
+	  <rule ref="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly">
+		 <properties>
+			<property name="allowFullyQualifiedGlobalFunctions" value="true" />
+			<property name="allowFullyQualifiedGlobalClasses" value="true" />
+			<property name="allowFullyQualifiedGlobalConstants" value="true" />
+			<property name="allowFallbackGlobalFunctions" value="true" />
+			<property name="allowFallbackGlobalConstants" value="true" />
+			<property
+			name="allowFullyQualifiedNameForCollidingClasses"
+			value="true"
+		  />
+		</properties>
+	  </rule>
+
 </ruleset>

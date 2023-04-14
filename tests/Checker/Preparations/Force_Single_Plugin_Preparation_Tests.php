@@ -7,9 +7,9 @@
 
 namespace Checker\Preparations;
 
+use Exception;
 use WordPress\Plugin_Check\Checker\Preparations\Force_Single_Plugin_Preparation;
 use WP_UnitTestCase;
-use Exception;
 
 class Force_Single_Plugin_Preparation_Tests extends WP_UnitTestCase {
 

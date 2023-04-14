@@ -9,7 +9,6 @@ namespace Checker\Preparations;
 
 use WordPress\Plugin_Check\Checker\Preparations\Demo_Posts_Creation_Preparation;
 use WP_UnitTestCase;
-use Exception;
 
 class Demo_Posts_Creation_Preparation_Tests extends WP_UnitTestCase {
 
