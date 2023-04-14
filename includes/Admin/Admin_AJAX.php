@@ -259,7 +259,7 @@ class Admin_AJAX {
 			return new WP_Error( 'invalid-nonce', __( 'Invalid nonce', 'plugin-check' ) );
 		}
 
-		if ( ! current_user_can( 'activate_plugins' )  ) {
+		if ( ! current_user_can( 'activate_plugins' ) ) {
 			return new WP_Error( 'invalid-permissions', __( 'Invalid user permissions, you are not allowed to perform this request.', 'plugin-check' ) );
 		}
 
