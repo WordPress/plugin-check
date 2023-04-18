@@ -30,15 +30,47 @@ class Admin_AJAX {
 	const NONCE_KEY = 'plugin-check-run-checks';
 
 	/**
+	 * Clean up Runtime Environment action name.
+	 *
+	 * @since n.e.x.t
+	 * @var string
+	 */
+	const ACTION_CLEAN_UP_ENVIRONMENT = 'plugin_check_clean_up_environment';
+
+	/**
+	 * Set up Runtime Environment action name.
+	 *
+	 * @since n.e.x.t
+	 * @var string
+	 */
+	const ACTION_SET_UP_ENVIRONMENT = 'plugin_check_set_up_environment';
+
+	/**
+	 * Get Checks to run action name.
+	 *
+	 * @since n.e.x.t
+	 * @var string
+	 */
+	const ACTION_GET_CHECKS_TO_RUN = 'plugin_check_get_checks_to_run';
+
+	/**
+	 * Run Checks action name.
+	 *
+	 * @since n.e.x.t
+	 * @var string
+	 */
+	const ACTION_RUN_CHECKS = 'plugin_check_run_checks';
+
+	/**
 	 * Registers WordPress hooks for the Admin AJAX.
 	 *
 	 * @since n.e.x.t
 	 */
 	public function add_hooks() {
-		add_action( 'wp_ajax_plugin_check_clean_up_environment', array( $this, 'clean_up_environment' ) );
-		add_action( 'wp_ajax_plugin_check_set_up_environment', array( $this, 'set_up_environment' ) );
-		add_action( 'wp_ajax_plugin_check_get_checks_to_run', array( $this, 'get_checks_to_run' ) );
-		add_action( 'wp_ajax_plugin_check_run_checks', array( $this, 'run_checks' ) );
+		add_action( 'wp_ajax_' . self::ACTION_CLEAN_UP_ENVIRONMENT, array( $this, 'clean_up_environment' ) );
+		add_action( 'wp_ajax_' . self::ACTION_SET_UP_ENVIRONMENT, array( $this, 'set_up_environment' ) );
+		add_action( 'wp_ajax_' . self::ACTION_GET_CHECKS_TO_RUN, array( $this, 'get_checks_to_run' ) );
+		add_action( 'wp_ajax_' . self::ACTION_RUN_CHECKS, array( $this, 'run_checks' ) );
 	}
 
 	/**
@@ -57,7 +89,7 @@ class Admin_AJAX {
 	 */
 	public function set_up_environment() {
 		// Verify the nonce before continuing.
-		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_STRING ) );
+		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) );
 
 		if ( is_wp_error( $valid_request ) ) {
 			wp_send_json_error( $valid_request, 403 );
@@ -77,7 +109,7 @@ class Admin_AJAX {
 		}
 
 		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
-		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_STRING );
+		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		try {
 			$runner->set_check_slugs( $checks );
@@ -116,7 +148,7 @@ class Admin_AJAX {
 		global $wpdb;
 
 		// Verify the nonce before continuing.
-		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_STRING ) );
+		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) );
 
 		if ( is_wp_error( $valid_request ) ) {
 			wp_send_json_error( $valid_request, 403 );
@@ -151,7 +183,7 @@ class Admin_AJAX {
 	 */
 	public function get_checks_to_run() {
 		// Verify the nonce before continuing.
-		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_STRING ) );
+		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) );
 
 		if ( is_wp_error( $valid_request ) ) {
 			wp_send_json_error( $valid_request, 403 );
@@ -159,7 +191,7 @@ class Admin_AJAX {
 
 		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
 		$checks = is_null( $checks ) ? array() : $checks;
-		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_STRING );
+		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		$runner = Plugin_Request_Utility::get_runner();
 
 		if ( is_null( $runner ) ) {
@@ -202,7 +234,7 @@ class Admin_AJAX {
 	 */
 	public function run_checks() {
 		// Verify the nonce before continuing.
-		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_STRING ) );
+		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) );
 
 		if ( is_wp_error( $valid_request ) ) {
 			wp_send_json_error( $valid_request, 403 );
@@ -224,7 +256,7 @@ class Admin_AJAX {
 
 		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
 		$checks = is_null( $checks ) ? array() : $checks;
-		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_STRING );
+		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		try {
 			$runner->set_check_slugs( $checks );
