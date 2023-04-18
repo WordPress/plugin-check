@@ -69,7 +69,7 @@
 		pluginCheckData.append( 'plugin', data.plugin );
 		pluginCheckData.append(
 			'action',
-			pluginCheck.action_set_up_runtime_environment
+			pluginCheck.actionSetUpRuntimeEnvironment
 		);
 
 		for ( let i = 0; i < data.checks.length; i++ ) {
@@ -108,7 +108,7 @@
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append(
 			'action',
-			pluginCheck.action_clean_up_runtime_environment
+			pluginCheck.actionCleanUpRuntimeEnvironment
 		);
 
 		return fetch( ajaxurl, {
@@ -138,10 +138,7 @@
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append( 'plugin', pluginsList.value );
-		pluginCheckData.append(
-			'action',
-			pluginCheck.action_get_checks_to_run
-		);
+		pluginCheckData.append( 'action', pluginCheck.actionGetChecksToRun );
 
 		return fetch( ajaxurl, {
 			method: 'POST',
@@ -199,7 +196,7 @@
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append( 'plugin', plugin );
 		pluginCheckData.append( 'checks[]', check );
-		pluginCheckData.append( 'action', pluginCheck.action_run_checks );
+		pluginCheckData.append( 'action', pluginCheck.actionRunChecks );
 
 		return fetch( ajaxurl, {
 			method: 'POST',

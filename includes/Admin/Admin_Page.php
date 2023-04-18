@@ -94,11 +94,11 @@ class Admin_Page {
 			'plugin-check-admin',
 			'const PLUGIN_CHECK = ' . json_encode(
 				array(
-					'nonce'                               => $this->admin_ajax->get_nonce(),
-					'action_get_checks_to_run'            => Admin_AJAX::ACTION_GET_CHECKS_TO_RUN,
-					'action_set_up_runtime_environment'   => Admin_AJAX::ACTION_SET_UP_ENVIRONMENT,
-					'action_run_checks'                   => Admin_AJAX::ACTION_RUN_CHECKS,
-					'action_clean_up_runtime_environment' => Admin_AJAX::ACTION_CLEAN_UP_ENVIRONMENT,
+					'nonce'                           => $this->admin_ajax->get_nonce(),
+					'actionGetChecksToRun'            => Admin_AJAX::ACTION_GET_CHECKS_TO_RUN,
+					'actionSetUpRuntimeEnvironment'   => Admin_AJAX::ACTION_SET_UP_ENVIRONMENT,
+					'actionRunChecks'                 => Admin_AJAX::ACTION_RUN_CHECKS,
+					'actionCleanUpRuntimeEnvironment' => Admin_AJAX::ACTION_CLEAN_UP_ENVIRONMENT,
 				)
 			),
 			'before'
