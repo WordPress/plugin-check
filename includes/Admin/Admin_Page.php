@@ -94,7 +94,11 @@ class Admin_Page {
 			'plugin-check-admin',
 			'const PLUGIN_CHECK = ' . json_encode(
 				array(
-					'nonce' => $this->admin_ajax->get_nonce(),
+					'nonce'                           => $this->admin_ajax->get_nonce(),
+					'actionGetChecksToRun'            => Admin_AJAX::ACTION_GET_CHECKS_TO_RUN,
+					'actionSetUpRuntimeEnvironment'   => Admin_AJAX::ACTION_SET_UP_ENVIRONMENT,
+					'actionRunChecks'                 => Admin_AJAX::ACTION_RUN_CHECKS,
+					'actionCleanUpRuntimeEnvironment' => Admin_AJAX::ACTION_CLEAN_UP_ENVIRONMENT,
 				)
 			),
 			'before'
