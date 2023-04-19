@@ -23,6 +23,18 @@ class File_Checks extends Check_Base {
 		}
 	}
 
+	function check_phar() {
+		if ( $matches = preg_grep( '!\.phar$!i', $this->files ) ) {
+			return new Error(
+				'phar_detected',
+				sprintf(
+					'Phar files are not permitted.. Detected: %s',
+					basename( array_shift( $matches ) )
+				)
+			);
+		}
+	}
+
 	function check_vcs() {
 		$directories = [ '.git', '.svn', '.hg', '.bzr' ];
 
