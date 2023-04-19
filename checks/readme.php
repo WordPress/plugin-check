@@ -40,6 +40,36 @@ class Readme extends Check_Base {
 		}
 	}
 
+	function check_for_default_text() {
+		if ( ! $this->readme ) {
+			return;
+		}
+
+		if (
+			str_contains( $this->readme->short_description, 'Here is a short description of the plugin.' ) ||
+			in_array( 'tag1', $this->readme->tags ) ||
+			str_contains( $this->readme->donate_link, 'example' )
+		) {
+			return new Notice(
+				'default_readme_text',
+				'The readme.txt appears to contain default text.'
+			);
+		}
+	}
+
+	function check_for_warnings() {
+		if ( ! empty( $this->readme->warnings ) ) {
+			return new Warning(
+				'readme_parser_warnings',
+				sprintf(
+					'The following readme parser warnings were detected: %s',
+					esc_html( implode( ', ', ),  $this->readme->warnings )
+				)
+			);
+		}
+	}
+
+
 	public function check_stable_tag() {
 		if ( ! $this->readme ) {
 			return;
