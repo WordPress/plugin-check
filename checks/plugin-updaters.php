@@ -4,6 +4,15 @@ use WordPressdotorg\Plugin_Check\{Error, Guideline_Violation, Message, Notice, W
 
 class Plugin_Updaters extends Check_Base {
 
+	function check_update_uri() {
+		if ( ! empty( $this->headers['UpdateURI'] ) ) {
+			return new Error(
+				'plugin_updater_detected',
+				'Plugin Updater detected. Use of the Update URI header is not helpful in plugins hosted on WordPress.org.',
+			);
+		}
+	}
+
 	function check_updaters() {
 		$filenames     = array_map( 'strtolower', array_map( 'basename', $this->files ) );
 		$blocked_files = [
