@@ -91,4 +91,69 @@ abstract class Check_Base {
 			}
 		}
 	}
+
+	/*
+	 * Shared helper fixtures.
+	 */
+
+	/**
+	 * Scan all files for a matching needle.
+	 *
+	 * @param string $needle The needle to search for. May be regex by wrapping with #...#.
+	 * @return bool Whether the $needle is found in any file.
+	 */
+	function scan_files_for_needle( $needle ) {
+		return self::scan_matching_files_for_needle( $needle, '' );
+	}
+
+	/**
+	 * Scan matching files for a matching needle.
+	 *
+	 * @param string $needle The needle to search for. May be regex by wrapping with #...#.
+	 * @param string $files  A regex to apply to the list of files to scan.
+	 * @return bool Whether the $needle is found in any matching file.
+	 */
+	function scan_matching_files_for_needle( $needle, $files = '' ) {
+		$is_regex = str_starts_with( $needle, '#' ) && preg_match( '!^#.+#\w*$!', $needle );
+
+		$matching_files = $this->files;
+		if ( $files ) {
+			$matching_files = preg_grep( '#' . $files . '#', $matching_files );
+		}
+
+		try {
+			$checker = $this;
+			array_walk(
+				$matching_files,
+				function( $file ) use( $needle, $is_regex, $checker ) {
+					$contents = Check_Base::file_get_contents( $file );
+					if ( $is_regex ) {
+						if ( preg_match( $needle, $contents ) ) {
+							throw new Exception( 'Matched' );
+						}
+					} else {
+						if ( str_contains( $contents, $needle ) ) {
+							throw new Exception( 'Matched' );
+						}
+					}
+				}
+			);
+		} catch( Exception $e ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * A caching wrapper for file_get_contents().
+	 *
+	 * @param string $file The filename.
+	 * @return string
+	 */
+	static function file_get_contents( $file ) {
+		static $cache = [];
+
+		return $cache[ $file ] ?? $cache[ $file ] = file_get_contents( $file );
+	}
 }
