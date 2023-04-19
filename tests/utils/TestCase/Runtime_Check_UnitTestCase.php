@@ -7,14 +7,14 @@
 
 namespace WordPress\Plugin_Check\Test_Utils\TestCase;
 
-use WP_UnitTestCase;
 use WordPress\Plugin_Check\Checker\Check;
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
-use WordPress\Plugin_Check\Checker\Runtime_Check;
 use WordPress\Plugin_Check\Checker\Preparation;
-use WordPress\Plugin_Check\Checker\With_Shared_Preparations;
 use WordPress\Plugin_Check\Checker\Preparations\Universal_Runtime_Preparation;
+use WordPress\Plugin_Check\Checker\Runtime_Check;
+use WordPress\Plugin_Check\Checker\With_Shared_Preparations;
+use WP_UnitTestCase;
 
 abstract class Runtime_Check_UnitTestCase extends WP_UnitTestCase {
 	/**

@@ -8,8 +8,8 @@
 namespace WordPress\Plugin_Check\Checker;
 
 use Exception;
-use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 use WordPress\Plugin_Check\Checker\Preparations\Universal_Runtime_Preparation;
+use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 
 /**
  * Abstract Check Runner class.

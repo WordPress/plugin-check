@@ -7,7 +7,6 @@
 
 namespace WordPress\Plugin_Check\Checker;
 
-use WordPress\Plugin_Check\Checker\Check_Context;
 use Exception;
 
 /**
