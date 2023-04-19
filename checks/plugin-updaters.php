@@ -42,4 +42,24 @@ class Plugin_Updaters extends Check_Base {
 		}
 	}
 
+	function check_updater_warnings() {
+		$needles = [
+			"#pre_set_site_transient_update_\w+#i",
+			'auto_update_plugin',
+			'#_site_transient_update_\w+#i',
+		];
+
+		foreach ( $needles as $needle ) {
+			if ( $match = $this->scan_matching_files_for_needle( $needle, '\.php$' ) ) {
+				return new Warning(
+					'update_modification_detected',
+					sprintf(
+						'Detected code which may be altering WordPress update routines. Detected: %s',
+						esc_html( $match )
+					)
+				);
+			}
+		}
+	}
+
 }
