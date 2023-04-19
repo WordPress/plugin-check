@@ -1,6 +1,7 @@
 <?php
 namespace WordPressdotorg\Plugin_Check\Checks;
 use WordPressdotorg\Plugin_Check\{Error, Guideline_Violation, Message, Notice, Warning};
+use Exception;
 
 abstract class Check_Base {
 	public $args      = [];
@@ -121,11 +122,13 @@ abstract class Check_Base {
 			$matching_files = preg_grep( '#' . $files . '#', $matching_files );
 		}
 
+		$path = $this->path;
+
 		try {
 			array_walk(
 				$matching_files,
-				function( $file ) use( $needle, $is_regex ) {
-					$contents = Check_Base::file_get_contents( $file );
+				function( $file ) use( $path, $needle, $is_regex ) {
+					$contents = Check_Base::file_get_contents( $path . '/' . $file );
 					if ( $is_regex ) {
 						if ( preg_match( $needle, $contents, $m ) ) {
 							throw new Exception( $m[0] );
