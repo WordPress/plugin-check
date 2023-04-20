@@ -28,7 +28,7 @@ class Runtime_Environment_Setup {
 		$old_prefix = $wpdb->set_prefix( $table_prefix . 'pc_' );
 
 		// Create and populate the test database tables if they do not exist.
-		if ( $wpdb->posts === $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->posts ) ) ) {
+		if ( $wpdb->posts !== $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->posts ) ) ) {
 			wp_install(
 				'Plugin Check',
 				'plugincheck',
