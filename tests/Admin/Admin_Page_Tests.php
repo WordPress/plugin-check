@@ -39,8 +39,7 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 		wp_set_current_user( $admin_user );
 		set_current_screen( 'dashboard' );
 
-		$this->admin_page->add_page();
-		$page_hook    = 'admin_page_plugin-check';
+		$page_hook    = $this->admin_page->add_page();
 		$parent_pages = $_parent_pages;
 
 		set_current_screen( $current_screen );

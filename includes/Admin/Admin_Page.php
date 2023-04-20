@@ -58,6 +58,8 @@ class Admin_Page {
 		);
 
 		add_action( "load-{$hook}", array( $this, 'initialize_page' ) );
+
+		return $hook;
 	}
 
 	/**
