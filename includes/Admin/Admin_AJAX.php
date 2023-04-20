@@ -145,7 +145,7 @@ class Admin_AJAX {
 	 * @since n.e.x.t
 	 */
 	public function clean_up_environment() {
-		global $wpdb;
+		global $wpdb, $table_prefix;
 
 		// Verify the nonce before continuing.
 		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) );
@@ -155,12 +155,12 @@ class Admin_AJAX {
 		}
 
 		// Set the new prefix.
-		$old_prefix = $wpdb->set_prefix( 'wppc_' );
+		$old_prefix = $wpdb->set_prefix( $table_prefix . 'pc_' );
 
 		$message = __( 'Runtime environment was not prepared, cleanup was not run.', 'plugin-check' );
 
 		// Test if the runtime environment tables exist.
-		if ( 'wppc_posts' === $wpdb->get_var( "SHOW TABLES LIKE 'wppc_posts'" ) || defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) ) {
+		if ( $wpdb->posts === $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->posts ) ) || defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) ) {
 			$runtime = new Runtime_Environment_Setup();
 			$runtime->cleanup();
 			$message = __( 'Runtime environment cleanup successful.', 'plugin-check' );

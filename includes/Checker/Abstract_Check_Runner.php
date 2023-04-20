@@ -153,8 +153,8 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			$cleanup     = $preparation->prepare();
 
 			// Set the database prefix to use the demo tables.
-			global $wpdb;
-			$old_prefix = $wpdb->set_prefix( 'wppc_' );
+			global $wpdb, $table_prefix;
+			$old_prefix = $wpdb->set_prefix( $table_prefix . 'pc_' );
 
 			return function() use ( $old_prefix, $cleanup ) {
 				global $wpdb;
