@@ -37,31 +37,37 @@ class Admin_Page {
 	 * @since n.e.x.t
 	 */
 	public function add_hooks() {
-		add_action( 'admin_menu', array( $this, 'add_page' ) );
+		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 		add_filter( 'plugin_action_links', array( $this, 'filter_plugin_action_links' ), 10, 2 );
 
 		$this->admin_ajax->add_hooks();
 	}
 
 	/**
-	 * Registers the admin page under the tools menu.
+	 * Add the admin page.
 	 *
 	 * @since n.e.x.t
 	 *
 	 * @return string The hook identifier for the admin page.
 	 */
 	public function add_page() {
-		$hook = add_management_page(
+		return add_management_page(
 			__( 'Plugin Check', 'plugin-check' ),
 			__( 'Plugin Check', 'plugin-check' ),
 			'activate_plugins',
 			'plugin-check',
 			array( $this, 'render_page' )
 		);
+	}
 
+	/**
+	 * Registers the admin page under the tools menu.
+	 *
+	 * @since n.e.x.t
+	 */
+	public function admin_menu() {
+		$hook = $this->add_page();
 		add_action( "load-{$hook}", array( $this, 'initialize_page' ) );
-
-		return $hook;
 	}
 
 	/**
