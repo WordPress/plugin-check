@@ -21,11 +21,11 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 
 	public function test_add_hooks() {
 		$this->admin_page->add_hooks();
-		$this->assertEquals( 10, has_action( 'admin_menu', array( $this->admin_page, 'admin_menu' ) ) );
+		$this->assertEquals( 10, has_action( 'admin_menu', array( $this->admin_page, 'add_and_initialize_page' ) ) );
 		$this->assertEquals( 10, has_filter( 'plugin_action_links', array( $this->admin_page, 'filter_plugin_action_links' ) ) );
 	}
 
-	public function test_admin_menu() {
+	public function test_add_and_initialize_page() {
 		global $_parent_pages;
 
 		$current_screen = get_current_screen();
@@ -39,8 +39,8 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 		wp_set_current_user( $admin_user );
 		set_current_screen( 'dashboard' );
 
+		$this->admin_page->add_and_initialize_page();
 		$page_hook = $this->admin_page->add_page();
-		$this->admin_page->admin_menu();
 		$parent_pages = $_parent_pages;
 
 		set_current_screen( $current_screen );

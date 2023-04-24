@@ -23,6 +23,14 @@ class Admin_Page {
 	protected $admin_ajax;
 
 	/**
+	 * Admin page hook suffix.
+	 *
+	 * @since n.e.x.t
+	 * @var string
+	 */
+	protected $hook_suffix;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since n.e.x.t
@@ -37,7 +45,7 @@ class Admin_Page {
 	 * @since n.e.x.t
 	 */
 	public function add_hooks() {
-		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
+		add_action( 'admin_menu', array( $this, 'add_and_initialize_page' ) );
 		add_filter( 'plugin_action_links', array( $this, 'filter_plugin_action_links' ), 10, 2 );
 
 		$this->admin_ajax->add_hooks();
@@ -51,13 +59,16 @@ class Admin_Page {
 	 * @return string The hook identifier for the admin page.
 	 */
 	public function add_page() {
-		return add_management_page(
-			__( 'Plugin Check', 'plugin-check' ),
-			__( 'Plugin Check', 'plugin-check' ),
-			'activate_plugins',
-			'plugin-check',
-			array( $this, 'render_page' )
-		);
+		if ( null === $this->hook_suffix ) {
+			$this->hook_suffix = add_management_page(
+				__( 'Plugin Check', 'plugin-check' ),
+				__( 'Plugin Check', 'plugin-check' ),
+				'activate_plugins',
+				'plugin-check',
+				array( $this, 'render_page' )
+			);
+		}
+		return $this->hook_suffix;
 	}
 
 	/**
@@ -65,9 +76,9 @@ class Admin_Page {
 	 *
 	 * @since n.e.x.t
 	 */
-	public function admin_menu() {
+	public function add_and_initialize_page() {
 		$hook = $this->add_page();
-		add_action( "load-{$hook}", array( $this, 'initialize_page' ) );
+		add_action( 'load-' . $hook, array( $this, 'initialize_page' ) );
 	}
 
 	/**
