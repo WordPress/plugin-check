@@ -125,10 +125,14 @@ class Use_Minimal_Theme_Preparation implements Preparation {
 	 *
 	 * @since n.e.x.t
 	 *
+	 * @param string $current Current theme.
 	 * @return string The theme name.
 	 */
-	public function get_theme_name() {
+	public function get_theme_name( $current ) {
 		$theme = wp_get_theme( $this->theme_slug, $this->themes_dir );
+		if ( ! $theme->exists() ) {
+			return $current;
+		}
 		return $theme->display( 'Name' );
 	}
 
