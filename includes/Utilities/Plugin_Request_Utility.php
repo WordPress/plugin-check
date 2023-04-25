@@ -8,9 +8,6 @@
 namespace WordPress\Plugin_Check\Utilities;
 
 use Exception;
-use WordPress\Plugin_Check\Checker\Abstract_Check_Runner;
-use WordPress\Plugin_Check\Checker\AJAX_Runner;
-use WordPress\Plugin_Check\Checker\CLI_Runner;
 
 /**
  * Class providing utility methods to return plugin information based on the request.
@@ -18,22 +15,6 @@ use WordPress\Plugin_Check\Checker\CLI_Runner;
  * @since n.e.x.t
  */
 class Plugin_Request_Utility {
-
-	/**
-	 * Instance of the current runner based on the request.
-	 *
-	 * @since n.e.x.t
-	 * @var Abstract_Check_Runner
-	 */
-	protected static $runner;
-
-	/**
-	 * The universal runtime preparation cleanups if applied.
-	 *
-	 * @since n.e.x.t
-	 * @var callable
-	 */
-	protected static $cleanup;
 
 	/**
 	 * Returns the plugin basename based on the input provided.
@@ -78,60 +59,5 @@ class Plugin_Request_Utility {
 				$plugin_slug
 			)
 		);
-	}
-
-	/**
-	 * Initializes the runner classes.
-	 *
-	 * @since n.e.x.t
-	 */
-	public static function initialize_runner() {
-		$runners = array(
-			new CLI_Runner(),
-			new AJAX_Runner(),
-		);
-
-		foreach ( $runners as $runner ) {
-			if ( $runner->is_plugin_check() ) {
-				add_action(
-					'muplugins_loaded',
-					function() use ( $runner ) {
-						static::$cleanup = $runner->prepare();
-						static::$runner  = $runner;
-					}
-				);
-
-				break;
-			}
-		}
-	}
-
-	/**
-	 * Get the Runner class for the current request.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @return Abstract_Check_Runner|null The Runner class for the request or null.
-	 */
-	public static function get_runner() {
-		if ( isset( static::$runner ) ) {
-			return static::$runner;
-		}
-
-		return null;
-	}
-
-	/**
-	 * Runs the cleanup functions and destroys the runner.
-	 *
-	 * @since n.e.x.t
-	 */
-	public static function destroy_runner() {
-		// Run the cleanup functions.
-		if ( isset( self::$cleanup ) ) {
-			call_user_func( self::$cleanup );
-		}
-
-		static::$runner = null;
 	}
 }

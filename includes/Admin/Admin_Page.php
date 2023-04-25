@@ -7,6 +7,8 @@
 
 namespace WordPress\Plugin_Check\Admin;
 
+
+use WordPress\Plugin_Check\Checker\AJAX_Runner;
 /**
  * Class is handling admin tools page functionality.
  *
@@ -28,7 +30,8 @@ class Admin_Page {
 	 * @since n.e.x.t
 	 */
 	public function __construct() {
-		$this->admin_ajax = new Admin_AJAX();
+		$ajax_runner      = new AJAX_Runner();
+		$this->admin_ajax = new Admin_AJAX( $ajax_runner );
 	}
 
 	/**

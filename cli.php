@@ -9,7 +9,9 @@
  */
 
 use WordPress\Plugin_Check\Plugin_Context;
+use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\CLI\Plugin_Check_Command;
+
 
 if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) {
 	return;
@@ -31,8 +33,9 @@ if ( ! isset( $context ) ) {
 	$context = new Plugin_Context( __DIR__ . '/plugin-check.php' );
 }
 
+$runner = new CLI_Runner();
 // Create the CLI command instance and add to WP CLI.
-$plugin_command = new Plugin_Check_Command( $context );
+$plugin_command = new Plugin_Check_Command( $context, $runner );
 WP_CLI::add_command( 'plugin', $plugin_command );
 
 
@@ -43,21 +46,16 @@ WP_CLI::add_command( 'plugin', $plugin_command );
  */
 WP_CLI::add_hook(
 	'before_wp_load',
-	function() {
-		if ( empty( $_SERVER['argv'] ) || 3 > count( $_SERVER['argv'] ) ) {
+	function() use ( $runner ) {
+		if( !$runner->is_plugin_check() ){
 			return;
 		}
 
-		if (
-			'wp' === substr( $_SERVER['argv'][0], -2 ) &&
-			'plugin' === $_SERVER['argv'][1] &&
-			'check' === $_SERVER['argv'][2]
-		) {
-			if ( ! file_exists( ABSPATH . 'wp-content/object-cache.php' ) ) {
-				if ( ! copy(  __DIR__ . '/object-cache.copy.php', ABSPATH . 'wp-content/object-cache.php' ) ) {
-					WP_CLI::error( 'Unable to copy object-cache.php file.' );
-				}
+		if ( ! file_exists( ABSPATH . 'wp-content/object-cache.php' ) ) {
+			if ( ! copy(  __DIR__ . '/object-cache.copy.php', ABSPATH . 'wp-content/object-cache.php' ) ) {
+				WP_CLI::error( 'Unable to copy object-cache.php file.' );
 			}
 		}
+
 	}
 );

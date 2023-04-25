@@ -33,10 +33,5 @@ function plugin_check_initialize_runner() {
 	}
 
 	require_once $plugin_dir . 'vendor/autoload.php';
-
-	if ( class_exists( 'WordPress\Plugin_Check\Utilities\Plugin_Request_Utility' ) ) {
-		// Initialize the Check Runner class based on the request.
-		WordPress\Plugin_Check\Utilities\Plugin_Request_Utility::initialize_runner();
-	}
 }
 plugin_check_initialize_runner();

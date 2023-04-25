@@ -12,7 +12,6 @@ use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Checker\Runtime_Check;
 use WordPress\Plugin_Check\Checker\Runtime_Environment_Setup;
 use WordPress\Plugin_Check\Plugin_Context;
-use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 use WP_CLI;
 
 /**
@@ -27,6 +26,14 @@ class Plugin_Check_Command {
 	 * @var Plugin_Context
 	 */
 	protected $plugin_context;
+
+	/**
+	 * Runner context.
+	 *
+	 * @since n.e.x.t
+	 * @var CLI_Runner
+	 */
+	protected $runner;
 
 	/**
 	 * Output format type.
@@ -46,9 +53,11 @@ class Plugin_Check_Command {
 	 * @since n.e.x.t
 	 *
 	 * @param Plugin_Context $plugin_context Plugin context.
+	 * @param CLI_Runner     $runner CLI Runner.
 	 */
-	public function __construct( Plugin_Context $plugin_context ) {
+	public function __construct( Plugin_Context $plugin_context, CLI_Runner $runner ) {
 		$this->plugin_context = $plugin_context;
+		$this->runner         = $runner;
 	}
 
 	/**
@@ -105,26 +114,11 @@ class Plugin_Check_Command {
 		$plugin = isset( $args[0] ) ? $args[0] : '';
 		$checks = wp_parse_list( $options['checks'] );
 
-		// Get the CLI Runner.
-		$runner = Plugin_Request_Utility::get_runner();
-
-		// Create the runner if not already initialized.
-		if ( is_null( $runner ) ) {
-			$runner = new CLI_Runner();
-		}
-
-		// Make sure we are using the correct runner instance.
-		if ( ! ( $runner instanceof CLI_Runner ) ) {
-			WP_CLI::error(
-				__( 'CLI Runner was not initialized correctly.', 'plugin-check' )
-			);
-		}
-
 		try {
-			$runner->set_check_slugs( $checks );
-			$runner->set_plugin( $plugin );
+			$this->runner->set_check_slugs( $checks );
+			$this->runner->set_plugin( $plugin );
 
-			$checks_to_run = $runner->get_checks_to_run();
+			$checks_to_run = $this->runner->get_checks_to_run();
 		} catch ( Exception $error ) {
 			WP_CLI::error( $error->getMessage() );
 		}
@@ -137,19 +131,17 @@ class Plugin_Check_Command {
 
 		// Run checks against the plugin.
 		try {
-			$result = $runner->run();
+			$result = $this->runner->run();
 		} catch ( Exception $error ) {
-			Plugin_Request_Utility::destroy_runner();
-
 			if ( isset( $runtime_setup ) ) {
 				$runtime_setup->cleanup();
 				WP_CLI::line( __( 'Cleaning up runtime environment.', 'plugin-check' ) );
 			}
 
 			WP_CLI::error( $error->getMessage() );
+		} finally {
+			$this->runner->prepare();
 		}
-
-		Plugin_Request_Utility::destroy_runner();
 
 		if ( isset( $runtime_setup ) ) {
 			$runtime_setup->cleanup();

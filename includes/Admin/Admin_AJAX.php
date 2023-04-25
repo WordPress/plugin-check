@@ -11,7 +11,6 @@ use Exception;
 use WordPress\Plugin_Check\Checker\AJAX_Runner;
 use WordPress\Plugin_Check\Checker\Runtime_Check;
 use WordPress\Plugin_Check\Checker\Runtime_Environment_Setup;
-use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 use WP_Error;
 
 /**
@@ -62,6 +61,25 @@ class Admin_AJAX {
 	const ACTION_RUN_CHECKS = 'plugin_check_run_checks';
 
 	/**
+	 * Runner context.
+	 *
+	 * @since n.e.x.t
+	 * @var AJAX_Runner
+	 */
+	protected $runner;
+
+	/**
+	 * Constructor.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param AJAX_Runner $runner AJAX Runner.
+	 */
+	public function __construct( AJAX_Runner $runner ) {
+		$this->runner = $runner;
+	}
+
+	/**
 	 * Registers WordPress hooks for the Admin AJAX.
 	 *
 	 * @since n.e.x.t
@@ -94,27 +112,14 @@ class Admin_AJAX {
 		if ( is_wp_error( $valid_request ) ) {
 			wp_send_json_error( $valid_request, 403 );
 		}
-		$runner = Plugin_Request_Utility::get_runner();
-
-		if ( is_null( $runner ) ) {
-			$runner = new AJAX_Runner();
-		}
-
-		// Make sure we are using the correct runner instance.
-		if ( ! ( $runner instanceof AJAX_Runner ) ) {
-			wp_send_json_error(
-				new WP_Error( 'invalid-runner', __( 'AJAX Runner was not initialized correctly.', 'plugin-check' ) ),
-				500
-			);
-		}
 
 		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
 		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		try {
-			$runner->set_check_slugs( $checks );
-			$runner->set_plugin( $plugin );
-			$checks_to_run = $runner->get_checks_to_run();
+			$this->runner->set_check_slugs( $checks );
+			$this->runner->set_plugin( $plugin );
+			$checks_to_run = $this->runner->get_checks_to_run();
 		} catch ( Exception $error ) {
 			wp_send_json_error(
 				new WP_Error( 'invalid-request', $error->getMessage() ),
@@ -192,26 +197,13 @@ class Admin_AJAX {
 		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
 		$checks = is_null( $checks ) ? array() : $checks;
 		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		$runner = Plugin_Request_Utility::get_runner();
-
-		if ( is_null( $runner ) ) {
-			$runner = new AJAX_Runner();
-		}
-
-		// Make sure we are using the correct runner instance.
-		if ( ! ( $runner instanceof AJAX_Runner ) ) {
-			wp_send_json_error(
-				new WP_Error( 'invalid-runner', __( 'AJAX Runner was not initialized correctly.', 'plugin-check' ) ),
-				403
-			);
-		}
 
 		try {
-			$runner->set_check_slugs( $checks );
-			$runner->set_plugin( $plugin );
+			$this->runner->set_check_slugs( $checks );
+			$this->runner->set_plugin( $plugin );
 
-			$plugin_basename = $runner->get_plugin_basename();
-			$checks_to_run   = $runner->get_checks_to_run();
+			$plugin_basename = $this->runner->get_plugin_basename();
+			$checks_to_run   = $this->runner->get_checks_to_run();
 		} catch ( Exception $error ) {
 			wp_send_json_error(
 				new WP_Error( 'invalid-checks', $error->getMessage() ),
@@ -240,28 +232,14 @@ class Admin_AJAX {
 			wp_send_json_error( $valid_request, 403 );
 		}
 
-		$runner = Plugin_Request_Utility::get_runner();
-
-		if ( is_null( $runner ) ) {
-			$runner = new AJAX_Runner();
-		}
-
-		// Make sure we are using the correct runner instance.
-		if ( ! ( $runner instanceof AJAX_Runner ) ) {
-			wp_send_json_error(
-				new WP_Error( 'invalid-runner', __( 'AJAX Runner was not initialized correctly.', 'plugin-check' ) ),
-				500
-			);
-		}
-
 		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
 		$checks = is_null( $checks ) ? array() : $checks;
 		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		try {
-			$runner->set_check_slugs( $checks );
-			$runner->set_plugin( $plugin );
-			$results = $runner->run();
+			$this->runner->set_check_slugs( $checks );
+			$this->runner->set_plugin( $plugin );
+			$results = $this->runner->run();
 		} catch ( Exception $error ) {
 			wp_send_json_error(
 				new WP_Error( 'invalid-request', $error->getMessage() ),
