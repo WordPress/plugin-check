@@ -8,6 +8,7 @@
 namespace Admin;
 
 use WordPress\Plugin_Check\Admin\Admin_AJAX;
+use WordPress\Plugin_Check\Checker\AJAX_Runner;
 use WP_UnitTestCase;
 
 class Admin_AJAX_Tests extends WP_UnitTestCase {
@@ -16,7 +17,8 @@ class Admin_AJAX_Tests extends WP_UnitTestCase {
 
 	public function set_up() {
 		parent::set_up();
-		$this->admin_ajax = new Admin_AJAX();
+		$ajax_runner      = new AJAX_Runner();
+		$this->admin_ajax = new Admin_AJAX( $ajax_runner );
 	}
 
 	public function test_add_hooks() {
