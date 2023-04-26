@@ -283,7 +283,7 @@
 	 * @param {Object} warnings The file warnings.
 	 */
 	function renderFileResults( file, errors, warnings ) {
-		const index = Date.now();
+		const index = parseInt( Math.random() * 100000, 10 );
 
 		// Render the file table.
 		resultsContainer.innerHTML += renderTemplate(
