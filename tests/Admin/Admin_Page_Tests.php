@@ -40,7 +40,8 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 		set_current_screen( 'dashboard' );
 
 		$this->admin_page->add_and_initialize_page();
-		$page_hook    = $this->admin_page->add_page();
+		$page_hook = $this->admin_page->get_hook_suffix();
+		$this->assertNotNull( $page_hook );
 		$parent_pages = $_parent_pages;
 
 		set_current_screen( $current_screen );

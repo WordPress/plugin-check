@@ -55,20 +55,15 @@ class Admin_Page {
 	 * Add the admin page.
 	 *
 	 * @since n.e.x.t
-	 *
-	 * @return string The hook identifier for the admin page.
 	 */
 	public function add_page() {
-		if ( null === $this->hook_suffix ) {
-			$this->hook_suffix = add_management_page(
-				__( 'Plugin Check', 'plugin-check' ),
-				__( 'Plugin Check', 'plugin-check' ),
-				'activate_plugins',
-				'plugin-check',
-				array( $this, 'render_page' )
-			);
-		}
-		return $this->hook_suffix;
+		$this->hook_suffix = add_management_page(
+			__( 'Plugin Check', 'plugin-check' ),
+			__( 'Plugin Check', 'plugin-check' ),
+			'activate_plugins',
+			'plugin-check',
+			array( $this, 'render_page' )
+		);
 	}
 
 	/**
@@ -77,8 +72,8 @@ class Admin_Page {
 	 * @since n.e.x.t
 	 */
 	public function add_and_initialize_page() {
-		$hook = $this->add_page();
-		add_action( 'load-' . $hook, array( $this, 'initialize_page' ) );
+		$this->add_page();
+		add_action( 'load-' . $this->get_hook_suffix(), array( $this, 'initialize_page' ) );
 	}
 
 	/**
@@ -217,5 +212,16 @@ class Admin_Page {
 				'type' => 'text/template',
 			)
 		);
+	}
+
+	/**
+	 * Get hook_suffix property.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return string
+	 */
+	public function get_hook_suffix() {
+		return $this->hook_suffix;
 	}
 }
