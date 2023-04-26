@@ -27,7 +27,7 @@ class Admin_Page {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param Admin_AJAX $admin_ajax    Instance of Admin_AJAX.
+	 * @param Admin_AJAX $admin_ajax Instance of Admin_AJAX.
 	 */
 	public function __construct( Admin_AJAX $admin_ajax ) {
 		$this->admin_ajax = $admin_ajax;
