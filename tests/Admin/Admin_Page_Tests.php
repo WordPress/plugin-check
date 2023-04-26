@@ -43,7 +43,7 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 
 		$this->admin_page->add_and_initialize_page();
 		$page_hook = $this->admin_page->get_hook_suffix();
-		$this->assertNotNull( $page_hook );
+		$this->assertNotEmpty( $page_hook );
 		$parent_pages = $_parent_pages;
 
 		set_current_screen( $current_screen );

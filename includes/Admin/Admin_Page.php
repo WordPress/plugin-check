@@ -28,7 +28,7 @@ class Admin_Page {
 	 * @since n.e.x.t
 	 * @var string
 	 */
-	protected $hook_suffix;
+	protected $hook_suffix = '';
 
 	/**
 	 * Constructor.
@@ -54,7 +54,7 @@ class Admin_Page {
 	}
 
 	/**
-	 * Add the admin page.
+	 * Adds the admin page under the tools menu.
 	 *
 	 * @since n.e.x.t
 	 */
@@ -69,7 +69,7 @@ class Admin_Page {
 	}
 
 	/**
-	 * Registers the admin page under the tools menu.
+	 * Adds and initializes the admin page under the tools menu.
 	 *
 	 * @since n.e.x.t
 	 */
@@ -217,11 +217,11 @@ class Admin_Page {
 	}
 
 	/**
-	 * Get hook_suffix property.
+	 * Gets the hook suffix under which the admin page is added.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return string
+	 * @return string Hook suffix, or empty string if admin page was not added.
 	 */
 	public function get_hook_suffix() {
 		return $this->hook_suffix;
