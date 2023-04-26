@@ -77,7 +77,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		// Create the default arguments for PHPCS.
 		$defaults = array(
 			'',
-			$result->plugin()->path( '' ),
+			$result->plugin()->location(),
 			'--report=Json',
 			'--report-width=9999',
 		);
