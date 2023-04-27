@@ -71,7 +71,7 @@ class Checks {
 		// Create an array of Check objects to run based on the check names passed.
 		$checks_to_run = array_filter(
 			$checks,
-			function( $check ) use ( $all_checks ) {
+			static function( Check $check ) use ( $all_checks ) {
 				return in_array( $check, $all_checks, true );
 			}
 		);

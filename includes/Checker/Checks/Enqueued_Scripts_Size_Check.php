@@ -48,12 +48,7 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	public function __construct( $threshold_size = 300000 ) {
 		$this->threshold_size = $threshold_size;
 
-		$this->viewable_post_types = array_filter(
-			get_post_types(),
-			function( $post_type ) {
-				return is_post_type_viewable( $post_type );
-			}
-		);
+		$this->viewable_post_types = array_filter( get_post_types(), 'is_post_type_viewable' );
 	}
 
 	/**
@@ -92,7 +87,7 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	 */
 	public function get_shared_preparations() {
 		$demo_posts = array_map(
-			function( $post_type ) {
+			static function( $post_type ) {
 				return array(
 					'post_title'   => "Demo {$post_type} post",
 					'post_content' => 'Test content',
