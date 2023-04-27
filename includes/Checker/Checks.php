@@ -126,7 +126,7 @@ class Checks {
 	 * @return array An array map of check slugs to Check instances.
 	 */
 	public function get_checks() {
-		if ( ! isset( $this->checks ) ) {
+		if ( null === $this->checks ) {
 			// TODO: Add checks once implemented.
 			$checks = array(
 				'i18n_usage'            => new Checks\I18n_Usage_Check(),

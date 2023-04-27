@@ -65,6 +65,12 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 			include_once $autoloader;
 		}
 
+		if ( ! class_exists( '\PHP_CodeSniffer\Runner' ) ) {
+			throw new Exception(
+				__( 'Unable to find Runner class.', 'plugin-check' )
+			);
+		}
+
 		// Backup the original command line arguments.
 		$orig_cmd_args = $_SERVER['argv'];
 
