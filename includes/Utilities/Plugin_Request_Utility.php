@@ -23,7 +23,7 @@ class Plugin_Request_Utility {
 	 * Instance of the current runner based on the request.
 	 *
 	 * @since n.e.x.t
-	 * @var Abstract_Check_Runner
+	 * @var Abstract_Check_Runner|null
 	 */
 	protected static $runner;
 
@@ -114,7 +114,7 @@ class Plugin_Request_Utility {
 	 * @return Abstract_Check_Runner|null The Runner class for the request or null.
 	 */
 	public static function get_runner() {
-		if ( isset( static::$runner ) ) {
+		if ( null !== static::$runner ) {
 			return static::$runner;
 		}
 
@@ -128,7 +128,7 @@ class Plugin_Request_Utility {
 	 */
 	public static function destroy_runner() {
 		// Run the cleanup functions.
-		if ( isset( self::$cleanup ) ) {
+		if ( null !== self::$cleanup ) {
 			call_user_func( self::$cleanup );
 		}
 
