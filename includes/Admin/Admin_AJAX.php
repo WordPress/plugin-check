@@ -89,27 +89,11 @@ class Admin_AJAX {
 	 */
 	public function set_up_environment() {
 		// Verify the nonce before continuing.
-		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) );
+		$this->validate_request();
 
-		if ( is_wp_error( $valid_request ) ) {
-			wp_send_json_error( $valid_request, 403 );
-		}
-		$runner = Plugin_Request_Utility::get_runner();
-
-		if ( is_null( $runner ) ) {
-			$runner = new AJAX_Runner();
-		}
-
-		// Make sure we are using the correct runner instance.
-		if ( ! ( $runner instanceof AJAX_Runner ) ) {
-			wp_send_json_error(
-				new WP_Error( 'invalid-runner', __( 'AJAX Runner was not initialized correctly.', 'plugin-check' ) ),
-				500
-			);
-		}
-
-		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
-		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$runner = $this->get_runner();
+		$checks = $this->get_checks();
+		$plugin = $this->get_plugin();
 
 		try {
 			$runner->set_check_slugs( $checks );
@@ -148,11 +132,7 @@ class Admin_AJAX {
 		global $wpdb, $table_prefix;
 
 		// Verify the nonce before continuing.
-		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) );
-
-		if ( is_wp_error( $valid_request ) ) {
-			wp_send_json_error( $valid_request, 403 );
-		}
+		$this->validate_request();
 
 		// Set the new prefix.
 		$old_prefix = $wpdb->set_prefix( $table_prefix . 'pc_' );
@@ -183,28 +163,11 @@ class Admin_AJAX {
 	 */
 	public function get_checks_to_run() {
 		// Verify the nonce before continuing.
-		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) );
+		$this->validate_request();
 
-		if ( is_wp_error( $valid_request ) ) {
-			wp_send_json_error( $valid_request, 403 );
-		}
-
-		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
-		$checks = is_null( $checks ) ? array() : $checks;
-		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		$runner = Plugin_Request_Utility::get_runner();
-
-		if ( is_null( $runner ) ) {
-			$runner = new AJAX_Runner();
-		}
-
-		// Make sure we are using the correct runner instance.
-		if ( ! ( $runner instanceof AJAX_Runner ) ) {
-			wp_send_json_error(
-				new WP_Error( 'invalid-runner', __( 'AJAX Runner was not initialized correctly.', 'plugin-check' ) ),
-				403
-			);
-		}
+		$runner = $this->get_runner();
+		$checks = $this->get_checks();
+		$plugin = $this->get_plugin();
 
 		try {
 			$runner->set_check_slugs( $checks );
@@ -234,29 +197,11 @@ class Admin_AJAX {
 	 */
 	public function run_checks() {
 		// Verify the nonce before continuing.
-		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) );
+		$this->validate_request();
 
-		if ( is_wp_error( $valid_request ) ) {
-			wp_send_json_error( $valid_request, 403 );
-		}
-
-		$runner = Plugin_Request_Utility::get_runner();
-
-		if ( is_null( $runner ) ) {
-			$runner = new AJAX_Runner();
-		}
-
-		// Make sure we are using the correct runner instance.
-		if ( ! ( $runner instanceof AJAX_Runner ) ) {
-			wp_send_json_error(
-				new WP_Error( 'invalid-runner', __( 'AJAX Runner was not initialized correctly.', 'plugin-check' ) ),
-				500
-			);
-		}
-
-		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
-		$checks = is_null( $checks ) ? array() : $checks;
-		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$runner = $this->get_runner();
+		$checks = $this->get_checks();
+		$plugin = $this->get_plugin();
 
 		try {
 			$runner->set_check_slugs( $checks );
@@ -276,6 +221,70 @@ class Admin_AJAX {
 				'warnings' => $results->get_warnings(),
 			)
 		);
+	}
+
+
+	/**
+	 * Get the AJAX_Runner runner.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return AJAX_Runner
+	 */
+	protected function get_runner() {
+		$runner = Plugin_Request_Utility::get_runner();
+
+		if ( is_null( $runner ) ) {
+			Plugin_Request_Utility::initialize_runner();
+			$runner = Plugin_Request_Utility::get_runner();
+		}
+
+		// Make sure we are using the correct runner instance.
+		if ( ! ( $runner instanceof AJAX_Runner ) ) {
+			wp_send_json_error(
+				new WP_Error( 'invalid-runner', __( 'AJAX Runner was not initialized correctly.', 'plugin-check' ) ),
+				500
+			);
+		}
+
+		return $runner;
+	}
+
+	/**
+	 * Get array of checks to run.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array
+	 */
+	protected function get_checks() {
+		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
+
+		return is_null( $checks ) ? array() : (array) $checks;
+	}
+
+	/**
+	 * Get requested plugin.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return string
+	 */
+	protected function get_plugin() {
+		return filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+	}
+
+	/**
+	 * Validate request by checking nonce.
+	 *
+	 * @since n.e.x.t
+	 */
+	protected function validate_request() {
+		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) );
+
+		if ( is_wp_error( $valid_request ) ) {
+			wp_send_json_error( $valid_request, 403 );
+		}
 	}
 
 	/**
