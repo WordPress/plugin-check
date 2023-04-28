@@ -128,7 +128,7 @@ class Plugin_Request_Utility {
 	 */
 	public static function destroy_runner() {
 		// Run the cleanup functions.
-		if ( isset( self::$cleanup ) ) {
+		if ( null !== self::$cleanup ) {
 			call_user_func( self::$cleanup );
 		}
 
