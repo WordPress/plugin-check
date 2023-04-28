@@ -7,12 +7,12 @@
 
 namespace WordPress\Plugin_Check\CLI;
 
-use WordPress\Plugin_Check\Plugin_Context;
+use Exception;
+use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Checker\Runtime_Check;
 use WordPress\Plugin_Check\Checker\Runtime_Environment_Setup;
+use WordPress\Plugin_Check\Plugin_Context;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
-use WordPress\Plugin_Check\Checker\CLI_Runner;
-use Exception;
 use WP_CLI;
 
 /**
@@ -120,6 +120,7 @@ class Plugin_Check_Command {
 			);
 		}
 
+		$checks_to_run = array();
 		try {
 			$runner->set_check_slugs( $checks );
 			$runner->set_plugin( $plugin );
@@ -135,6 +136,7 @@ class Plugin_Check_Command {
 			$runtime_setup->setup();
 		}
 
+		$result = false;
 		// Run checks against the plugin.
 		try {
 			$result = $runner->run();
@@ -158,11 +160,11 @@ class Plugin_Check_Command {
 
 		// Get errors and warnings from the results.
 		$errors = array();
-		if ( empty( $assoc_args['ignore-errors'] ) ) {
+		if ( $result && empty( $assoc_args['ignore-errors'] ) ) {
 			$errors = $result->get_errors();
 		}
 		$warnings = array();
-		if ( empty( $assoc_args['ignore-warnings'] ) ) {
+		if ( $result && empty( $assoc_args['ignore-warnings'] ) ) {
 			$warnings = $result->get_warnings();
 		}
 
@@ -304,7 +306,7 @@ class Plugin_Check_Command {
 
 		usort(
 			$file_results,
-			function( $a, $b ) {
+			static function( $a, $b ) {
 				if ( $a['line'] < $b['line'] ) {
 					return -1;
 				}

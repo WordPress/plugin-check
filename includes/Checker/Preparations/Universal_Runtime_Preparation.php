@@ -7,9 +7,9 @@
 
 namespace WordPress\Plugin_Check\Checker\Preparations;
 
+use Exception;
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Preparation;
-use Exception;
 
 /**
  * Class handle all preparations required for when at least one `Runtime_Check` is being run.

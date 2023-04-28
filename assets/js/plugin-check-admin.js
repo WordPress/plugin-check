@@ -67,7 +67,10 @@
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append( 'plugin', data.plugin );
-		pluginCheckData.append( 'action', 'plugin_check_set_up_environment' );
+		pluginCheckData.append(
+			'action',
+			pluginCheck.actionSetUpRuntimeEnvironment
+		);
 
 		for ( let i = 0; i < data.checks.length; i++ ) {
 			pluginCheckData.append( 'checks[]', data.checks[ i ] );
@@ -103,7 +106,10 @@
 	function cleanUpEnvironment() {
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
-		pluginCheckData.append( 'action', 'plugin_check_clean_up_environment' );
+		pluginCheckData.append(
+			'action',
+			pluginCheck.actionCleanUpRuntimeEnvironment
+		);
 
 		return fetch( ajaxurl, {
 			method: 'POST',
@@ -132,7 +138,7 @@
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append( 'plugin', pluginsList.value );
-		pluginCheckData.append( 'action', 'plugin_check_get_checks_to_run' );
+		pluginCheckData.append( 'action', pluginCheck.actionGetChecksToRun );
 
 		return fetch( ajaxurl, {
 			method: 'POST',
@@ -190,7 +196,7 @@
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append( 'plugin', plugin );
 		pluginCheckData.append( 'checks[]', check );
-		pluginCheckData.append( 'action', 'plugin_check_run_checks' );
+		pluginCheckData.append( 'action', pluginCheck.actionRunChecks );
 
 		return fetch( ajaxurl, {
 			method: 'POST',
@@ -277,7 +283,9 @@
 	 * @param {Object} warnings The file warnings.
 	 */
 	function renderFileResults( file, errors, warnings ) {
-		const index = Date.now();
+		const index =
+			Date.now().toString( 36 ) +
+			Math.random().toString( 36 ).substr( 2 );
 
 		// Render the file table.
 		resultsContainer.innerHTML += renderTemplate(

@@ -5,9 +5,9 @@
  * @package plugin-check
  */
 
-use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
-use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Checker\AJAX_Runner;
+use WordPress\Plugin_Check\Checker\CLI_Runner;
+use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 
 class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 

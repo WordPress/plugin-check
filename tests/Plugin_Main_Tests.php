@@ -5,8 +5,8 @@
  * @package plugin-check
  */
 
-use WordPress\Plugin_Check\Plugin_Main;
 use WordPress\Plugin_Check\Plugin_Context;
+use WordPress\Plugin_Check\Plugin_Main;
 
 class Plugin_Main_Tests extends WP_UnitTestCase {
 	public function set_up() {

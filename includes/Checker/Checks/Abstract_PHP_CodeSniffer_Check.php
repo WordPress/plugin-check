@@ -7,9 +7,9 @@
 
 namespace WordPress\Plugin_Check\Checker\Checks;
 
-use WordPress\Plugin_Check\Checker\Static_Check;
-use WordPress\Plugin_Check\Checker\Check_Result;
 use Exception;
+use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Static_Check;
 
 /**
  * Check for running one or more PHP CodeSniffer sniffs.
@@ -65,13 +65,19 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 			include_once $autoloader;
 		}
 
+		if ( ! class_exists( '\PHP_CodeSniffer\Runner' ) ) {
+			throw new Exception(
+				__( 'Unable to find Runner class.', 'plugin-check' )
+			);
+		}
+
 		// Backup the original command line arguments.
 		$orig_cmd_args = $_SERVER['argv'];
 
 		// Create the default arguments for PHPCS.
 		$defaults = array(
 			'',
-			$result->plugin()->path( '' ),
+			$result->plugin()->location(),
 			'--report=Json',
 			'--report-width=9999',
 		);
@@ -82,7 +88,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		// Run PHPCS.
 		try {
 			ob_start();
-			$runner = new \PHP_CodeSniffer\Runner();
+			$runner = new \PHP_CodeSniffer\Runner(); // phpcs:ignore SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.ReferenceViaFullyQualifiedName
 			$runner->runPHPCS();
 			$reports = ob_get_clean();
 		} catch ( Exception $e ) {

@@ -7,6 +7,7 @@
 
 namespace Admin;
 
+use WordPress\Plugin_Check\Admin\Admin_AJAX;
 use WordPress\Plugin_Check\Admin\Admin_Page;
 use WP_UnitTestCase;
 
@@ -16,16 +17,17 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 
 	public function set_up() {
 		parent::set_up();
-		$this->admin_page = new Admin_Page();
+		$admin_ajax       = new Admin_AJAX();
+		$this->admin_page = new Admin_Page( $admin_ajax );
 	}
 
 	public function test_add_hooks() {
 		$this->admin_page->add_hooks();
-		$this->assertEquals( 10, has_action( 'admin_menu', array( $this->admin_page, 'add_page' ) ) );
+		$this->assertEquals( 10, has_action( 'admin_menu', array( $this->admin_page, 'add_and_initialize_page' ) ) );
 		$this->assertEquals( 10, has_filter( 'plugin_action_links', array( $this->admin_page, 'filter_plugin_action_links' ) ) );
 	}
 
-	public function test_add_page() {
+	public function test_add_and_initialize_page() {
 		global $_parent_pages;
 
 		$current_screen = get_current_screen();
@@ -39,7 +41,9 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 		wp_set_current_user( $admin_user );
 		set_current_screen( 'dashboard' );
 
-		$page_hook    = $this->admin_page->add_page();
+		$this->admin_page->add_and_initialize_page();
+		$page_hook = $this->admin_page->get_hook_suffix();
+		$this->assertNotEmpty( $page_hook );
 		$parent_pages = $_parent_pages;
 
 		set_current_screen( $current_screen );

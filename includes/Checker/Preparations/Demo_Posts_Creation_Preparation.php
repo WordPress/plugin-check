@@ -7,8 +7,8 @@
 
 namespace WordPress\Plugin_Check\Checker\Preparations;
 
-use WordPress\Plugin_Check\Checker\Preparation;
 use Exception;
+use WordPress\Plugin_Check\Checker\Preparation;
 
 /**
  * Class to create demo posts to be used by Checks.

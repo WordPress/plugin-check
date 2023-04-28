@@ -7,7 +7,7 @@
 
 namespace WordPress\Plugin_Check;
 
-use WordPress\Plugin_Check\CLI\Plugin_Check_Command;
+use WordPress\Plugin_Check\Admin\Admin_AJAX;
 use WordPress\Plugin_Check\Admin\Admin_Page;
 
 /**
@@ -60,8 +60,9 @@ class Plugin_Main {
 			require_once WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'cli.php';
 		}
 
+		$admin_ajax = new Admin_AJAX();
 		// Create the Admin page.
-		$admin_page = new Admin_Page();
+		$admin_page = new Admin_Page( $admin_ajax );
 		$admin_page->add_hooks();
 	}
 }

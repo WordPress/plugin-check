@@ -9,8 +9,8 @@ namespace WordPress\Plugin_Check\Utilities;
 
 use Exception;
 use WordPress\Plugin_Check\Checker\Abstract_Check_Runner;
-use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Checker\AJAX_Runner;
+use WordPress\Plugin_Check\Checker\CLI_Runner;
 
 /**
  * Class providing utility methods to return plugin information based on the request.
@@ -23,7 +23,7 @@ class Plugin_Request_Utility {
 	 * Instance of the current runner based on the request.
 	 *
 	 * @since n.e.x.t
-	 * @var Abstract_Check_Runner
+	 * @var Abstract_Check_Runner|null
 	 */
 	protected static $runner;
 
@@ -107,7 +107,7 @@ class Plugin_Request_Utility {
 	 * @return Abstract_Check_Runner|null The Runner class for the request or null.
 	 */
 	public static function get_runner() {
-		if ( isset( static::$runner ) ) {
+		if ( null !== static::$runner ) {
 			return static::$runner;
 		}
 

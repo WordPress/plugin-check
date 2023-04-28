@@ -14,16 +14,23 @@
     "wp-phpunit/wp-phpunit": "^6.1",
     "yoast/phpunit-polyfills": "^1.0",
     "phpcompatibility/php-compatibility": "^9.3",
-    "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2"
+    "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2",
+    "phpstan/phpstan": "^1.10",
+    "szepeviktor/phpstan-wordpress": "^1.1",
+    "phpstan/extension-installer": "^1.2",
+    "slevomat/coding-standard": "^8.9"
   },
   "scripts": {
     "lint": "phpcs --standard=phpcs.xml.dist",
-    "test": "phpunit -c phpunit.xml.dist --verbose"
+    "format": "phpcbf --standard=phpcs.xml.dist",
+    "test": "phpunit -c phpunit.xml.dist --verbose",
+    "phpstan": "phpstan analyse --memory-limit=2048M"
   },
   "config": {
     "allow-plugins": {
       "dealerdirect/phpcodesniffer-composer-installer": true,
-      "composer/installers": true
+      "composer/installers": true,
+      "phpstan/extension-installer": true
     }
   },
   "autoload": {

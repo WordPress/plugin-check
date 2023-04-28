@@ -20,7 +20,7 @@ class Runtime_Environment_Setup {
 	 * @since n.e.x.t
 	 */
 	public function setup() {
-		global $wpdb, $wp_filesystem;
+		global $wpdb, $table_prefix, $wp_filesystem;
 
 		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 
@@ -28,10 +28,10 @@ class Runtime_Environment_Setup {
 		$active_plugins = get_option( 'active_plugins' );
 
 		// Set the new prefix.
-		$old_prefix = $wpdb->set_prefix( 'wppc_' );
+		$old_prefix = $wpdb->set_prefix( $table_prefix . 'pc_' );
 
 		// Create and populate the test database tables if they do not exist.
-		if ( 'wppc_posts' !== $wpdb->get_var( "SHOW TABLES LIKE 'wppc_posts'" ) ) {
+		if ( $wpdb->posts !== $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->posts ) ) ) {
 			wp_install(
 				'Plugin Check',
 				'plugincheck',
@@ -66,11 +66,11 @@ class Runtime_Environment_Setup {
 	 * @since n.e.x.t
 	 */
 	public function cleanup() {
-		global $wpdb, $wp_filesystem;
+		global $wpdb, $table_prefix, $wp_filesystem;
 
 		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 
-		$old_prefix = $wpdb->set_prefix( 'wppc_' );
+		$old_prefix = $wpdb->set_prefix( $table_prefix . 'pc_' );
 		$tables     = $wpdb->tables();
 
 		foreach ( $tables as $table ) {
