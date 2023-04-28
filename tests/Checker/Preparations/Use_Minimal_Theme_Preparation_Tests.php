@@ -47,10 +47,19 @@ class Use_Minimal_Theme_Preparation_Tests extends WP_UnitTestCase {
 	public function test_get_theme_name() {
 		$preparation = new Use_Minimal_Theme_Preparation( $this->theme_slug, $this->theme_dir );
 		$cleanup     = $preparation->prepare();
-		$theme_name  = $preparation->get_theme_name( '' );
+		$theme_name  = $preparation->get_theme_name();
 		$cleanup();
 
 		$this->assertSame( $this->theme_name, $theme_name );
+	}
+
+	public function test_get_theme_name_error() {
+		$preparation = new Use_Minimal_Theme_Preparation( 'foo', 'bar' );
+
+		$this->expectException( 'Exception' );
+		$this->expectExceptionMessage( 'Invalid theme: Theme does not exist for some reason.' );
+
+		$preparation->get_theme_name();
 	}
 
 	public function test_get_theme_root() {
