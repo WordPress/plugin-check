@@ -303,7 +303,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @throws Exception Thrown if the plugin slug is invalid.
 	 */
 	protected function get_checks_instance() {
-		if ( isset( $this->checks ) ) {
+		if ( null !== $this->checks ) {
 			return $this->checks;
 		}
 
@@ -321,7 +321,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @return array An array of check slugs to run.
 	 */
 	protected function get_check_slugs() {
-		if ( isset( $this->check_slugs ) ) {
+		if ( null !== $this->check_slugs ) {
 			return $this->check_slugs;
 		}
 
@@ -336,8 +336,8 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @return string The plugin basename to check.
 	 */
 	public function get_plugin_basename() {
-		if ( ! isset( $this->plugin_basename ) ) {
-			$plugin                = isset( $this->plugin ) ? $this->plugin : $this->get_plugin_param();
+		if ( null === $this->plugin_basename ) {
+			$plugin                = null !== $this->plugin ? $this->plugin : $this->get_plugin_param();
 			$this->plugin_basename = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin );
 		}
 

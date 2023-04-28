@@ -34,4 +34,15 @@ class Plugin_Context_Tests extends WP_UnitTestCase {
 	public function test_url_with_parameter() {
 		$this->assertSame( WP_PLUGIN_URL . '/' . $this->plugin_name . '/folder/file.css', $this->plugin_context->url( '/folder/file.css' ) );
 	}
+
+	public function test_location() {
+		$this->assertSame( WP_PLUGIN_DIR . '/' . $this->plugin_name . '/', $this->plugin_context->location() );
+	}
+
+	public function test_location_with_single_file_plugin() {
+		$single_file = WP_PLUGIN_DIR . '/single-file-plugin.php';
+		$context     = new Plugin_Context( $single_file );
+
+		$this->assertSame( $single_file, $context->location() );
+	}
 }

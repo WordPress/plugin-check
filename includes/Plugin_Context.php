@@ -67,4 +67,22 @@ class Plugin_Context {
 	public function url( $relative_path = '/' ) {
 		return plugin_dir_url( $this->main_file ) . ltrim( $relative_path, '/' );
 	}
+
+	/**
+	 * Returns the plugin location.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return string The plugin file if single file plugin. Or the plugin folder.
+	 */
+	public function location() {
+		$path = $this->path();
+
+		// Return the plugin path and basename if the path matches the plugin directory.
+		if ( WP_PLUGIN_DIR . '/' === $path ) {
+			return $path . $this->basename();
+		}
+
+		return $path;
+	}
 }

@@ -71,7 +71,7 @@ class Checks {
 		// Create an array of Check objects to run based on the check names passed.
 		$checks_to_run = array_filter(
 			$checks,
-			function( $check ) use ( $all_checks ) {
+			static function( Check $check ) use ( $all_checks ) {
 				return in_array( $check, $all_checks, true );
 			}
 		);
@@ -126,7 +126,7 @@ class Checks {
 	 * @return array An array map of check slugs to Check instances.
 	 */
 	public function get_checks() {
-		if ( ! isset( $this->checks ) ) {
+		if ( null === $this->checks ) {
 			// TODO: Add checks once implemented.
 			$checks = array(
 				'i18n_usage'            => new Checks\I18n_Usage_Check(),
