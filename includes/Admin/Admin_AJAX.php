@@ -235,8 +235,7 @@ class Admin_AJAX {
 		$runner = Plugin_Request_Utility::get_runner();
 
 		if ( is_null( $runner ) ) {
-			Plugin_Request_Utility::initialize_runner();
-			$runner = Plugin_Request_Utility::get_runner();
+			$runner = new AJAX_Runner();
 		}
 
 		// Make sure we are using the correct runner instance.
