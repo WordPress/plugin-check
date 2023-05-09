@@ -31,7 +31,7 @@ class Plugin_Request_Utility {
 	 * The universal runtime preparation cleanups if applied.
 	 *
 	 * @since n.e.x.t
-	 * @var callable
+	 * @var callable|null
 	 */
 	protected static $cleanup;
 

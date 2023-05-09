@@ -150,17 +150,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	public function prepare() {
 		if ( $this->has_runtime_check( $this->get_checks_to_run() ) ) {
 			$preparation = new Universal_Runtime_Preparation( $this->get_checks_instance()->context() );
-			$cleanup     = $preparation->prepare();
-
-			// Set the database prefix to use the demo tables.
-			global $wpdb, $table_prefix;
-			$old_prefix = $wpdb->set_prefix( $table_prefix . 'pc_' );
-
-			return function() use ( $old_prefix, $cleanup ) {
-				global $wpdb;
-				$wpdb->set_prefix( $old_prefix );
-				$cleanup();
-			};
+			return $preparation->prepare();
 		}
 
 		return function() {};
@@ -174,10 +164,18 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @return Check_Result An object containing all check results.
 	 */
 	public function run() {
+		global $wpdb, $table_prefix;
 		$checks       = $this->get_checks_to_run();
 		$preparations = $this->get_shared_preparations( $checks );
 		$cleanups     = array();
+		$old_prefix   = null;
 
+		// Set the correct test database prefix if required.
+		if ( $this->has_runtime_check( $checks ) ) {
+			$old_prefix = $wpdb->set_prefix( $table_prefix . 'pc_' );
+		}
+
+		// Prepare all shared preparations.
 		foreach ( $preparations as $preparation ) {
 			$instance   = new $preparation['class']( ...$preparation['args'] );
 			$cleanups[] = $instance->prepare();
@@ -189,6 +187,11 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			foreach ( $cleanups as $cleanup ) {
 				$cleanup();
 			}
+		}
+
+		// Restore the old prefix.
+		if ( $old_prefix ) {
+			$wpdb->set_prefix( $old_prefix );
 		}
 
 		return $results;

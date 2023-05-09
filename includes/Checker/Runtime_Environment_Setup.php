@@ -24,6 +24,9 @@ class Runtime_Environment_Setup {
 
 		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 
+		// Get the existing active plugins.
+		$active_plugins = get_option( 'active_plugins' );
+
 		// Set the new prefix.
 		$old_prefix = $wpdb->set_prefix( $table_prefix . 'pc_' );
 
@@ -35,6 +38,9 @@ class Runtime_Environment_Setup {
 				'demo@plugincheck.test',
 				false
 			);
+
+			// Activate the same plugins in the test environment.
+			update_option( 'active_plugins', $active_plugins );
 		}
 
 		// Restore the old prefix.
