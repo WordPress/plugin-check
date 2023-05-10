@@ -8,6 +8,7 @@
 namespace WordPress\Plugin_Check\Checker;
 
 use Exception;
+use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 
 /**
  * CLI Runner class.
@@ -32,15 +33,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 	 * @return bool Returns true if is an CLI request for the plugin check else false.
 	 */
 	public function is_plugin_check() {
-		if ( empty( $_SERVER['argv'] ) || 3 > count( $_SERVER['argv'] ) ) {
-			return false;
-		}
-
-		if (
-			'wp' === substr( $_SERVER['argv'][0], -2 ) &&
-			'plugin' === $_SERVER['argv'][1] &&
-			'check' === $_SERVER['argv'][2]
-		) {
+		if ( Plugin_Request_Utility::is_plugin_check() ) {
 			return true;
 		}
 
