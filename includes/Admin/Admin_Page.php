@@ -113,6 +113,8 @@ class Admin_Page {
 					'actionSetUpRuntimeEnvironment'   => Admin_AJAX::ACTION_SET_UP_ENVIRONMENT,
 					'actionRunChecks'                 => Admin_AJAX::ACTION_RUN_CHECKS,
 					'actionCleanUpRuntimeEnvironment' => Admin_AJAX::ACTION_CLEAN_UP_ENVIRONMENT,
+					'successMessage'                  => __( 'No errors found.', 'plugin-check' ),
+					'errorMessage'                    => __( 'Errors were found.', 'plugin-check' ),
 				)
 			),
 			'before'
