@@ -26,6 +26,19 @@ class PHPCS_Checks extends Check_Base {
 		);
 	}
 
+	function check_against_phpcs_review() {
+		if ( ! HAS_VENDOR ) {
+			return new Notice(
+				'phpcs_not_tested',
+				'PHP CS rulesets have not been tested, as the vendor directory is missing. Perhaps you need to run <code>`composer install`</code>.'
+			);
+		}
+
+		return $this->run_phpcs_standard(
+			__DIR__ . '/phpcs/plugin-check-needs-review.xml'
+		);
+	}
+
 	protected function run_phpcs_standard( string $standard, array $args = [] ) {
 		$phpcs = new PHPCS();
 		$phpcs->set_standard( $standard );

@@ -83,19 +83,6 @@
 			</property>
 		</properties>
 	</rule>
-	<!-- Hmm.. Can't have a second instance of this.. bad error message anyway
-	<rule ref="Generic.PHP.ForbiddenFunctions">
-		<type>warning</type>
-		<properties>
-			<property name="forbiddenFunctions" type="array">
-				<element key="error_reporting" value="null"/>
-				<element key="move_uploaded_file" value="null"/>
-				<element key="wp_create_user" value="null"/>
-				<element key="hex2bin" value="null"/>
-			</property>
-		</properties>
-	</rule>
-	-->
 
 	<!-- Check for use of deprecated WordPress classes, functions and function parameters. -->
 	<rule ref="WordPress.WP.DeprecatedClasses"/>
