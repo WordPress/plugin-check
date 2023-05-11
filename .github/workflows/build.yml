@@ -26,6 +26,12 @@ jobs:
             - name: Trim the repo down to just the plugin files
               run: |
                   rm -rf node_modules
+                  rm -rf tests
+                  rm -rf .github
+                  rm -f .*
+                  rm -f package.*
+                  rm -rf composer.*
+                  rm -f *.xml*
 
             - name: Add all the plugin files
               run: |
