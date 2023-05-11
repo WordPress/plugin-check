@@ -39,7 +39,7 @@ class Checks {
 	 *
 	 * @param string $plugin_main_file Absolute path to the plugin main file.
 	 */
-	public function __construct( $plugin_main_file ) {
+	final public function __construct( $plugin_main_file ) {
 		$this->check_context = new Check_Context( $plugin_main_file );
 	}
 
@@ -50,7 +50,7 @@ class Checks {
 	 *
 	 * @return Check_Context The plugin context that is being checked.
 	 */
-	public function context() {
+	final public function context() {
 		return $this->check_context;
 	}
 
@@ -64,7 +64,7 @@ class Checks {
 	 *
 	 * @throws Exception Thrown when check fails with critical error.
 	 */
-	public function run_checks( array $checks ) {
+	final public function run_checks( array $checks ) {
 		$result     = new Check_Result( $this->check_context );
 		$all_checks = $this->get_checks();
 
@@ -97,7 +97,7 @@ class Checks {
 	 *
 	 * @throws Exception Thrown when check fails with critical error.
 	 */
-	protected function run_check_with_result( Check $check, Check_Result $result ) {
+	private function run_check_with_result( Check $check, Check_Result $result ) {
 		// If $check implements Preparation interface, ensure the preparation and clean up is run.
 		if ( $check instanceof Preparation ) {
 			$cleanup = $check->prepare();
@@ -125,7 +125,7 @@ class Checks {
 	 *
 	 * @return array An array map of check slugs to Check instances.
 	 */
-	public function get_checks() {
+	final public function get_checks() {
 		if ( null === $this->checks ) {
 			// TODO: Add checks once implemented.
 			$checks = array(

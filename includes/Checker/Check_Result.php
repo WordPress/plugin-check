@@ -62,7 +62,7 @@ class Check_Result {
 	 *
 	 * @param Check_Context $check_context Check context instance for the plugin.
 	 */
-	public function __construct( Check_Context $check_context ) {
+	final public function __construct( Check_Context $check_context ) {
 		$this->check_context = $check_context;
 	}
 
@@ -73,7 +73,7 @@ class Check_Result {
 	 *
 	 * @return Check_Context Plugin context instance.
 	 */
-	public function plugin() {
+	final public function plugin() {
 		return $this->check_context;
 	}
 
@@ -93,7 +93,7 @@ class Check_Result {
 	 *     @type int    $column The column on which the message occurred. Default 0 (unknown column).
 	 * }
 	 */
-	public function add_message( $error, $message, $args = array() ) {
+	final public function add_message( $error, $message, $args = array() ) {
 		$defaults = array(
 			'code'   => '',
 			'file'   => '',
@@ -148,7 +148,7 @@ class Check_Result {
 	 *
 	 * @return array All errors with their data.
 	 */
-	public function get_errors() {
+	final public function get_errors() {
 		return $this->errors;
 	}
 
@@ -159,7 +159,7 @@ class Check_Result {
 	 *
 	 * @return array All warnings with their data.
 	 */
-	public function get_warnings() {
+	final public function get_warnings() {
 		return $this->warnings;
 	}
 
@@ -170,7 +170,7 @@ class Check_Result {
 	 *
 	 * @return int Number of errors found.
 	 */
-	public function get_error_count() {
+	final public function get_error_count() {
 		return $this->error_count;
 	}
 
@@ -181,7 +181,7 @@ class Check_Result {
 	 *
 	 * @return int Number of warnings found.
 	 */
-	public function get_warning_count() {
+	final public function get_warning_count() {
 		return $this->warning_count;
 	}
 }

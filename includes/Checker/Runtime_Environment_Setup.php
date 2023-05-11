@@ -19,7 +19,7 @@ class Runtime_Environment_Setup {
 	 *
 	 * @since n.e.x.t
 	 */
-	public function setup() {
+	final public function setup() {
 		global $wpdb, $table_prefix, $wp_filesystem;
 
 		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
@@ -65,7 +65,7 @@ class Runtime_Environment_Setup {
 	 *
 	 * @since n.e.x.t
 	 */
-	public function cleanup() {
+	final public function cleanup() {
 		global $wpdb, $table_prefix, $wp_filesystem;
 
 		require_once ABSPATH . '/wp-admin/includes/upgrade.php';

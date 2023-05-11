@@ -66,7 +66,7 @@ class Admin_AJAX {
 	 *
 	 * @since n.e.x.t
 	 */
-	public function add_hooks() {
+	final public function add_hooks() {
 		add_action( 'wp_ajax_' . self::ACTION_CLEAN_UP_ENVIRONMENT, array( $this, 'clean_up_environment' ) );
 		add_action( 'wp_ajax_' . self::ACTION_SET_UP_ENVIRONMENT, array( $this, 'set_up_environment' ) );
 		add_action( 'wp_ajax_' . self::ACTION_GET_CHECKS_TO_RUN, array( $this, 'get_checks_to_run' ) );
@@ -78,7 +78,7 @@ class Admin_AJAX {
 	 *
 	 * @since n.e.x.t
 	 */
-	public function get_nonce() {
+	final public function get_nonce() {
 		return wp_create_nonce( self::NONCE_KEY );
 	}
 
@@ -87,7 +87,7 @@ class Admin_AJAX {
 	 *
 	 * @since n.e.x.t
 	 */
-	public function set_up_environment() {
+	final public function set_up_environment() {
 		// Verify the nonce before continuing.
 		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) );
 
@@ -144,7 +144,7 @@ class Admin_AJAX {
 	 *
 	 * @since n.e.x.t
 	 */
-	public function clean_up_environment() {
+	final public function clean_up_environment() {
 		global $wpdb, $table_prefix;
 
 		// Verify the nonce before continuing.
@@ -181,7 +181,7 @@ class Admin_AJAX {
 	 *
 	 * @since n.e.x.t
 	 */
-	public function get_checks_to_run() {
+	final public function get_checks_to_run() {
 		// Verify the nonce before continuing.
 		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) );
 
@@ -232,7 +232,7 @@ class Admin_AJAX {
 	 *
 	 * @since n.e.x.t
 	 */
-	public function run_checks() {
+	final public function run_checks() {
 		// Verify the nonce before continuing.
 		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) );
 
@@ -286,7 +286,7 @@ class Admin_AJAX {
 	 * @param string $nonce The request nonce passed.
 	 * @return bool|WP_Error True if the nonce is valid. WP_Error if invalid.
 	 */
-	protected function verify_request( $nonce ) {
+	private function verify_request( $nonce ) {
 		if ( ! wp_verify_nonce( $nonce, self::NONCE_KEY ) ) {
 			return new WP_Error( 'invalid-nonce', __( 'Invalid nonce', 'plugin-check' ) );
 		}
@@ -306,7 +306,7 @@ class Admin_AJAX {
 	 * @param array $checks An array of Check instances.
 	 * @return bool True if a Runtime_Check exists in the array, false if not.
 	 */
-	protected function has_runtime_check( array $checks ) {
+	private function has_runtime_check( array $checks ) {
 		foreach ( $checks as $check ) {
 			if ( $check instanceof Runtime_Check ) {
 				return true;

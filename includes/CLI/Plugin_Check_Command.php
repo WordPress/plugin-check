@@ -47,7 +47,7 @@ class Plugin_Check_Command {
 	 *
 	 * @param Plugin_Context $plugin_context Plugin context.
 	 */
-	public function __construct( Plugin_Context $plugin_context ) {
+	final public function __construct( Plugin_Context $plugin_context ) {
 		$this->plugin_context = $plugin_context;
 	}
 
@@ -97,7 +97,7 @@ class Plugin_Check_Command {
 	 *
 	 * @throws Exception Throws exception.
 	 */
-	public function check( $args, $assoc_args ) {
+	final public function check( $args, $assoc_args ) {
 		// Get options based on the CLI arguments.
 		$options = $this->get_options( $assoc_args );
 
@@ -200,7 +200,7 @@ class Plugin_Check_Command {
 	 *
 	 * @throws WP_CLI\ExitException Show error if plugin not found.
 	 */
-	protected function get_options( $assoc_args ) {
+	private function get_options( $assoc_args ) {
 		$defaults = array(
 			'checks'          => '',
 			'format'          => 'table',
@@ -231,7 +231,7 @@ class Plugin_Check_Command {
 	 * @param array $assoc_args Associative arguments.
 	 * @return WP_CLI\Formatter The formatter instance.
 	 */
-	protected function get_formatter( $assoc_args ) {
+	private function get_formatter( $assoc_args ) {
 		$default_fields = array(
 			'line',
 			'column',
@@ -269,7 +269,7 @@ class Plugin_Check_Command {
 	 * @param array $file_warnings Warnings from a Check_Result, for a specific file.
 	 * @return array Combined file results.
 	 */
-	protected function flatten_file_results( $file_errors, $file_warnings ) {
+	private function flatten_file_results( $file_errors, $file_warnings ) {
 		$file_results = array();
 
 		foreach ( $file_errors as $line => $line_errors ) {
@@ -335,7 +335,7 @@ class Plugin_Check_Command {
 	 * @param string           $file_name    File name.
 	 * @param array            $file_results Results.
 	 */
-	protected function display_results( $formatter, $file_name, $file_results ) {
+	private function display_results( $formatter, $file_name, $file_results ) {
 		WP_CLI::line(
 			sprintf(
 				'FILE: %s',
@@ -357,7 +357,7 @@ class Plugin_Check_Command {
 	 * @param array $checks An array of Check instances.
 	 * @return bool True if a Runtime_Check exists in the array, false if not.
 	 */
-	protected function has_runtime_check( array $checks ) {
+	private function has_runtime_check( array $checks ) {
 		foreach ( $checks as $check ) {
 			if ( $check instanceof Runtime_Check ) {
 				return true;
