@@ -21,7 +21,7 @@ jobs:
                   npm install
                   npm run wp-env start
                   npm run wp-env run composer 'install --no-dev'
-                  curl -so readme-parser.php https://meta.svn.wordpress.org/sites/trunk/wordpress.org/public_html/wp-content/plugins/plugin-directory/readme/class-parser.php
+                  npm run setup:readme-parser
 
             - name: Trim the repo down to just the plugin files
               run: |

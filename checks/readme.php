@@ -63,7 +63,7 @@ class Readme extends Check_Base {
 				'readme_parser_warnings',
 				sprintf(
 					'The following readme parser warnings were detected: %s',
-					esc_html( implode( ', ', ),  $this->readme->warnings )
+					esc_html( implode( ', ',  array_keys( $this->readme->warnings ) ) )
 				)
 			);
 		}

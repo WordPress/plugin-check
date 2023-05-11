@@ -9,6 +9,7 @@
   "scripts": {
     "wp-env": "wp-env",
     "setup:tools": "npm run wp-env run composer install",
+    "setup:readme-parser": "npm run wp-env run cli 'curl -so wp-content/plugins/plugin-check/readme-parser.php https://meta.svn.wordpress.org/sites/trunk/wordpress.org/public_html/wp-content/plugins/plugin-directory/readme/class-parser.php'",
     "test": "npm run wp-env run phpunit 'phpunit -c /var/www/html/wp-content/plugins/plugin-check/phpunit.xml.dist'"
   },
   "repository": {
