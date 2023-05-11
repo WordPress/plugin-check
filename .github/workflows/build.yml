@@ -28,9 +28,9 @@ jobs:
                   rm -rf node_modules
                   rm -rf tests
                   rm -rf .github
-                  rm -f .*
+                  rm -f .gitignore .nvmrc .wp-env.json
                   rm -f package.*
-                  rm -rf composer.*
+                  rm -f composer.*
                   rm -f *.xml*
 
             - name: Add all the plugin files
