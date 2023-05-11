@@ -7,8 +7,6 @@
 		"platform": {
 			"php": "7.4"
 		},
-		"_comment": "Work around `test:watch` timeout, see https://github.com/spatie/phpunit-watcher/issues/63#issuecomment-545633709",
-		"process-timeout": 0,
 		"allow-plugins": {
 			"dealerdirect/phpcodesniffer-composer-installer": true
 		}
@@ -23,13 +21,7 @@
 	},
 	"require-dev": {
 		"phpunit/phpunit": "^7",
-		"spatie/phpunit-watcher": "^1.23"
-	},
-	"scripts": {
-		"test": [
-			"phpunit tests"
-		],
-		"test:watch": "phpunit-watcher watch < /dev/tty"
+		"yoast/phpunit-polyfills": "^1.0"
 	},
 	"autoload": {
 		"classmap": [
