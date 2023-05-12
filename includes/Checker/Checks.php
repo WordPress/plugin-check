@@ -25,13 +25,6 @@ class Checks {
 	protected $checks;
 
 	/**
-	 * Constructor.
-	 *
-	 * @since n.e.x.t
-	 */
-	public function __construct() { }
-
-	/**
 	 * Runs checks against the plugin.
 	 *
 	 * @since n.e.x.t
