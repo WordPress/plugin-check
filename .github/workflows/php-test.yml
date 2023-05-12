@@ -35,13 +35,16 @@ on:
       - reopened
       - synchronize
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   php-test:
     name: PHP
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: styfle/cancel-workflow-action@0.9.1
       - uses: actions/checkout@v3
       - uses: shivammathur/setup-php@v2
       - name: Setup Node.js (.nvmrc)
