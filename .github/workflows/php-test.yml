@@ -69,7 +69,7 @@ jobs:
             experimental: true
     env:
       WP_ENV_PHP_VERSION: ${{ matrix.php }}
-      WP_ENV_CORE: ${{ matrix.wordpress == 'latest' && '.' || matrix.wordpress == 'trunk' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', matrix.wordpress ) }}
+      WP_ENV_CORE: ${{ matrix.wordpress == 'trunk' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', matrix.wordpress ) }}
     steps:
       - uses: actions/checkout@v3
       - uses: shivammathur/setup-php@v2
