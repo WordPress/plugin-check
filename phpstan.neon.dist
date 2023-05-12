@@ -14,3 +14,4 @@ parameters:
     - vendor/squizlabs/php_codesniffer/autoload.php
   dynamicConstantNames:
     - WP_PLUGIN_CHECK_PLUGIN_DIR_URL
+  treatPhpDocTypesAsCertain: false
