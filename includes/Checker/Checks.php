@@ -25,47 +25,25 @@ class Checks {
 	protected $checks;
 
 	/**
-	 * Context for the plugin to check.
+	 * Constructor.
 	 *
 	 * @since n.e.x.t
-	 * @var Check_Context
 	 */
-	protected $check_context;
-
-	/**
-	 * Sets the main context and the main file of the plugin to check.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @param string $plugin_main_file Absolute path to the plugin main file.
-	 */
-	public function __construct( $plugin_main_file ) {
-		$this->check_context = new Check_Context( $plugin_main_file );
-	}
-
-	/**
-	 * Returns the Check Context.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @return Check_Context The plugin context that is being checked.
-	 */
-	public function context() {
-		return $this->check_context;
-	}
+	public function __construct() { }
 
 	/**
 	 * Runs checks against the plugin.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param array $checks An array of Check objects to run.
+	 * @param Check_Context $context The check context for the plugin to be checked.
+	 * @param array         $checks  An array of Check objects to run.
 	 * @return Check_Result Object containing all check results.
 	 *
 	 * @throws Exception Thrown when check fails with critical error.
 	 */
-	public function run_checks( array $checks ) {
-		$result     = new Check_Result( $this->check_context );
+	public function run_checks( Check_Context $context, array $checks ) {
+		$result     = new Check_Result( $context );
 		$all_checks = $this->get_checks();
 
 		// Create an array of Check objects to run based on the check names passed.
