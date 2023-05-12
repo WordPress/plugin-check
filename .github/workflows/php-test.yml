@@ -41,7 +41,7 @@ concurrency:
 
 jobs:
   php-test:
-    name: PHP ${{ matrix.php }} - WP ${{ matrix.wp }}${{ matrix.experimental && ' (experimental)' || '' }}${{ matrix.coverage && ' (with coverage)' || '' }}${{ matrix.random && ' (in random order)' || '' }}
+    name: PHP ${{ matrix.php }} - WP ${{ matrix.wordpress }}${{ matrix.experimental && ' (experimental)' || '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -56,14 +56,13 @@ jobs:
         - '7.4'
         - '8.0'
         - '8.1'
+        - '8.2'
         wordpress: [ 'latest' ]
         include:
           - php: '8.0'
             wordpress: '6.0'
           - php: '8.0'
             wordpress: '6.1'
-          - php: '8.1'
-            wordpress: 'trunk'
           - php: '8.2'
             wordpress: 'trunk'
             experimental: true
