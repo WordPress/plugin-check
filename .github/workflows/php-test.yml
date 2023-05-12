@@ -41,12 +41,40 @@ concurrency:
 
 jobs:
   php-test:
-    name: PHP
+    name: PHP ${{ matrix.php }} - WP ${{ matrix.wp }}${{ matrix.experimental && ' (experimental)' || '' }}${{ matrix.coverage && ' (with coverage)' || '' }}${{ matrix.random && ' (in random order)' || '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      fail-fast: true
+      matrix:
+        php:
+        - '5.6'
+        - '7.0'
+        - '7.1'
+        - '7.2'
+        - '7.3'
+        - '7.4'
+        - '8.0'
+        - '8.1'
+        wordpress: [ 'latest' ]
+        include:
+          - php: '8.0'
+            wordpress: '6.0'
+          - php: '8.0'
+            wordpress: '6.1'
+          - php: '8.1'
+            wordpress: 'trunk'
+          - php: '8.2'
+            wordpress: 'trunk'
+            experimental: true
+      env:
+        WP_ENV_PHP_VERSION: ${{ matrix.php }}
+        WP_ENV_CORE: ${{ matrix.wordpress == 'latest' && '.' || matrix.wordpress == 'trunk' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', matrix.wordpress ) }}
     steps:
       - uses: actions/checkout@v3
       - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
       - name: Setup Node.js (.nvmrc)
         uses: actions/setup-node@v3
         with:
