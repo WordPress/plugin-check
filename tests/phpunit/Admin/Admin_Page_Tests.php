@@ -28,7 +28,7 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_add_and_initialize_page() {
-		$this->markTestSkipped('Requires investigation due to failure on WordPress 6.0');
+		$this->markTestSkipped( 'Requires investigation due to failure on WordPress 6.0' );
 
 		global $_parent_pages;
 
