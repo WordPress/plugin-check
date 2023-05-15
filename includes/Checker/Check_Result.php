@@ -125,7 +125,7 @@ class Check_Result {
 				$this->errors[ $file ][ $line ][ $column ] = array();
 			}
 			$this->errors[ $file ][ $line ][ $column ][] = $data;
-			$this->error_count++;
+			++$this->error_count;
 		} else {
 			if ( ! isset( $this->warnings[ $file ] ) ) {
 				$this->warnings[ $file ] = array();
@@ -137,7 +137,7 @@ class Check_Result {
 				$this->warnings[ $file ][ $line ][ $column ] = array();
 			}
 			$this->warnings[ $file ][ $line ][ $column ][] = $data;
-			$this->warning_count++;
+			++$this->warning_count;
 		}
 	}
 
