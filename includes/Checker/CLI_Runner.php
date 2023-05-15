@@ -31,7 +31,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 	 *
 	 * @return bool Returns true if is an CLI request for the plugin check else false.
 	 */
-	static function is_plugin_check() {
+	public static function is_plugin_check() {
 		if ( empty( $_SERVER['argv'] ) || 3 > count( $_SERVER['argv'] ) ) {
 			return false;
 		}

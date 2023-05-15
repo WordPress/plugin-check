@@ -31,7 +31,7 @@ class AJAX_Runner extends Abstract_Check_Runner {
 	 *
 	 * @return bool Returns true if is an AJAX request for the plugin check else false.
 	 */
-	static function is_plugin_check() {
+	public static function is_plugin_check() {
 		if ( ! wp_doing_ajax() ) {
 			return false;
 		}

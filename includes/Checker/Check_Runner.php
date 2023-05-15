@@ -23,7 +23,7 @@ interface Check_Runner {
 	 *
 	 * @return boolean Returns true if the check is for plugin else false.
 	 */
-	static function is_plugin_check();
+	public static function is_plugin_check();
 
 	/**
 	 * Prepares the environment for running the requested checks.
