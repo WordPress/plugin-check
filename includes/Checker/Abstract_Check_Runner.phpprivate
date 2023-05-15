@@ -353,7 +353,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @return Check_Context The check context for the plugin file.
 	 */
-	protected function get_check_context() {
+	private function get_check_context() {
 		return new Check_Context( WP_PLUGIN_DIR . '/' . $this->get_plugin_basename() );
 	}
 }
