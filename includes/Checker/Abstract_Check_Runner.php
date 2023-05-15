@@ -310,8 +310,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			return $this->checks;
 		}
 
-		$plugin_basename = $this->get_plugin_basename();
-		$this->checks    = new Checks();
+		$this->checks = new Checks();
 
 		return $this->checks;
 	}

@@ -16,7 +16,7 @@ class Checks_Tests extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 
-		$this->checks  = new Checks( 'test-plugin/test-plugin.php' );
+		$this->checks  = new Checks();
 		$this->context = new Check_Context( 'test-plugin/test-plugin.php' );
 	}
 
