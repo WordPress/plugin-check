@@ -19,6 +19,6 @@
     "format-php": "wp-env run composer run-script format",
     "pretest-php": "wp-env run composer 'install --no-interaction'",
     "test-php": "wp-env run phpunit 'phpunit -c /var/www/html/wp-content/plugins/plugin-check/phpunit.xml.dist --verbose'",
-    "test-php-multisite": "wp-env run phpunit 'WP_MULTISITE=1 phpunit -c /var/www/html/wp-content/plugins/plugin-check/tests/multisite.xml --verbose'"
+    "test-php-multisite": "wp-env run phpunit 'WP_MULTISITE=1 phpunit -c /var/www/html/wp-content/plugins/plugin-check/tests/phpunit/multisite.xml --verbose'"
   }
 }
