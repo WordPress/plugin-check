@@ -8,9 +8,9 @@
  * @since n.e.x.t
  */
 
+use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Plugin_Context;
 use WordPress\Plugin_Check\CLI\Plugin_Check_Command;
-use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 
 if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) {
 	return;
@@ -45,14 +45,12 @@ WP_CLI::add_command( 'plugin', $plugin_command );
 WP_CLI::add_hook(
 	'before_wp_load',
 	function() {
-		if ( Plugin_Request_Utility::is_plugin_check() ) {
+		if ( CLI_Runner::is_plugin_check() ) {
 			if ( ! file_exists( ABSPATH . 'wp-content/object-cache.php' ) ) {
 				if ( ! copy(  __DIR__ . '/object-cache.copy.php', ABSPATH . 'wp-content/object-cache.php' ) ) {
 					WP_CLI::error( 'Unable to copy object-cache.php file.' );
 				}
 			}
-		} else {
-			return;
 		}
 	}
 );

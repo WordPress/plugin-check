@@ -134,28 +134,4 @@ class Plugin_Request_Utility {
 
 		static::$runner = null;
 	}
-
-	/**
-	 * Checks if the current request is a CLI request for the Plugin Checker.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @return bool Returns true if is a CLI request for the plugin check else false.
-	 */
-	public static function is_plugin_check() {
-		if ( empty( $_SERVER['argv'] ) || 3 > count( $_SERVER['argv'] ) ) {
-			return false;
-		}
-
-		if (
-			'wp' === $_SERVER['argv'][0] &&
-			'plugin' === $_SERVER['argv'][1] &&
-			'check' === $_SERVER['argv'][2]
-		) {
-			return true;
-		}
-
-		return false;
-	}
-
 }

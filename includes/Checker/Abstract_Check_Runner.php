@@ -65,7 +65,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @return bool Returns true if the check is for plugin else false.
 	 */
-	abstract public function is_plugin_check();
+	abstract static function is_plugin_check();
 
 	/**
 	 * Returns the plugin parameter based on the request.
