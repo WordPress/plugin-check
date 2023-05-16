@@ -19,7 +19,7 @@ use WP_Error;
  *
  * @since n.e.x.t
  */
-class Admin_AJAX {
+final class Admin_AJAX {
 
 	/**
 	 * Nonce key.
@@ -286,7 +286,7 @@ class Admin_AJAX {
 	 * @param string $nonce The request nonce passed.
 	 * @return bool|WP_Error True if the nonce is valid. WP_Error if invalid.
 	 */
-	protected function verify_request( $nonce ) {
+	private function verify_request( $nonce ) {
 		if ( ! wp_verify_nonce( $nonce, self::NONCE_KEY ) ) {
 			return new WP_Error( 'invalid-nonce', __( 'Invalid nonce', 'plugin-check' ) );
 		}
@@ -306,7 +306,7 @@ class Admin_AJAX {
 	 * @param array $checks An array of Check instances.
 	 * @return bool True if a Runtime_Check exists in the array, false if not.
 	 */
-	protected function has_runtime_check( array $checks ) {
+	private function has_runtime_check( array $checks ) {
 		foreach ( $checks as $check ) {
 			if ( $check instanceof Runtime_Check ) {
 				return true;
