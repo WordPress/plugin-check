@@ -172,14 +172,41 @@
 	 * @param {Object} data The response data.
 	 */
 	async function runChecks( data ) {
+		let isSuccessMessage = true;
+		let messageClass = '';
+		let messageText = '';
 		for ( let i = 0; i < data.checks.length; i++ ) {
 			try {
 				const results = await runCheck( data.plugin, data.checks[ i ] );
+				const errorsLength = Object.values( results.errors ).length;
+				const warningsLength = Object.values( results.errors ).length;
+				if (
+					isSuccessMessage &&
+					( errorsLength > 0 || warningsLength > 0 )
+				) {
+					isSuccessMessage = false;
+				}
 				renderResults( results );
 			} catch ( e ) {
 				// Ignore for now.
 			}
 		}
+
+		if ( isSuccessMessage ) {
+			messageClass = 'notice-success';
+			messageText = pluginCheck.successMessage;
+		} else {
+			messageClass = 'notice-error';
+			messageText = pluginCheck.errorMessage;
+		}
+
+		resultsContainer.innerHTML += renderTemplate(
+			'plugin-check-results-complete',
+			{
+				class: messageClass,
+				message: messageText,
+			}
+		);
 	}
 
 	/**
@@ -252,10 +279,8 @@
 	 */
 	function renderResults( results ) {
 		const { errors, warnings } = results;
-		let errorWarningMessage = false;
 		// Render errors and warnings for files.
 		for ( const file in errors ) {
-			errorWarningMessage = true;
 			if ( warnings[ file ] ) {
 				renderFileResults( file, errors[ file ], warnings[ file ] );
 				delete warnings[ file ];
@@ -266,27 +291,7 @@
 
 		// Render remaining files with only warnings.
 		for ( const file in warnings ) {
-			errorWarningMessage = true;
 			renderFileResults( file, [], warnings[ file ] );
-		}
-
-		resultsContainer.innerHTML += renderTemplate(
-			'plugin-check-results-complete'
-		);
-
-		const resultsMessage = document.getElementById(
-			'plugin-check__message'
-		);
-		if ( resultsMessage ) {
-			const resultsMessageChild = resultsMessage.querySelector( 'p' );
-			if ( errorWarningMessage ) {
-				resultsMessage.classList.remove( 'notice-success' );
-				resultsMessage.classList.add( 'notice-error' );
-				resultsMessageChild.innerHTML += ' ' + pluginCheck.errorMessage;
-			} else {
-				resultsMessageChild.innerHTML +=
-					' ' + pluginCheck.successMessage;
-			}
 		}
 	}
 

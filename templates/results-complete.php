@@ -1,3 +1,3 @@
-<div id="plugin-check__message" class="notice notice-success">
-    <p><?php esc_html_e( 'Checks complete.', 'plugin-check' ); ?></p>
+<div class="notice {{ data.class }}">
+    <p><?php esc_html_e( 'Checks complete.', 'plugin-check' ); ?> {{ data.message }}</p>
 </div>
