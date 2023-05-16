@@ -12,7 +12,7 @@ namespace WordPress\Plugin_Check\Admin;
  *
  * @since n.e.x.t
  */
-class Admin_Page {
+final class Admin_Page {
 
 	/**
 	 * Admin AJAX class instance.

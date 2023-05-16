@@ -14,7 +14,7 @@ use Exception;
  *
  * @since n.e.x.t
  */
-class Checks {
+final class Checks {
 
 	/**
 	 * Array of all available Checks.
@@ -68,7 +68,7 @@ class Checks {
 	 *
 	 * @throws Exception Thrown when check fails with critical error.
 	 */
-	protected function run_check_with_result( Check $check, Check_Result $result ) {
+	private function run_check_with_result( Check $check, Check_Result $result ) {
 		// If $check implements Preparation interface, ensure the preparation and clean up is run.
 		if ( $check instanceof Preparation ) {
 			$cleanup = $check->prepare();

@@ -7,6 +7,9 @@
 
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\CLI_Runner;
+use WordPress\Plugin_Check\Test_Data\Empty_Check;
+use WordPress\Plugin_Check\Test_Data\Error_Check;
+use WordPress\Plugin_Check\Test_Data\Runtime_Check;
 
 class CLI_Runner_Tests extends WP_UnitTestCase {
 
@@ -53,7 +56,7 @@ class CLI_Runner_Tests extends WP_UnitTestCase {
 			'wp_plugin_check_checks',
 			function( $checks ) {
 				return array(
-					'runtime-check' => new WordPress\Plugin_Check\Test_Data\Runtime_Check(),
+					'runtime-check' => new Runtime_Check(),
 				);
 			}
 		);
@@ -93,7 +96,7 @@ class CLI_Runner_Tests extends WP_UnitTestCase {
 			'wp_plugin_check_checks',
 			function( $checks ) {
 				return array(
-					'empty-check' => new WordPress\Plugin_Check\Test_Data\Empty_Check(),
+					'empty-check' => new Empty_Check(),
 				);
 			}
 		);
@@ -155,7 +158,7 @@ class CLI_Runner_Tests extends WP_UnitTestCase {
 			'wp_plugin_check_checks',
 			function( $checks ) {
 				return array(
-					'error-check' => new WordPress\Plugin_Check\Test_Data\Error_Check(),
+					'error-check' => new Error_Check(),
 				);
 			}
 		);

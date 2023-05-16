@@ -8,6 +8,8 @@
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Checks;
+use WordPress\Plugin_Check\Test_Data\Empty_Check;
+use WordPress\Plugin_Check\Test_Data\Error_Check;
 
 class Checks_Tests extends WP_UnitTestCase {
 
@@ -22,8 +24,8 @@ class Checks_Tests extends WP_UnitTestCase {
 
 	public function test_get_checks_returns_array_of_expected_checks() {
 		$expected = array(
-			new WordPress\Plugin_Check\Test_Data\Empty_Check(),
-			new WordPress\Plugin_Check\Test_Data\Error_Check(),
+			new Empty_Check(),
+			new Error_Check(),
 		);
 
 		add_filter(

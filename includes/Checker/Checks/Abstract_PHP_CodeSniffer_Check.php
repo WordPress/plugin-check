@@ -57,7 +57,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	 * @throws Exception Thrown when the check fails with a critical error (unrelated to any errors detected as part of
 	 *                   the check).
 	 */
-	public function run( Check_Result $result ) {
+	final public function run( Check_Result $result ) {
 		// Include the PHPCS autoloader.
 		$autoloader = WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/vendor/squizlabs/php_codesniffer/autoload.php';
 

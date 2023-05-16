@@ -10,8 +10,6 @@ parameters:
     - tests/phpstan/stubs/wp-cli.php
     - tests/phpstan/stubs/exitexception.php
     - tests/phpstan/stubs/formatter.php
-    - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
-    - vendor/squizlabs/php_codesniffer/autoload.php
   dynamicConstantNames:
     - WP_PLUGIN_CHECK_PLUGIN_DIR_URL
   treatPhpDocTypesAsCertain: false

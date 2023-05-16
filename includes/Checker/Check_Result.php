@@ -13,7 +13,7 @@ namespace WordPress\Plugin_Check\Checker;
  *
  * @since n.e.x.t
  */
-class Check_Result {
+final class Check_Result {
 
 	/**
 	 * Context for the plugin to check.
