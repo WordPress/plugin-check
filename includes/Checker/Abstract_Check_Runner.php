@@ -90,7 +90,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @since n.e.x.t
 	 */
-	public function __construct() {
+	final public function __construct() {
 		$this->initialized_early = ! did_action( 'muplugins_loaded' );
 	}
 
@@ -103,7 +103,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @throws Exception Thrown if the checks do not match those in the original request.
 	 */
-	public function set_check_slugs( array $check_slugs ) {
+	final public function set_check_slugs( array $check_slugs ) {
 		if ( $this->initialized_early ) {
 			// Compare the check slugs to see if there was an error.
 			if ( $check_slugs !== $this->get_check_slugs_param() ) {
@@ -125,7 +125,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @throws Exception Thrown if the plugin set does not match the original request parameter.
 	 */
-	public function set_plugin( $plugin ) {
+	final public function set_plugin( $plugin ) {
 		if ( $this->initialized_early ) {
 			// Compare the plugin parameter to see if there was an error.
 			if ( $plugin !== $this->get_plugin_param() ) {
@@ -147,7 +147,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @throws Exception Thrown exception when preparation fails.
 	 */
-	public function prepare() {
+	final public function prepare() {
 		if ( $this->has_runtime_check( $this->get_checks_to_run() ) ) {
 			$preparation = new Universal_Runtime_Preparation( $this->get_check_context() );
 			return $preparation->prepare();
@@ -163,7 +163,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @return Check_Result An object containing all check results.
 	 */
-	public function run() {
+	final public function run() {
 		global $wpdb, $table_prefix;
 		$checks       = $this->get_checks_to_run();
 		$preparations = $this->get_shared_preparations( $checks );
@@ -205,7 +205,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @param array $checks An array of check instances to run.
 	 * @return bool Returns true if one or more checks is a runtime check.
 	 */
-	protected function has_runtime_check( array $checks ) {
+	private function has_runtime_check( array $checks ) {
 		foreach ( $checks as $check ) {
 			if ( $check instanceof Runtime_Check ) {
 				return true;
@@ -257,7 +257,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @throws Exception Thrown exception when a runtime check is requested and the plugin inactive.
 	 */
-	public function get_checks_to_run() {
+	final public function get_checks_to_run() {
 		$check_slugs   = $this->get_check_slugs();
 		$all_checks    = $this->get_checks_instance()->get_checks();
 		$plugin_active = is_plugin_active( $this->get_plugin_basename() );
@@ -322,7 +322,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @return array An array of check slugs to run.
 	 */
-	protected function get_check_slugs() {
+	private function get_check_slugs() {
 		if ( null !== $this->check_slugs ) {
 			return $this->check_slugs;
 		}
@@ -337,7 +337,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @return string The plugin basename to check.
 	 */
-	public function get_plugin_basename() {
+	final public function get_plugin_basename() {
 		if ( null === $this->plugin_basename ) {
 			$plugin                = null !== $this->plugin ? $this->plugin : $this->get_plugin_param();
 			$this->plugin_basename = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin );
