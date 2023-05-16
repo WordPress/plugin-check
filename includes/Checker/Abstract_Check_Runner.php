@@ -65,7 +65,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @return bool Returns true if the check is for plugin else false.
 	 */
-	abstract public function is_plugin_check();
+	abstract public static function is_plugin_check();
 
 	/**
 	 * Returns the plugin parameter based on the request.
@@ -149,7 +149,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 */
 	final public function prepare() {
 		if ( $this->has_runtime_check( $this->get_checks_to_run() ) ) {
-			$preparation = new Universal_Runtime_Preparation( $this->get_checks_instance()->context() );
+			$preparation = new Universal_Runtime_Preparation( $this->get_check_context() );
 			return $preparation->prepare();
 		}
 
@@ -181,7 +181,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			$cleanups[] = $instance->prepare();
 		}
 
-		$results = $this->get_checks_instance()->run_checks( $checks );
+		$results = $this->get_checks_instance()->run_checks( $this->get_check_context(), $checks );
 
 		if ( ! empty( $cleanups ) ) {
 			foreach ( $cleanups as $cleanup ) {
@@ -310,8 +310,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			return $this->checks;
 		}
 
-		$plugin_basename = $this->get_plugin_basename();
-		$this->checks    = new Checks( WP_PLUGIN_DIR . '/' . $plugin_basename );
+		$this->checks = new Checks();
 
 		return $this->checks;
 	}
@@ -345,5 +344,15 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		}
 
 		return $this->plugin_basename;
+	}
+
+	/** Gets the Check_Context for the plugin.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return Check_Context The check context for the plugin file.
+	 */
+	private function get_check_context() {
+		return new Check_Context( WP_PLUGIN_DIR . '/' . $this->get_plugin_basename() );
 	}
 }
