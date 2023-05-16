@@ -29,32 +29,32 @@ on:
       - reopened
       - synchronize
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   php-lint:
     name: PHP
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: styfle/cancel-workflow-action@0.9.1
       - uses: actions/checkout@v3
+
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: '7.4'
-      - name: Get Composer Cache Directory
-        id: composer-cache
-        run: |
-          echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v3
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
+          php-version: '8.0'
+
       - name: Validate Composer configuration
         run: composer validate
-      - name: Composer Install
-        run: composer install --no-interaction --no-progress
+
+      - name: Install PHP dependencies
+        uses: ramsey/composer-install@83af392bf5f031813d25e6fe4cd626cdba9a2df6
+        with:
+          composer-options: '--prefer-dist --no-progress --no-interaction'
+
       - name: PHP Lint
         run: composer lint
+
       - name: PHPStan
         run: composer phpstan
