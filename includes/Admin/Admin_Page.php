@@ -12,7 +12,7 @@ namespace WordPress\Plugin_Check\Admin;
  *
  * @since n.e.x.t
  */
-class Admin_Page {
+final class Admin_Page {
 
 	/**
 	 * Admin AJAX class instance.
@@ -37,7 +37,7 @@ class Admin_Page {
 	 *
 	 * @param Admin_AJAX $admin_ajax Instance of Admin_AJAX.
 	 */
-	final public function __construct( Admin_AJAX $admin_ajax ) {
+	public function __construct( Admin_AJAX $admin_ajax ) {
 		$this->admin_ajax = $admin_ajax;
 	}
 
@@ -46,7 +46,7 @@ class Admin_Page {
 	 *
 	 * @since n.e.x.t
 	 */
-	final public function add_hooks() {
+	public function add_hooks() {
 		add_action( 'admin_menu', array( $this, 'add_and_initialize_page' ) );
 		add_filter( 'plugin_action_links', array( $this, 'filter_plugin_action_links' ), 10, 2 );
 
@@ -58,7 +58,7 @@ class Admin_Page {
 	 *
 	 * @since n.e.x.t
 	 */
-	final public function add_page() {
+	public function add_page() {
 		$this->hook_suffix = add_management_page(
 			__( 'Plugin Check', 'plugin-check' ),
 			__( 'Plugin Check', 'plugin-check' ),
@@ -73,7 +73,7 @@ class Admin_Page {
 	 *
 	 * @since n.e.x.t
 	 */
-	final public function add_and_initialize_page() {
+	public function add_and_initialize_page() {
 		$this->add_page();
 		add_action( 'load-' . $this->get_hook_suffix(), array( $this, 'initialize_page' ) );
 	}
@@ -83,7 +83,7 @@ class Admin_Page {
 	 *
 	 * @since n.e.x.t
 	 */
-	final public function initialize_page() {
+	public function initialize_page() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'admin_footer', array( $this, 'admin_footer' ) );
 	}
@@ -93,7 +93,7 @@ class Admin_Page {
 	 *
 	 * @since n.e.x.t
 	 */
-	final public function enqueue_scripts() {
+	public function enqueue_scripts() {
 		wp_enqueue_script(
 			'plugin-check-admin',
 			WP_PLUGIN_CHECK_PLUGIN_DIR_URL . 'assets/js/plugin-check-admin.js',
@@ -147,7 +147,7 @@ class Admin_Page {
 	 *
 	 * @since n.e.x.t
 	 */
-	final public function render_page() {
+	public function render_page() {
 		$available_plugins = $this->get_available_plugins();
 
 		$selected_plugin_basename = filter_input( INPUT_GET, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
@@ -164,7 +164,7 @@ class Admin_Page {
 	 * @param string $plugin_file Plugin main file.
 	 * @return array The modified list of actions.
 	 */
-	final public function filter_plugin_action_links( $actions, $plugin_file ) {
+	public function filter_plugin_action_links( $actions, $plugin_file ) {
 		if ( current_user_can( 'activate_plugins' ) ) {
 			$actions[] = sprintf(
 				'<a href="%1$s">%2$s</a>',
@@ -181,7 +181,7 @@ class Admin_Page {
 	 *
 	 * @since n.e.x.t
 	 */
-	final public function admin_footer() {
+	public function admin_footer() {
 		ob_start();
 		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/results-table.php';
 		$results_table_template = ob_get_clean();
@@ -223,7 +223,7 @@ class Admin_Page {
 	 *
 	 * @return string Hook suffix, or empty string if admin page was not added.
 	 */
-	final public function get_hook_suffix() {
+	public function get_hook_suffix() {
 		return $this->hook_suffix;
 	}
 }

@@ -18,7 +18,7 @@ use WP_CLI;
 /**
  * Plugin check command.
  */
-class Plugin_Check_Command {
+final class Plugin_Check_Command {
 
 	/**
 	 * Plugin context.
@@ -47,7 +47,7 @@ class Plugin_Check_Command {
 	 *
 	 * @param Plugin_Context $plugin_context Plugin context.
 	 */
-	final public function __construct( Plugin_Context $plugin_context ) {
+	public function __construct( Plugin_Context $plugin_context ) {
 		$this->plugin_context = $plugin_context;
 	}
 
@@ -97,7 +97,7 @@ class Plugin_Check_Command {
 	 *
 	 * @throws Exception Throws exception.
 	 */
-	final public function check( $args, $assoc_args ) {
+	public function check( $args, $assoc_args ) {
 		// Get options based on the CLI arguments.
 		$options = $this->get_options( $assoc_args );
 

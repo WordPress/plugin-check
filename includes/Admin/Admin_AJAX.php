@@ -19,7 +19,7 @@ use WP_Error;
  *
  * @since n.e.x.t
  */
-class Admin_AJAX {
+final class Admin_AJAX {
 
 	/**
 	 * Nonce key.
@@ -66,7 +66,7 @@ class Admin_AJAX {
 	 *
 	 * @since n.e.x.t
 	 */
-	final public function add_hooks() {
+	public function add_hooks() {
 		add_action( 'wp_ajax_' . self::ACTION_CLEAN_UP_ENVIRONMENT, array( $this, 'clean_up_environment' ) );
 		add_action( 'wp_ajax_' . self::ACTION_SET_UP_ENVIRONMENT, array( $this, 'set_up_environment' ) );
 		add_action( 'wp_ajax_' . self::ACTION_GET_CHECKS_TO_RUN, array( $this, 'get_checks_to_run' ) );
@@ -78,7 +78,7 @@ class Admin_AJAX {
 	 *
 	 * @since n.e.x.t
 	 */
-	final public function get_nonce() {
+	public function get_nonce() {
 		return wp_create_nonce( self::NONCE_KEY );
 	}
 
@@ -87,7 +87,7 @@ class Admin_AJAX {
 	 *
 	 * @since n.e.x.t
 	 */
-	final public function set_up_environment() {
+	public function set_up_environment() {
 		// Verify the nonce before continuing.
 		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) );
 
@@ -144,7 +144,7 @@ class Admin_AJAX {
 	 *
 	 * @since n.e.x.t
 	 */
-	final public function clean_up_environment() {
+	public function clean_up_environment() {
 		global $wpdb, $table_prefix;
 
 		// Verify the nonce before continuing.
@@ -181,7 +181,7 @@ class Admin_AJAX {
 	 *
 	 * @since n.e.x.t
 	 */
-	final public function get_checks_to_run() {
+	public function get_checks_to_run() {
 		// Verify the nonce before continuing.
 		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) );
 
@@ -232,7 +232,7 @@ class Admin_AJAX {
 	 *
 	 * @since n.e.x.t
 	 */
-	final public function run_checks() {
+	public function run_checks() {
 		// Verify the nonce before continuing.
 		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) );
 

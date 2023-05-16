@@ -12,14 +12,14 @@ namespace WordPress\Plugin_Check\Checker;
  *
  * @since n.e.x.t
  */
-class Runtime_Environment_Setup {
+final class Runtime_Environment_Setup {
 
 	/**
 	 * Sets up the WordPress environment for runtime checks
 	 *
 	 * @since n.e.x.t
 	 */
-	final public function setup() {
+	public function setup() {
 		global $wpdb, $table_prefix, $wp_filesystem;
 
 		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
@@ -65,7 +65,7 @@ class Runtime_Environment_Setup {
 	 *
 	 * @since n.e.x.t
 	 */
-	final public function cleanup() {
+	public function cleanup() {
 		global $wpdb, $table_prefix, $wp_filesystem;
 
 		require_once ABSPATH . '/wp-admin/includes/upgrade.php';

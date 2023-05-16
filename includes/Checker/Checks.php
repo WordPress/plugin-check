@@ -14,7 +14,7 @@ use Exception;
  *
  * @since n.e.x.t
  */
-class Checks {
+final class Checks {
 
 	/**
 	 * Array of all available Checks.
@@ -35,7 +35,7 @@ class Checks {
 	 *
 	 * @throws Exception Thrown when check fails with critical error.
 	 */
-	final public function run_checks( Check_Context $context, array $checks ) {
+	public function run_checks( Check_Context $context, array $checks ) {
 		$result     = new Check_Result( $context );
 		$all_checks = $this->get_checks();
 
@@ -96,7 +96,7 @@ class Checks {
 	 *
 	 * @return array An array map of check slugs to Check instances.
 	 */
-	final public function get_checks() {
+	public function get_checks() {
 		if ( null === $this->checks ) {
 			// TODO: Add checks once implemented.
 			$checks = array(
