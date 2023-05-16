@@ -71,19 +71,25 @@ jobs:
       WP_ENV_CORE: ${{ matrix.wordpress == 'trunk' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', matrix.wordpress ) }}
     steps:
       - uses: actions/checkout@v3
+
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
+ 
       - name: Setup Node.js (.nvmrc)
         uses: actions/setup-node@v3
         with:
           node-version-file: '.nvmrc'
           cache: npm
+
       - name: npm install
         run: npm ci
+
       - name: Install WordPress
         run: npm run wp-env start
+
       - name: Running php unit tests
         run: npm run test-php
+
       - name: Running multisite unit tests
         run: npm run test-php-multisite
