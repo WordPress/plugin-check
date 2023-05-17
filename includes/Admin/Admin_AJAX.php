@@ -271,9 +271,11 @@ final class Admin_AJAX {
 
 		wp_send_json_success(
 			array(
-				'message'  => __( 'Checks run successfully', 'plugin-check' ),
-				'errors'   => $results->get_errors(),
-				'warnings' => $results->get_warnings(),
+				'message'      => __( 'Checks run successfully', 'plugin-check' ),
+				'errors'       => $results->get_errors(),
+				'errorCount'   => count( $results->get_errors() ),
+				'warnings'     => $results->get_warnings(),
+				'warningCount' => count( $results->get_warnings() ),
 			)
 		);
 	}
