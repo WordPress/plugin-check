@@ -7,6 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\AJAX_Runner;
 use WordPress\Plugin_Check\Checker\CLI_Runner;
+use WordPress\Plugin_Check\Test_Data\Runtime_Check;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 
 class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
@@ -86,7 +87,7 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 			'wp_plugin_check_checks',
 			function( $checks ) {
 				return array(
-					'runtime-check' => new WordPress\Plugin_Check\Test_Data\Runtime_Check(),
+					'runtime-check' => new Runtime_Check(),
 				);
 			}
 		);

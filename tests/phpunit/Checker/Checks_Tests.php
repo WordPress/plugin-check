@@ -8,6 +8,8 @@
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Checks;
+use WordPress\Plugin_Check\Test_Data\Empty_Check;
+use WordPress\Plugin_Check\Test_Data\Error_Check;
 
 class Checks_Tests extends WP_UnitTestCase {
 
@@ -22,8 +24,8 @@ class Checks_Tests extends WP_UnitTestCase {
 
 	public function test_run_checks() {
 		$all_checks = array(
-			new WordPress\Plugin_Check\Test_Data\Empty_Check(),
-			new WordPress\Plugin_Check\Test_Data\Error_Check(),
+			new Empty_Check(),
+			new Error_Check(),
 		);
 
 		$checks_to_run = array(
@@ -46,8 +48,8 @@ class Checks_Tests extends WP_UnitTestCase {
 
 	public function test_run_checks_with_error() {
 		$all_checks = array(
-			new WordPress\Plugin_Check\Test_Data\Empty_Check(),
-			new WordPress\Plugin_Check\Test_Data\Error_Check(),
+			new Empty_Check(),
+			new Error_Check(),
 		);
 
 		$checks_to_run = array(
