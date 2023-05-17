@@ -179,7 +179,7 @@
 			try {
 				const results = await runCheck( data.plugin, data.checks[ i ] );
 				const errorsLength = Object.values( results.errors ).length;
-				const warningsLength = Object.values( results.errors ).length;
+				const warningsLength = Object.values( results.warnings ).length;
 				if (
 					isSuccessMessage &&
 					( errorsLength > 0 || warningsLength > 0 )
