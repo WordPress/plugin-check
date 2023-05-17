@@ -36,20 +36,11 @@ class Checks {
 	 * @throws Exception Thrown when check fails with critical error.
 	 */
 	public function run_checks( Check_Context $context, array $checks ) {
-		$result     = new Check_Result( $context );
-		$all_checks = $this->get_checks();
-
-		// Create an array of Check objects to run based on the check names passed.
-		$checks_to_run = array_filter(
-			$checks,
-			static function( Check $check ) use ( $all_checks ) {
-				return in_array( $check, $all_checks, true );
-			}
-		);
+		$result = new Check_Result( $context );
 
 		// Run the checks.
 		array_walk(
-			$checks_to_run,
+			$checks,
 			function( Check $check ) use ( $result ) {
 				$this->run_check_with_result( $check, $result );
 			}
@@ -87,33 +78,5 @@ class Checks {
 
 		// Otherwise, just run the check.
 		$check->run( $result );
-	}
-
-	/**
-	 * Gets the available plugin check classes.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @return array An array map of check slugs to Check instances.
-	 */
-	public function get_checks() {
-		if ( null === $this->checks ) {
-			// TODO: Add checks once implemented.
-			$checks = array(
-				'i18n_usage'            => new Checks\I18n_Usage_Check(),
-				'enqueued_scripts_size' => new Checks\Enqueued_Scripts_Size_Check(),
-			);
-
-			/**
-			 * Filters the available plugin check classes.
-			 *
-			 * @since n.e.x.t
-			 *
-			 * @param array $checks An array map of check slugs to Check instances.
-			 */
-			$this->checks = apply_filters( 'wp_plugin_check_checks', $checks );
-		}
-
-		return $this->checks;
 	}
 }
