@@ -173,16 +173,14 @@
 	 */
 	async function runChecks( data ) {
 		let isSuccessMessage = true;
-		let messageClass = '';
-		let messageText = '';
+		let messageClass = 'notice-success';
+		let messageText = pluginCheck.successMessage;
 		for ( let i = 0; i < data.checks.length; i++ ) {
 			try {
 				const results = await runCheck( data.plugin, data.checks[ i ] );
-				const errorsLength = Object.values( results.errors ).length;
-				const warningsLength = Object.values( results.warnings ).length;
 				if (
 					isSuccessMessage &&
-					( errorsLength > 0 || warningsLength > 0 )
+					( results.errorCount > 0 || results.warningCount > 0 )
 				) {
 					isSuccessMessage = false;
 				}
@@ -192,10 +190,7 @@
 			}
 		}
 
-		if ( isSuccessMessage ) {
-			messageClass = 'notice-success';
-			messageText = pluginCheck.successMessage;
-		} else {
+		if ( ! isSuccessMessage ) {
 			messageClass = 'notice-error';
 			messageText = pluginCheck.errorMessage;
 		}
