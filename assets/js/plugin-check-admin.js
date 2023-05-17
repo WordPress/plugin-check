@@ -173,7 +173,7 @@
 	 */
 	async function runChecks( data ) {
 		let isSuccessMessage = true;
-		let messageClass = 'notice-success';
+		let messageType = 'success';
 		let messageText = pluginCheck.successMessage;
 		for ( let i = 0; i < data.checks.length; i++ ) {
 			try {
@@ -191,14 +191,14 @@
 		}
 
 		if ( ! isSuccessMessage ) {
-			messageClass = 'notice-error';
+			messageType = 'error';
 			messageText = pluginCheck.errorMessage;
 		}
 
 		resultsContainer.innerHTML += renderTemplate(
 			'plugin-check-results-complete',
 			{
-				class: messageClass,
+				type: messageType,
 				message: messageText,
 			}
 		);
