@@ -7,7 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Repository;
 use WordPress\Plugin_Check\Checker\Default_Check_Repository;
-use WordPress\Plugin_Check\Test_Data\Empty_Check;
+use WordPress\Plugin_Check\Test_Data\Invalid_Check;
 use WordPress\Plugin_Check\Test_Data\Runtime_Check;
 use WordPress\Plugin_Check\Test_Data\Static_Check;
 
@@ -37,7 +37,7 @@ class Default_Check_Repository_Tests extends WP_UnitTestCase {
 		$this->expectException( 'Exception' );
 		$this->expectExceptionMessage( 'Check must be an instance of Runtime_Check or Static_Check.' );
 
-		$this->repository->register_check( 'empty_check', new Empty_Check() );
+		$this->repository->register_check( 'empty_check', new Invalid_Check() );
 	}
 
 	public function test_register_exception_thrown_for_existing_check_slug() {
