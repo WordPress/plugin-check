@@ -12,7 +12,7 @@ namespace WordPress\Plugin_Check\Checker;
  *
  * @since n.e.x.t
  */
-class Runtime_Environment_Setup {
+final class Runtime_Environment_Setup {
 
 	/**
 	 * Sets up the WordPress environment for runtime checks

@@ -15,6 +15,8 @@
  * @package plugin-check
  */
 
+use WordPress\Plugin_Check\Plugin_Main;
+
 define( 'WP_PLUGIN_CHECK_VERSION', 'n.e.x.t' );
 define( 'WP_PLUGIN_CHECK_MINIMUM_PHP', '5.6' );
 define( 'WP_PLUGIN_CHECK_MAIN_FILE', __FILE__ );
@@ -43,7 +45,7 @@ function wp_plugin_check_load() {
 	require_once WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'vendor/autoload.php';
 
 	// Setup the plugin.
-	$instance = new WordPress\Plugin_Check\Plugin_Main( WP_PLUGIN_CHECK_MAIN_FILE );
+	$instance = new Plugin_Main( WP_PLUGIN_CHECK_MAIN_FILE );
 	$instance->add_hooks();
 }
 

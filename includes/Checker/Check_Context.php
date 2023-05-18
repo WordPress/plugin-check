@@ -14,6 +14,5 @@ use WordPress\Plugin_Check\Plugin_Context;
  *
  * @since n.e.x.t
  */
-class Check_Context extends Plugin_Context {
-
+final class Check_Context extends Plugin_Context {
 }

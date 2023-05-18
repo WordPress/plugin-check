@@ -7,6 +7,9 @@
 
 use WordPress\Plugin_Check\Checker\AJAX_Runner;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Test_Data\Empty_Check;
+use WordPress\Plugin_Check\Test_Data\Error_Check;
+use WordPress\Plugin_Check\Test_Data\Runtime_Check;
 
 class AJAX_Runner_Tests extends WP_UnitTestCase {
 
@@ -58,7 +61,7 @@ class AJAX_Runner_Tests extends WP_UnitTestCase {
 			'wp_plugin_check_checks',
 			function( $checks ) {
 				return array(
-					'runtime_check' => new WordPress\Plugin_Check\Test_Data\Runtime_Check(),
+					'runtime_check' => new Runtime_Check(),
 				);
 			}
 		);
@@ -95,7 +98,7 @@ class AJAX_Runner_Tests extends WP_UnitTestCase {
 			'wp_plugin_check_checks',
 			function( $checks ) {
 				return array(
-					'empty_check' => new WordPress\Plugin_Check\Test_Data\Empty_Check(),
+					'empty_check' => new Empty_Check(),
 				);
 			}
 		);
@@ -151,7 +154,7 @@ class AJAX_Runner_Tests extends WP_UnitTestCase {
 			'wp_plugin_check_checks',
 			function( $checks ) {
 				return array(
-					'error_check' => new WordPress\Plugin_Check\Test_Data\Error_Check(),
+					'error_check' => new Error_Check(),
 				);
 			}
 		);
