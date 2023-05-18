@@ -64,7 +64,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @since n.e.x.t
 	 * @var Check_Repository
 	 */
-	protected $check_repository;
+	private $check_repository;
 
 	/**
 	 * Determines if the current request is intended for the plugin checker.
@@ -271,7 +271,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		$check_flags = Check_Repository::TYPE_STATIC;
 
 		// Check if conditions are met in order to perform Runtime Checks.
-		if ( $this->initialized_early ) {
+		if ( $this->initialized_early && is_plugin_active( $this->get_plugin_basename() ) ) {
 			$check_flags = Check_Repository::TYPE_ALL;
 		}
 
@@ -346,6 +346,13 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	private function register_checks() {
 		$this->check_repository = new Default_Check_Repository();
 
+		/**
+		 * Filters the available plugin check classes.
+		 *
+		 * @since n.e.x.t
+		 *
+		 * @param array $checks An array map of check slugs to Check instances.
+		 */
 		$checks = apply_filters(
 			'wp_plugin_check_checks',
 			array(
