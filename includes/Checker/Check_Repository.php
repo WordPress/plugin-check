@@ -33,6 +33,8 @@ interface Check_Repository {
 	/**
 	 * Bitwise flag for all check types.
 	 *
+	 * This is the same as `TYPE_STATIC | TYPE_RUNTIME`.
+	 *
 	 * @since n.e.x.t
 	 * @var int
 	 */
@@ -55,7 +57,6 @@ interface Check_Repository {
 	 *
 	 * @param int   $flags       The check type flag.
 	 * @param array $check_slugs An array of check slugs to return.
-	 *
 	 * @return array An indexed array of check instances.
 	 */
 	public function get_checks( $flags = self::TYPE_ALL, array $check_slugs = array() );

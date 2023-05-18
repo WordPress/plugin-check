@@ -40,12 +40,20 @@ class Default_Check_Repository_Tests extends WP_UnitTestCase {
 		$this->repository->register_check( 'empty_check', new Invalid_Check() );
 	}
 
-	public function test_register_exception_thrown_for_existing_check_slug() {
+	public function test_register_exception_thrown_for_existing_static_check_slug() {
 		$this->expectException( 'Exception' );
 		$this->expectExceptionMessage( 'Check slug "static_check" is already in use.' );
 
 		$this->repository->register_check( 'static_check', new Static_Check() );
 		$this->repository->register_check( 'static_check', new Static_Check() );
+	}
+
+	public function test_register_exception_thrown_for_existing_runtime_check_slug() {
+		$this->expectException( 'Exception' );
+		$this->expectExceptionMessage( 'Check slug "runtime_check" is already in use.' );
+
+		$this->repository->register_check( 'runtime_check', new Runtime_Check() );
+		$this->repository->register_check( 'runtime_check', new Runtime_Check() );
 	}
 
 	public function test_get_checks_returns_all_checks() {
@@ -86,13 +94,6 @@ class Default_Check_Repository_Tests extends WP_UnitTestCase {
 		$this->repository->register_check( 'runtime_check', $runtime_check );
 
 		$this->assertSame( array( $static_check ), $this->repository->get_checks( Check_Repository::TYPE_ALL, array( 'static_check' ) ) );
-	}
-
-	public function test_get_checks_throws_exception_for_invalid_flag() {
-		$this->expectException( 'Exception' );
-		$this->expectExceptionMessage( 'Invalid check flags passed.' );
-
-		$this->repository->get_checks( 5 );
 	}
 
 	public function test_get_checks_throws_exception_for_invalid_check_slug() {

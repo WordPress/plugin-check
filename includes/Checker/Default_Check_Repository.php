@@ -25,7 +25,7 @@ class Default_Check_Repository implements Check_Repository {
 	protected $runtime_checks = array();
 
 	/**
-	 * Array map holding all runtime checks.
+	 * Array map holding all static checks.
 	 *
 	 * @since n.e.x.t
 	 * @var array
@@ -47,7 +47,7 @@ class Default_Check_Repository implements Check_Repository {
 			throw new Exception( __( 'Check must be an instance of Runtime_Check or Static_Check.', 'plugin-check' ) );
 		}
 
-		if ( array_key_exists( $slug, $this->runtime_checks ) || array_key_exists( $slug, $this->static_checks ) ) {
+		if ( isset( $this->runtime_checks[ $slug ] ) || isset( $this->static_checks[ $slug] ) ) {
 			throw new Exception(
 				sprintf(
 					/* translators: %s: The Check slug. */
@@ -68,23 +68,20 @@ class Default_Check_Repository implements Check_Repository {
 	 *
 	 * @param int   $flags       The check type flag.
 	 * @param array $check_slugs An array of check slugs to return.
-	 *
 	 * @return array An indexed array of check instances.
 	 *
 	 * @throws Exception Thrown when invalid flag is passed, or Check slug does not exist.
 	 */
 	public function get_checks( $flags = self::TYPE_ALL, array $check_slugs = array() ) {
-		$check_arrays = array(
-			self::TYPE_ALL     => array_merge( $this->static_checks, $this->runtime_checks ),
-			self::TYPE_STATIC  => $this->static_checks,
-			self::TYPE_RUNTIME => $this->runtime_checks,
-		);
+		$checks = array();
 
-		if ( ! isset( $check_arrays[ $flags ] ) ) {
-			throw new Exception( __( 'Invalid check flags passed.', 'plugin-check' ) );
+		if ( $flags & self::TYPE_STATIC ) {
+			$checks += $this->static_checks;
 		}
 
-		$checks = $check_arrays[ $flags ];
+		if ( $flags & self::TYPE_RUNTIME ) {
+			$checks += $this->runtime_checks;
+		}
 
 		// Filter out the specific check slugs requested.
 		if ( ! empty( $check_slugs ) ) {
