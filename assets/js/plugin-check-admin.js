@@ -173,14 +173,14 @@
 	 */
 	async function runChecks( data ) {
 		let isSuccessMessage = true;
-		let messageType = 'success';
-		let messageText = pluginCheck.successMessage;
 		for ( let i = 0; i < data.checks.length; i++ ) {
 			try {
 				const results = await runCheck( data.plugin, data.checks[ i ] );
+				const errorsLength = Object.values( results.errors ).length;
+				const warningsLength = Object.values( results.errors ).length;
 				if (
 					isSuccessMessage &&
-					( results.errorCount > 0 || results.warningCount > 0 )
+					( errorsLength > 0 || warningsLength > 0 )
 				) {
 					isSuccessMessage = false;
 				}
@@ -189,6 +189,20 @@
 				// Ignore for now.
 			}
 		}
+
+		renderResultsMessage( isSuccessMessage );
+	}
+
+	/**
+	 * Renders result message.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param {boolean} isSuccessMessage Whether the message is a success message.
+	 */
+	function renderResultsMessage( isSuccessMessage ) {
+		let messageType = 'success';
+		let messageText = pluginCheck.successMessage;
 
 		if ( ! isSuccessMessage ) {
 			messageType = 'error';
