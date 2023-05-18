@@ -202,7 +202,9 @@
 	 */
 	function renderResultsMessage( isSuccessMessage ) {
 		const messageType = isSuccessMessage ? 'success' : 'error';
-		const messageText = isSuccessMessage ? pluginCheck.successMessage : pluginCheck.errorMessage;
+		const messageText = isSuccessMessage
+			? pluginCheck.successMessage
+			: pluginCheck.errorMessage;
 
 		resultsContainer.innerHTML += renderTemplate(
 			'plugin-check-results-complete',
