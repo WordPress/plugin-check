@@ -177,7 +177,7 @@
 			try {
 				const results = await runCheck( data.plugin, data.checks[ i ] );
 				const errorsLength = Object.values( results.errors ).length;
-				const warningsLength = Object.values( results.errors ).length;
+				const warningsLength = Object.values( results.warnings ).length;
 				if (
 					isSuccessMessage &&
 					( errorsLength > 0 || warningsLength > 0 )
@@ -201,13 +201,8 @@
 	 * @param {boolean} isSuccessMessage Whether the message is a success message.
 	 */
 	function renderResultsMessage( isSuccessMessage ) {
-		let messageType = 'success';
-		let messageText = pluginCheck.successMessage;
-
-		if ( ! isSuccessMessage ) {
-			messageType = 'error';
-			messageText = pluginCheck.errorMessage;
-		}
+		const messageType = isSuccessMessage ? 'success' : 'error';
+		const messageText = isSuccessMessage ? pluginCheck.successMessage : pluginCheck.errorMessage;
 
 		resultsContainer.innerHTML += renderTemplate(
 			'plugin-check-results-complete',
