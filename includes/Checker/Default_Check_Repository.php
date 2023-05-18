@@ -47,7 +47,7 @@ class Default_Check_Repository implements Check_Repository {
 			throw new Exception( __( 'Check must be an instance of Runtime_Check or Static_Check.', 'plugin-check' ) );
 		}
 
-		if ( isset( $this->runtime_checks[ $slug ] ) || isset( $this->static_checks[ $slug] ) ) {
+		if ( isset( $this->runtime_checks[ $slug ] ) || isset( $this->static_checks[ $slug ] ) ) {
 			throw new Exception(
 				sprintf(
 					/* translators: %s: The Check slug. */
