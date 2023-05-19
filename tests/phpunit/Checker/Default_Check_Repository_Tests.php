@@ -56,6 +56,14 @@ class Default_Check_Repository_Tests extends WP_UnitTestCase {
 		$this->repository->register_check( 'runtime_check', new Runtime_Check() );
 	}
 
+	public function test_register_exception_thrown_for_existing_check_slug_between_types() {
+		$this->expectException( 'Exception' );
+		$this->expectExceptionMessage( 'Check slug "check" is already in use.' );
+
+		$this->repository->register_check( 'check', new Static_Check() );
+		$this->repository->register_check( 'check', new Runtime_Check() );
+	}
+
 	public function test_get_checks_returns_all_checks() {
 		$static_check  = new Static_Check();
 		$runtime_check = new Runtime_Check();
