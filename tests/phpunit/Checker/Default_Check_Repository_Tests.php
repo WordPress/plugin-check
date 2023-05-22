@@ -23,14 +23,14 @@ class Default_Check_Repository_Tests extends WP_UnitTestCase {
 		$check = new Static_Check();
 		$this->repository->register_check( 'static_check', $check );
 
-		$this->assertSame( array( $check ), $this->repository->get_checks() );
+		$this->assertSame( array( 'static_check' => $check ), $this->repository->get_checks() );
 	}
 
 	public function test_register_runtime_check() {
 		$check = new Runtime_Check();
 		$this->repository->register_check( 'runtime_check', $check );
 
-		$this->assertSame( array( $check ), $this->repository->get_checks() );
+		$this->assertSame( array( 'runtime_check' => $check ), $this->repository->get_checks() );
 	}
 
 	public function test_register_exception_thrown_for_invalid_check() {
@@ -71,7 +71,12 @@ class Default_Check_Repository_Tests extends WP_UnitTestCase {
 		$this->repository->register_check( 'static_check', $static_check );
 		$this->repository->register_check( 'runtime_check', $runtime_check );
 
-		$this->assertSame( array( $static_check, $runtime_check ), $this->repository->get_checks() );
+		$expected = array(
+			'static_check'  => $static_check,
+			'runtime_check' => $runtime_check,
+		);
+
+		$this->assertSame( $expected, $this->repository->get_checks() );
 	}
 
 	public function test_get_checks_returns_static_checks_via_flag() {
@@ -81,7 +86,7 @@ class Default_Check_Repository_Tests extends WP_UnitTestCase {
 		$this->repository->register_check( 'static_check', $static_check );
 		$this->repository->register_check( 'runtime_check', $runtime_check );
 
-		$this->assertSame( array( $static_check ), $this->repository->get_checks( Check_Repository::TYPE_STATIC ) );
+		$this->assertSame( array( 'static_check' => $static_check ), $this->repository->get_checks( Check_Repository::TYPE_STATIC ) );
 	}
 
 	public function test_get_checks_returns_runtime_checks_via_flag() {
@@ -91,7 +96,7 @@ class Default_Check_Repository_Tests extends WP_UnitTestCase {
 		$this->repository->register_check( 'static_check', $static_check );
 		$this->repository->register_check( 'runtime_check', $runtime_check );
 
-		$this->assertSame( array( $runtime_check ), $this->repository->get_checks( Check_Repository::TYPE_RUNTIME ) );
+		$this->assertSame( array( 'runtime_check' => $runtime_check ), $this->repository->get_checks( Check_Repository::TYPE_RUNTIME ) );
 	}
 
 	public function test_get_checks_returns_checks_via_slug() {
