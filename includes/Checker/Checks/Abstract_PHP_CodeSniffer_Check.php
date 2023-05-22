@@ -8,6 +8,7 @@
 namespace WordPress\Plugin_Check\Checker\Checks;
 
 use Exception;
+use PHP_CodeSniffer\Runner;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Static_Check;
 
@@ -88,7 +89,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		// Run PHPCS.
 		try {
 			ob_start();
-			$runner = new \PHP_CodeSniffer\Runner(); // phpcs:ignore SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.ReferenceViaFullyQualifiedName
+			$runner = new Runner();
 			$runner->runPHPCS();
 			$reports = ob_get_clean();
 		} catch ( Exception $e ) {

@@ -150,6 +150,8 @@ final class Admin_Page {
 	 * @since n.e.x.t
 	 */
 	public function render_page() {
+		global $available_plugins, $selected_plugin_basename;
+
 		$available_plugins = $this->get_available_plugins();
 
 		$selected_plugin_basename = filter_input( INPUT_GET, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );

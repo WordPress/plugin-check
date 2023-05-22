@@ -66,7 +66,7 @@ class Plugin_Request_Utility {
 			);
 		}
 
-		foreach ( $plugins as $plugin_basename => $plugin_data ) {
+		foreach ( array_keys( $plugins ) as $plugin_basename ) {
 			if ( strpos( $plugin_basename, $plugin_slug . '/' ) === 0 ) {
 				return $plugin_basename;
 			}
