@@ -72,11 +72,10 @@ function wp_plugin_check_display_php_version_notice() {
  */
 function wp_plugin_check_display_composer_autoload_notice() {
 	echo '<div class="notice notice-error"><p>';
-	echo wp_kses(
-		__( 'Composer autoload files are missing. Please run <code>composer install</code>.', 'plugin-check' ),
-		array(
-			'code' => array(),
-		)
+	printf(
+		/* translators: composer command. */
+		esc_html__( 'Your installation of the Plugin Check plugin is incomplete. Please run %s.', 'plugin-check' ),
+		'<code>composer install</code>'
 	);
 	echo '</p></div>';
 }
