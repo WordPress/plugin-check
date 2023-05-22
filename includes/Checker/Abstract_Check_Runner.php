@@ -267,6 +267,9 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @throws Exception Thrown when invalid flag is passed, or Check slug does not exist.
 	 */
 	final public function get_checks_to_run() {
+		// Include file to use is_plugin_active() in CLI context.
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+
 		$check_slugs = $this->get_check_slugs();
 		$check_flags = Check_Repository::TYPE_STATIC;
 
