@@ -96,6 +96,8 @@ final class Plugin_Check_Command {
 	 * @param array $assoc_args List of the associative arguments.
 	 *
 	 * @throws Exception Throws exception.
+	 *
+	 * @SuppressWarnings(PHPMD.NPathComplexity)
 	 */
 	public function check( $args, $assoc_args ) {
 		// Get options based on the CLI arguments.
@@ -268,6 +270,8 @@ final class Plugin_Check_Command {
 	 * @param array $file_errors   Errors from a Check_Result, for a specific file.
 	 * @param array $file_warnings Warnings from a Check_Result, for a specific file.
 	 * @return array Combined file results.
+	 *
+	 * @SuppressWarnings(PHPMD.NPathComplexity)
 	 */
 	private function flatten_file_results( $file_errors, $file_warnings ) {
 		$file_results = array();

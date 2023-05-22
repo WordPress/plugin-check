@@ -166,6 +166,8 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	 *
 	 * @throws Exception Thrown when the check fails with a critical error (unrelated to any errors detected as part of
 	 *                   the check).
+	 *
+	 * @SuppressWarnings(PHPMD.NPathComplexity)
 	 */
 	protected function check_url( Check_Result $result, $url ) {
 		// Reset the WP_Scripts instance.
