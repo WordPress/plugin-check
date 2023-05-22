@@ -68,7 +68,7 @@ class Default_Check_Repository implements Check_Repository {
 	 *
 	 * @param int   $flags       The check type flag.
 	 * @param array $check_slugs An array of check slugs to return.
-	 * @return array An indexed array of check instances.
+	 * @return array An array of check instances.
 	 *
 	 * @throws Exception Thrown when invalid flag is passed, or Check slug does not exist.
 	 */
@@ -103,6 +103,6 @@ class Default_Check_Repository implements Check_Repository {
 			);
 		}
 
-		return array_values( $checks );
+		return $checks;
 	}
 }
