@@ -121,7 +121,7 @@ final class Runtime_Environment_Setup {
 		if ( $wp_filesystem->exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
 			// Get the correct Plugin Check directory when run too early.
 			if ( ! defined( 'WP_PLUGIN_CHECK_PLUGIN_DIR_PATH' ) ) {
-				$plugins_dir  = defined( 'WP_PLUGIN_DIR' ) ? WP_PLUGIN_DIR : WP_CONTENT_DIR . '/plugins';
+				$plugins_dir       = defined( 'WP_PLUGIN_DIR' ) ? WP_PLUGIN_DIR : WP_CONTENT_DIR . '/plugins';
 				$object_cache_copy = $plugins_dir . '/plugin-check/object-cache.copy.php';
 			} else {
 				$object_cache_copy = WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'object-cache.copy.php';

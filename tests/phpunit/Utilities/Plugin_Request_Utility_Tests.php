@@ -8,9 +8,12 @@
 use WordPress\Plugin_Check\Checker\AJAX_Runner;
 use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Test_Data\Runtime_Check;
+use WordPress\Plugin_Check\Test_Utils\Traits\With_Mock_Filesystem;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 
 class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
+
+	use With_Mock_Filesystem;
 
 	public function tear_down() {
 		// Force reset the database prefix after runner prepare method called.
@@ -75,19 +78,21 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 	public function test_destroy_runner_with_cli() {
 		global $wpdb, $table_prefix, $wp_actions;
 
+		$this->set_up_mock_filesystem();
+
 		$_SERVER['argv'] = array(
 			'wp',
 			'plugin',
 			'check',
 			'plugin-check',
-			'--checks=runtime-check',
+			'--checks=runtime_check',
 		);
 
 		add_filter(
 			'wp_plugin_check_checks',
 			function( $checks ) {
 				return array(
-					'runtime-check' => new Runtime_Check(),
+					'runtime_check' => new Runtime_Check(),
 				);
 			}
 		);
@@ -120,6 +125,8 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 	public function test_destroy_runner_with_ajax() {
 		global $wpdb, $table_prefix, $wp_actions;
 
+		$this->set_up_mock_filesystem();
+
 		add_filter( 'wp_doing_ajax', '__return_true' );
 		$_REQUEST['action'] = 'plugin_check_run_checks';
 		$_REQUEST['plugin'] = 'plugin-check';
@@ -129,7 +136,7 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 			'wp_plugin_check_checks',
 			function( $checks ) {
 				return array(
-					'runtime_check' => new WordPress\Plugin_Check\Test_Data\Runtime_Check(),
+					'runtime_check' => new Runtime_Check(),
 				);
 			}
 		);

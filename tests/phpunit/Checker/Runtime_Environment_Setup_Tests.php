@@ -6,8 +6,11 @@
  */
 
 use WordPress\Plugin_Check\Checker\Runtime_Environment_Setup;
+use WordPress\Plugin_Check\Test_Utils\Traits\With_Mock_Filesystem;
 
 class Runtime_Environment_Setup_Tests extends WP_UnitTestCase {
+
+	use With_Mock_Filesystem;
 
 	public function test_setup() {
 		global $wp_filesystem, $wpdb, $table_prefix;
@@ -74,25 +77,25 @@ class Runtime_Environment_Setup_Tests extends WP_UnitTestCase {
 		$this->assertSame( $dummy_file_content, $wp_filesystem->get_contents( WP_CONTENT_DIR . '/object-cache.php' ) );
 	}
 
-	private function set_up_mock_filesystem() {
+	public function test_can_setup_runtime_environment() {
+		$this->set_up_mock_filesystem();
+
+		$runtime_setup = new Runtime_Environment_Setup();
+
+		$this->assertTrue( $runtime_setup->can_setup_runtime_environment() );
+	}
+
+	public function test_can_setup_runtime_environment_with_existing_object_cache() {
 		global $wp_filesystem;
 
-		add_filter(
-			'filesystem_method_file',
-			function() {
-				return __DIR__ . '/../testdata/Filesystem/WP_Filesystem_MockFilesystem.php';
-			}
-		);
-		add_filter(
-			'filesystem_method',
-			function() {
-				return 'MockFilesystem';
-			}
-		);
+		$this->set_up_mock_filesystem();
 
-		WP_Filesystem();
+		// Simulate a different object-cache.php.
+		$dummy_file_content = '<?php /* Empty object-cache.php drop-in file. */';
+		$wp_filesystem->put_contents( WP_CONTENT_DIR . '/object-cache.php', $dummy_file_content );
 
-		// Simulate that the original object-cache.copy.php file exists.
-		$wp_filesystem->put_contents( WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'object-cache.copy.php', file_get_contents( WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'object-cache.copy.php' ) );
+		$runtime_setup = new Runtime_Environment_Setup();
+
+		$this->assertFalse( $runtime_setup->can_setup_runtime_environment() );
 	}
 }
