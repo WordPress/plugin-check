@@ -100,4 +100,42 @@ final class Runtime_Environment_Setup {
 			}
 		}
 	}
+
+	/**
+	 * Checks if the Runtime Environment can be created.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return bool Returns true if the runtime environment can be created, false if not.
+	 */
+	public function can_setup_runtime_environment() {
+		global $wp_filesystem;
+
+		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
+
+		if ( ! $wp_filesystem && ! WP_Filesystem() ) {
+			return false;
+		}
+
+		// Check if the object-cache.php file exists.
+		if ( $wp_filesystem->exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
+			// Get the correct Plugin Check directory when run too early.
+			if ( ! defined( 'WP_PLUGIN_CHECK_PLUGIN_DIR_PATH' ) ) {
+				$plugins_dir  = defined( 'WP_PLUGIN_DIR' ) ? WP_PLUGIN_DIR : WP_CONTENT_DIR . '/plugins';
+				$object_cache_copy = $plugins_dir . '/plugin-check/object-cache.copy.php';
+			} else {
+				$object_cache_copy = WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'object-cache.copy.php';
+			}
+
+			// Check the drop-in file matches the plugin check version.
+			$original_content = $wp_filesystem->get_contents( WP_CONTENT_DIR . '/object-cache.php' );
+			$copy_content     = $wp_filesystem->get_contents( $object_cache_copy );
+
+			if ( $original_content && $original_content !== $copy_content ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
 }
