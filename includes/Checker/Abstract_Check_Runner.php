@@ -59,6 +59,14 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	protected $plugin_basename;
 
 	/**
+	 * An instance of the Check_Repository.
+	 *
+	 * @since n.e.x.t
+	 * @var Check_Repository
+	 */
+	private $check_repository;
+
+	/**
 	 * Determines if the current request is intended for the plugin checker.
 	 *
 	 * @since n.e.x.t
@@ -92,6 +100,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 */
 	final public function __construct() {
 		$this->initialized_early = ! did_action( 'muplugins_loaded' );
+		$this->register_checks();
 	}
 
 	/**
@@ -255,45 +264,21 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @return array An array map of check slugs to Check instances.
 	 *
-	 * @throws Exception Thrown exception when a runtime check is requested and the plugin inactive.
+	 * @throws Exception Thrown when invalid flag is passed, or Check slug does not exist.
 	 */
 	final public function get_checks_to_run() {
-		$check_slugs   = $this->get_check_slugs();
-		$all_checks    = $this->get_checks_instance()->get_checks();
-		$plugin_active = is_plugin_active( $this->get_plugin_basename() );
+		// Include file to use is_plugin_active() in CLI context.
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 
-		if ( ! empty( $check_slugs ) ) {
-			// Get the check instances based on the requested checks.
-			$checks_to_run = array_intersect_key( $all_checks, array_flip( $check_slugs ) );
+		$check_slugs = $this->get_check_slugs();
+		$check_flags = Check_Repository::TYPE_STATIC;
 
-			// Check the following conditions if at least one runtime check is requested.
-			if ( $this->has_runtime_check( $checks_to_run ) ) {
-				// Throw an error if the plugin is not active.
-				if ( ! $plugin_active ) {
-					throw new Exception( __( 'Runtime checks cannot be run against inactive plugins.', 'plugin-check' ) );
-				}
-
-				// Throw and error if the runner was not initialized early and the runtime environment was not set up.
-				if ( ! $this->initialized_early ) {
-					throw new Exception( __( 'Runtime checks cannot be run as the runtime environment was not set up.', 'plugin-check' ) );
-				}
-			}
-		} else {
-			// Run all checks for the plugin.
-			$checks_to_run = $all_checks;
-
-			// Only run static checks if the plugin is inactive or the runtime environment was not set up.
-			if ( ! $plugin_active || ! $this->initialized_early ) {
-				$checks_to_run = array_filter(
-					$checks_to_run,
-					function ( $check ) {
-						return ! $check instanceof Runtime_Check;
-					}
-				);
-			}
+		// Check if conditions are met in order to perform Runtime Checks.
+		if ( $this->initialized_early && is_plugin_active( $this->get_plugin_basename() ) ) {
+			$check_flags = Check_Repository::TYPE_ALL;
 		}
 
-		return $checks_to_run;
+		return $this->check_repository->get_checks( $check_flags, $check_slugs );
 	}
 
 	/**
@@ -354,5 +339,33 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 */
 	private function get_check_context() {
 		return new Check_Context( WP_PLUGIN_DIR . '/' . $this->get_plugin_basename() );
+	}
+
+	/**
+	 * Registers Checks to the Check_Repository.
+	 *
+	 * @since n.e.x.t
+	 */
+	private function register_checks() {
+		$this->check_repository = new Default_Check_Repository();
+
+		/**
+		 * Filters the available plugin check classes.
+		 *
+		 * @since n.e.x.t
+		 *
+		 * @param array $checks An array map of check slugs to Check instances.
+		 */
+		$checks = apply_filters(
+			'wp_plugin_check_checks',
+			array(
+				'i18n_usage'            => new Checks\I18n_Usage_Check(),
+				'enqueued_scripts_size' => new Checks\Enqueued_Scripts_Size_Check(),
+			)
+		);
+
+		foreach ( $checks as $slug => $check ) {
+			$this->check_repository->register_check( $slug, $check );
+		}
 	}
 }
