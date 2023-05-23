@@ -56,7 +56,7 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 		$php_files = self::filter_files_by_extension( $files, 'php' );
 
 		if ( $this->flags & self::TYPE_ZEND ) {
-			$this->look_for_zend( $result, $php_files );
+			$this->look_for_zendguard( $result, $php_files );
 		}
 		if ( $this->flags & self::TYPE_SOURCEGUARDIAN ) {
 			$this->look_for_sourceguardian( $result, $php_files );
@@ -67,14 +67,14 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 	}
 
 	/**
-	 * Looks for Zend obfuscated files and amends the given result with an error if found.
+	 * Looks for Zend Guard obfuscated files and amends the given result with an error if found.
 	 *
 	 * @since n.e.x.t
 	 *
 	 * @param Check_Result $result    The check result to amend, including the plugin context to check.
 	 * @param array        $php_files List of absolute PHP file paths.
 	 */
-	protected function look_for_zend( Check_Result $result, array $php_files ) {
+	protected function look_for_zendguard( Check_Result $result, array $php_files ) {
 		$obfuscated_file = self::file_preg_match( '/(<\?php \@Zend;)|(This file was encoded by)/', $php_files );
 		if ( $obfuscated_file ) {
 			$result->add_message(
