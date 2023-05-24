@@ -143,10 +143,10 @@ class File_Type_Check extends Abstract_File_Check {
 
 		if ( $vcs_directories ) {
 			// Only use an error in production, otherwise a warning.
-			$error = ( ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || 'production' !== wp_get_environment_type() ) ? false : true;
+			$is_error = ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) && 'production' === wp_get_environment_type();
 			foreach ( $vcs_directories as $dir ) {
 				$result->add_message(
-					$error,
+					$is_error,
 					'Version control checkouts should not be present.',
 					array(
 						'code' => 'vcs_present',
