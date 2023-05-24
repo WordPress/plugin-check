@@ -12,6 +12,11 @@
  * @package test-plugin-code-obfuscation-zendguard-errors
  */
 
+// This constant is defined here to prevent fatal errors from the file below.
+if ( ! defined( 'Zend' ) ) {
+	define( 'Zend', true );
+}
+
 /**
  * File contains code which is used to detect Zend Guard obfuscated files.
  */
