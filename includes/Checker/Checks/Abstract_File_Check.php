@@ -132,7 +132,7 @@ abstract class Abstract_File_Check implements Static_Check {
 	final protected static function file_preg_match( $pattern, array $files, array &$matches = null ) {
 		foreach ( $files as $file ) {
 			$contents = self::file_get_contents( $file );
-			if ( preg_match( $regex, $contents, $m ) ) {
+			if ( preg_match( $pattern, $contents, $m ) ) {
 				$matches = $m;
 				return $file;
 			}
