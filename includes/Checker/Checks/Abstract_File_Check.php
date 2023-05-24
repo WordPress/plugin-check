@@ -8,10 +8,10 @@
 namespace WordPress\Plugin_Check\Checker\Checks;
 
 use Exception;
-use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
-use WordPress\Plugin_Check\Checker\Check_Result;
+use RecursiveIteratorIterator;
 use WordPress\Plugin_Check\Checker\Check_Context;
+use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Static_Check;
 
 /**
@@ -152,7 +152,7 @@ abstract class Abstract_File_Check implements Static_Check {
 	 * @param string $needle The substring to search for.
 	 * @return string|bool File path if needle was found, false otherwise.
 	 */
-	final protected static function file_str_contains( array $files, string $needle ) {
+	final protected static function file_str_contains( array $files, $needle ) {
 		// Backward compatibility prior to PHP 8.
 		$find_needle = 'str_contains';
 		if ( ! function_exists( 'str_contains' ) ) {
