@@ -10,8 +10,15 @@ use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Test_Data\Empty_Check;
 use WordPress\Plugin_Check\Test_Data\Error_Check;
 use WordPress\Plugin_Check\Test_Data\Runtime_Check;
+use WordPress\Plugin_Check\Test_Utils\Traits\With_Mock_Filesystem;
 
 class CLI_Runner_Tests extends WP_UnitTestCase {
+
+	use With_Mock_Filesystem;
+
+	public function set_up() {
+		$this->set_up_mock_filesystem();
+	}
 
 	public function tear_down() {
 		// Force reset the database prefix after runner prepare method called.
