@@ -361,7 +361,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			'wp_plugin_check_checks',
 			array(
 				'i18n_usage'            => new Checks\I18n_Usage_Check(),
-				'enqueued_scripts_size' => new Checks\Enqueued_Scripts_Size_Check( 1 ),
+				'enqueued_scripts_size' => new Checks\Enqueued_Scripts_Size_Check(),
 			)
 		);
 
