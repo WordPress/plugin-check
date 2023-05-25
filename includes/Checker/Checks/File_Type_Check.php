@@ -80,7 +80,7 @@ class File_Type_Check extends Abstract_File_Check {
 		$compressed_files = self::filter_files_by_extensions( $files, array( 'zip', 'gz', 'tgz', 'rar', 'tar', '7z' ) );
 		if ( $compressed_files ) {
 			foreach ( $compressed_files as $file ) {
-				$this->add_result_error_for_file( $result, $file, 'compressed_files', 'Compressed files are not permitted.' );
+				$this->add_result_error_for_file( $result, $file, 'compressed_files', __( 'Compressed files are not permitted.', 'plugin-check' ) );
 			}
 		}
 	}
@@ -97,7 +97,7 @@ class File_Type_Check extends Abstract_File_Check {
 		$phar_files = self::filter_files_by_extension( $files, 'phar' );
 		if ( $phar_files ) {
 			foreach ( $phar_files as $file ) {
-				$this->add_result_error_for_file( $result, $file, 'phar_files', 'Phar files are not permitted.' );
+				$this->add_result_error_for_file( $result, $file, 'phar_files', __( 'Phar files are not permitted.', 'plugin-check' ) );
 			}
 		}
 	}
@@ -133,7 +133,7 @@ class File_Type_Check extends Abstract_File_Check {
 			foreach ( $vcs_directories as $dir ) {
 				$result->add_message(
 					$is_error,
-					'Version control checkouts should not be present.',
+					__( 'Version control checkouts should not be present.', 'plugin-check' ),
 					array(
 						'code' => 'vcs_present',
 						'file' => str_replace( $result->plugin()->path(), '', $dir ),
@@ -156,7 +156,7 @@ class File_Type_Check extends Abstract_File_Check {
 		$hidden_files = self::filter_files_by_regex( $files, '/^((?!\/vendor\/|\/node_modules\/).)*\/\.\w+(\.\w+)*$/' );
 		if ( $hidden_files ) {
 			foreach ( $hidden_files as $file ) {
-				$this->add_result_error_for_file( $result, $file, 'hidden_files', 'Hidden files are not permitted.' );
+				$this->add_result_error_for_file( $result, $file, 'hidden_files', __( 'Hidden files are not permitted.', 'plugin-check' ) );
 			}
 		}
 	}

@@ -124,7 +124,8 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 		$result->add_message(
 			true,
 			sprintf(
-				'Code Obfuscation tools are not permitted. Detected: %s',
+				/* translators: %s: tool name */
+				__( 'Code Obfuscation tools are not permitted. Detected: %s', 'plugin-check' ),
 				$tool_name
 			),
 			array(
