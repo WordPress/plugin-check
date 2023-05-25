@@ -80,14 +80,7 @@ class File_Type_Check extends Abstract_File_Check {
 		$compressed_files = self::filter_files_by_extensions( $files, array( 'zip', 'gz', 'tgz', 'rar', 'tar', '7z' ) );
 		if ( $compressed_files ) {
 			foreach ( $compressed_files as $file ) {
-				$result->add_message(
-					true,
-					'Compressed files are not permitted.',
-					array(
-						'code' => 'compressed_files',
-						'file' => str_replace( $result->plugin()->path(), '', $file ),
-					)
-				);
+				$this->add_result_error_for_file( $result, $file, 'compressed_files', 'Compressed files are not permitted.' );
 			}
 		}
 	}
@@ -104,14 +97,7 @@ class File_Type_Check extends Abstract_File_Check {
 		$phar_files = self::filter_files_by_extension( $files, 'phar' );
 		if ( $phar_files ) {
 			foreach ( $phar_files as $file ) {
-				$result->add_message(
-					true,
-					'Phar files are not permitted.',
-					array(
-						'code' => 'phar_files',
-						'file' => str_replace( $result->plugin()->path(), '', $file ),
-					)
-				);
+				$this->add_result_error_for_file( $result, $file, 'phar_files', 'Phar files are not permitted.' );
 			}
 		}
 	}
@@ -170,15 +156,29 @@ class File_Type_Check extends Abstract_File_Check {
 		$hidden_files = self::filter_files_by_regex( $files, '/^((?!\/vendor\/|\/node_modules\/).)*\/\.\w+(\.\w+)*$/' );
 		if ( $hidden_files ) {
 			foreach ( $hidden_files as $file ) {
-				$result->add_message(
-					true,
-					'Hidden files are not permitted.',
-					array(
-						'code' => 'hidden_files',
-						'file' => str_replace( $result->plugin()->path(), '', $file ),
-					)
-				);
+				$this->add_result_error_for_file( $result, $file, 'hidden_files', 'Hidden files are not permitted.' );
 			}
 		}
+	}
+
+	/**
+	 * Amends the given result with an error for the given file, code, and message.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param Check_Result $result  The check result to amend, including the plugin context to check.
+	 * @param string       $file    Absolute path to the file found.
+	 * @param string       $code    Error code.
+	 * @param string       $message Error message.
+	 */
+	private function add_result_error_for_file( Check_Result $result, $file, $code, $message ) {
+		$result->add_message(
+			true,
+			$message,
+			array(
+				'code' => $code,
+				'file' => str_replace( $result->plugin()->path(), '', $file ),
+			)
+		);
 	}
 }

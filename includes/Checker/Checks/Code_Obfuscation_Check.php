@@ -77,17 +77,7 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 	protected function look_for_zendguard( Check_Result $result, array $php_files ) {
 		$obfuscated_file = self::file_preg_match( '/(<\?php \@Zend;)|(This file was encoded by)/', $php_files );
 		if ( $obfuscated_file ) {
-			$result->add_message(
-				true,
-				sprintf(
-					'Code Obfuscation tools are not permitted. Detected: %s',
-					'Zend Guard'
-				),
-				array(
-					'code' => 'obfuscated_code_detected',
-					'file' => str_replace( $result->plugin()->path(), '', $obfuscated_file ),
-				)
-			);
+			$this->add_result_error_for_file( $result, $obfuscated_file, 'Zend Guard' );
 		}
 	}
 
@@ -102,17 +92,7 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 	protected function look_for_sourceguardian( Check_Result $result, array $php_files ) {
 		$obfuscated_file = self::file_preg_match( "/(sourceguardian\.com)|(function_exists\('sg_load'\))|(\$__x=)/", $php_files );
 		if ( $obfuscated_file ) {
-			$result->add_message(
-				true,
-				sprintf(
-					'Code Obfuscation tools are not permitted. Detected: %s',
-					'Source Guardian'
-				),
-				array(
-					'code' => 'obfuscated_code_detected',
-					'file' => str_replace( $result->plugin()->path(), '', $obfuscated_file ),
-				)
-			);
+			$this->add_result_error_for_file( $result, $obfuscated_file, 'Source Guardian' );
 		}
 	}
 
@@ -127,17 +107,30 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 	protected function look_for_ioncube( Check_Result $result, array $php_files ) {
 		$obfuscated_file = self::file_str_contains( $php_files, 'ionCube' );
 		if ( $obfuscated_file ) {
-			$result->add_message(
-				true,
-				sprintf(
-					'Code Obfuscation tools are not permitted. Detected: %s',
-					'ionCube'
-				),
-				array(
-					'code' => 'obfuscated_code_detected',
-					'file' => str_replace( $result->plugin()->path(), '', $obfuscated_file ),
-				)
-			);
+			$this->add_result_error_for_file( $result, $obfuscated_file, 'ionCube' );
 		}
+	}
+
+	/**
+	 * Amends the given result with an error for the given obfuscated file and tool name.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param Check_Result $result          The check result to amend, including the plugin context to check.
+	 * @param string       $obfuscated_file Absolute path to the obfuscated file found.
+	 * @param string       $tool_name       Human-readable name of the tool detected for obfuscation.
+	 */
+	private function add_result_error_for_file( Check_Result $result, $obfuscated_file, $tool_name ) {
+		$result->add_message(
+			true,
+			sprintf(
+				'Code Obfuscation tools are not permitted. Detected: %s',
+				$tool_name
+			),
+			array(
+				'code' => 'obfuscated_code_detected',
+				'file' => str_replace( $result->plugin()->path(), '', $obfuscated_file ),
+			)
+		);
 	}
 }
