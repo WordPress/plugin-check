@@ -153,17 +153,9 @@ abstract class Abstract_File_Check implements Static_Check {
 	 * @return string|bool File path if needle was found, false otherwise.
 	 */
 	final protected static function file_str_contains( array $files, $needle ) {
-		// Backward compatibility prior to PHP 8.
-		$find_needle = 'str_contains';
-		if ( ! function_exists( 'str_contains' ) ) {
-			$find_needle = function( $haystack, $needle ) {
-				return false !== strpos( $haystack, $needle );
-			};
-		}
-
 		foreach ( $files as $file ) {
 			$contents = self::file_get_contents( $file );
-			if ( call_user_func( $find_needle, $contents, $needle ) ) {
+			if ( str_contains( $contents, $needle ) ) {
 				return $file;
 			}
 		}
