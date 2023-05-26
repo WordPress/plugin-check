@@ -82,6 +82,16 @@ class Runtime_Environment_Setup_Tests extends WP_UnitTestCase {
 		$this->assertFalse( $runtime_setup->can_set_up() );
 	}
 
+	public function test_can_set_up_with_failing_filesystem() {
+		global $wp_filesystem;
+
+		$this->set_up_failing_mock_filesystem();
+
+		$runtime_setup = new Runtime_Environment_Setup();
+
+		$this->assertFalse( $runtime_setup->can_set_up() );
+	}
+
 	public function test_clean_up() {
 		global $wp_filesystem, $wpdb, $table_prefix;
 
