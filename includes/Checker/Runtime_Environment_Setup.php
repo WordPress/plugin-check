@@ -119,6 +119,11 @@ final class Runtime_Environment_Setup {
 
 		// Check if the object-cache.php file exists.
 		if ( $wp_filesystem->exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
+			// Check If the object-cache.php file is the Plugin Check version.
+			if ( defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) && WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION ) {
+				return true;
+			}
+		} else {
 			// Get the correct Plugin Check directory when run too early.
 			if ( ! defined( 'WP_PLUGIN_CHECK_PLUGIN_DIR_PATH' ) ) {
 				$plugins_dir       = defined( 'WP_PLUGIN_DIR' ) ? WP_PLUGIN_DIR : WP_CONTENT_DIR . '/plugins';
@@ -127,15 +132,17 @@ final class Runtime_Environment_Setup {
 				$object_cache_copy = WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'object-cache.copy.php';
 			}
 
-			// Check the drop-in file matches the plugin check version.
-			$original_content = $wp_filesystem->get_contents( WP_CONTENT_DIR . '/object-cache.php' );
-			$copy_content     = $wp_filesystem->get_contents( $object_cache_copy );
+			// If the file does not exist, check if we can place it.
+			$wp_filesystem->copy( $object_cache_copy, WP_CONTENT_DIR . '/object-cache.php' );
 
-			if ( $original_content && $original_content !== $copy_content ) {
-				return false;
+			if ( $wp_filesystem->exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
+				// Remove the file before returning.
+				$wp_filesystem->delete( WP_CONTENT_DIR . '/object-cache.php' );
+
+				return true;
 			}
 		}
 
-		return true;
+		return false;
 	}
 }
