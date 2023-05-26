@@ -19,7 +19,7 @@ final class Runtime_Environment_Setup {
 	 *
 	 * @since n.e.x.t
 	 */
-	public function setup() {
+	public function set_up() {
 		global $wpdb, $table_prefix, $wp_filesystem;
 
 		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
@@ -65,7 +65,7 @@ final class Runtime_Environment_Setup {
 	 *
 	 * @since n.e.x.t
 	 */
-	public function cleanup() {
+	public function clean_up() {
 		global $wpdb, $table_prefix, $wp_filesystem;
 
 		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
@@ -102,18 +102,18 @@ final class Runtime_Environment_Setup {
 	}
 
 	/**
-	 * Checks if the Runtime Environment can be created.
+	 * Checks if the WordPress Environment can be set up for runtime checks.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return bool Returns true if the runtime environment can be created, false if not.
+	 * @return bool Returns true if the runtime environment can be set up, false if not.
 	 */
-	public function can_setup_runtime_environment() {
+	public function can_set_up() {
 		global $wp_filesystem;
 
 		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 
-		if ( ! $wp_filesystem && ! WP_Filesystem() ) {
+		if ( ! is_object( $wp_filesystem ) && ! WP_Filesystem() ) {
 			return false;
 		}
 

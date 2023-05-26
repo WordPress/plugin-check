@@ -126,7 +126,7 @@ final class Admin_AJAX {
 
 		if ( $this->has_runtime_check( $checks_to_run ) ) {
 			$runtime = new Runtime_Environment_Setup();
-			$runtime->setup();
+			$runtime->set_up();
 			$message = __( 'Runtime environment setup successful.', 'plugin-check' );
 		}
 
@@ -162,7 +162,7 @@ final class Admin_AJAX {
 		// Test if the runtime environment tables exist.
 		if ( $wpdb->posts === $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->posts ) ) || defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) ) {
 			$runtime = new Runtime_Environment_Setup();
-			$runtime->cleanup();
+			$runtime->clean_up();
 			$message = __( 'Runtime environment cleanup successful.', 'plugin-check' );
 		}
 

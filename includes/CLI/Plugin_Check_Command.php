@@ -133,7 +133,7 @@ final class Plugin_Check_Command {
 		if ( $this->has_runtime_check( $checks_to_run ) ) {
 			WP_CLI::line( __( 'Setting up runtime environment.', 'plugin-check' ) );
 			$runtime_setup = new Runtime_Environment_Setup();
-			$runtime_setup->setup();
+			$runtime_setup->set_up();
 		}
 
 		$result = false;
@@ -144,7 +144,7 @@ final class Plugin_Check_Command {
 			Plugin_Request_Utility::destroy_runner();
 
 			if ( isset( $runtime_setup ) ) {
-				$runtime_setup->cleanup();
+				$runtime_setup->clean_up();
 				WP_CLI::line( __( 'Cleaning up runtime environment.', 'plugin-check' ) );
 			}
 
@@ -154,7 +154,7 @@ final class Plugin_Check_Command {
 		Plugin_Request_Utility::destroy_runner();
 
 		if ( isset( $runtime_setup ) ) {
-			$runtime_setup->cleanup();
+			$runtime_setup->clean_up();
 			WP_CLI::line( __( 'Cleaning up runtime environment.', 'plugin-check' ) );
 		}
 

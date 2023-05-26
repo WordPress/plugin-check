@@ -275,7 +275,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		$check_flags = Check_Repository::TYPE_STATIC;
 
 		// Check if conditions are met in order to perform Runtime Checks.
-		if ( $runtime->can_setup_runtime_environment() && is_plugin_active( $this->get_plugin_basename() ) ) {
+		if ( ( $this->initialized_early || $runtime->can_set_up() ) && is_plugin_active( $this->get_plugin_basename() ) ) {
 			$check_flags = Check_Repository::TYPE_ALL;
 		}
 
