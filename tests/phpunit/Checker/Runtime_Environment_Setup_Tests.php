@@ -25,23 +25,6 @@ class Runtime_Environment_Setup_Tests extends WP_UnitTestCase {
 		$this->assertSame( file_get_contents( WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'object-cache.copy.php' ), $wp_filesystem->get_contents( WP_CONTENT_DIR . '/object-cache.php' ) );
 	}
 
-	public function test_clean_up() {
-		global $wp_filesystem, $wpdb, $table_prefix;
-
-		$this->set_up_mock_filesystem();
-
-		$runtime_setup = new Runtime_Environment_Setup();
-		$runtime_setup->set_up();
-
-		// Simulate file exists by setting constant found in object-cache.php.
-		define( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION', 1 );
-
-		$runtime_setup->clean_up();
-
-		$this->assertTrue( 0 <= strpos( $wpdb->last_query, $table_prefix . 'pc_' ) );
-		$this->assertFalse( $wp_filesystem->exists( WP_CONTENT_DIR . '/object-cache.php' ) );
-	}
-
 	public function test_setup_with_existing_object_cache() {
 		global $wp_filesystem, $wpdb, $table_prefix;
 
@@ -97,5 +80,22 @@ class Runtime_Environment_Setup_Tests extends WP_UnitTestCase {
 		$runtime_setup = new Runtime_Environment_Setup();
 
 		$this->assertFalse( $runtime_setup->can_set_up() );
+	}
+
+	public function test_clean_up() {
+		global $wp_filesystem, $wpdb, $table_prefix;
+
+		$this->set_up_mock_filesystem();
+
+		$runtime_setup = new Runtime_Environment_Setup();
+		$runtime_setup->set_up();
+
+		// Simulate file exists by setting constant found in object-cache.php.
+		define( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION', 1 );
+
+		$runtime_setup->clean_up();
+
+		$this->assertTrue( 0 <= strpos( $wpdb->last_query, $table_prefix . 'pc_' ) );
+		$this->assertFalse( $wp_filesystem->exists( WP_CONTENT_DIR . '/object-cache.php' ) );
 	}
 }

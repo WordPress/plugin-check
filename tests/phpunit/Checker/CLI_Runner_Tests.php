@@ -17,6 +17,7 @@ class CLI_Runner_Tests extends WP_UnitTestCase {
 	use With_Mock_Filesystem;
 
 	public function set_up() {
+		// Setup the mock filesystem so the Runtime_Environment_Setup works correctly within the CLI_Runner.
 		$this->set_up_mock_filesystem();
 	}
 

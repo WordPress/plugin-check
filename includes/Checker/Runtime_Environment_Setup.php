@@ -135,7 +135,7 @@ final class Runtime_Environment_Setup {
 			// If the file does not exist, check if we can place it.
 			$wp_filesystem->copy( $object_cache_copy, WP_CONTENT_DIR . '/object-cache.php' );
 
-			if ( $wp_filesystem->exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
+			if ( $wp_filesystem->exists( WP_CONTENT_DIR . '/object-cache.php' ) ) { // @phpstan-ignore-line
 				// Remove the file before returning.
 				$wp_filesystem->delete( WP_CONTENT_DIR . '/object-cache.php' );
 
