@@ -67,6 +67,14 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	private $check_repository;
 
 	/**
+	 * Runtime environment.
+	 *
+	 * @since n.e.x.t
+	 * @var Runtime_Environment_Setup
+	 */
+	protected $runtime_environment;
+
+	/**
 	 * Determines if the current request is intended for the plugin checker.
 	 *
 	 * @since n.e.x.t
@@ -101,6 +109,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	final public function __construct() {
 		$this->initialized_early = ! did_action( 'muplugins_loaded' );
 		$this->register_checks();
+		$this->runtime_environment = new Runtime_Environment_Setup();
 	}
 
 	/**
@@ -270,12 +279,11 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		// Include file to use is_plugin_active() in CLI context.
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 
-		$runtime     = new Runtime_Environment_Setup();
 		$check_slugs = $this->get_check_slugs();
 		$check_flags = Check_Repository::TYPE_STATIC;
 
 		// Check if conditions are met in order to perform Runtime Checks.
-		if ( ( $this->initialized_early || $runtime->can_set_up() ) && is_plugin_active( $this->get_plugin_basename() ) ) {
+		if ( ( $this->initialized_early || $this->runtime_environment->can_set_up() ) && is_plugin_active( $this->get_plugin_basename() ) ) {
 			$check_flags = Check_Repository::TYPE_ALL;
 		}
 
@@ -368,5 +376,16 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		foreach ( $checks as $slug => $check ) {
 			$this->check_repository->register_check( $slug, $check );
 		}
+	}
+
+	/**
+	 * Sets the runtime environment setup.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param Runtime_Environment_Setup $runtime_environment_setup Runtime environment instance.
+	 */
+	final public function set_runtime_environment_setup( $runtime_environment_setup ) {
+		$this->runtime_environment = $runtime_environment_setup;
 	}
 }
