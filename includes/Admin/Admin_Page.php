@@ -170,7 +170,7 @@ final class Admin_Page {
 		if ( current_user_can( 'activate_plugins' ) ) {
 			$actions[] = sprintf(
 				'<a href="%1$s">%2$s</a>',
-				esc_url( admin_url() . 'tools.php?page=plugin-check&plugin=' . $plugin_file ),
+				esc_url( admin_url( "tools.php?page=plugin-check&plugin={$plugin_file}" ) ),
 				esc_html__( 'Check this plugin', 'plugin-check' )
 			);
 		}
