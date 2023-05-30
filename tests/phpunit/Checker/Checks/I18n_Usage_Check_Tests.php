@@ -1,6 +1,6 @@
 <?php
 /**
- * Tests for the I18n_Usage_Check_Tests class.
+ * Tests for the I18n_Usage_Check class.
  *
  * @package plugin-check
  */
