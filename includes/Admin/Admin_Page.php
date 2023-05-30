@@ -154,7 +154,7 @@ final class Admin_Page {
 
 		$selected_plugin_basename = filter_input( INPUT_GET, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
-		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/admin-page.php';
+		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'templates/admin-page.php';
 	}
 
 	/**
@@ -185,7 +185,7 @@ final class Admin_Page {
 	 */
 	public function admin_footer() {
 		ob_start();
-		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/results-table.php';
+		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'templates/results-table.php';
 		$results_table_template = ob_get_clean();
 		wp_print_inline_script_tag(
 			$results_table_template,
@@ -196,7 +196,7 @@ final class Admin_Page {
 		);
 
 		ob_start();
-		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/results-row.php';
+		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'templates/results-row.php';
 		$results_row_template = ob_get_clean();
 		wp_print_inline_script_tag(
 			$results_row_template,
@@ -207,7 +207,7 @@ final class Admin_Page {
 		);
 
 		ob_start();
-		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/results-complete.php';
+		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'templates/results-complete.php';
 		$results_row_template = ob_get_clean();
 		wp_print_inline_script_tag(
 			$results_row_template,
