@@ -134,7 +134,13 @@ final class Runtime_Environment_Setup {
 			// If the file does not exist, check if we can place it.
 			$wp_filesystem->copy( $object_cache_copy, WP_CONTENT_DIR . '/object-cache.php' );
 
-			if ( $wp_filesystem->exists( WP_CONTENT_DIR . '/object-cache.php' ) ) { // @phpstan-ignore-line
+			/**
+			 * PHPStan ignore reason: PHPStan raised an issue because we have redundant file existence checks in our code.
+			 * We perform this double check because we want to ensure that we can write the file we're testing.
+			 *
+			 * @phpstan-ignore-next-line
+			 */
+			if ( $wp_filesystem->exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
 				// Remove the file before returning.
 				$wp_filesystem->delete( WP_CONTENT_DIR . '/object-cache.php' );
 
