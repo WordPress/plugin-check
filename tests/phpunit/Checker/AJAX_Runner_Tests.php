@@ -10,8 +10,16 @@ use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Test_Data\Empty_Check;
 use WordPress\Plugin_Check\Test_Data\Error_Check;
 use WordPress\Plugin_Check\Test_Data\Runtime_Check;
+use WordPress\Plugin_Check\Test_Utils\Traits\With_Mock_Filesystem;
 
 class AJAX_Runner_Tests extends WP_UnitTestCase {
+
+	use With_Mock_Filesystem;
+
+	public function set_up() {
+		// Setup the mock filesystem so the Runtime_Environment_Setup works correctly within the AJAX_Runner.
+		$this->set_up_mock_filesystem();
+	}
 
 	public function tear_down() {
 		// Force reset the database prefix after runner prepare method called.
