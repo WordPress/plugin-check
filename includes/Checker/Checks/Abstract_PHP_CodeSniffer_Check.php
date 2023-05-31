@@ -1,6 +1,6 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\PHP_CodeSniffer_Check
+ * Class WordPress\Plugin_Check\Checker\Checks\Abstract_PHP_CodeSniffer_Check
  *
  * @package plugin-check
  */
