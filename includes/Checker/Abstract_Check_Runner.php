@@ -372,6 +372,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 				'enqueued_scripts_size' => new Checks\Enqueued_Scripts_Size_Check(),
 				'code_obfuscation'      => new Checks\Code_Obfuscation_Check(),
 				'file_type'             => new Checks\File_Type_Check(),
+				'enqueued_styles_scope' => new Checks\Enqueued_Styles_Scope_Check(),
 			)
 		);
 
