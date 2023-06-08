@@ -10,7 +10,7 @@ use WordPress\Plugin_Check\Test_Utils\TestCase\Runtime_Check_UnitTestCase;
 
 class Enqueued_Styles_Scope_Check_Tests extends Runtime_Check_UnitTestCase {
 
-	public function run_with_errors() {
+	public function test_run_with_errors() {
 		// Load the test plugin.
 		require TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-enqueued-styles-scope-check-with-error/load.php';
 

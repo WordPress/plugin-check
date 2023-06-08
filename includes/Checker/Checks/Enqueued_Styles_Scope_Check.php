@@ -206,9 +206,15 @@ class Enqueued_Styles_Scope_Check extends Abstract_Runtime_Check implements With
 
 			$style_path = str_replace( $result->plugin()->url(), $result->plugin()->path(), $style->src );
 
+			if ( isset( $this->plugin_style_count[ $handle ] ) ) {
+				$this->plugin_style_count[ $handle ] += 1;
+			} else {
+				$this->plugin_style_count[ $handle ] = 1;
+			}
+
 			$this->plugin_styles[ $handle ] = array(
 				'path'  => $style_path,
-				'count' => ++$this->plugin_style_count[ $handle ],
+				'count' => $this->plugin_style_count[ $handle ],
 			);
 		}
 	}
