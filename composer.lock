@@ -4,8 +4,53 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7fae7df1b98ffeb1dfcfc338d4d5a292",
+    "content-hash": "da763730545c9ff85569945bd79314b7",
     "packages": [
+        {
+            "name": "automattic/vipwpcs",
+            "version": "0.2.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Automattic/VIP-Coding-Standards.git",
+                "reference": "c74e8861cf3a0db3a3a1633cb9b7854144ec585b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Automattic/VIP-Coding-Standards/zipball/c74e8861cf3a0db3a3a1633cb9b7854144ec585b",
+                "reference": "c74e8861cf3a0db3a3a1633cb9b7854144ec585b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3",
+                "squizlabs/php_codesniffer": "^2.9.0 || ^3.0.2",
+                "wp-coding-standards/wpcs": "*"
+            },
+            "suggest": {
+                "dealerdirect/phpcodesniffer-composer-installer": "^0.4.1"
+            },
+            "type": "phpcodesniffer-standard",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/Automattic/VIP-Coding-Standards/graphs/contributors"
+                }
+            ],
+            "description": "PHP_CodeSniffer rules (sniffs) to enforce WordPress VIP minimum coding conventions",
+            "keywords": [
+                "phpcs",
+                "standards",
+                "wordpress"
+            ],
+            "support": {
+                "issues": "https://github.com/Automattic/VIP-Coding-Standards/issues",
+                "source": "https://github.com/Automattic/VIP-Coding-Standards"
+            },
+            "time": "2018-07-18T16:53:09+00:00"
+        },
         {
             "name": "composer/installers",
             "version": "v1.12.0",

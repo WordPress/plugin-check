@@ -7,7 +7,8 @@
     "php": ">=5.6",
     "composer/installers": "^v1.12.0 || ^2.2",
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0.0",
-    "wp-coding-standards/wpcs": "dev-develop#fca9d9e"
+    "wp-coding-standards/wpcs": "dev-develop#fca9d9e",
+    "automattic/vipwpcs": "^0.2.4"
   },
   "require-dev": {
     "wp-phpunit/wp-phpunit": "^6.1",
