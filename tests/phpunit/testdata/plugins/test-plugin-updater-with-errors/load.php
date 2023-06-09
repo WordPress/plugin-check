@@ -16,5 +16,5 @@
  * @package test-plugin-updater-check
  */
  
- // Disable automatic WordPress plugin updates.
- add_filter( 'auto_update_plugin', '__return_false' );
+// Disable automatic WordPress plugin updates.
+add_filter( 'auto_update_plugin', '__return_false' );
