@@ -26,13 +26,13 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 */
 	protected function check_files( Check_Result $result, array $files ) {
 		// Find the readme file.
-		$readme = self::filter_files_by_regex( $files, '/readme\.txt/' );
+		$readme = self::filter_files_by_regex( $files, '/readme\.txt$/' );
 
 		// If the readme.txt does not exist, add a warning and skip other tests.
 		if ( empty( $readme ) ) {
 			$result->add_message(
 				false,
-				__( 'The plugins readme.txt does not exist.', 'plugin-check' ),
+				__( 'The plugin readme.txt does not exist.', 'plugin-check' ),
 				array(
 					'file' => 'readme.txt',
 					'code' => 'plugin_readme.does_not_exist',
@@ -82,15 +82,12 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 * @param array        $files  Array of plugin files.
 	 */
 	private function readme_check_license( Check_Result $result, array $files ) {
-		if (
-			! self::file_str_contains( $files, 'License:' ) ||
-			! self::file_str_contains( $files, 'License URI:' )
-		) {
+		if ( ! self::file_preg_match( '/(License:\s*([a-z0-9\-\+\.]+)(\sor\s([a-z0-9\-\+\.]+))*)|(License URI:\s*([a-z0-9\-\+\.]+)(\sor\s([a-z0-9\-\+\.]+))*)/i', $files ) ) {
 			$result->add_message(
 				false,
-				__( 'The plugins readme.txt does not include a valid license.', 'plugin-check' ),
+				__( 'Your plugin has an invalid license declared. Please update your readme.txt with a valid SPDX license identifier.', 'plugin-check' ),
 				array(
-					'code' => 'plugin_readme.missing_license',
+					'code' => 'invalid_license',
 					'file' => $result->plugin()->path( '/readme.txt' ),
 				)
 			);

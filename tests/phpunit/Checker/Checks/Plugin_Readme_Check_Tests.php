@@ -48,7 +48,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 0, $warnings['readme.txt'] );
 		$this->assertArrayHasKey( 0, $warnings['readme.txt'][0] );
 		$this->assertArrayHasKey( 'code', $warnings['readme.txt'][0][0][0] );
-		$this->assertEquals( 'plugin_readme.missing_license', $warnings['readme.txt'][0][0][0]['code'] );
+		$this->assertEquals( 'invalid_license', $warnings['readme.txt'][0][0][0]['code'] );
 
 		// Check for valid stable tag warning.
 		$this->assertArrayHasKey( 0, $warnings['readme.txt'] );
