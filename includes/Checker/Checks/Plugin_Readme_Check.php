@@ -35,7 +35,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				__( 'The plugin readme.txt does not exist.', 'plugin-check' ),
 				array(
 					'file' => 'readme.txt',
-					'code' => 'plugin_readme.does_not_exist',
+					'code' => 'no_plugin_readme',
 				)
 			);
 
@@ -43,13 +43,13 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		}
 
 		// Check the readme.txt for default text.
-		$this->readme_check_default_text( $result, $readme );
+		$this->check_default_text( $result, $readme );
 
 		// Check the readme.txt for a valid license.
-		$this->readme_check_license( $result, $readme );
+		$this->check_license( $result, $readme );
 
 		// Check the readme.txt for a valid version.
-		$this->readme_check_version( $result, $readme );
+		$this->check_stable_tag( $result, $readme );
 	}
 
 	/**
@@ -60,13 +60,17 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 * @param Check_Result $result The Check Result to amend.
 	 * @param array        $files  Array of plugin files.
 	 */
-	private function readme_check_default_text( Check_Result $result, array $files ) {
-		if ( self::file_str_contains( $files, 'Here is a short description of the plugin.' ) ) {
+	private function check_default_text( Check_Result $result, array $files ) {
+		if (
+			self::file_str_contains( $files, 'Here is a short description of the plugin.' ) ||
+			self::file_str_contains( $files, 'Tags: tag1' ) ||
+			self::file_str_contains( $files, 'Donate link: http://example.com/' )
+		) {
 			$result->add_message(
 				false,
-				__( 'The plugins readme.txt appears to contain default text.', 'plugin-check' ),
+				__( 'The readme.txt appears to contain default text.', 'plugin-check' ),
 				array(
-					'code' => 'plugin_readme.contains_default_text',
+					'code' => 'default_readme_text',
 					'file' => $result->plugin()->path( '/readme.txt' ),
 				)
 			);
@@ -81,7 +85,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 * @param Check_Result $result The Check Result to amend.
 	 * @param array        $files  Array of plugin files.
 	 */
-	private function readme_check_license( Check_Result $result, array $files ) {
+	private function check_license( Check_Result $result, array $files ) {
 		if ( ! self::file_preg_match( '/(License:\s*([a-z0-9\-\+\.]+)(\sor\s([a-z0-9\-\+\.]+))*)|(License URI:\s*([a-z0-9\-\+\.]+)(\sor\s([a-z0-9\-\+\.]+))*)/i', $files ) ) {
 			$result->add_message(
 				false,
@@ -95,20 +99,42 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	}
 
 	/**
-	 * Checks the readme.txt for a valid version.
+	 * Checks the readme.txt stable tag.
 	 *
 	 * @since n.e.x.t
 	 *
 	 * @param Check_Result $result The Check Result to amend.
 	 * @param array        $files  Array of plugin files.
 	 */
-	private function readme_check_version( Check_Result $result, array $files ) {
-		if ( ! self::file_str_contains( $files, 'Stable tag:' ) ) {
+	private function check_stable_tag( Check_Result $result, array $files ) {
+		// Get the readme.txt Stable tag.
+		$matches = array();
+		self::file_preg_match( '/Stable tag:\s*([a-z0-9\.]+)/i', $files, $matches );
+		$stable_tag = isset( $matches[1] ) ? $matches[1] : '';
+
+		if ( 'trunk' === $stable_tag ) {
 			$result->add_message(
 				false,
-				__( 'The plugins readme.txt does not include a valid stable tag.', 'plugin-check' ),
+				__( "It's recommended not to use 'Stable Tag: trunk'.", 'plugin-check' ),
 				array(
-					'code' => 'plugin_readme.missing_stable_tag',
+					'code' => 'trunk_stable_tag',
+					'file' => $result->plugin()->path( '/readme.txt' ),
+				)
+			);
+		}
+
+		// Check the readme.txt Stable tag against the plugin's main file version.
+		$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $result->plugin()->basename() );
+
+		if (
+			$stable_tag && ! empty( $plugin_data['Version'] ) &&
+			$stable_tag !== $plugin_data['Version']
+		) {
+			$result->add_message(
+				false,
+				__( 'The Stable Tag in your readme.txt file does not match the version in your main plugin file.', 'plugin-check' ),
+				array(
+					'code' => 'stable_tag_mismatch',
 					'file' => $result->plugin()->path( '/readme.txt' ),
 				)
 			);
