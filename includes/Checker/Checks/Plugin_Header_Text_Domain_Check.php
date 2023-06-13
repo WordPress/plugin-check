@@ -34,7 +34,7 @@ class Plugin_Header_Text_Domain_Check implements Static_Check {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
 
-		$plugin_main_file = $result->plugin()->abspath();
+		$plugin_main_file = WP_PLUGIN_DIR . '/' . $result->plugin()->basename();
 		$plugin_header    = get_plugin_data( $plugin_main_file );
 		$plugin_slug      = basename( $result->plugin()->path() );
 
