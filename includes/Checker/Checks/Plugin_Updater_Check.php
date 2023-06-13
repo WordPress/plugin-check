@@ -158,7 +158,7 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 					true,
 					sprintf(
 						/* translators: %s: The match updater string. */
-						__( 'sdfsfsf Plugin Updater detected. These are not permitted in WordPress.org hosted plugins. Detected: %s', 'plugin-check' ),
+						__( 'Plugin Updater detected. These are not permitted in WordPress.org hosted plugins. Detected: %s', 'plugin-check' ),
 						esc_attr( $matches[0] )
 					),
 					'plugin_updater_detected',
