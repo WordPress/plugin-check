@@ -11,6 +11,84 @@ use WordPress\Plugin_Check\Checker\Checks\Plugin_Updater_Check;
 
 class Plugin_Updater_Check_Tests extends WP_UnitTestCase {
 
+	/**
+	 * @dataProvider data_plugin_updater_check
+	 */
+	public function test_run_with_plugin_updater_errors( $type_flag, $plugin_basename, $expected_file, $code, $error ) {
+		$check_context = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/' . $plugin_basename );
+		$check_result  = new Check_Result( $check_context );
+
+		$check = new Plugin_Updater_Check( $type_flag );
+		$check->run( $check_result );
+
+		if ( $error ) {
+			$errors = $check_result->get_errors();
+
+			$this->assertNotEmpty( $errors );
+			$this->assertArrayHasKey( $expected_file, $errors );
+			$this->assertSame( 1, $check_result->get_error_count() );
+
+			$this->assertTrue( isset( $errors[ $expected_file ][0][0][0] ) );
+			$this->assertSame( $code, $errors[ $expected_file ][0][0][0]['code'] );
+		} else {
+			$warnings = $check_result->get_warnings();
+
+			$this->assertNotEmpty( $warnings );
+			$this->assertArrayHasKey( $expected_file, $warnings );
+			$this->assertSame( 1, $check_result->get_warning_count() );
+
+			$this->assertTrue( isset( $warnings[ $expected_file ][0][0][0] ) );
+			$this->assertSame( $code, $warnings[ $expected_file ][0][0][0]['code'] );
+		}
+	}
+
+	public function data_plugin_updater_check() {
+		return array(
+			'Update URI Header'      => array(
+				Plugin_Updater_Check::TYPE_PLUGIN_UPDATE_URI_HEADER,
+				'test-plugin-update-uri-header-errors/load.php',
+				'load.php',
+				'plugin_updater_detected',
+				true,
+			),
+			'Updater File'           => array(
+				Plugin_Updater_Check::TYPE_PLUGIN_UPDATER_FILE,
+				'test-plugin-updater-file-errors/load.php',
+				'plugin-update-checker.php',
+				'plugin_updater_detected',
+				true,
+			),
+			'Plugin Updaters'        => array(
+				Plugin_Updater_Check::TYPE_PLUGIN_UPDATERS,
+				'test-plugin-updaters-errors/load.php',
+				'load.php',
+				'plugin_updater_detected',
+				true,
+			),
+			'Plugin Updaters Regex'  => array(
+				Plugin_Updater_Check::TYPE_PLUGIN_UPDATERS,
+				'test-plugin-updaters-regex-errors/load.php',
+				'load.php',
+				'plugin_updater_detected',
+				true,
+			),
+			'Updater Routines'       => array(
+				Plugin_Updater_Check::TYPE_PLUGIN_UPDATER_ROUTINES,
+				'test-plugin-updater-routines-errors/load.php',
+				'load.php',
+				'update_modification_detected',
+				false,
+			),
+			'Updater Routines Regex' => array(
+				Plugin_Updater_Check::TYPE_PLUGIN_UPDATER_ROUTINES,
+				'test-plugin-updater-routines-regex-errors/load.php',
+				'load.php',
+				'update_modification_detected',
+				false,
+			),
+		);
+	}
+
 	public function test_run_without_any_errors() {
 		// Test plugin without any plugin updater.
 		$check_context = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-i18n-usage-without-errors/load.php' );
@@ -27,47 +105,5 @@ class Plugin_Updater_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertEquals( 0, $check_result->get_error_count() );
 		$this->assertEquals( 0, $check_result->get_warning_count() );
-	}
-
-	public function test_look_for_update_uri_header() {
-		// Test plugin without any plugin updater.
-		$check_context = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-updater-with-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
-
-		$check = new Plugin_Updater_Check();
-		$check->run( $check_result );
-
-		$errors   = $check_result->get_errors();
-		$warnings = $check_result->get_warnings();
-
-		$this->assertNotEmpty( $errors );
-		$this->assertArrayHasKey( 'load.php', $errors );
-		$this->assertArrayHasKey( 'plugin-update-checker.php', $errors );
-		$this->assertEquals( 3, $check_result->get_error_count() );
-
-		// Check for plugin_updater_detected error on Line no 0 and column no at 0.
-		$this->assertArrayHasKey( 0, $errors['load.php'] );
-		$this->assertArrayHasKey( 0, $errors['load.php'][0] );
-		$this->assertArrayHasKey( 'code', $errors['load.php'][0][0][0] );
-		$this->assertEquals( 'plugin_updater_detected', $errors['load.php'][0][0][0]['code'] );
-
-		$this->assertArrayHasKey( 0, $errors['updater.php'] );
-		$this->assertArrayHasKey( 0, $errors['updater.php'][0] );
-		$this->assertArrayHasKey( 'code', $errors['updater.php'][0][0][0] );
-		$this->assertEquals( 'plugin_updater_detected', $errors['updater.php'][0][0][0]['code'] );
-
-		$this->assertArrayHasKey( 0, $errors['plugin-update-checker.php'] );
-		$this->assertArrayHasKey( 0, $errors['plugin-update-checker.php'][0] );
-		$this->assertArrayHasKey( 'code', $errors['plugin-update-checker.php'][0][0][0] );
-		$this->assertEquals( 'plugin_updater_detected', $errors['plugin-update-checker.php'][0][0][0]['code'] );
-
-		// Check for update_modification_detected warning on Line no 0 and column no at 0.
-		$this->assertNotEmpty( $warnings );
-		$this->assertArrayHasKey( 'load.php', $warnings );
-		$this->assertEquals( 1, $check_result->get_warning_count() );
-		$this->assertArrayHasKey( 0, $warnings['load.php'] );
-		$this->assertArrayHasKey( 0, $warnings['load.php'][0] );
-		$this->assertArrayHasKey( 'code', $warnings['load.php'][0][0][0] );
-		$this->assertEquals( 'update_modification_detected', $warnings['load.php'][0][0][0]['code'] );
 	}
 }

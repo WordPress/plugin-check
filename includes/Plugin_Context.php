@@ -85,15 +85,4 @@ class Plugin_Context {
 
 		return $path;
 	}
-
-	/**
-	 * Returns the plugin absolute path of the main file.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @return string The absolute path to the plugin main file.
-	 */
-	public function abspath() {
-		return $this->main_file;
-	}
 }
