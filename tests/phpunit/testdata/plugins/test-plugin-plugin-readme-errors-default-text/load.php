@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Test Plugin Readme check (with errors)
+ * Plugin Name: Test Plugin Readme Errors (default text)
  * Plugin URI: https://github.com/wordpress/plugin-check
  * Description: Test plugin for the Readme check.
  * Requires at least: 6.0
