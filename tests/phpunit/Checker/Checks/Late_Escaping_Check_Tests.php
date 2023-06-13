@@ -8,8 +8,9 @@
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Checks\Late_Escaping_Check;
+use WordPress\Plugin_Check\Test_Utils\TestCase\Static_Check_UnitTestCase;
 
-class Late_Escaping_Check_Tests extends WP_UnitTestCase {
+class Late_Escaping_Check_Tests extends Static_Check_UnitTestCase {
 
 	public function test_run_with_errors() {
 		$late_escape_check = new Late_Escaping_Check();
@@ -22,13 +23,13 @@ class Late_Escaping_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertNotEmpty( $errors );
 		$this->assertArrayHasKey( 'load.php', $errors );
-		$this->assertEquals( 2, $check_result->get_error_count() );
+		$this->assertEquals( 1, $check_result->get_error_count() );
 
-		// Check for WordPress.Security.EscapeOutput error on Line no 22 and column no at 5.
-		$this->assertArrayHasKey( 22, $errors['load.php'] );
-		$this->assertArrayHasKey( 5, $errors['load.php'][22] );
-		$this->assertArrayHasKey( 'code', $errors['load.php'][22][5][0] );
-		$this->assertEquals( 'WordPress.Security.EscapeOutput', $errors['load.php'][22][5][0]['code'] );
+		// Check for WordPress.Security.EscapeOutput error on Line no 24 and column no at 6.
+		$this->assertArrayHasKey( 24, $errors['load.php'] );
+		$this->assertArrayHasKey( 6, $errors['load.php'][24] );
+		$this->assertArrayHasKey( 'code', $errors['load.php'][24][6][0] );
+		$this->assertEquals( 'WordPress.Security.EscapeOutput.OutputNotEscaped', $errors['load.php'][24][6][0]['code'] );
 	}
 
 	public function test_run_without_errors() {
