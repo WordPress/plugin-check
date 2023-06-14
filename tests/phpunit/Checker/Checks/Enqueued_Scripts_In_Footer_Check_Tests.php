@@ -8,8 +8,9 @@
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Checks\Enqueued_Scripts_In_Footer_Check;
+use WordPress\Plugin_Check\Test_Utils\TestCase\Static_Check_UnitTestCase;
 
-class Enqueued_Scripts_In_Footer_Check_Tests extends WP_UnitTestCase {
+class Enqueued_Scripts_In_Footer_Check_Tests extends Static_Check_UnitTestCase {
 
 	public function test_run_with_errors() {
 

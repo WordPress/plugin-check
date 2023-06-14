@@ -74,18 +74,6 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		// Backup the original command line arguments.
 		$orig_cmd_args = $_SERVER['argv'];
 
-		/*
-		 * Reset \PHP_CodeSniffer\Config::$overriddenDefaults to prevent
-		 * incorrect results when running multiple checks.
-		 *
-		 * PHPStan ignore reason: PHPStan raised an issue because we can't
-		 * use class in ReflectionClass.
-		 *
-		 * @phpstan-ignore-next-line
-		 */
-		$reflected_phpcs_config = new \ReflectionClass( '\PHP_CodeSniffer\Config' );
-		$reflected_phpcs_config->setStaticPropertyValue( 'overriddenDefaults', array() );
-
 		// Create the default arguments for PHPCS.
 		$defaults = array(
 			'',
@@ -107,6 +95,9 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 			$_SERVER['argv'] = $orig_cmd_args;
 			throw $e;
 		}
+
+		// Restore original arguments.
+		$_SERVER['argv'] = $orig_cmd_args;
 
 		// Parse the reports into data to add to the overall $result.
 		$reports = json_decode( trim( $reports ), true );
