@@ -1,6 +1,6 @@
 <?php
 /**
- * Abstract Runtime_Check_UnitTestCase.
+ * Abstract Static_Check_UnitTestCase.
  *
  * @package plugin-check
  */
@@ -15,16 +15,12 @@ abstract class Static_Check_UnitTestCase extends WP_UnitTestCase {
 			/*
 			 * Reset \PHP_CodeSniffer\Config::$overriddenDefaults to prevent
 			 * incorrect results when running multiple checks.
-			 *
-			 * PHPStan ignore reason: PHPStan raised an issue because we can't
-			 * use class in ReflectionClass.
-			 *
-			 * @phpstan-ignore-next-line
 			 */
 			$reflected_phpcs_config = new \ReflectionClass( '\PHP_CodeSniffer\Config' );
-			if ( $reflected_phpcs_config->hasProperty( 'overriddenDefaults' ) ) {
-				$reflected_phpcs_config->setStaticPropertyValue( 'overriddenDefaults', array() );
-			}
+			$overridden_defaults    = $reflected_phpcs_config->getProperty( 'overriddenDefaults' );
+			$overridden_defaults->setAccessible( true );
+			$overridden_defaults->setValue( array() );
+			$overridden_defaults->setAccessible( false );
 		}
 	}
 }
