@@ -192,13 +192,14 @@ class Enqueued_Styles_Scope_Check extends Abstract_Runtime_Check implements With
 		 * Run the 'wp_enqueue_script' action, wrapped in an output buffer in case of any callbacks printing styles
 		 * directly. This is discouraged, but some plugins or themes are still doing it.
 		 */
+		$wp_styles = wp_styles();
 		ob_start();
 			wp_enqueue_scripts();
-			wp_styles()->do_footer_items();
+			$wp_styles->do_footer_items();
 		ob_get_clean();
 
-		foreach ( wp_styles()->done as $handle ) {
-			$style = wp_styles()->registered[ $handle ];
+		foreach ( $wp_styles->done as $handle ) {
+			$style = $wp_styles->registered[ $handle ];
 
 			if ( ! $style->src || strpos( $style->src, $result->plugin()->url() ) !== 0 ) {
 				continue;

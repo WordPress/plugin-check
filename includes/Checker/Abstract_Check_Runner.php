@@ -373,7 +373,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 				'code_obfuscation'          => new Checks\Code_Obfuscation_Check(),
 				'file_type'                 => new Checks\File_Type_Check(),
 				'plugin_header_text_domain' => new Checks\Plugin_Header_Text_Domain_Check(),
-        'enqueued_styles_scope'     => new Checks\Enqueued_Styles_Scope_Check(),
+				'enqueued_styles_scope'     => new Checks\Enqueued_Styles_Scope_Check(),
 			)
 		);
 
