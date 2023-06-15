@@ -112,10 +112,10 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 	 */
 	protected function look_for_updater_file( Check_Result $result, array $php_files ) {
 
-		$plugin_update_file = self::filter_files_by_regex( $php_files, '/plugin-update-checker\.php$/' );
+		$plugin_update_files = self::filter_files_by_regex( $php_files, '/plugin-update-checker\.php$/' );
 
-		if ( $plugin_update_file ) {
-			foreach ( $plugin_update_file as $file ) {
+		if ( $plugin_update_files ) {
+			foreach ( $plugin_update_files as $file ) {
 				$this->add_result_error_for_file(
 					$result,
 					true,
