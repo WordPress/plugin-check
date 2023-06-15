@@ -19,17 +19,29 @@ class Performant_WP_Query_Params_Check_Tests extends Static_Check_UnitTestCase {
 
 		$performant_query->run( $check_result );
 
-		$errors = $check_result->get_errors();
+		$warnings = $check_result->get_warnings();
 
-		$this->assertNotEmpty( $errors );
-		$this->assertArrayHasKey( 'load.php', $errors );
-		$this->assertEquals( 2, $check_result->get_error_count() );
+		$this->assertNotEmpty( $warnings );
+		$this->assertArrayHasKey( 'load.php', $warnings );
+		$this->assertEquals( 3, $check_result->get_warning_count() );
 
-		// Check for WordPress.DB.SlowDBQuery error on Line no 22 and column no at 5.
-		$this->assertArrayHasKey( 22, $errors['load.php'] );
-		$this->assertArrayHasKey( 5, $errors['load.php'][22] );
-		$this->assertArrayHasKey( 'code', $errors['load.php'][22][5][0] );
-		$this->assertEquals( 'WordPress.DB.SlowDBQuery', $errors['load.php'][22][5][0]['code'] );
+		// Check for WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn error.
+		$this->assertArrayHasKey( 24, $warnings['load.php'] );
+		$this->assertArrayHasKey( 9, $warnings['load.php'][24] );
+		$this->assertArrayHasKey( 'code', $warnings['load.php'][24][9][0] );
+		$this->assertEquals( 'WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn', $warnings['load.php'][24][9][0]['code'] );
+
+		// Check for WordPress.DB.SlowDBQuery.slow_db_query_meta_query warning.
+		$this->assertArrayHasKey( 27, $warnings['load.php'] );
+		$this->assertArrayHasKey( 26, $warnings['load.php'][27] );
+		$this->assertArrayHasKey( 'code', $warnings['load.php'][27][26][0] );
+		$this->assertEquals( 'WordPress.DB.SlowDBQuery.slow_db_query_meta_query', $warnings['load.php'][27][26][0]['code'] );
+
+		// Check for WordPress.DB.SlowDBQuery.slow_db_query_tax_query warning.
+		$this->assertArrayHasKey( 34, $warnings['load.php'] );
+		$this->assertArrayHasKey( 26, $warnings['load.php'][34] );
+		$this->assertArrayHasKey( 'code', $warnings['load.php'][34][26][0] );
+		$this->assertEquals( 'WordPress.DB.SlowDBQuery.slow_db_query_tax_query', $warnings['load.php'][34][26][0]['code'] );
 	}
 
 	public function test_run_without_errors() {

@@ -24,7 +24,6 @@
 		'post__not_in'   => array( 1, 2, 3 ),
 		'posts_per_page' => -1,
 		'cache_results'  => false,
-		'meta_key'       => 'age',
 		'meta_query'     => array(
 			array(
 				'key'     => 'age',
