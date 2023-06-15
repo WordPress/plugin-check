@@ -86,7 +86,15 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 * @param array        $files  Array of plugin files.
 	 */
 	private function check_license( Check_Result $result, array $files ) {
-		if ( ! self::file_preg_match( '/(License:\s*([a-z0-9\-\+\.]+)(\sor\s([a-z0-9\-\+\.]+))*)|(License URI:\s*([a-z0-9\-\+\.]+)(\sor\s([a-z0-9\-\+\.]+))*)/i', $files ) ) {
+		// Get the license from the readme file.
+		self::file_preg_match( '/(License:|License URI:)\s*(.+)*/i', $files, $matches );
+
+		if ( empty( $matches ) ) {
+			return;
+		}
+
+		// Test for a valid valid SPDX license identifier.
+		if ( ! preg_match( '/^([a-z0-9\-\+\.]+)(\sor\s([a-z0-9\-\+\.]+))*$/i', $matches[2] ) ) {
 			$result->add_message(
 				false,
 				__( 'Your plugin has an invalid license declared. Please update your readme.txt with a valid SPDX license identifier.', 'plugin-check' ),
@@ -108,8 +116,10 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 */
 	private function check_stable_tag( Check_Result $result, array $files ) {
 		// Get the readme.txt Stable tag.
-		$matches = array();
-		self::file_preg_match( '/Stable tag:\s*([a-z0-9\.]+)/i', $files, $matches );
+		if ( ! self::file_preg_match( '/Stable tag:\s*([a-z0-9\.]+)/i', $files, $matches ) ) {
+			return;
+		}
+
 		$stable_tag = isset( $matches[1] ) ? $matches[1] : '';
 
 		if ( 'trunk' === $stable_tag ) {
