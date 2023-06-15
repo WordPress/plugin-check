@@ -108,8 +108,8 @@ class Enqueued_Styles_Scope_Check extends Abstract_Runtime_Check implements With
 	public function run( Check_Result $result ) {
 		$this->run_for_urls(
 			$this->get_urls(),
-			function ( $url ) use ( $result ) {
-				$this->check_url( $result, $url );
+			function () use ( $result ) {
+				$this->check_url( $result );
 			}
 		);
 
@@ -143,15 +143,33 @@ class Enqueued_Styles_Scope_Check extends Abstract_Runtime_Check implements With
 		$urls = array( home_url( '/' ) );
 
 		foreach ( $this->get_viewable_post_types() as $post_type ) {
-			$posts = get_posts(
-				array(
-					'posts_per_page' => 1,
-					'post_type'      => $post_type,
-					'post_status'    => array( 'publish', 'inherit' ),
-				)
+			$args = array(
+				'posts_per_page'         => 1,
+				'post_type'              => $post_type,
+				'post_status'            => array( 'publish', 'inherit' ),
+				'ignore_sticky_posts'    => true,
+				'no_found_rows'          => true,
+				'lazy_load_term_meta'    => false,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
 			);
 
-			if ( ! isset( $posts[0] ) ) {
+			$the_query = new \WP_Query( $args );
+
+			if ( $the_query->have_posts() ) {
+				while ( $the_query->have_posts() ) {
+					$the_query->the_post();
+
+					$urls[] = get_permalink();
+
+					// Add post category link.
+					$id = get_the_ID();
+					if ( 'post' === get_post_type( $id ) ) {
+						$category = get_the_category( $id );
+						$urls[]   = get_category_link( $category[0]->term_id );
+					}
+				}
+			} else {
 				throw new Exception(
 					sprintf(
 						/* translators: %s: The Post Type name. */
@@ -161,13 +179,8 @@ class Enqueued_Styles_Scope_Check extends Abstract_Runtime_Check implements With
 				);
 			}
 
-			$urls[] = get_permalink( $posts[0] );
-
-			// Add post category link.
-			if ( 'post' === get_post_type( $posts[0] ) ) {
-				$category = get_the_category( $posts[0]->ID );
-				$urls[]   = get_category_link( $category[0]->term_id );
-			}
+			/* Restore original Post Data */
+			wp_reset_postdata();
 		}
 
 		return $urls;
@@ -179,12 +192,11 @@ class Enqueued_Styles_Scope_Check extends Abstract_Runtime_Check implements With
 	 * @since n.e.x.t
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
-	 * @param string       $url    URL to run the check for.
 	 *
 	 * @throws Exception Thrown when the check fails with a critical error (unrelated to any errors detected as part of
 	 *                   the check).
 	 */
-	protected function check_url( Check_Result $result, $url ) {
+	protected function check_url( Check_Result $result ) {
 		// Reset the wp_styles instance.
 		unset( $GLOBALS['wp_styles'] );
 
