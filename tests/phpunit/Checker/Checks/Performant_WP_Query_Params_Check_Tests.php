@@ -8,8 +8,9 @@
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Checks\Performant_WP_Query_Params_Check;
+use WordPress\Plugin_Check\Test_Utils\TestCase\Static_Check_UnitTestCase;
 
-class Performant_WP_Query_Params_Check_Tests extends WP_UnitTestCase {
+class Performant_WP_Query_Params_Check_Tests extends Static_Check_UnitTestCase {
 
 	public function test_run_with_errors() {
 		$performant_query = new Performant_WP_Query_Params_Check();
@@ -19,7 +20,6 @@ class Performant_WP_Query_Params_Check_Tests extends WP_UnitTestCase {
 		$performant_query->run( $check_result );
 
 		$errors = $check_result->get_errors();
-		$warnings = $check_result->get_warnings();
 
 		$this->assertNotEmpty( $errors );
 		$this->assertArrayHasKey( 'load.php', $errors );
@@ -30,7 +30,6 @@ class Performant_WP_Query_Params_Check_Tests extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 5, $errors['load.php'][22] );
 		$this->assertArrayHasKey( 'code', $errors['load.php'][22][5][0] );
 		$this->assertEquals( 'WordPress.DB.SlowDBQuery', $errors['load.php'][22][5][0]['code'] );
-
 	}
 
 	public function test_run_without_errors() {
