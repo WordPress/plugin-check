@@ -28,12 +28,6 @@ class Enqueued_Styles_Scope_Check_Tests extends Runtime_Check_UnitTestCase {
 		$this->assertEquals( 1, $results->get_warning_count() );
 	}
 
-	/**
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
-	 *
-	 * @return void
-	 */
 	public function test_run_without_errors() {
 		// Load the test plugin.
 		require TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-enqueued-styles-scope-check-without-error/load.php';
