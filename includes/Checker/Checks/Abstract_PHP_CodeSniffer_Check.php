@@ -96,6 +96,9 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 			throw $e;
 		}
 
+		// Restore original arguments.
+		$_SERVER['argv'] = $orig_cmd_args;
+
 		// Parse the reports into data to add to the overall $result.
 		$reports = json_decode( trim( $reports ), true );
 
