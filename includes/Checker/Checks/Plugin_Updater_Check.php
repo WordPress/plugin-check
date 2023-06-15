@@ -18,10 +18,10 @@ use WordPress\Plugin_Check\Checker\Check_Result;
 class Plugin_Updater_Check extends Abstract_File_Check {
 
 	const TYPE_PLUGIN_UPDATE_URI_HEADER = 1;
-	const TYPE_PLUGIN_UPDATER_FILE      = 3;
-	const TYPE_PLUGIN_UPDATERS          = 5;
-	const TYPE_PLUGIN_UPDATER_ROUTINES  = 7;
-	const TYPE_ALL                      = 9; // Same as all of the above with bitwise OR.
+	const TYPE_PLUGIN_UPDATER_FILE      = 2;
+	const TYPE_PLUGIN_UPDATERS          = 4;
+	const TYPE_PLUGIN_UPDATER_ROUTINES  = 8;
+	const TYPE_ALL                      = 15; // Same as all of the above with bitwise OR.
 
 	/**
 	 * Bitwise flags to control check behavior.
