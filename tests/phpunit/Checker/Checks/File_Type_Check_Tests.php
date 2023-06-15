@@ -16,7 +16,7 @@ class File_Type_Check_Tests extends WP_UnitTestCase {
 	 */
 	public function test_run_with_file_type_errors( $type_flag, $plugin_basename, $expected_file, $expected_code ) {
 		// Test given plugin with relevant forbidden file types.
-		$check_context = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/' . $plugin_basename );
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . $plugin_basename );
 		$check_result  = new Check_Result( $check_context );
 
 		$check = new File_Type_Check( $type_flag );
@@ -57,7 +57,7 @@ class File_Type_Check_Tests extends WP_UnitTestCase {
 
 	public function test_run_with_vcs_dir_errors() {
 		// Test plugin with a .bzr directory which is forbidden.
-		$check_context = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-file-type-vcs-hidden-errors/load.php' );
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-file-type-vcs-hidden-errors/load.php' );
 		$check_result  = new Check_Result( $check_context );
 
 		$check = new File_Type_Check( File_Type_Check::TYPE_VCS );
@@ -81,7 +81,7 @@ class File_Type_Check_Tests extends WP_UnitTestCase {
 
 	public function test_run_without_any_file_type_errors() {
 		// Test plugin without any forbidden file types.
-		$check_context = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-i18n-usage-without-errors/load.php' );
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-i18n-usage-without-errors/load.php' );
 		$check_result  = new Check_Result( $check_context );
 
 		$check = new File_Type_Check();

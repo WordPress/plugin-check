@@ -15,7 +15,7 @@ class Plugin_Updater_Check_Tests extends WP_UnitTestCase {
 	 * @dataProvider data_plugin_updater_check
 	 */
 	public function test_run_with_plugin_updater_errors( $type_flag, $plugin_basename, $expected_file, $code, $error ) {
-		$check_context = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/' . $plugin_basename );
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . $plugin_basename );
 		$check_result  = new Check_Result( $check_context );
 
 		$check = new Plugin_Updater_Check( $type_flag );
@@ -91,7 +91,7 @@ class Plugin_Updater_Check_Tests extends WP_UnitTestCase {
 
 	public function test_run_without_any_errors() {
 		// Test plugin without any plugin updater.
-		$check_context = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-i18n-usage-without-errors/load.php' );
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-i18n-usage-without-errors/load.php' );
 		$check_result  = new Check_Result( $check_context );
 
 		$check = new Plugin_Updater_Check();
