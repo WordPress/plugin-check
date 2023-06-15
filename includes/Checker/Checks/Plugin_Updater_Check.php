@@ -142,12 +142,12 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 	protected function look_for_plugin_updaters( Check_Result $result, array $php_files ) {
 
 		$look_for_regex = array(
-			'#\'plugin-update-checker\'#i',
-			'#WP_GitHub_Updater#i',
-			'#WPGitHubUpdater#i',
+			'#\'plugin-update-checker\'#',
+			'#WP_GitHub_Updater#',
+			'#WPGitHubUpdater#',
 			'#class [A-Z_]+_Plugin_Updater#i',
 			'#updater\.\w+\.\w{2,5}#i',
-			'#site_transient_update_plugins#i',
+			'#site_transient_update_plugins#',
 		);
 
 		foreach ( $look_for_regex as $regex ) {
@@ -179,7 +179,7 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 	protected function look_for_updater_routines( Check_Result $result, array $php_files ) {
 
 		$look_for_regex = array(
-			'#auto_update_plugin#i',
+			'#auto_update_plugin#',
 			'#pre_set_site_transient_update_\w+#i',
 			'#_site_transient_update_\w+#i',
 		);
