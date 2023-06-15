@@ -106,15 +106,16 @@ class Enqueued_Styles_Scope_Check extends Abstract_Runtime_Check implements With
 	 * @param Check_Result $result The check results to amend and the plugin context.
 	 */
 	public function run( Check_Result $result ) {
+		$urls = $this->get_urls();
 		$this->run_for_urls(
-			$this->get_urls(),
+			$urls,
 			function () use ( $result ) {
 				$this->check_url( $result );
 			}
 		);
 
 		if ( ! empty( $this->plugin_styles ) ) {
-			$url_count = count( $this->get_urls() );
+			$url_count = count( $urls );
 			foreach ( $this->plugin_styles as $plugin_style ) {
 				if ( isset( $plugin_style['count'] ) && ( $url_count === $plugin_style['count'] ) ) {
 					$result->add_message(
@@ -140,7 +141,9 @@ class Enqueued_Styles_Scope_Check extends Abstract_Runtime_Check implements With
 	 * @throws Exception Thrown when a post type URL cannot be retrieved.
 	 */
 	protected function get_urls() {
-		$urls = array( home_url( '/' ) );
+		$urls   = array( home_url( '/' ) );
+		$urls[] = get_search_link();
+		$urls[] = get_author_posts_url( (int) get_the_author_meta( 'ID' ) );
 
 		foreach ( $this->get_viewable_post_types() as $post_type ) {
 			$args = array(
@@ -219,11 +222,10 @@ class Enqueued_Styles_Scope_Check extends Abstract_Runtime_Check implements With
 
 			$style_path = str_replace( $result->plugin()->url(), $result->plugin()->path(), $style->src );
 
-			if ( isset( $this->plugin_style_count[ $handle ] ) ) {
-				$this->plugin_style_count[ $handle ] += 1;
-			} else {
-				$this->plugin_style_count[ $handle ] = 1;
+			if ( ! isset( $this->plugin_style_count[ $handle ] ) ) {
+				$this->plugin_style_count[ $handle ] = 0;
 			}
+			$this->plugin_style_count[ $handle ] += 1;
 
 			$this->plugin_styles[ $handle ] = array(
 				'path'  => $style_path,
