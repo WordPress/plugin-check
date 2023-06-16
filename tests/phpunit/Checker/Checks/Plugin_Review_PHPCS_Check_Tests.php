@@ -14,7 +14,7 @@ class Plugin_Review_PHPCS_Check_Tests extends Static_Check_UnitTestCase {
 
 	public function test_run_with_errors() {
 		$plugin_review_phpcs_check = new Plugin_Review_PHPCS_Check();
-		$check_context             = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-review-phpcs-errors/load.php' );
+		$check_context             = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-review-phpcs-errors/load.php' );
 		$check_result              = new Check_Result( $check_context );
 
 		$plugin_review_phpcs_check->run( $check_result );
@@ -40,7 +40,7 @@ class Plugin_Review_PHPCS_Check_Tests extends Static_Check_UnitTestCase {
 
 	public function test_run_without_errors() {
 		$plugin_review_phpcs_check = new Plugin_Review_PHPCS_Check();
-		$check_context             = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-review-phpcs-without-errors/load.php' );
+		$check_context             = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-review-phpcs-without-errors/load.php' );
 		$check_result              = new Check_Result( $check_context );
 
 		$plugin_review_phpcs_check->run( $check_result );
