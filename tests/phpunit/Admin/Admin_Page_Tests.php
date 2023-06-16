@@ -149,7 +149,7 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 		$this->assertEquals(
 			sprintf(
 				'<a href="%1$s">%2$s</a>',
-				esc_url( admin_url() . 'tools.php?page=plugin-check&plugin=' . $base_file ),
+				esc_url( admin_url( "tools.php?page=plugin-check&plugin={$base_file}" ) ),
 				esc_html__( 'Check this plugin', 'plugin-check' )
 			),
 			$action_links[0]

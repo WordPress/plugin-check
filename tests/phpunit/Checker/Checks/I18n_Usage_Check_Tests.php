@@ -1,6 +1,6 @@
 <?php
 /**
- * Tests for the I18n_Usage_Check_Tests class.
+ * Tests for the I18n_Usage_Check class.
  *
  * @package plugin-check
  */
@@ -8,12 +8,13 @@
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Checks\I18n_Usage_Check;
+use WordPress\Plugin_Check\Test_Utils\TestCase\Static_Check_UnitTestCase;
 
-class I18n_Usage_Check_Tests extends WP_UnitTestCase {
+class I18n_Usage_Check_Tests extends Static_Check_UnitTestCase {
 
 	public function test_run_with_errors() {
 		$i18n_usage_check = new I18n_Usage_Check();
-		$check_context    = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-i18n-usage-errors/load.php' );
+		$check_context    = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-i18n-usage-errors/load.php' );
 		$check_result     = new Check_Result( $check_context );
 
 		$i18n_usage_check->run( $check_result );
@@ -39,7 +40,7 @@ class I18n_Usage_Check_Tests extends WP_UnitTestCase {
 
 	public function test_run_without_errors() {
 		$i18n_usage_check = new I18n_Usage_Check();
-		$check_context    = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-i18n-usage-without-errors/load.php' );
+		$check_context    = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-i18n-usage-without-errors/load.php' );
 		$check_result     = new Check_Result( $check_context );
 
 		$i18n_usage_check->run( $check_result );

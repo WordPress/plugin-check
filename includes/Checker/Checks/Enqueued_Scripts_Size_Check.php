@@ -47,8 +47,6 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	 */
 	public function __construct( $threshold_size = 300000 ) {
 		$this->threshold_size = $threshold_size;
-
-		$this->viewable_post_types = array_filter( get_post_types(), 'is_post_type_viewable' );
 	}
 
 	/**
@@ -95,7 +93,7 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 					'post_status'  => 'publish',
 				);
 			},
-			$this->viewable_post_types
+			$this->get_viewable_post_types()
 		);
 
 		return array(
@@ -131,7 +129,7 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	protected function get_urls() {
 		$urls = array( home_url() );
 
-		foreach ( $this->viewable_post_types as $post_type ) {
+		foreach ( $this->get_viewable_post_types() as $post_type ) {
 			$posts = get_posts(
 				array(
 					'posts_per_page' => 1,
@@ -232,5 +230,18 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 				);
 			}
 		}
+	}
+
+	/**
+	 * Returns an array of viewable post types.
+	 *
+	 * @return array Array of viewable post type slugs.
+	 */
+	private function get_viewable_post_types() {
+		if ( ! is_array( $this->viewable_post_types ) ) {
+			$this->viewable_post_types = array_filter( get_post_types(), 'is_post_type_viewable' );
+		}
+
+		return $this->viewable_post_types;
 	}
 }
