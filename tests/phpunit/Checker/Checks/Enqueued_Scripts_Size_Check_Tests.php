@@ -62,7 +62,7 @@ class Enqueued_Scripts_Size_Check_Tests extends Runtime_Check_UnitTestCase {
 
 	public function test_run_without_errors() {
 		// Load the test plugin.
-		require TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-enqueued-script-size-check/load.php';
+		require UNIT_TESTS_PLUGIN_DIR . 'test-plugin-enqueued-script-size-check/load.php';
 
 		$check   = new Enqueued_Scripts_Size_Check();
 		$context = $this->get_context( WP_PLUGIN_CHECK_MAIN_FILE );
@@ -80,7 +80,7 @@ class Enqueued_Scripts_Size_Check_Tests extends Runtime_Check_UnitTestCase {
 
 	public function test_run_with_errors() {
 		// Load the test plugin.
-		require TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-enqueued-script-size-check/load.php';
+		require UNIT_TESTS_PLUGIN_DIR . 'test-plugin-enqueued-script-size-check/load.php';
 
 		// Test with low threshold to force warnings.
 		$check   = new Enqueued_Scripts_Size_Check( 1 );
@@ -99,7 +99,7 @@ class Enqueued_Scripts_Size_Check_Tests extends Runtime_Check_UnitTestCase {
 
 	public function test_run_with_errors_for_inline_script() {
 		// Load the test plugin.
-		require TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-enqueued-script-size-check/load.php';
+		require UNIT_TESTS_PLUGIN_DIR . 'test-plugin-enqueued-script-size-check/load.php';
 
 		// Test with threshold under the enqueued test-script.js byte size.
 		$check   = new Enqueued_Scripts_Size_Check( 20 );
