@@ -14,7 +14,7 @@ class Performant_WP_Query_Params_Check_Tests extends Static_Check_UnitTestCase {
 
 	public function test_run_with_errors() {
 		$performant_query = new Performant_WP_Query_Params_Check();
-		$check_context    = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-performant-wp-query-params-errors/load.php' );
+		$check_context    = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-performant-wp-query-params-errors/load.php' );
 		$check_result     = new Check_Result( $check_context );
 
 		$performant_query->run( $check_result );
@@ -46,7 +46,7 @@ class Performant_WP_Query_Params_Check_Tests extends Static_Check_UnitTestCase {
 
 	public function test_run_without_errors() {
 		$performant_query = new Performant_WP_Query_Params_Check();
-		$check_context    = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-performant-wp-query-params-without-errors/load.php' );
+		$check_context    = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-performant-wp-query-params-without-errors/load.php' );
 		$check_result     = new Check_Result( $check_context );
 
 		$performant_query->run( $check_result );
