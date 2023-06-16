@@ -14,7 +14,7 @@ class Late_Escaping_Check_Tests extends Static_Check_UnitTestCase {
 
 	public function test_run_with_errors() {
 		$late_escape_check = new Late_Escaping_Check();
-		$check_context     = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-late-escaping-errors/load.php' );
+		$check_context     = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-late-escaping-errors/load.php' );
 		$check_result      = new Check_Result( $check_context );
 
 		$late_escape_check->run( $check_result );
@@ -34,7 +34,7 @@ class Late_Escaping_Check_Tests extends Static_Check_UnitTestCase {
 
 	public function test_run_without_errors() {
 		$late_escape_check = new Late_Escaping_Check();
-		$check_context     = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-late-escaping-without-errors/load.php' );
+		$check_context     = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-late-escaping-without-errors/load.php' );
 		$check_result      = new Check_Result( $check_context );
 
 		$late_escape_check->run( $check_result );

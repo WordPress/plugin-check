@@ -6,6 +6,7 @@
  */
 
 define( 'TESTS_PLUGIN_DIR', dirname( dirname( __DIR__ ) ) );
+define( 'UNIT_TESTS_PLUGIN_DIR', TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/' );
 
 if ( file_exists( TESTS_PLUGIN_DIR . '/vendor/autoload.php' ) ) {
 	require_once TESTS_PLUGIN_DIR . '/vendor/autoload.php';
