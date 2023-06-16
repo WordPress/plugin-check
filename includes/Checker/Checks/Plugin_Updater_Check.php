@@ -151,6 +151,7 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 		);
 
 		foreach ( $look_for_regex as $regex ) {
+			$matches      = array();
 			$updater_file = self::file_preg_match( $regex, $php_files, $matches );
 			if ( $updater_file ) {
 				$this->add_result_error_for_file(
