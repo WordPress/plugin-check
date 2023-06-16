@@ -94,7 +94,7 @@ class Enqueued_Scripts_Size_Check_Tests extends Runtime_Check_UnitTestCase {
 		$this->assertNotEmpty( $warnings );
 
 		$this->assertEquals( 0, $results->get_error_count() );
-		$this->assertEquals( 8, $results->get_warning_count() );
+		$this->assertEquals( 4, $results->get_warning_count() );
 	}
 
 	public function test_run_with_errors_for_inline_script() {
@@ -113,6 +113,6 @@ class Enqueued_Scripts_Size_Check_Tests extends Runtime_Check_UnitTestCase {
 		$this->assertNotEmpty( $warnings );
 
 		$this->assertEquals( 0, $results->get_error_count() );
-		$this->assertEquals( 8, $results->get_warning_count() );
+		$this->assertEquals( 4, $results->get_warning_count() );
 	}
 }

@@ -14,7 +14,7 @@ class Enqueued_Scripts_In_Footer_Check_Tests extends Static_Check_UnitTestCase {
 
 	public function test_run_with_errors() {
 		$enqueued_scripts_in_footer_check = new Enqueued_Scripts_In_Footer_Check();
-		$check_context                    = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-enqueued-scripts-in-footer-check-with-errors/load.php' );
+		$check_context                    = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-enqueued-scripts-in-footer-check-with-errors/load.php' );
 		$check_result                     = new Check_Result( $check_context );
 
 		$enqueued_scripts_in_footer_check->run( $check_result );
@@ -38,7 +38,7 @@ class Enqueued_Scripts_In_Footer_Check_Tests extends Static_Check_UnitTestCase {
 
 	public function test_run_without_errors() {
 		$enqueued_scripts_in_footer_check = new Enqueued_Scripts_In_Footer_Check();
-		$check_context                    = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-enqueued-scripts-in-footer-check-without-errors/load.php' );
+		$check_context                    = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-enqueued-scripts-in-footer-check-without-errors/load.php' );
 		$check_result                     = new Check_Result( $check_context );
 
 		$enqueued_scripts_in_footer_check->run( $check_result );
