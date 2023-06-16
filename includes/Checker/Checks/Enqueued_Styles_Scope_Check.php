@@ -141,10 +141,7 @@ class Enqueued_Styles_Scope_Check extends Abstract_Runtime_Check implements With
 	 * @throws Exception Thrown when a post type URL cannot be retrieved.
 	 */
 	protected function get_urls() {
-		$urls   = array( home_url( '/' ) );
-		$urls[] = get_search_link();
-		$urls[] = get_author_posts_url( (int) get_the_author_meta( 'ID' ) );
-
+		$urls = array( home_url( '/' ), get_search_link(), get_author_posts_url( 1 ) );
 		foreach ( $this->get_viewable_post_types() as $post_type ) {
 			$args = array(
 				'posts_per_page'         => 1,
@@ -163,13 +160,24 @@ class Enqueued_Styles_Scope_Check extends Abstract_Runtime_Check implements With
 				while ( $the_query->have_posts() ) {
 					$the_query->the_post();
 
-					$urls[] = get_permalink();
+					$urls[]         = get_permalink();
+					$post           = get_post();
+					$taxonomy_names = get_post_taxonomies( $post );
+					foreach ( $taxonomy_names as $taxonomy_name ) {
+						if ( ! is_taxonomy_viewable( $taxonomy_name ) ) {
+							continue;
+						}
 
-					// Add post category link.
-					$id = get_the_ID();
-					if ( 'post' === get_post_type( $id ) ) {
-						$category = get_the_category( $id );
-						$urls[]   = get_category_link( $category[0]->term_id );
+						$terms = get_the_terms( $post, $taxonomy_name );
+						if ( ! is_array( $terms ) ) {
+							continue;
+						}
+						foreach ( $terms as $term ) {
+							$term_link = get_term_link( $term );
+							if ( ! is_wp_error( $term_link ) ) {
+								$urls[] = $term_link;
+							}
+						}
 					}
 				}
 			} else {
