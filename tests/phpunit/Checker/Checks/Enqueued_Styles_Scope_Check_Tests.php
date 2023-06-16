@@ -12,7 +12,7 @@ class Enqueued_Styles_Scope_Check_Tests extends Runtime_Check_UnitTestCase {
 
 	public function test_run_with_errors() {
 		// Load the test plugin.
-		require TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-enqueued-styles-scope-check-with-error/load.php';
+		require UNIT_TESTS_PLUGIN_DIR . 'test-plugin-enqueued-styles-scope-check-with-error/load.php';
 
 		$check   = new Enqueued_Styles_Scope_Check();
 		$context = $this->get_context( WP_PLUGIN_CHECK_MAIN_FILE );
@@ -30,7 +30,7 @@ class Enqueued_Styles_Scope_Check_Tests extends Runtime_Check_UnitTestCase {
 
 	public function test_run_without_errors() {
 		// Load the test plugin.
-		require TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-enqueued-styles-scope-check-without-error/load.php';
+		require UNIT_TESTS_PLUGIN_DIR . 'test-plugin-enqueued-styles-scope-check-without-error/load.php';
 
 		$check   = new Enqueued_Styles_Scope_Check();
 		$context = $this->get_context( WP_PLUGIN_CHECK_MAIN_FILE );
