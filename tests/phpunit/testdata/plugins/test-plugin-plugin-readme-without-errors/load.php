@@ -14,4 +14,3 @@
  *
  * @package test-plugin-check-errors
  */
-

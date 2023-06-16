@@ -13,7 +13,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 	public function test_run_with_errors_no_readme() {
 		$readme_check  = new Plugin_Readme_Check();
-		$check_context = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-plugin-readme-errors-no-readme/load.php' );
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-no-readme/load.php' );
 		$check_result  = new Check_Result( $check_context );
 
 		$readme_check->run( $check_result );
@@ -33,7 +33,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 	public function test_run_with_errors_default_text() {
 		$readme_check  = new Plugin_Readme_Check();
-		$check_context = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-plugin-readme-errors-default-text/load.php' );
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-default-text/load.php' );
 		$check_result  = new Check_Result( $check_context );
 
 		$readme_check->run( $check_result );
@@ -53,7 +53,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 	public function test_run_with_errors_stable_tag() {
 		$readme_check  = new Plugin_Readme_Check();
-		$check_context = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-plugin-readme-errors-stable-tag/load.php' );
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-stable-tag/load.php' );
 		$check_result  = new Check_Result( $check_context );
 
 		$readme_check->run( $check_result );
@@ -79,7 +79,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 	public function test_run_with_errors_license() {
 		$readme_check  = new Plugin_Readme_Check();
-		$check_context = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-plugin-readme-errors-license/load.php' );
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-license/load.php' );
 		$check_result  = new Check_Result( $check_context );
 
 		$readme_check->run( $check_result );
@@ -99,7 +99,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 	public function test_run_without_errors() {
 		$readme_check  = new Plugin_Readme_Check();
-		$check_context = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-plugin-readme-without-errors/load.php' );
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-without-errors/load.php' );
 		$check_result  = new Check_Result( $check_context );
 
 		$readme_check->run( $check_result );

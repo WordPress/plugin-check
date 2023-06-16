@@ -34,8 +34,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				false,
 				__( 'The plugin readme.txt does not exist.', 'plugin-check' ),
 				array(
-					'file' => 'readme.txt',
 					'code' => 'no_plugin_readme',
+					'file' => 'readme.txt',
 				)
 			);
 
@@ -93,7 +93,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 			return;
 		}
 
-		// Test for a valid valid SPDX license identifier.
+		// Test for a valid SPDX license identifier.
 		if ( ! preg_match( '/^([a-z0-9\-\+\.]+)(\sor\s([a-z0-9\-\+\.]+))*$/i', $matches[2] ) ) {
 			$result->add_message(
 				false,
