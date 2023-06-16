@@ -13,7 +13,7 @@ class Plugin_Header_Text_Domain_Check_Tests extends WP_UnitTestCase {
 
 	public function test_run_with_errors() {
 		$plugin_header_text_domain_check = new Plugin_Header_Text_Domain_Check();
-		$check_context                   = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-header-text-domain-with-errors/load.php' );
+		$check_context                   = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-header-text-domain-with-errors/load.php' );
 		$check_result                    = new Check_Result( $check_context );
 
 		$plugin_header_text_domain_check->run( $check_result );
@@ -32,7 +32,7 @@ class Plugin_Header_Text_Domain_Check_Tests extends WP_UnitTestCase {
 
 	public function test_run_without_errors() {
 		$plugin_header_text_domain_check = new Plugin_Header_Text_Domain_Check();
-		$check_context                   = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-header-text-domain-without-errors/load.php' );
+		$check_context                   = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-header-text-domain-without-errors/load.php' );
 		$check_result                    = new Check_Result( $check_context );
 
 		$plugin_header_text_domain_check->run( $check_result );

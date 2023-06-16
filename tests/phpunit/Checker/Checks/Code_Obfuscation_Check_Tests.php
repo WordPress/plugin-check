@@ -16,7 +16,7 @@ class Code_Obfuscation_Check_Tests extends WP_UnitTestCase {
 	 */
 	public function test_run_with_obfuscation_errors( $type_flag, $plugin_basename, $expected_file ) {
 		// Test given plugin with relevant obfuscation.
-		$check_context = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/' . $plugin_basename );
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . $plugin_basename );
 		$check_result  = new Check_Result( $check_context );
 
 		$check = new Code_Obfuscation_Check( $type_flag );
@@ -54,7 +54,7 @@ class Code_Obfuscation_Check_Tests extends WP_UnitTestCase {
 
 	public function test_run_without_any_obfuscation_errors() {
 		// Test plugin without any obfuscation.
-		$check_context = new Check_Context( TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/test-plugin-i18n-usage-without-errors/load.php' );
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-i18n-usage-without-errors/load.php' );
 		$check_result  = new Check_Result( $check_context );
 
 		$check = new Code_Obfuscation_Check();
