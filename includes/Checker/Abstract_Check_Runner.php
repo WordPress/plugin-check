@@ -368,14 +368,15 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		$checks = apply_filters(
 			'wp_plugin_check_checks',
 			array(
-				'i18n_usage'                => new Checks\I18n_Usage_Check(),
-				'enqueued_scripts_size'     => new Checks\Enqueued_Scripts_Size_Check(),
-				'code_obfuscation'          => new Checks\Code_Obfuscation_Check(),
-				'file_type'                 => new Checks\File_Type_Check(),
-				'plugin_header_text_domain' => new Checks\Plugin_Header_Text_Domain_Check(),
-				'late_escaping'             => new Checks\Late_Escaping_Check(),
-				'plugin_updater'            => new Checks\Plugin_Updater_Check(),
-				'plugin_review_phpcs'       => new Checks\Plugin_Review_PHPCS_Check(),
+				'i18n_usage'                 => new Checks\I18n_Usage_Check(),
+				'enqueued_scripts_size'      => new Checks\Enqueued_Scripts_Size_Check(),
+				'code_obfuscation'           => new Checks\Code_Obfuscation_Check(),
+				'file_type'                  => new Checks\File_Type_Check(),
+				'plugin_header_text_domain'  => new Checks\Plugin_Header_Text_Domain_Check(),
+				'late_escaping'              => new Checks\Late_Escaping_Check(),
+				'plugin_updater'             => new Checks\Plugin_Updater_Check(),
+				'plugin_review_phpcs'        => new Checks\Plugin_Review_PHPCS_Check(),
+				'enqueued_scripts_in_footer' => new Checks\Enqueued_Scripts_In_Footer_Check(),
 			)
 		);
 
