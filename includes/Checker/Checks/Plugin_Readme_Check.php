@@ -86,6 +86,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 * @param array        $files  Array of plugin files.
 	 */
 	private function check_license( Check_Result $result, array $files ) {
+		$matches = array();
 		// Get the license from the readme file.
 		self::file_preg_match( '/(License:|License URI:)\s*(.+)*/i', $files, $matches );
 
@@ -115,6 +116,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 * @param array        $files  Array of plugin files.
 	 */
 	private function check_stable_tag( Check_Result $result, array $files ) {
+		$matches = array();
 		// Get the readme.txt Stable tag.
 		if ( ! self::file_preg_match( '/Stable tag:\s*([a-z0-9\.]+)/i', $files, $matches ) ) {
 			return;
