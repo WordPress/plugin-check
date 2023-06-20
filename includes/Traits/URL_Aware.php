@@ -108,6 +108,8 @@ trait URL_Aware {
 	 * @since n.e.x.t
 	 *
 	 * @param string $url URL to simulate request for.
+	 *
+	 * @SuppressWarnings(PHPMD.NPathComplexity)
 	 */
 	protected function go_to( $url ) {
 		/*
