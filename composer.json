@@ -24,6 +24,10 @@
       "build-cs/vendor/bin/phpcbf --standard=phpcs.xml.dist"
     ],
     "test": "phpunit -c phpunit.xml.dist --verbose",
+    "phpmd": [
+      "composer --working-dir=build-cs install",
+      "build-cs/vendor/bin/phpmd . text phpmd.xml"
+    ],
     "phpstan": [
       "composer --working-dir=build-cs install",
       "build-cs/vendor/bin/phpstan analyse --memory-limit=2048M"

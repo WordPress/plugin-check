@@ -55,6 +55,8 @@ class Plugin_Main {
 	 */
 	public function add_hooks() {
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			global $context;
+
 			// Setup the CLI command.
 			$context = $this->context();
 			require_once WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'cli.php';
