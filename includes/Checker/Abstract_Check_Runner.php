@@ -376,7 +376,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 				'late_escaping'              => new Checks\Late_Escaping_Check(),
 				'plugin_updater'             => new Checks\Plugin_Updater_Check(),
 				'plugin_review_phpcs'        => new Checks\Plugin_Review_PHPCS_Check(),
-				'performant_wp_query_params' => new Checks\Late_Escaping_Check(),
+				'performant_wp_query_params' => new Checks\Performant_WP_Query_Params_Check(),
 				'enqueued_scripts_in_footer' => new Checks\Enqueued_Scripts_In_Footer_Check(),
 				'plugin_readme'              => new Checks\Plugin_Readme_Check(),
 				'enqueued_styles_scope'      => new Checks\Enqueued_Styles_Scope_Check(),
