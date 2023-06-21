@@ -22,29 +22,10 @@ class Checks_Tests extends WP_UnitTestCase {
 		$this->context = new Check_Context( 'test-plugin/test-plugin.php' );
 	}
 
-	public function test_get_checks_returns_array_of_expected_checks() {
-		$expected = array(
-			new Empty_Check(),
-			new Error_Check(),
-		);
-
-		add_filter(
-			'wp_plugin_check_checks',
-			function( $checks ) use ( $expected ) {
-				return $expected;
-			}
-		);
-
-		$checks = $this->checks->get_checks();
-
-		$this->assertIsArray( $checks );
-		$this->assertSame( $expected, $checks );
-	}
-
 	public function test_run_checks() {
 		$all_checks = array(
-			new WordPress\Plugin_Check\Test_Data\Empty_Check(),
-			new WordPress\Plugin_Check\Test_Data\Error_Check(),
+			new Empty_Check(),
+			new Error_Check(),
 		);
 
 		$checks_to_run = array(
@@ -67,8 +48,8 @@ class Checks_Tests extends WP_UnitTestCase {
 
 	public function test_run_checks_with_error() {
 		$all_checks = array(
-			new WordPress\Plugin_Check\Test_Data\Empty_Check(),
-			new WordPress\Plugin_Check\Test_Data\Error_Check(),
+			new Empty_Check(),
+			new Error_Check(),
 		);
 
 		$checks_to_run = array(

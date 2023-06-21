@@ -1,6 +1,6 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\PHP_CodeSniffer_Check
+ * Class WordPress\Plugin_Check\Checker\Checks\Abstract_PHP_CodeSniffer_Check
  *
  * @package plugin-check
  */
@@ -8,6 +8,7 @@
 namespace WordPress\Plugin_Check\Checker\Checks;
 
 use Exception;
+use PHP_CodeSniffer\Runner;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Static_Check;
 
@@ -59,7 +60,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	 */
 	final public function run( Check_Result $result ) {
 		// Include the PHPCS autoloader.
-		$autoloader = WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/vendor/squizlabs/php_codesniffer/autoload.php';
+		$autoloader = WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'vendor/squizlabs/php_codesniffer/autoload.php';
 
 		if ( file_exists( $autoloader ) ) {
 			include_once $autoloader;
@@ -88,13 +89,16 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		// Run PHPCS.
 		try {
 			ob_start();
-			$runner = new \PHP_CodeSniffer\Runner(); // phpcs:ignore SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.ReferenceViaFullyQualifiedName
+			$runner = new Runner();
 			$runner->runPHPCS();
 			$reports = ob_get_clean();
 		} catch ( Exception $e ) {
 			$_SERVER['argv'] = $orig_cmd_args;
 			throw $e;
 		}
+
+		// Restore original arguments.
+		$_SERVER['argv'] = $orig_cmd_args;
 
 		// Parse the reports into data to add to the overall $result.
 		$reports = json_decode( trim( $reports ), true );

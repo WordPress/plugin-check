@@ -70,6 +70,9 @@ class AJAX_Runner extends Abstract_Check_Runner {
 	 * @return array An array of Check slugs to run.
 	 */
 	protected function get_check_slugs_param() {
-		return filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
+		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
+		$checks = is_null( $checks ) ? array() : $checks;
+
+		return $checks;
 	}
 }
