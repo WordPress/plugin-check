@@ -26,7 +26,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 */
 	protected function check_files( Check_Result $result, array $files ) {
 		// Find the readme file.
-		$readme = self::filter_files_by_regex( $files, '/readme\.txt|readme\.md$/' );
+		$readme = self::filter_files_by_regex( $files, '/readme\.(txt|md)$/i' );
 
 		// If the readme.txt does not exist, add a warning and skip other tests.
 		if ( empty( $readme ) ) {
