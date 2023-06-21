@@ -1,0 +1,13 @@
+diff --git a/WordPressVIPMinimum/ruleset.xml b/WordPressVIPMinimum/ruleset.xml
+index 2ce2511..dd306ca 100644
+--- a/WordPressVIPMinimum/ruleset.xml
++++ b/WordPressVIPMinimum/ruleset.xml
+@@ -26,8 +26,6 @@
+ 	<rule ref="WordPress.DB.DirectDatabaseQuery"/>
+ 	<rule ref="WordPress.DB.SlowDBQuery"/>
+ 	<rule ref="WordPress.WP.GlobalVariablesOverride"/>
+-	<rule ref="WordPress.PHP.StrictComparisons"/>
+-	<rule ref="WordPress.CodeAnalysis.AssignmentInCondition"/>
+ 	<rule ref="WordPress.PHP.StrictInArray"/>
+ 	<rule ref="WordPress.PHP.DontExtract"/>
+ 	<rule ref="WordPress.WP.CronInterval">
