@@ -122,7 +122,7 @@ The checks `run()` method will hold all the logic to test the plugin and raise a
 
 The run method accepts an instance of the `Check_Results` class which is used to add messages to the results list.
 
-Warnings and errors are added via the `add_message()` method which accepts 3 parameters.
+The warnings and errors are added via the `add_message()` method which accepts 3 parameters.
 
 - `$error (bool)` - Whether the message is an error or warning. True for error, false for warning.
 - `$message (string)` - The error/warning message.

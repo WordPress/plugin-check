@@ -1,19 +1,13 @@
-# Introduction
-
-The Plugin Checker is a WordPress plugin that can check a plugin for potential problems around plugin development best practices, with a focus on performance and security.
-
-## Technical Overview
+# Technical Overview
 
 The Plugin Checker works by running checks against a single plugin. Each check will test for a specific issue and raise either an error or warning depending on the severity.
 
 The Plugin Checker performs these checks following the process below.
 
-1. Determine Checks to run based on the request.
-2. Setup the Runtime Environment if required.
-3. Run any Check Preparations required to prepare the environment.
-4. Run all Checks against the plugin.
-5. Clean up the Runtime Environment.
-6. Report all Errors and Warnings raised by the checks run.
+1. Determine checks to run based on the request.
+2. Run any check preparations required to prepare the environment.
+3. Run all checks against the plugin.
+4. Report all errors and warnings raised by the checks run.
 
 
 ## Checks
@@ -39,19 +33,18 @@ As runtime checks execute code against a test environment they often include pre
 
 Preparations are used to prepare the test environment ahead of running a runtime check to ensure that they run correctly.
 
-Preparations can include any logic from activating specific themes or plugins, or creating test content to perform checks against.
+Preparations can include any logic from adding filters, or creating test content to perform checks against.
 
-Preparations can be created as part of the check where the logic contained within the Checks `prepare()` method. Alternatively, preparations can also be created as individual classes so that they may be reusued within other checks.
-
-All preparations return a clean up function which is called after the check run is complete to reverse the changes made by the preparation.
+Every preparation contains a `prepare()` method, which returns a cleanup function that is called to revert the changes made by that method. Preparations can be implemented as their individual classes or alternatively as part of a specific check.
 
 ## The Test Environment
 
-When running a Runtime Check the Plugin Checker creates a Runtime Environment in which to perform checks against. This environment is separate from the production environment in order to prevent making changes to the existing site.
+In the context of runtime checks, the Plugin Checker ensures that the checks are performed in a controlled environment separate from the production site. This approach prevents any unintended changes to the actual WordPress site.
 
-The environment is also configured with a minimal setup by using a basic theme and only activating the test plugin. This is to ensure checks only raise errors and warnings for the plugin being tested.
+To achieve this, the Plugin Checker employs the following practices:
 
+Separate Database Tables: During runtime checks, a distinct set of database tables is utilized. This isolation ensures that the checks do not interfere with the data of the production site.
 
-## Creating custom checks
+Restricted Plugin Activation: Only the plugin being tested is activated in the runtime environment. By keeping other plugins deactivated, the checks focus solely on the plugin under examination.
 
-Custom checks can be created to perform specific tests as part of the Plugin Checker process. Custom checks can be contributed to the main repository or created outside of the main repo and added via the `wp_plugin_check_checks` filter.
+It's important to note that while these measures aim to minimize the impact on the WordPress site, it is strongly advised not to perform runtime checks using the Plugin Checker on a production site. Despite the precautions taken, there is still a possibility of unintended consequences or conflicts.
