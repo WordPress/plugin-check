@@ -19,15 +19,15 @@ The Plugin Checker performs these checks following the process below.
 ## Checks
 Checks are single PHP classes that run code to test a plugin for a specific problem.
 
-Every Check will contain a `run()` method which accepts an instance of the `Check_Results` class. The `Check_Results` object is used to add any errors or warnings raised by the Check to be reported later.
+Every check contains a `run()` method which accepts an instance of the `Check_Result` class. The `Check_Result` instance is used to add any errors or warnings raised by the check to be reported later.
 
 Currently, static and runtime checks are the 2 types of checks that can be run by the Plugin Checker.
 
 ### Static Checks
 
-Static checks are used to perform tests against the codebase without running any code. This is simillar to other static analysis tools such as PHP Code Sniffer.
+Static checks are used to perform tests against the codebase without running any code. This is similar to other static analysis tools such as PHP Code Sniffer.
 
-Static checks are one of the simplest checks to implement and can be used to run existing code standards sniffs, such as those in the WordPress Coding Standards, against a plugin as part of the Plugin Checker test process.
+Static checks can run existing PHPCodeSniffer sniffs, such as those in the [WordPress Coding Standards](https://github.com/WordPress/WordPress-Coding-Standards), or they can be implemented in a more manual way, e.g. searching for specific patterns across all files, similar to how the checks of the [WordPress Theme Check tool](https://github.com/WordPress/theme-check) are implemented.
 
 ### Runtime Checks
 
@@ -37,7 +37,7 @@ As runtime checks execute code against a test environment they often include pre
 
 ### Preparations
 
-Preparations are used to prepare the test environment ahead of running a check to ensure that the tests run correctly.
+Preparations are used to prepare the test environment ahead of running a runtime check to ensure that they run correctly.
 
 Preparations can include any logic from activating specific themes or plugins, or creating test content to perform checks against.
 

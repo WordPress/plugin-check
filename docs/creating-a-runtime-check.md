@@ -1,6 +1,6 @@
 # Creating a Runtime Check
 
-Runtime checks are used to perform tests by executing the plugins code.
+Runtime checks are used to perform tests by executing the plugin's code.
 
 The Plugin Checker uses a number of interfaces to build out runtime checks.
 
@@ -20,8 +20,8 @@ class Custom_Check extends Abstract_Runtime_Check {
     // Handle the Checks preparations and return a cleanup function.
   }
 
-  public function run( Check_Results $results ) {
-    // Handle running the check and adding warnings or errors to the results.
+  public function run( Check_Result $result ) {
+    // Handle running the check and adding warnings or errors to the result.
   }
 }
 ```

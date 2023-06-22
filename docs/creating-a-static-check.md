@@ -1,7 +1,7 @@
 
 # Creating a Static Check
 
-Static checks are used to perform static analysis against a plugins codebase.
+Static checks are used to perform static analysis against a plugin's codebase.
 
 The Plugin Checker uses PHPCS to perform static checks against a plugin and provides the `Abstract_PHP_CodeSniffer_Check` class to help create additional static checks that use PHPCS sniffs.
 
@@ -48,7 +48,7 @@ class I18n_Usage_Check extends Abstract_PHP_CodeSniffer_Check {
 
 In order to run the check as part of the Plugin Checker process it needs to be added to the Plugin Checkers list of available checks.
 
-This is done by using the `wp_plugin_check_checks` filter to register an instance of the Check with it's slug.
+This is done by using the `wp_plugin_check_checks` filter to register an instance of the check with its slug.
 
 ```php
 add_filter(
