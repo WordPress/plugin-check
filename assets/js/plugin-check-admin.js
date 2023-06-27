@@ -14,8 +14,6 @@
 	}
 
 	// Handle disabling the check it button when a plugin is not selected.
-	pluginsList.addEventListener( 'change', canRunChecks );
-
 	function canRunChecks() {
 		if ( '' === pluginsList.value ) {
 			checkItButton.disabled = true;
@@ -26,6 +24,7 @@
 
 	// Run on page load to test if dropdown is auto populated.
 	canRunChecks();
+	pluginsList.addEventListener( 'change', canRunChecks );
 
 	// When the Check it button is clicked.
 	checkItButton.addEventListener( 'click', ( e ) => {
@@ -33,6 +32,7 @@
 
 		resetResults();
 		checkItButton.disabled = true;
+		pluginsList.disabled = true;
 		spinner.classList.add( 'is-active' );
 
 		getChecksToRun()
@@ -69,6 +69,7 @@
 	function resetForm() {
 		spinner.classList.remove( 'is-active' );
 		checkItButton.disabled = false;
+		pluginsList.disabled = false;
 	}
 
 	/**
