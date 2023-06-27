@@ -15,5 +15,7 @@
  * @package test-plugin-unfiltered-uploads-errors
  */
 
-// Define constant.
-define( 'ALLOW_UNFILTERED_UPLOADS', true );
+// Check if the constant is defined.
+if ( defined( 'ALLOW_UNFILTERED_UPLOADS' ) ) {
+    return;
+}
