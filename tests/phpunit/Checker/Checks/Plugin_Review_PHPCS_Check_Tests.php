@@ -8,9 +8,8 @@
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Checks\Plugin_Review_PHPCS_Check;
-use WordPress\Plugin_Check\Test_Utils\TestCase\Static_Check_UnitTestCase;
 
-class Plugin_Review_PHPCS_Check_Tests extends Static_Check_UnitTestCase {
+class Plugin_Review_PHPCS_Check_Tests extends WP_UnitTestCase {
 
 	public function test_run_with_errors() {
 		$plugin_review_phpcs_check = new Plugin_Review_PHPCS_Check();

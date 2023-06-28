@@ -8,9 +8,8 @@
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Checks\I18n_Usage_Check;
-use WordPress\Plugin_Check\Test_Utils\TestCase\Static_Check_UnitTestCase;
 
-class I18n_Usage_Check_Tests extends Static_Check_UnitTestCase {
+class I18n_Usage_Check_Tests extends WP_UnitTestCase {
 
 	public function test_run_with_errors() {
 		$i18n_usage_check = new I18n_Usage_Check();
