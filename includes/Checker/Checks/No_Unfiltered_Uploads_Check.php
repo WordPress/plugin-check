@@ -8,6 +8,7 @@
 namespace WordPress\Plugin_Check\Checker\Checks;
 
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Stable_Check;
 
 /**
  * Check for detecting "ALLOW_UNFILTERED_UPLOADS" constant in plugin files.
@@ -15,6 +16,8 @@ use WordPress\Plugin_Check\Checker\Check_Result;
  * @since n.e.x.t
  */
 class No_Unfiltered_Uploads_Check extends Abstract_File_Check {
+
+	use Stable_Check;
 
 	/**
 	 * Check the "ALLOW_UNFILTERED_UPLOADS" constant in file.

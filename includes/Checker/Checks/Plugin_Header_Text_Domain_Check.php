@@ -18,6 +18,8 @@ use WordPress\Plugin_Check\Checker\Static_Check;
  */
 class Plugin_Header_Text_Domain_Check implements Static_Check {
 
+	use Static_Check;
+
 	/**
 	 * Amends the given result by running the check on the associated plugin.
 	 *

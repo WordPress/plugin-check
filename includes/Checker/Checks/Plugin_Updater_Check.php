@@ -9,6 +9,7 @@ namespace WordPress\Plugin_Check\Checker\Checks;
 
 use Exception;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Stable_Check;
 
 /**
  * Check to detect plugin updater.
@@ -16,6 +17,8 @@ use WordPress\Plugin_Check\Checker\Check_Result;
  * @since n.e.x.t
  */
 class Plugin_Updater_Check extends Abstract_File_Check {
+
+	use Stable_Check;
 
 	const TYPE_PLUGIN_UPDATE_URI_HEADER = 1;
 	const TYPE_PLUGIN_UPDATER_FILE      = 2;

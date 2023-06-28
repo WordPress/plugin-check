@@ -7,12 +7,16 @@
 
 namespace WordPress\Plugin_Check\Checker\Checks;
 
+use WordPress\Plugin_Check\Checker\Stable_Check;
+
 /**
  * Check for running WordPress performant WP_Query params sniffs.
  *
  * @since n.e.x.t
  */
 class Performant_WP_Query_Params_Check extends Abstract_PHP_CodeSniffer_Check {
+
+	use Stable_Check;
 
 	/**
 	 * Returns an associative array of arguments to pass to PHPCS.
