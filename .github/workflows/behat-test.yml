@@ -84,9 +84,20 @@ jobs:
       WP_ENV_PHP_VERSION: ${{ matrix.php }}
       WP_ENV_CORE: ${{ matrix.wordpress == 'trunk' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', matrix.wordpress ) }}
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      - uses: shivammathur/setup-php@v2
+      - name: Shutdown default MySQL service
+        run: sudo service mysql stop
+
+      - name: Verify DB connection
+        run: |
+          while ! mysqladmin ping -h"127.0.0.1" -P"${{ job.services.mysql.ports[3306] }}" --silent; do
+            sleep 1
+          done
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
 
