@@ -1,0 +1,150 @@
+name: Behat Testing
+
+on:
+  push:
+    branches:
+      - trunk
+      - 'release/**'
+    # Only run if PHP-related files changed.
+    paths:
+      - '.github/workflows/behat-test.yml'
+      - '**.php'
+      - '**.feature'
+      - 'behat.yml'
+      - 'composer.json'
+      - 'composer.lock'
+  pull_request:
+    branches:
+      - trunk
+      - 'release/**'
+      - 'feature/**'
+    # Only run if PHP-related files changed.
+    paths:
+      - '.github/workflows/behat-test.yml'
+      - '**.php'
+      - '**.feature'
+      - 'behat.yml'
+      - 'composer.json'
+      - 'composer.lock'
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  php-test:
+    name: PHP ${{ matrix.php }} - WP ${{ matrix.wordpress }}${{ matrix.experimental && ' (experimental)' || '' }}
+    runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
+    timeout-minutes: 20
+    services:
+      mysql:
+        image: mysql:5.7
+        ports:
+        - 3306/tcp
+        env:
+          MYSQL_ROOT_PASSWORD: password
+        # Set health checks to wait until mysql has started
+        options: >-
+          --health-cmd "mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
+          -e MYSQL_ROOT_PASSWORD=root
+          -e MYSQL_DATABASE=wp_cli_test
+          --entrypoint sh mysql:5.7
+          -c "exec docker-entrypoint.sh mysqld --default-authentication-plugin=mysql_native_password"
+    strategy:
+      fail-fast: true
+      matrix:
+        php:
+        - '5.6'
+        - '7.0'
+        - '7.1'
+        - '7.2'
+        - '7.3'
+        - '7.4'
+        - '8.0'
+        - '8.1'
+        - '8.2'
+        wordpress: [ 'latest' ]
+        include:
+          - php: '8.0'
+            wordpress: '6.0'
+          - php: '8.0'
+            wordpress: '6.1'
+          - php: '8.2'
+            wordpress: 'trunk'
+            experimental: true
+    env:
+      WP_ENV_PHP_VERSION: ${{ matrix.php }}
+      WP_ENV_CORE: ${{ matrix.wordpress == 'trunk' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', matrix.wordpress ) }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+
+      - name: Make Composer packages available globally
+        run: |
+          echo "${PWD}/vendor/bin" >> $GITHUB_PATH
+
+      - name: Install WP-CLI
+        run: |
+          curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+          chmod +x wp-cli.phar
+          mkdir -p bin
+          mv wp-cli.phar bin/wp
+          echo "WP_CLI_BIN_DIR=${PWD}/bin" >> $GITHUB_ENV
+
+      - name: Update PHPUnit to get latest php-code-coverage library
+        if: ${{ matrix.coverage == true }}
+        # phpunit/phpunit has to be updated as the one in use provides an older version of phpunit/php-code-coverage,
+        # but we need the v9.x branch.
+        # It cannot be removed, as it is a requirement of wp-cli/wp-cli-tests as well.
+        run: |
+          composer require --dev --ignore-platform-reqs --update-with-all-dependencies phpunit/phpunit
+
+      - name: Configure DB environment
+        run: |
+          export MYSQL_HOST=127.0.0.1
+          export MYSQL_TCP_PORT=${{ job.services.mysql.ports['3306'] }}
+          echo "WP_CLI_TEST_DBROOTUSER=root" >> $GITHUB_ENV
+          echo "WP_CLI_TEST_DBROOTPASS=root" >> $GITHUB_ENV
+          echo "WP_CLI_TEST_DBUSER=wp_cli_test" >> $GITHUB_ENV
+          echo "WP_CLI_TEST_DBPASS=password1" >> $GITHUB_ENV
+          echo "WP_CLI_TEST_DBHOST=$MYSQL_HOST:$MYSQL_TCP_PORT" >> $GITHUB_ENV
+
+      - name: Prepare test database
+        run: composer prepare-behat-tests
+
+      - name: Check Behat environment
+        run: WP_CLI_TEST_DEBUG_BEHAT_ENV=1 BEHAT_FEATURES_FOLDER=tests/behat/features composer behat
+
+      - name: Run tests
+        env:
+          BEHAT_CODE_COVERAGE: ${{ matrix.coverage }}
+          BEHAT_FEATURES_FOLDER: tests/features
+        run: composer behat || composer behat-rerun
+
+      - name: Retrieve list of coverage files
+        id: coverage_files
+        if: ${{ matrix.coverage == true }}
+        run: |
+          FILES=$(ls -d -1 "$GITHUB_WORKSPACE/build/logs/clover-behat/"*.* | paste --serial --delimiters=",")
+          test -n "$FILES"
+          echo "Coverage files: $FILES"
+          echo "::set-output name=COVERAGE_FILES::$FILES"
+
+      - name: Upload code coverage report
+        if: ${{ matrix.coverage }}
+        uses: codecov/codecov-action@v3
+        with:
+          files: ${{ steps.coverage_files.outputs.COVERAGE_FILES }}
+          flags: feature
+          fail_ci_if_error: true
