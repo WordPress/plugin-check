@@ -43,21 +43,15 @@ jobs:
     timeout-minutes: 20
     services:
       mysql:
-        image: mysql:5.7
-        ports:
-        - 3306/tcp
+        image: mariadb:latest
         env:
-          MYSQL_ROOT_PASSWORD: password
-        # Set health checks to wait until mysql has started
-        options: >-
-          --health-cmd "mysqladmin ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 3
-          -e MYSQL_ROOT_PASSWORD=root
-          -e MYSQL_DATABASE=wp_cli_test
-          --entrypoint sh mysql:5.7
-          -c "exec docker-entrypoint.sh mysqld --default-authentication-plugin=mysql_native_password"
+          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: true
+          MARIADB_DATABASE: wp_cli_test
+          MARIADB_MYSQL_LOCALHOST_USER: 1
+          MARIADB_MYSQL_LOCALHOST_GRANTS: USAGE
+        ports:
+        - 3306
+        options: --health-cmd="healthcheck.sh --su-mysql --connect --innodb_initialized" --health-interval=10s --health-timeout=5s --health-retries=3
     strategy:
       fail-fast: true
       matrix:
@@ -68,11 +62,13 @@ jobs:
         - '7.2'
         - '7.3'
         - '7.4'
-        - '8.0'
         - '8.1'
         - '8.2'
         wordpress: [ 'latest' ]
         include:
+          - php: '8.0'
+            wordpress: 'latest'
+            coverage: true
           - php: '8.0'
             wordpress: '6.0'
           - php: '8.0'
@@ -90,16 +86,14 @@ jobs:
       - name: Shutdown default MySQL service
         run: sudo service mysql stop
 
-      - name: Verify DB connection
-        run: |
-          while ! mysqladmin ping -h"127.0.0.1" -P"${{ job.services.mysql.ports[3306] }}" --silent; do
-            sleep 1
-          done
-
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
+          extensions: mysql
+          tools: composer
           php-version: ${{ matrix.php }}
+          coverage: ${{ matrix.coverage && 'pcov' || 'none' }}
+          ini-values: pcov.directory=.,pcov.exclude=~(vendor|tests)~
 
       - name: Install PHP dependencies
         uses: ramsey/composer-install@83af392bf5f031813d25e6fe4cd626cdba9a2df6
