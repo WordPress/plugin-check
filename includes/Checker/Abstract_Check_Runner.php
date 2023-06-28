@@ -381,6 +381,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 				'plugin_readme'              => new Checks\Plugin_Readme_Check(),
 				'enqueued_styles_scope'      => new Checks\Enqueued_Styles_Scope_Check(),
 				'localhost'                  => new Checks\Localhost_Check(),
+				'no_unfiltered_uploads'      => new Checks\No_Unfiltered_Uploads_Check(),
 			)
 		);
 
