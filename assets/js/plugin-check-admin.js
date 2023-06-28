@@ -13,11 +13,26 @@
 		return;
 	}
 
+	// Handle disabling the Check it button when a plugin is not selected.
+	function canRunChecks() {
+		if ( '' === pluginsList.value ) {
+			checkItButton.disabled = true;
+		} else {
+			checkItButton.disabled = false;
+		}
+	}
+
+	// Run on page load to test if dropdown is auto populated.
+	canRunChecks();
+	pluginsList.addEventListener( 'change', canRunChecks );
+
+	// When the Check it button is clicked.
 	checkItButton.addEventListener( 'click', ( e ) => {
 		e.preventDefault();
 
 		resetResults();
 		checkItButton.disabled = true;
+		pluginsList.disabled = true;
 		spinner.classList.add( 'is-active' );
 
 		getChecksToRun()
@@ -54,6 +69,7 @@
 	function resetForm() {
 		spinner.classList.remove( 'is-active' );
 		checkItButton.disabled = false;
+		pluginsList.disabled = false;
 	}
 
 	/**
