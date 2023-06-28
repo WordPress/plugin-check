@@ -13,7 +13,7 @@
 		return;
 	}
 
-	// Handle disabling the check it button when a plugin is not selected.
+	// Handle disabling the Check it button when a plugin is not selected.
 	function canRunChecks() {
 		if ( '' === pluginsList.value ) {
 			checkItButton.disabled = true;
