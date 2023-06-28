@@ -15,6 +15,30 @@ use Exception;
  * @since n.e.x.t
  */
 interface Check {
+	/**
+	 * Bitwise flag for stable checks.
+	 *
+	 * @since n.e.x.t
+	 * @var int
+	 */
+	const STABILITY_STABLE = 1;
+
+	/**
+	 * Bitwise flag for experimental checks.
+	 *
+	 * @since n.e.x.t
+	 * @var int
+	 */
+	const STABILITY_EXPERIMENTAL = 2;
+
+	/**
+	 * Returns the checks stability.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return int
+	 */
+	public function get_stability();
 
 	/**
 	 * Amends the given result by running the check on the associated plugin.
