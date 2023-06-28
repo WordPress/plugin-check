@@ -76,10 +76,10 @@ final class FeatureContext extends WP_CLI_FeatureContext {
 		$project_dir = realpath( self::get_vendor_dir() . '/../' );
 		$plugin_dir  = $this->variables['RUN_DIR'] . '/wp-content/plugins';
 		$this->ensure_dir_exists( $plugin_dir );
-		$this->proc( "ln -s {$project_dir} {$plugin_dir}/traduttore" )->run_check();
+		$this->proc( "ln -s {$project_dir} {$plugin_dir}/plugin-check" )->run_check();
 
 		// Activate the plugin.
-		$this->proc( 'wp plugin activate traduttore' )->run_check();
+		$this->proc( 'wp plugin activate plugin-check' )->run_check();
 	}
 
 	/**
