@@ -13,13 +13,13 @@ The WordPress plugin checker was [first proposed in summer 2022](https://make.wo
     * Static checks, which analyze the code, either using PHPCodeSniffer sniffs or custom logic e.g. using regular expressions.
     * Runtime checks, which actually execute certain parts of the code, such as running specific WordPress hooks with the plugin active.
 * Allows customizing which checks are run, either via a list of individual check identifiers, or specific check categories.
-* Comes with an ever-growing list of checks for various plugin development requirements and best practices. Please see the [`Abstract_Check_Runner::register_checks()` method](https://github.com/10up/plugin-check/blob/trunk/includes/Checker/Abstract_Check_Runner.php#L358) for a quick overview of currently available checks.
+* Comes with an ever-growing list of checks for various plugin development requirements and best practices. Please see the [`Abstract_Check_Runner::register_checks()` method](/includes/Checker/Abstract_Check_Runner.php#L358) for a quick overview of currently available checks.
 
 ### For developers
 
 * Facilitates efficient yet flexible authoring of new checks, either using a base class for common check patterns, or implementing an interface for more specific checks.
-    * Every check has to implement either the [`Static_Check`](https://github.com/10up/plugin-check/blob/trunk/includes/Checker/Static_Check.php) or the [`Runtime_Check`](https://github.com/10up/plugin-check/blob/trunk/includes/Checker/Runtime_Check.php) interface.
-    * Most checks will benefit from extending either the [`Abstract_File_Check`](https://github.com/10up/plugin-check/blob/trunk/includes/Checker/Checks/Abstract_File_Check.php), the [`Abstract_PHPCodeSniffer_Check`](https://github.com/10up/plugin-check/blob/trunk/includes/Checker/Checks/Abstract_PHP_CodeSniffer_Check.php), or the [`Abstract_Runtime_Check`](https://github.com/10up/plugin-check/blob/trunk/includes/Checker/Checks/Abstract_Runtime_Check.php) class.
+    * Every check has to implement either the [`Static_Check`](/includes/Checker/Static_Check.php) or the [`Runtime_Check`](/includes/Checker/Runtime_Check.php) interface.
+    * Most checks will benefit from extending either the [`Abstract_File_Check`](/includes/Checker/Checks/Abstract_File_Check.php), the [`Abstract_PHPCodeSniffer_Check`](/includes/Checker/Checks/Abstract_PHP_CodeSniffer_Check.php), or the [`Abstract_Runtime_Check`](/includes/Checker/Checks/Abstract_Runtime_Check.php) class.
 * Comes with comprehensive unit test coverage.
 
 ## How to use
@@ -59,8 +59,8 @@ If you want to stop the environment again, you can use:
 npm run wp-env stop
 ```
 
-For further information on contributing, please see the [CONTRIBUTING.md guide here](/CONTRIBUTING.md).
+For further information on contributing, please see the [contributing guide](/CONTRIBUTING.md).
 
 ## License
 
-The WordPress plugin checker is free software, and is released under the terms of the GNU General Public License version 2 or (at your option) any later version. See [LICENSE](https://github.com/10up/plugin-check/blob/trunk/LICENSE) for complete license.
+The WordPress plugin checker is free software, and is released under the terms of the GNU General Public License version 2 or (at your option) any later version. See [LICENSE](/LICENSE) for complete license.
