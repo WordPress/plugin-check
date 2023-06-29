@@ -2,6 +2,6 @@ default:
   suites:
     default:
       contexts:
-      - WordPress\Plugin_Check\Behat_Utils\FeatureContext
+        - WordPress\Plugin_Check\Behat_Utils\FeatureContext
       paths:
-      - tests/behat/features
+        - tests/behat/features
