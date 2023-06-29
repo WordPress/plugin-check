@@ -43,15 +43,19 @@ jobs:
     timeout-minutes: 20
     services:
       mysql:
-        image: mariadb:latest
-        env:
-          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: true
-          MARIADB_DATABASE: wp_cli_test
-          MARIADB_MYSQL_LOCALHOST_USER: 1
-          MARIADB_MYSQL_LOCALHOST_GRANTS: USAGE
+        image: mysql:8.0
         ports:
-        - 3306
-        options: --health-cmd="healthcheck.sh --su-mysql --connect --innodb_initialized" --health-interval=10s --health-timeout=5s --health-retries=3
+        - 3306/tcp
+        options: >-
+          --health-cmd "mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
+          -e MYSQL_ROOT_PASSWORD=root
+          -e MYSQL_DATABASE=wp_cli_test
+          --entrypoint sh mysql:8.0
+          -c "exec docker-entrypoint.sh mysqld --default-authentication-plugin=mysql_native_password"
+
     strategy:
       fail-fast: true
       matrix:
@@ -82,9 +86,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Shutdown default MySQL service
-        run: sudo service mysql stop
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -119,6 +120,9 @@ jobs:
         # It cannot be removed, as it is a requirement of wp-cli/wp-cli-tests as well.
         run: |
           composer require --dev --ignore-platform-reqs --update-with-all-dependencies phpunit/phpunit
+
+      - name: Start MySQL server
+        run: sudo systemctl start mysql
 
       - name: Configure DB environment
         run: |
