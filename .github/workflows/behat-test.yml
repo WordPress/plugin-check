@@ -93,7 +93,7 @@ jobs:
           extensions: mysql
           tools: composer
           php-version: ${{ matrix.php }}
-          coverage: ${{ matrix.coverage && 'pcov' || 'none' }}
+          coverage: ${{ matrix.coverage && 'xdebug' || 'none' }}
           ini-values: pcov.directory=.,pcov.exclude=~(vendor|tests)~
 
       - name: Install PHP dependencies
