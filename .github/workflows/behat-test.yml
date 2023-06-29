@@ -135,17 +135,17 @@ jobs:
           echo "WP_CLI_TEST_DBPASS=password1" >> $GITHUB_ENV
           echo "WP_CLI_TEST_DBHOST=127.0.0.1:${{ job.services.mysql.ports['3306'] }}" >> $GITHUB_ENV
 
-
       - name: Prepare test database
         run: composer prepare-behat-tests
 
       - name: Check Behat environment
-        run: WP_CLI_TEST_DEBUG_BEHAT_ENV=1 BEHAT_FEATURES_FOLDER=tests/behat/features composer behat
+        run: composer behat
+        env:
+          WP_CLI_TEST_DEBUG_BEHAT_ENV: 1
 
       - name: Run tests
         env:
           BEHAT_CODE_COVERAGE: ${{ matrix.coverage }}
-          BEHAT_FEATURES_FOLDER: tests/features
         run: composer behat || composer behat-rerun
 
       - name: Retrieve list of coverage files

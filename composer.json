@@ -36,8 +36,8 @@
       "composer --working-dir=build-cs install",
       "build-cs/vendor/bin/phpstan analyse --memory-limit=2048M"
     ],
-    "behat": "run-behat-tests",
-    "behat-rerun": "rerun-behat-tests",
+    "behat": "BEHAT_FEATURES_FOLDER=tests/behat/features run-behat-tests",
+    "behat-rerun": "BEHAT_FEATURES_FOLDER=tests/behat/features rerun-behat-tests",
     "prepare-behat-tests": "install-package-tests"
   },
   "scripts-descriptions": {
