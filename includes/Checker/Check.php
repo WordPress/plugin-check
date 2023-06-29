@@ -16,20 +16,20 @@ use Exception;
  */
 interface Check {
 	/**
-	 * Bitwise flag for stable checks.
+	 * Flag for stable checks.
 	 *
 	 * @since n.e.x.t
 	 * @var int
 	 */
-	const STABILITY_STABLE = 1;
+	const STABILITY_STABLE = 'stable';
 
 	/**
-	 * Bitwise flag for experimental checks.
+	 * Flag for experimental checks.
 	 *
 	 * @since n.e.x.t
 	 * @var int
 	 */
-	const STABILITY_EXPERIMENTAL = 2;
+	const STABILITY_EXPERIMENTAL = 'experimental';
 
 	/**
 	 * Returns the checks stability.

@@ -9,6 +9,7 @@ namespace WordPress\Plugin_Check\Checker\Checks;
 
 use Exception;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Stable_Check;
 use WordPress\Plugin_Check\Checker\Static_Check;
 
 /**
@@ -18,7 +19,7 @@ use WordPress\Plugin_Check\Checker\Static_Check;
  */
 class Plugin_Header_Text_Domain_Check implements Static_Check {
 
-	use Static_Check;
+	use Stable_Check;
 
 	/**
 	 * Amends the given result by running the check on the associated plugin.
