@@ -81,6 +81,8 @@ final class Plugin_Check_Command {
 	 * [--ignore-errors]
 	 * : Limit displayed results to exclude errors.
 	 *
+	 * [--include-experimental]
+	 * : Include experimental checks.
 	 *
 	 * ## EXAMPLES
 	 *
@@ -124,6 +126,7 @@ final class Plugin_Check_Command {
 
 		$checks_to_run = array();
 		try {
+			$runner->include_experimental_checks( $options['include-experimental'] );
 			$runner->set_check_slugs( $checks );
 			$runner->set_plugin( $plugin );
 
@@ -204,10 +207,11 @@ final class Plugin_Check_Command {
 	 */
 	private function get_options( $assoc_args ) {
 		$defaults = array(
-			'checks'          => '',
-			'format'          => 'table',
-			'ignore-warnings' => false,
-			'ignore-errors'   => false,
+			'checks'               => '',
+			'format'               => 'table',
+			'ignore-warnings'      => false,
+			'ignore-errors'        => false,
+			'include-experimental' => false,
 		);
 
 		$options = wp_parse_args( $assoc_args, $defaults );

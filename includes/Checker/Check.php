@@ -21,7 +21,7 @@ interface Check {
 	 * @since n.e.x.t
 	 * @var int
 	 */
-	const STABILITY_STABLE = 'stable';
+	const STABILITY_STABLE = 1;
 
 	/**
 	 * Flag for experimental checks.
@@ -29,7 +29,7 @@ interface Check {
 	 * @since n.e.x.t
 	 * @var int
 	 */
-	const STABILITY_EXPERIMENTAL = 'experimental';
+	const STABILITY_EXPERIMENTAL = 2;
 
 	/**
 	 * Returns the checks stability.

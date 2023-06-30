@@ -75,6 +75,14 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	protected $runtime_environment;
 
 	/**
+	 * Whether to include experimental checks.
+	 *
+	 * @since n.e.x.t
+	 * @var bool
+	 */
+	protected $include_experimental = false;
+
+	/**
 	 * Determines if the current request is intended for the plugin checker.
 	 *
 	 * @since n.e.x.t
@@ -154,6 +162,17 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		}
 
 		$this->plugin = $plugin;
+	}
+
+	/**
+	 * Sets whether to include experimental checks in the process.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param bool $include_experimental True to include experimental checks. False to exclude.
+	 */
+	final public function include_experimental_checks( $include_experimental = false ) {
+		$this->include_experimental = $include_experimental;
 	}
 
 	/**
@@ -285,6 +304,11 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		// Check if conditions are met in order to perform Runtime Checks.
 		if ( ( $this->initialized_early || $this->runtime_environment->can_set_up() ) && is_plugin_active( $this->get_plugin_basename() ) ) {
 			$check_flags = Check_Repository::TYPE_ALL;
+		}
+
+		// Check whether to include experimental checks.
+		if ( $this->include_experimental ) {
+			$check_flags = $check_flags | Check_Repository::INCLUDE_EXPERIMENTAL;
 		}
 
 		return $this->check_repository->get_checks( $check_flags, $check_slugs );
