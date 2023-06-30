@@ -171,7 +171,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @param bool $include_experimental True to include experimental checks. False to exclude.
 	 */
-	final public function include_experimental_checks( $include_experimental = false ) {
+	final public function set_experimental_flag( $include_experimental ) {
 		$this->include_experimental = $include_experimental;
 	}
 

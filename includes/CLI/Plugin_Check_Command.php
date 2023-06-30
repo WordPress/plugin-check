@@ -126,7 +126,7 @@ final class Plugin_Check_Command {
 
 		$checks_to_run = array();
 		try {
-			$runner->include_experimental_checks( $options['include-experimental'] );
+			$runner->set_experimental_flag( $options['include-experimental'] );
 			$runner->set_check_slugs( $checks );
 			$runner->set_plugin( $plugin );
 
