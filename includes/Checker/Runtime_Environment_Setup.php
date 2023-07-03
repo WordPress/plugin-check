@@ -55,7 +55,7 @@ final class Runtime_Environment_Setup {
 		if ( $wp_filesystem || WP_Filesystem() ) {
 			// Do not replace the object-cache.php file if it already exists.
 			if ( ! $wp_filesystem->exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
-				$wp_filesystem->copy( WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'object-cache.copy.php', WP_CONTENT_DIR . '/object-cache.php' );
+				$wp_filesystem->copy( WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'drop-ins/object-cache.copy.php', WP_CONTENT_DIR . '/object-cache.php' );
 			}
 		}
 	}
@@ -93,7 +93,7 @@ final class Runtime_Environment_Setup {
 
 			// Check the drop-in file matches the copy.
 			$original_content = $wp_filesystem->get_contents( WP_CONTENT_DIR . '/object-cache.php' );
-			$copy_content     = $wp_filesystem->get_contents( WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'object-cache.copy.php' );
+			$copy_content     = $wp_filesystem->get_contents( WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'drop-ins/object-cache.copy.php' );
 
 			if ( $original_content && $original_content === $copy_content ) {
 				$wp_filesystem->delete( WP_CONTENT_DIR . '/object-cache.php' );
@@ -126,9 +126,9 @@ final class Runtime_Environment_Setup {
 		} else {
 			// Get the correct Plugin Check directory when run too early.
 			if ( ! defined( 'WP_PLUGIN_CHECK_PLUGIN_DIR_PATH' ) ) {
-				$object_cache_copy = dirname( dirname( __DIR__ ) ) . '/plugin-check/object-cache.copy.php';
+				$object_cache_copy = dirname( dirname( __DIR__ ) ) . '/plugin-check/drop-ins/object-cache.copy.php';
 			} else {
-				$object_cache_copy = WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'object-cache.copy.php';
+				$object_cache_copy = WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'drop-ins/object-cache.copy.php';
 			}
 
 			// If the file does not exist, check if we can place it.
