@@ -164,11 +164,19 @@ final class Admin_Page {
 	 *
 	 * @since n.e.x.t
 	 *
+	 * @global string $status
+	 *
 	 * @param array  $actions     List of actions.
 	 * @param string $plugin_file Plugin main file.
 	 * @return array The modified list of actions.
 	 */
 	public function filter_plugin_action_links( $actions, $plugin_file ) {
+		global $status;
+
+		if ( in_array( $status, array( 'mustuse', 'dropins' ), true ) ) {
+			return $actions;
+		}
+
 		if ( current_user_can( 'activate_plugins' ) ) {
 			$actions[] = sprintf(
 				'<a href="%1$s">%2$s</a>',
