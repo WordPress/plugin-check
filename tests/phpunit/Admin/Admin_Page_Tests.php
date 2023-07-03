@@ -134,7 +134,7 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 
 		$base_file = plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE );
 
-		$action_links = $this->admin_page->filter_plugin_action_links( array(), $base_file );
+		$action_links = $this->admin_page->filter_plugin_action_links( array(), $base_file, array(), 'all' );
 		$this->assertEmpty( $action_links );
 
 		/** Administrator check */
@@ -144,7 +144,7 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 			grant_super_admin( $admin_user );
 		}
 		wp_set_current_user( $admin_user );
-		$action_links = $this->admin_page->filter_plugin_action_links( array(), $base_file );
+		$action_links = $this->admin_page->filter_plugin_action_links( array(), $base_file, array(), 'all' );
 
 		$this->assertEquals(
 			sprintf(
