@@ -75,23 +75,6 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		// Backup the original command line arguments.
 		$orig_cmd_args = $_SERVER['argv'];
 
-		if ( class_exists( '\PHP_CodeSniffer\Config' ) ) {
-			/*
-			 * Reset \PHP_CodeSniffer\Config::$overriddenDefaults to prevent
-			 * incorrect results when running multiple checks.
-			 *
-			 * PHPStan ignore reason: PHPStan raised an issue because we can't
-			 * use class in ReflectionClass.
-			 *
-			 * @phpstan-ignore-next-line
-			 */
-			$reflected_phpcs_config = new \ReflectionClass( '\PHP_CodeSniffer\Config' );
-			$overridden_defaults    = $reflected_phpcs_config->getProperty( 'overriddenDefaults' );
-			$overridden_defaults->setAccessible( true );
-			$overridden_defaults->setValue( array() );
-			$overridden_defaults->setAccessible( false );
-		}
-
 		// Create the default arguments for PHPCS.
 		$defaults = array(
 			'',
@@ -102,6 +85,9 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 
 		// Set the check arguments for PHPCS.
 		$_SERVER['argv'] = $this->parse_argv( $this->get_args(), $defaults );
+
+		// Reset PHP_CodeSniffer config.
+		$this->reset_php_codesniffer_config();
 
 		// Run PHPCS.
 		try {
@@ -163,5 +149,27 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		}
 
 		return $defaults;
+	}
+
+	/**
+	 * Resets \PHP_CodeSniffer\Config::$overriddenDefaults to prevent
+	 * incorrect results when running multiple checks.
+	 *
+	 * @since n.e.x.t
+	 */
+	private function reset_php_codesniffer_config() {
+		if ( class_exists( '\PHP_CodeSniffer\Config' ) ) {
+			/*
+			 * PHPStan ignore reason: PHPStan raised an issue because we can't
+			 * use class in ReflectionClass.
+			 *
+			 * @phpstan-ignore-next-line
+			 */
+			$reflected_phpcs_config = new \ReflectionClass( '\PHP_CodeSniffer\Config' );
+			$overridden_defaults    = $reflected_phpcs_config->getProperty( 'overriddenDefaults' );
+			$overridden_defaults->setAccessible( true );
+			$overridden_defaults->setValue( array() );
+			$overridden_defaults->setAccessible( false );
+		}
 	}
 }
