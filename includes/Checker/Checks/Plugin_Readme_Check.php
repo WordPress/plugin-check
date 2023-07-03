@@ -7,6 +7,7 @@
 
 namespace WordPress\Plugin_Check\Checker\Checks;
 
+use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Result;
 
 /**
@@ -15,6 +16,15 @@ use WordPress\Plugin_Check\Checker\Check_Result;
  * @since n.e.x.t
  */
 class Plugin_Readme_Check extends Abstract_File_Check {
+
+	/**
+	 * Gets the category of the check.
+	 *
+	 * @since n.e.x.t
+	 */
+	public function get_category() {
+		return Check_Categories::CATEGORY_PLUGIN_REPO;
+	}
 
 	/**
 	 * Check the readme.txt file.

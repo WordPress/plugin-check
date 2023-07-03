@@ -8,6 +8,7 @@
 namespace WordPress\Plugin_Check\Checker\Checks;
 
 use Exception;
+use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Result;
 
 /**
@@ -39,6 +40,15 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 	 */
 	public function __construct( $flags = self::TYPE_ALL ) {
 		$this->flags = $flags;
+	}
+
+	/**
+	 * Gets the category of the check.
+	 *
+	 * @since n.e.x.t
+	 */
+	public function get_category() {
+		return Check_Categories::CATEGORY_PLUGIN_REPO;
 	}
 
 	/**

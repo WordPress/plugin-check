@@ -27,4 +27,11 @@ interface Check {
 	 *                   the check).
 	 */
 	public function run( Check_Result $result );
+
+	/**
+	 * Gets the category for the check.
+	 *
+	 * @since n.e.x.t
+	 */
+	public function get_category();
 }
