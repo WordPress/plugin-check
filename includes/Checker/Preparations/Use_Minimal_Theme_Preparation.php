@@ -7,8 +7,8 @@
 
 namespace WordPress\Plugin_Check\Checker\Preparations;
 
-use WordPress\Plugin_Check\Checker\Preparation;
 use Exception;
+use WordPress\Plugin_Check\Checker\Preparation;
 
 /**
  * Class for the preparation step to force usage of a minimal theme.
@@ -126,9 +126,16 @@ class Use_Minimal_Theme_Preparation implements Preparation {
 	 * @since n.e.x.t
 	 *
 	 * @return string The theme name.
+	 *
+	 * @throws Exception Thrown if theme does not exist for some reason.
 	 */
 	public function get_theme_name() {
 		$theme = wp_get_theme( $this->theme_slug, $this->themes_dir );
+		if ( ! $theme->exists() ) {
+			throw new Exception(
+				__( 'Invalid theme: Theme does not exist for some reason.', 'plugin-check' )
+			);
+		}
 		return $theme->display( 'Name' );
 	}
 

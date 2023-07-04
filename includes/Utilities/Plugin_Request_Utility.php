@@ -9,8 +9,8 @@ namespace WordPress\Plugin_Check\Utilities;
 
 use Exception;
 use WordPress\Plugin_Check\Checker\Abstract_Check_Runner;
-use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Checker\AJAX_Runner;
+use WordPress\Plugin_Check\Checker\CLI_Runner;
 
 /**
  * Class providing utility methods to return plugin information based on the request.
@@ -23,7 +23,7 @@ class Plugin_Request_Utility {
 	 * Instance of the current runner based on the request.
 	 *
 	 * @since n.e.x.t
-	 * @var Abstract_Check_Runner
+	 * @var Abstract_Check_Runner|null
 	 */
 	protected static $runner;
 
@@ -31,7 +31,7 @@ class Plugin_Request_Utility {
 	 * The universal runtime preparation cleanups if applied.
 	 *
 	 * @since n.e.x.t
-	 * @var callable
+	 * @var callable|null
 	 */
 	protected static $cleanup;
 
@@ -66,7 +66,7 @@ class Plugin_Request_Utility {
 			);
 		}
 
-		foreach ( $plugins as $plugin_basename => $plugin_data ) {
+		foreach ( array_keys( $plugins ) as $plugin_basename ) {
 			if ( strpos( $plugin_basename, $plugin_slug . '/' ) === 0 ) {
 				return $plugin_basename;
 			}
@@ -114,7 +114,7 @@ class Plugin_Request_Utility {
 	 * @return Abstract_Check_Runner|null The Runner class for the request or null.
 	 */
 	public static function get_runner() {
-		if ( isset( static::$runner ) ) {
+		if ( null !== static::$runner ) {
 			return static::$runner;
 		}
 
@@ -128,7 +128,7 @@ class Plugin_Request_Utility {
 	 */
 	public static function destroy_runner() {
 		// Run the cleanup functions.
-		if ( isset( self::$cleanup ) ) {
+		if ( null !== self::$cleanup ) {
 			call_user_func( self::$cleanup );
 		}
 

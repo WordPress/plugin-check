@@ -7,11 +7,11 @@
 
 namespace WordPress\Plugin_Check\Checker\Checks;
 
+use Exception;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Preparations\Demo_Posts_Creation_Preparation;
 use WordPress\Plugin_Check\Checker\With_Shared_Preparations;
 use WordPress\Plugin_Check\Traits\URL_Aware;
-use WordPress\Plugin_Check\Checker\Preparations\Demo_Posts_Creation_Preparation;
-use Exception;
 
 /**
  * Check for running WordPress internationalization sniffs.
@@ -47,13 +47,6 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	 */
 	public function __construct( $threshold_size = 300000 ) {
 		$this->threshold_size = $threshold_size;
-
-		$this->viewable_post_types = array_filter(
-			get_post_types(),
-			function( $post_type ) {
-				return is_post_type_viewable( $post_type );
-			}
-		);
 	}
 
 	/**
@@ -92,7 +85,7 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	 */
 	public function get_shared_preparations() {
 		$demo_posts = array_map(
-			function( $post_type ) {
+			static function( $post_type ) {
 				return array(
 					'post_title'   => "Demo {$post_type} post",
 					'post_content' => 'Test content',
@@ -100,7 +93,7 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 					'post_status'  => 'publish',
 				);
 			},
-			$this->viewable_post_types
+			$this->get_viewable_post_types()
 		);
 
 		return array(
@@ -136,7 +129,7 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	protected function get_urls() {
 		$urls = array( home_url() );
 
-		foreach ( $this->viewable_post_types as $post_type ) {
+		foreach ( $this->get_viewable_post_types() as $post_type ) {
 			$posts = get_posts(
 				array(
 					'posts_per_page' => 1,
@@ -171,6 +164,8 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	 *
 	 * @throws Exception Thrown when the check fails with a critical error (unrelated to any errors detected as part of
 	 *                   the check).
+	 *
+	 * @SuppressWarnings(PHPMD.NPathComplexity)
 	 */
 	protected function check_url( Check_Result $result, $url ) {
 		// Reset the WP_Scripts instance.
@@ -235,5 +230,18 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 				);
 			}
 		}
+	}
+
+	/**
+	 * Returns an array of viewable post types.
+	 *
+	 * @return array Array of viewable post type slugs.
+	 */
+	private function get_viewable_post_types() {
+		if ( ! is_array( $this->viewable_post_types ) ) {
+			$this->viewable_post_types = array_filter( get_post_types(), 'is_post_type_viewable' );
+		}
+
+		return $this->viewable_post_types;
 	}
 }

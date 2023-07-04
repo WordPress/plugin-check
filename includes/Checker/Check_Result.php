@@ -7,14 +7,13 @@
 
 namespace WordPress\Plugin_Check\Checker;
 
-use WordPress\Plugin_Check\Checker\Check_Context;
 
 /**
  * Result for running checks on a plugin.
  *
  * @since n.e.x.t
  */
-class Check_Result {
+final class Check_Result {
 
 	/**
 	 * Context for the plugin to check.
@@ -126,7 +125,7 @@ class Check_Result {
 				$this->errors[ $file ][ $line ][ $column ] = array();
 			}
 			$this->errors[ $file ][ $line ][ $column ][] = $data;
-			$this->error_count++;
+			++$this->error_count;
 		} else {
 			if ( ! isset( $this->warnings[ $file ] ) ) {
 				$this->warnings[ $file ] = array();
@@ -138,7 +137,7 @@ class Check_Result {
 				$this->warnings[ $file ][ $line ][ $column ] = array();
 			}
 			$this->warnings[ $file ][ $line ][ $column ][] = $data;
-			$this->warning_count++;
+			++$this->warning_count;
 		}
 	}
 

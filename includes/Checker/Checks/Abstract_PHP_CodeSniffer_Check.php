@@ -1,15 +1,16 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\PHP_CodeSniffer_Check
+ * Class WordPress\Plugin_Check\Checker\Checks\Abstract_PHP_CodeSniffer_Check
  *
  * @package plugin-check
  */
 
 namespace WordPress\Plugin_Check\Checker\Checks;
 
-use WordPress\Plugin_Check\Checker\Static_Check;
-use WordPress\Plugin_Check\Checker\Check_Result;
 use Exception;
+use PHP_CodeSniffer\Runner;
+use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Static_Check;
 
 /**
  * Check for running one or more PHP CodeSniffer sniffs.
@@ -57,12 +58,18 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	 * @throws Exception Thrown when the check fails with a critical error (unrelated to any errors detected as part of
 	 *                   the check).
 	 */
-	public function run( Check_Result $result ) {
+	final public function run( Check_Result $result ) {
 		// Include the PHPCS autoloader.
-		$autoloader = WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/vendor/squizlabs/php_codesniffer/autoload.php';
+		$autoloader = WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'vendor/squizlabs/php_codesniffer/autoload.php';
 
 		if ( file_exists( $autoloader ) ) {
 			include_once $autoloader;
+		}
+
+		if ( ! class_exists( '\PHP_CodeSniffer\Runner' ) ) {
+			throw new Exception(
+				__( 'Unable to find Runner class.', 'plugin-check' )
+			);
 		}
 
 		// Backup the original command line arguments.
@@ -71,7 +78,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		// Create the default arguments for PHPCS.
 		$defaults = array(
 			'',
-			$result->plugin()->path( '' ),
+			$result->plugin()->location(),
 			'--report=Json',
 			'--report-width=9999',
 		);
@@ -82,13 +89,16 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		// Run PHPCS.
 		try {
 			ob_start();
-			$runner = new \PHP_CodeSniffer\Runner();
+			$runner = new Runner();
 			$runner->runPHPCS();
 			$reports = ob_get_clean();
 		} catch ( Exception $e ) {
 			$_SERVER['argv'] = $orig_cmd_args;
 			throw $e;
 		}
+
+		// Restore original arguments.
+		$_SERVER['argv'] = $orig_cmd_args;
 
 		// Parse the reports into data to add to the overall $result.
 		$reports = json_decode( trim( $reports ), true );

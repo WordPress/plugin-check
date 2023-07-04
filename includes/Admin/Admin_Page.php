@@ -12,7 +12,7 @@ namespace WordPress\Plugin_Check\Admin;
  *
  * @since n.e.x.t
  */
-class Admin_Page {
+final class Admin_Page {
 
 	/**
 	 * Admin AJAX class instance.
@@ -23,12 +23,22 @@ class Admin_Page {
 	protected $admin_ajax;
 
 	/**
+	 * Admin page hook suffix.
+	 *
+	 * @since n.e.x.t
+	 * @var string
+	 */
+	protected $hook_suffix = '';
+
+	/**
 	 * Constructor.
 	 *
 	 * @since n.e.x.t
+	 *
+	 * @param Admin_AJAX $admin_ajax Instance of Admin_AJAX.
 	 */
-	public function __construct() {
-		$this->admin_ajax = new Admin_AJAX();
+	public function __construct( Admin_AJAX $admin_ajax ) {
+		$this->admin_ajax = $admin_ajax;
 	}
 
 	/**
@@ -37,31 +47,35 @@ class Admin_Page {
 	 * @since n.e.x.t
 	 */
 	public function add_hooks() {
-		add_action( 'admin_menu', array( $this, 'add_page' ) );
+		add_action( 'admin_menu', array( $this, 'add_and_initialize_page' ) );
 		add_filter( 'plugin_action_links', array( $this, 'filter_plugin_action_links' ), 10, 2 );
 
 		$this->admin_ajax->add_hooks();
 	}
 
 	/**
-	 * Registers the admin page under the tools menu.
+	 * Adds the admin page under the tools menu.
 	 *
 	 * @since n.e.x.t
-	 *
-	 * @return string The hook identifier for the admin page.
 	 */
 	public function add_page() {
-		$hook = add_management_page(
+		$this->hook_suffix = add_management_page(
 			__( 'Plugin Check', 'plugin-check' ),
 			__( 'Plugin Check', 'plugin-check' ),
 			'activate_plugins',
 			'plugin-check',
 			array( $this, 'render_page' )
 		);
+	}
 
-		add_action( "load-{$hook}", array( $this, 'initialize_page' ) );
-
-		return $hook;
+	/**
+	 * Adds and initializes the admin page under the tools menu.
+	 *
+	 * @since n.e.x.t
+	 */
+	public function add_and_initialize_page() {
+		$this->add_page();
+		add_action( 'load-' . $this->get_hook_suffix(), array( $this, 'initialize_page' ) );
 	}
 
 	/**
@@ -94,7 +108,13 @@ class Admin_Page {
 			'plugin-check-admin',
 			'const PLUGIN_CHECK = ' . json_encode(
 				array(
-					'nonce' => $this->admin_ajax->get_nonce(),
+					'nonce'                           => $this->admin_ajax->get_nonce(),
+					'actionGetChecksToRun'            => Admin_AJAX::ACTION_GET_CHECKS_TO_RUN,
+					'actionSetUpRuntimeEnvironment'   => Admin_AJAX::ACTION_SET_UP_ENVIRONMENT,
+					'actionRunChecks'                 => Admin_AJAX::ACTION_RUN_CHECKS,
+					'actionCleanUpRuntimeEnvironment' => Admin_AJAX::ACTION_CLEAN_UP_ENVIRONMENT,
+					'successMessage'                  => __( 'No errors found.', 'plugin-check' ),
+					'errorMessage'                    => __( 'Errors were found.', 'plugin-check' ),
 				)
 			),
 			'before'
@@ -130,11 +150,13 @@ class Admin_Page {
 	 * @since n.e.x.t
 	 */
 	public function render_page() {
+		global $available_plugins, $selected_plugin_basename;
+
 		$available_plugins = $this->get_available_plugins();
 
-		$selected_plugin_basename = filter_input( INPUT_GET, 'plugin', FILTER_SANITIZE_STRING );
+		$selected_plugin_basename = filter_input( INPUT_GET, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
-		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/admin-page.php';
+		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'templates/admin-page.php';
 	}
 
 	/**
@@ -150,7 +172,7 @@ class Admin_Page {
 		if ( current_user_can( 'activate_plugins' ) ) {
 			$actions[] = sprintf(
 				'<a href="%1$s">%2$s</a>',
-				esc_url( admin_url() . 'tools.php?page=plugin-check&plugin=' . $plugin_file ),
+				esc_url( admin_url( "tools.php?page=plugin-check&plugin={$plugin_file}" ) ),
 				esc_html__( 'Check this plugin', 'plugin-check' )
 			);
 		}
@@ -165,7 +187,7 @@ class Admin_Page {
 	 */
 	public function admin_footer() {
 		ob_start();
-		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/results-table.php';
+		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'templates/results-table.php';
 		$results_table_template = ob_get_clean();
 		wp_print_inline_script_tag(
 			$results_table_template,
@@ -176,7 +198,7 @@ class Admin_Page {
 		);
 
 		ob_start();
-		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/results-row.php';
+		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'templates/results-row.php';
 		$results_row_template = ob_get_clean();
 		wp_print_inline_script_tag(
 			$results_row_template,
@@ -187,7 +209,7 @@ class Admin_Page {
 		);
 
 		ob_start();
-		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . '/templates/results-complete.php';
+		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'templates/results-complete.php';
 		$results_row_template = ob_get_clean();
 		wp_print_inline_script_tag(
 			$results_row_template,
@@ -196,5 +218,16 @@ class Admin_Page {
 				'type' => 'text/template',
 			)
 		);
+	}
+
+	/**
+	 * Gets the hook suffix under which the admin page is added.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return string Hook suffix, or empty string if admin page was not added.
+	 */
+	public function get_hook_suffix() {
+		return $this->hook_suffix;
 	}
 }

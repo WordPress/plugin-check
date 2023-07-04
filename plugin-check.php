@@ -15,6 +15,8 @@
  * @package plugin-check
  */
 
+use WordPress\Plugin_Check\Plugin_Main;
+
 define( 'WP_PLUGIN_CHECK_VERSION', 'n.e.x.t' );
 define( 'WP_PLUGIN_CHECK_MINIMUM_PHP', '5.6' );
 define( 'WP_PLUGIN_CHECK_MAIN_FILE', __FILE__ );
@@ -43,8 +45,7 @@ function wp_plugin_check_load() {
 	require_once WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'vendor/autoload.php';
 
 	// Setup the plugin.
-	$class_name = 'WordPress\\Plugin_Check\\Plugin_Main';
-	$instance   = new $class_name( WP_PLUGIN_CHECK_MAIN_FILE );
+	$instance = new Plugin_Main( WP_PLUGIN_CHECK_MAIN_FILE );
 	$instance->add_hooks();
 }
 
@@ -71,11 +72,10 @@ function wp_plugin_check_display_php_version_notice() {
  */
 function wp_plugin_check_display_composer_autoload_notice() {
 	echo '<div class="notice notice-error"><p>';
-	echo wp_kses(
-		__( 'Composer autoload files are missing. Please run <code>composer install</code>.', 'plugin-check' ),
-		array(
-			'code' => array(),
-		)
+	printf(
+		/* translators: composer command. */
+		esc_html__( 'Your installation of the Plugin Check plugin is incomplete. Please run %s.', 'plugin-check' ),
+		'<code>composer install</code>'
 	);
 	echo '</p></div>';
 }

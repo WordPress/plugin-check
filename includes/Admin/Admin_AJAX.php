@@ -7,20 +7,19 @@
 
 namespace WordPress\Plugin_Check\Admin;
 
-use WP_Error;
 use Exception;
 use WordPress\Plugin_Check\Checker\AJAX_Runner;
-use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Runtime_Check;
 use WordPress\Plugin_Check\Checker\Runtime_Environment_Setup;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
+use WP_Error;
 
 /**
  * Class to handle the Admin AJAX requests.
  *
  * @since n.e.x.t
  */
-class Admin_AJAX {
+final class Admin_AJAX {
 
 	/**
 	 * Nonce key.
@@ -31,15 +30,47 @@ class Admin_AJAX {
 	const NONCE_KEY = 'plugin-check-run-checks';
 
 	/**
+	 * Clean up Runtime Environment action name.
+	 *
+	 * @since n.e.x.t
+	 * @var string
+	 */
+	const ACTION_CLEAN_UP_ENVIRONMENT = 'plugin_check_clean_up_environment';
+
+	/**
+	 * Set up Runtime Environment action name.
+	 *
+	 * @since n.e.x.t
+	 * @var string
+	 */
+	const ACTION_SET_UP_ENVIRONMENT = 'plugin_check_set_up_environment';
+
+	/**
+	 * Get Checks to run action name.
+	 *
+	 * @since n.e.x.t
+	 * @var string
+	 */
+	const ACTION_GET_CHECKS_TO_RUN = 'plugin_check_get_checks_to_run';
+
+	/**
+	 * Run Checks action name.
+	 *
+	 * @since n.e.x.t
+	 * @var string
+	 */
+	const ACTION_RUN_CHECKS = 'plugin_check_run_checks';
+
+	/**
 	 * Registers WordPress hooks for the Admin AJAX.
 	 *
 	 * @since n.e.x.t
 	 */
 	public function add_hooks() {
-		add_action( 'wp_ajax_plugin_check_clean_up_environment', array( $this, 'clean_up_environment' ) );
-		add_action( 'wp_ajax_plugin_check_set_up_environment', array( $this, 'set_up_environment' ) );
-		add_action( 'wp_ajax_plugin_check_get_checks_to_run', array( $this, 'get_checks_to_run' ) );
-		add_action( 'wp_ajax_plugin_check_run_checks', array( $this, 'run_checks' ) );
+		add_action( 'wp_ajax_' . self::ACTION_CLEAN_UP_ENVIRONMENT, array( $this, 'clean_up_environment' ) );
+		add_action( 'wp_ajax_' . self::ACTION_SET_UP_ENVIRONMENT, array( $this, 'set_up_environment' ) );
+		add_action( 'wp_ajax_' . self::ACTION_GET_CHECKS_TO_RUN, array( $this, 'get_checks_to_run' ) );
+		add_action( 'wp_ajax_' . self::ACTION_RUN_CHECKS, array( $this, 'run_checks' ) );
 	}
 
 	/**
@@ -58,10 +89,10 @@ class Admin_AJAX {
 	 */
 	public function set_up_environment() {
 		// Verify the nonce before continuing.
-		$valid_nonce = $this->verify_nonce( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_STRING ) );
+		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) );
 
-		if ( is_wp_error( $valid_nonce ) ) {
-			wp_send_json_error( $valid_nonce, 403 );
+		if ( is_wp_error( $valid_request ) ) {
+			wp_send_json_error( $valid_request, 403 );
 		}
 		$runner = Plugin_Request_Utility::get_runner();
 
@@ -78,7 +109,7 @@ class Admin_AJAX {
 		}
 
 		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
-		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_STRING );
+		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		try {
 			$runner->set_check_slugs( $checks );
@@ -95,7 +126,7 @@ class Admin_AJAX {
 
 		if ( $this->has_runtime_check( $checks_to_run ) ) {
 			$runtime = new Runtime_Environment_Setup();
-			$runtime->setup();
+			$runtime->set_up();
 			$message = __( 'Runtime environment setup successful.', 'plugin-check' );
 		}
 
@@ -114,24 +145,24 @@ class Admin_AJAX {
 	 * @since n.e.x.t
 	 */
 	public function clean_up_environment() {
-		global $wpdb;
+		global $wpdb, $table_prefix;
 
 		// Verify the nonce before continuing.
-		$valid_nonce = $this->verify_nonce( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_STRING ) );
+		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) );
 
-		if ( is_wp_error( $valid_nonce ) ) {
-			wp_send_json_error( $valid_nonce, 403 );
+		if ( is_wp_error( $valid_request ) ) {
+			wp_send_json_error( $valid_request, 403 );
 		}
 
 		// Set the new prefix.
-		$old_prefix = $wpdb->set_prefix( 'wppc_' );
+		$old_prefix = $wpdb->set_prefix( $table_prefix . 'pc_' );
 
 		$message = __( 'Runtime environment was not prepared, cleanup was not run.', 'plugin-check' );
 
 		// Test if the runtime environment tables exist.
-		if ( 'wppc_posts' === $wpdb->get_var( "SHOW TABLES LIKE 'wppc_posts'" ) || defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) ) {
+		if ( $wpdb->posts === $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->posts ) ) || defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) ) {
 			$runtime = new Runtime_Environment_Setup();
-			$runtime->cleanup();
+			$runtime->clean_up();
 			$message = __( 'Runtime environment cleanup successful.', 'plugin-check' );
 		}
 
@@ -152,15 +183,15 @@ class Admin_AJAX {
 	 */
 	public function get_checks_to_run() {
 		// Verify the nonce before continuing.
-		$valid_nonce = $this->verify_nonce( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_STRING ) );
+		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) );
 
-		if ( is_wp_error( $valid_nonce ) ) {
-			wp_send_json_error( $valid_nonce, 403 );
+		if ( is_wp_error( $valid_request ) ) {
+			wp_send_json_error( $valid_request, 403 );
 		}
 
 		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
 		$checks = is_null( $checks ) ? array() : $checks;
-		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_STRING );
+		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		$runner = Plugin_Request_Utility::get_runner();
 
 		if ( is_null( $runner ) ) {
@@ -203,10 +234,10 @@ class Admin_AJAX {
 	 */
 	public function run_checks() {
 		// Verify the nonce before continuing.
-		$valid_nonce = $this->verify_nonce( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_STRING ) );
+		$valid_request = $this->verify_request( filter_input( INPUT_POST, 'nonce', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) );
 
-		if ( is_wp_error( $valid_nonce ) ) {
-			wp_send_json_error( $valid_nonce, 403 );
+		if ( is_wp_error( $valid_request ) ) {
+			wp_send_json_error( $valid_request, 403 );
 		}
 
 		$runner = Plugin_Request_Utility::get_runner();
@@ -225,7 +256,7 @@ class Admin_AJAX {
 
 		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
 		$checks = is_null( $checks ) ? array() : $checks;
-		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_STRING );
+		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		try {
 			$runner->set_check_slugs( $checks );
@@ -248,30 +279,34 @@ class Admin_AJAX {
 	}
 
 	/**
-	 * Verify the nonce passed in the request.
+	 * Verify the request.
 	 *
 	 * @since n.e.x.t
 	 *
 	 * @param string $nonce The request nonce passed.
 	 * @return bool|WP_Error True if the nonce is valid. WP_Error if invalid.
 	 */
-	protected function verify_nonce( $nonce ) {
+	private function verify_request( $nonce ) {
 		if ( ! wp_verify_nonce( $nonce, self::NONCE_KEY ) ) {
-			new WP_Error( 'invalid-nonce', __( 'Invalid nonce', 'plugin-check' ) );
+			return new WP_Error( 'invalid-nonce', __( 'Invalid nonce', 'plugin-check' ) );
+		}
+
+		if ( ! current_user_can( 'activate_plugins' ) ) {
+			return new WP_Error( 'invalid-permissions', __( 'Invalid user permissions, you are not allowed to perform this request.', 'plugin-check' ) );
 		}
 
 		return true;
 	}
 
 	/**
-	 * Check for a Runtime_Check in a list of checks
+	 * Check for a Runtime_Check in a list of checks.
 	 *
 	 * @since n.e.x.t
 	 *
 	 * @param array $checks An array of Check instances.
 	 * @return bool True if a Runtime_Check exists in the array, false if not.
 	 */
-	protected function has_runtime_check( array $checks ) {
+	private function has_runtime_check( array $checks ) {
 		foreach ( $checks as $check ) {
 			if ( $check instanceof Runtime_Check ) {
 				return true;

@@ -13,11 +13,26 @@
 		return;
 	}
 
+	// Handle disabling the Check it button when a plugin is not selected.
+	function canRunChecks() {
+		if ( '' === pluginsList.value ) {
+			checkItButton.disabled = true;
+		} else {
+			checkItButton.disabled = false;
+		}
+	}
+
+	// Run on page load to test if dropdown is auto populated.
+	canRunChecks();
+	pluginsList.addEventListener( 'change', canRunChecks );
+
+	// When the Check it button is clicked.
 	checkItButton.addEventListener( 'click', ( e ) => {
 		e.preventDefault();
 
 		resetResults();
 		checkItButton.disabled = true;
+		pluginsList.disabled = true;
 		spinner.classList.add( 'is-active' );
 
 		getChecksToRun()
@@ -54,6 +69,7 @@
 	function resetForm() {
 		spinner.classList.remove( 'is-active' );
 		checkItButton.disabled = false;
+		pluginsList.disabled = false;
 	}
 
 	/**
@@ -67,7 +83,10 @@
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append( 'plugin', data.plugin );
-		pluginCheckData.append( 'action', 'plugin_check_set_up_environment' );
+		pluginCheckData.append(
+			'action',
+			pluginCheck.actionSetUpRuntimeEnvironment
+		);
 
 		for ( let i = 0; i < data.checks.length; i++ ) {
 			pluginCheckData.append( 'checks[]', data.checks[ i ] );
@@ -103,7 +122,10 @@
 	function cleanUpEnvironment() {
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
-		pluginCheckData.append( 'action', 'plugin_check_clean_up_environment' );
+		pluginCheckData.append(
+			'action',
+			pluginCheck.actionCleanUpRuntimeEnvironment
+		);
 
 		return fetch( ajaxurl, {
 			method: 'POST',
@@ -132,7 +154,7 @@
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append( 'plugin', pluginsList.value );
-		pluginCheckData.append( 'action', 'plugin_check_get_checks_to_run' );
+		pluginCheckData.append( 'action', pluginCheck.actionGetChecksToRun );
 
 		return fetch( ajaxurl, {
 			method: 'POST',
@@ -166,14 +188,47 @@
 	 * @param {Object} data The response data.
 	 */
 	async function runChecks( data ) {
+		let isSuccessMessage = true;
 		for ( let i = 0; i < data.checks.length; i++ ) {
 			try {
 				const results = await runCheck( data.plugin, data.checks[ i ] );
+				const errorsLength = Object.values( results.errors ).length;
+				const warningsLength = Object.values( results.warnings ).length;
+				if (
+					isSuccessMessage &&
+					( errorsLength > 0 || warningsLength > 0 )
+				) {
+					isSuccessMessage = false;
+				}
 				renderResults( results );
 			} catch ( e ) {
 				// Ignore for now.
 			}
 		}
+
+		renderResultsMessage( isSuccessMessage );
+	}
+
+	/**
+	 * Renders result message.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param {boolean} isSuccessMessage Whether the message is a success message.
+	 */
+	function renderResultsMessage( isSuccessMessage ) {
+		const messageType = isSuccessMessage ? 'success' : 'error';
+		const messageText = isSuccessMessage
+			? pluginCheck.successMessage
+			: pluginCheck.errorMessage;
+
+		resultsContainer.innerHTML += renderTemplate(
+			'plugin-check-results-complete',
+			{
+				type: messageType,
+				message: messageText,
+			}
+		);
 	}
 
 	/**
@@ -190,7 +245,7 @@
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append( 'plugin', plugin );
 		pluginCheckData.append( 'checks[]', check );
-		pluginCheckData.append( 'action', 'plugin_check_run_checks' );
+		pluginCheckData.append( 'action', pluginCheck.actionRunChecks );
 
 		return fetch( ajaxurl, {
 			method: 'POST',
@@ -246,7 +301,6 @@
 	 */
 	function renderResults( results ) {
 		const { errors, warnings } = results;
-
 		// Render errors and warnings for files.
 		for ( const file in errors ) {
 			if ( warnings[ file ] ) {
@@ -261,10 +315,6 @@
 		for ( const file in warnings ) {
 			renderFileResults( file, [], warnings[ file ] );
 		}
-
-		resultsContainer.innerHTML += renderTemplate(
-			'plugin-check-results-complete'
-		);
 	}
 
 	/**
@@ -277,7 +327,9 @@
 	 * @param {Object} warnings The file warnings.
 	 */
 	function renderFileResults( file, errors, warnings ) {
-		const index = Date.now();
+		const index =
+			Date.now().toString( 36 ) +
+			Math.random().toString( 36 ).substr( 2 );
 
 		// Render the file table.
 		resultsContainer.innerHTML += renderTemplate(

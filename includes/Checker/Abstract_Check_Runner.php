@@ -8,8 +8,8 @@
 namespace WordPress\Plugin_Check\Checker;
 
 use Exception;
-use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 use WordPress\Plugin_Check\Checker\Preparations\Universal_Runtime_Preparation;
+use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 
 /**
  * Abstract Check Runner class.
@@ -59,13 +59,29 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	protected $plugin_basename;
 
 	/**
+	 * An instance of the Check_Repository.
+	 *
+	 * @since n.e.x.t
+	 * @var Check_Repository
+	 */
+	private $check_repository;
+
+	/**
+	 * Runtime environment.
+	 *
+	 * @since n.e.x.t
+	 * @var Runtime_Environment_Setup
+	 */
+	protected $runtime_environment;
+
+	/**
 	 * Determines if the current request is intended for the plugin checker.
 	 *
 	 * @since n.e.x.t
 	 *
 	 * @return bool Returns true if the check is for plugin else false.
 	 */
-	abstract public function is_plugin_check();
+	abstract public static function is_plugin_check();
 
 	/**
 	 * Returns the plugin parameter based on the request.
@@ -90,8 +106,10 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @since n.e.x.t
 	 */
-	public function __construct() {
+	final public function __construct() {
 		$this->initialized_early = ! did_action( 'muplugins_loaded' );
+		$this->register_checks();
+		$this->runtime_environment = new Runtime_Environment_Setup();
 	}
 
 	/**
@@ -103,7 +121,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @throws Exception Thrown if the checks do not match those in the original request.
 	 */
-	public function set_check_slugs( array $check_slugs ) {
+	final public function set_check_slugs( array $check_slugs ) {
 		if ( $this->initialized_early ) {
 			// Compare the check slugs to see if there was an error.
 			if ( $check_slugs !== $this->get_check_slugs_param() ) {
@@ -125,7 +143,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @throws Exception Thrown if the plugin set does not match the original request parameter.
 	 */
-	public function set_plugin( $plugin ) {
+	final public function set_plugin( $plugin ) {
 		if ( $this->initialized_early ) {
 			// Compare the plugin parameter to see if there was an error.
 			if ( $plugin !== $this->get_plugin_param() ) {
@@ -147,20 +165,10 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @throws Exception Thrown exception when preparation fails.
 	 */
-	public function prepare() {
+	final public function prepare() {
 		if ( $this->has_runtime_check( $this->get_checks_to_run() ) ) {
-			$preparation = new Universal_Runtime_Preparation( $this->get_checks_instance()->context() );
-			$cleanup     = $preparation->prepare();
-
-			// Set the database prefix to use the demo tables.
-			global $wpdb;
-			$old_prefix = $wpdb->set_prefix( 'wppc_' );
-
-			return function() use ( $old_prefix, $cleanup ) {
-				global $wpdb;
-				$wpdb->set_prefix( $old_prefix );
-				$cleanup();
-			};
+			$preparation = new Universal_Runtime_Preparation( $this->get_check_context() );
+			return $preparation->prepare();
 		}
 
 		return function() {};
@@ -173,22 +181,35 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @return Check_Result An object containing all check results.
 	 */
-	public function run() {
+	final public function run() {
+		global $wpdb, $table_prefix;
 		$checks       = $this->get_checks_to_run();
 		$preparations = $this->get_shared_preparations( $checks );
 		$cleanups     = array();
+		$old_prefix   = null;
 
+		// Set the correct test database prefix if required.
+		if ( $this->has_runtime_check( $checks ) ) {
+			$old_prefix = $wpdb->set_prefix( $table_prefix . 'pc_' );
+		}
+
+		// Prepare all shared preparations.
 		foreach ( $preparations as $preparation ) {
 			$instance   = new $preparation['class']( ...$preparation['args'] );
 			$cleanups[] = $instance->prepare();
 		}
 
-		$results = $this->get_checks_instance()->run_checks( $checks );
+		$results = $this->get_checks_instance()->run_checks( $this->get_check_context(), $checks );
 
 		if ( ! empty( $cleanups ) ) {
 			foreach ( $cleanups as $cleanup ) {
 				$cleanup();
 			}
+		}
+
+		// Restore the old prefix.
+		if ( $old_prefix ) {
+			$wpdb->set_prefix( $old_prefix );
 		}
 
 		return $results;
@@ -202,7 +223,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @param array $checks An array of check instances to run.
 	 * @return bool Returns true if one or more checks is a runtime check.
 	 */
-	protected function has_runtime_check( array $checks ) {
+	private function has_runtime_check( array $checks ) {
 		foreach ( $checks as $check ) {
 			if ( $check instanceof Runtime_Check ) {
 				return true;
@@ -252,45 +273,21 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @return array An array map of check slugs to Check instances.
 	 *
-	 * @throws Exception Thrown exception when a runtime check is requested and the plugin inactive.
+	 * @throws Exception Thrown when invalid flag is passed, or Check slug does not exist.
 	 */
-	public function get_checks_to_run() {
-		$check_slugs   = $this->get_check_slugs();
-		$all_checks    = $this->get_checks_instance()->get_checks();
-		$plugin_active = is_plugin_active( $this->get_plugin_basename() );
+	final public function get_checks_to_run() {
+		// Include file to use is_plugin_active() in CLI context.
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 
-		if ( ! empty( $check_slugs ) ) {
-			// Get the check instances based on the requested checks.
-			$checks_to_run = array_intersect_key( $all_checks, array_flip( $check_slugs ) );
+		$check_slugs = $this->get_check_slugs();
+		$check_flags = Check_Repository::TYPE_STATIC;
 
-			// Check the following conditions if at least one runtime check is requested.
-			if ( $this->has_runtime_check( $checks_to_run ) ) {
-				// Throw an error if the plugin is not active.
-				if ( ! $plugin_active ) {
-					throw new Exception( __( 'Runtime checks cannot be run against inactive plugins.', 'plugin-check' ) );
-				}
-
-				// Throw and error if the runner was not initialized early and the runtime environment was not set up.
-				if ( ! $this->initialized_early ) {
-					throw new Exception( __( 'Runtime checks cannot be run as the runtime environment was not set up.', 'plugin-check' ) );
-				}
-			}
-		} else {
-			// Run all checks for the plugin.
-			$checks_to_run = $all_checks;
-
-			// Only run static checks if the plugin is inactive or the runtime environment was not set up.
-			if ( ! $plugin_active || ! $this->initialized_early ) {
-				$checks_to_run = array_filter(
-					$checks_to_run,
-					function ( $check ) {
-						return ! $check instanceof Runtime_Check;
-					}
-				);
-			}
+		// Check if conditions are met in order to perform Runtime Checks.
+		if ( ( $this->initialized_early || $this->runtime_environment->can_set_up() ) && is_plugin_active( $this->get_plugin_basename() ) ) {
+			$check_flags = Check_Repository::TYPE_ALL;
 		}
 
-		return $checks_to_run;
+		return $this->check_repository->get_checks( $check_flags, $check_slugs );
 	}
 
 	/**
@@ -303,12 +300,11 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @throws Exception Thrown if the plugin slug is invalid.
 	 */
 	protected function get_checks_instance() {
-		if ( isset( $this->checks ) ) {
+		if ( null !== $this->checks ) {
 			return $this->checks;
 		}
 
-		$plugin_basename = $this->get_plugin_basename();
-		$this->checks    = new Checks( WP_PLUGIN_DIR . '/' . $plugin_basename );
+		$this->checks = new Checks();
 
 		return $this->checks;
 	}
@@ -320,8 +316,8 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @return array An array of check slugs to run.
 	 */
-	protected function get_check_slugs() {
-		if ( isset( $this->check_slugs ) ) {
+	private function get_check_slugs() {
+		if ( null !== $this->check_slugs ) {
 			return $this->check_slugs;
 		}
 
@@ -335,12 +331,73 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @return string The plugin basename to check.
 	 */
-	public function get_plugin_basename() {
-		if ( ! isset( $this->plugin_basename ) ) {
-			$plugin                = isset( $this->plugin ) ? $this->plugin : $this->get_plugin_param();
+	final public function get_plugin_basename() {
+		if ( null === $this->plugin_basename ) {
+			$plugin                = null !== $this->plugin ? $this->plugin : $this->get_plugin_param();
 			$this->plugin_basename = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin );
 		}
 
 		return $this->plugin_basename;
+	}
+
+	/** Gets the Check_Context for the plugin.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return Check_Context The check context for the plugin file.
+	 */
+	private function get_check_context() {
+		return new Check_Context( WP_PLUGIN_DIR . '/' . $this->get_plugin_basename() );
+	}
+
+	/**
+	 * Registers Checks to the Check_Repository.
+	 *
+	 * @since n.e.x.t
+	 */
+	private function register_checks() {
+		$this->check_repository = new Default_Check_Repository();
+
+		/**
+		 * Filters the available plugin check classes.
+		 *
+		 * @since n.e.x.t
+		 *
+		 * @param array $checks An array map of check slugs to Check instances.
+		 */
+		$checks = apply_filters(
+			'wp_plugin_check_checks',
+			array(
+				'i18n_usage'                 => new Checks\I18n_Usage_Check(),
+				'enqueued_scripts_size'      => new Checks\Enqueued_Scripts_Size_Check(),
+				'code_obfuscation'           => new Checks\Code_Obfuscation_Check(),
+				'file_type'                  => new Checks\File_Type_Check(),
+				'plugin_header_text_domain'  => new Checks\Plugin_Header_Text_Domain_Check(),
+				'late_escaping'              => new Checks\Late_Escaping_Check(),
+				'plugin_updater'             => new Checks\Plugin_Updater_Check(),
+				'plugin_review_phpcs'        => new Checks\Plugin_Review_PHPCS_Check(),
+				'performant_wp_query_params' => new Checks\Performant_WP_Query_Params_Check(),
+				'enqueued_scripts_in_footer' => new Checks\Enqueued_Scripts_In_Footer_Check(),
+				'plugin_readme'              => new Checks\Plugin_Readme_Check(),
+				'enqueued_styles_scope'      => new Checks\Enqueued_Styles_Scope_Check(),
+				'localhost'                  => new Checks\Localhost_Check(),
+				'no_unfiltered_uploads'      => new Checks\No_Unfiltered_Uploads_Check(),
+			)
+		);
+
+		foreach ( $checks as $slug => $check ) {
+			$this->check_repository->register_check( $slug, $check );
+		}
+	}
+
+	/**
+	 * Sets the runtime environment setup.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param Runtime_Environment_Setup $runtime_environment_setup Runtime environment instance.
+	 */
+	final public function set_runtime_environment_setup( $runtime_environment_setup ) {
+		$this->runtime_environment = $runtime_environment_setup;
 	}
 }
