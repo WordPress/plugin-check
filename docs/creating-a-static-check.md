@@ -48,18 +48,18 @@ Below is an example of a Static Check class that checks for i18n usage in the pl
  */
 class I18n_Usage_Check extends Abstract_PHP_CodeSniffer_Check {
 
-	/**
-	 * Returns an associative array of arguments to pass to PHPCS.
-	 *
-	 * @return array An associative array of PHPCS CLI arguments.
-	 */
-	protected function get_args() {
-		return array(
-			'extensions' => 'php',
-			'standard'   => 'WordPress',
-			'sniffs'     => 'WordPress.WP.I18n',
-		);
-	}
+  /**
+   * Returns an associative array of arguments to pass to PHPCS.
+   *
+   * @return array An associative array of PHPCS CLI arguments.
+   */
+  protected function get_args() {
+    return array(
+      'extensions' => 'php',
+      'standard'   => 'WordPress',
+      'sniffs'     => 'WordPress.WP.I18n',
+    );
+  }
 }
 ```
 
@@ -106,29 +106,29 @@ Below is an example showing how to access the plugin context and add messages us
 
 ```php
 /**
-	 * Runs the check on the plugin and amends results.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @param Check_Result $result The check results to amend and the plugin context.
-	 */
-	public function run( Check_Result $result ) {
+ * Runs the check on the plugin and amends results.
+ *
+ * @since n.e.x.t
+ *
+ * @param Check_Result $result The check results to amend and the plugin context.
+ */
+public function run( Check_Result $result ) {
 
-    // Get the absolute file path for a specific file in the plugin.
-    $plugin_file = $result->plugin()->path( 'plugin-file.php' );
-    
-    // Run logic to test the plugin for warnings/errors...
+  // Get the absolute file path for a specific file in the plugin.
+  $plugin_file = $result->plugin()->path( 'plugin-file.php' );
 
-    // When an issue is found add a warning.
-    $result->add_message(
-      false, 
-			'Warning message content.', 
-			array(
-				'code'   => 'warning_code',
-				'file'   => $pluging_file,
-				'line'   => 1,
-				'column' => 10,
-			)
-    );
-  }
+  // Run logic to test the plugin for warnings/errors...
+
+  // When an issue is found add a warning.
+  $result->add_message(
+    false, 
+    'Warning message content.', 
+    array(
+      'code'   => 'warning_code',
+      'file'   => $pluging_file,
+      'line'   => 1,
+      'column' => 10,
+    )
+  );
+}
 ```

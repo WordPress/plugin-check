@@ -164,22 +164,22 @@ Below is an example showing how to access the plugin context and add messages us
 
 ```php
 /**
-	 * Runs the check on the plugin and amends results.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @param Check_Result $result The check results to amend and the plugin context.
-	 */
-	public function run( Check_Result $result ) {
+ * Runs the check on the plugin and amends results.
+ *
+ * @since n.e.x.t
+ *
+ * @param Check_Result $result The check results to amend and the plugin context.
+ */
+public function run( Check_Result $result ) {
 
-    // Get the absolute file path for a specific file in the plugin.
-    $plugin_file = $result->plugin()->path( 'plugin-file.php' );
-    
-    // Run logic to test the plugin for warnings/errors...
+	// Get the absolute file path for a specific file in the plugin.
+	$plugin_file = $result->plugin()->path( 'plugin-file.php' );
 
-    // When an issue is found add a warning.
-    $result->add_message(
-      false, 
+	// Run logic to test the plugin for warnings/errors...
+
+	// When an issue is found add a warning.
+	$result->add_message(
+		false, 
 			'Warning message content.', 
 			array(
 				'code'   => 'warning_code',
@@ -187,6 +187,6 @@ Below is an example showing how to access the plugin context and add messages us
 				'line'   => 1,
 				'column' => 10,
 			)
-    );
-  }
+	);
+}
 ```
