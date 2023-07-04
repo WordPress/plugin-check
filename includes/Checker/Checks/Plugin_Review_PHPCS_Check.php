@@ -20,6 +20,8 @@ class Plugin_Review_PHPCS_Check extends Abstract_PHP_CodeSniffer_Check {
 	 * Gets the category of the check.
 	 *
 	 * @since n.e.x.t
+	 *
+	 * @return string The category of the check.
 	 */
 	public function get_category() {
 		return Check_Categories::CATEGORY_PLUGIN_REPO;

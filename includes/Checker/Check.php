@@ -32,6 +32,8 @@ interface Check {
 	 * Gets the category for the check.
 	 *
 	 * @since n.e.x.t
+	 *
+	 * @return string The category for the check.
 	 */
 	public function get_category();
 }

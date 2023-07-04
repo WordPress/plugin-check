@@ -21,6 +21,8 @@ class No_Unfiltered_Uploads_Check extends Abstract_File_Check {
 	 * Gets the category of the check.
 	 *
 	 * @since n.e.x.t
+	 *
+	 * @return string The category of the check.
 	 */
 	public function get_category() {
 		return Check_Categories::CATEGORY_SECURITY;

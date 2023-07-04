@@ -25,6 +25,8 @@ class Check_Categories {
 	 * Returns an array of available categories.
 	 *
 	 * @since n.e.x.t
+	 *
+	 * @return array An array of available categories.
 	 */
 	public static function get_categories() {
 		return array(
