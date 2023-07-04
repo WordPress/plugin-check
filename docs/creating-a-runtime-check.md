@@ -4,7 +4,17 @@ Runtime checks are used to perform tests by executing the plugin's code.
 
 The Plugin Checker uses a number of interfaces to build out runtime checks.
 
-One interface is the `Runtime_Check` interface. This interface contains no methods, but is used to help identify a runtime check from static checks.
+The Plugin Checker provides the `Runtime_Check` interface, which is used to identify a runtime check. This interface does not contain any methods but serves as a marker for runtime checks.
+
+```php
+use WordPress\Plugin_Check\Checker\Check_Result;
+
+class Custom_Check extends Runtime_Check {
+  public function run( Check_Result $result );
+    // Handle running the check and adding warnings or errors to the result.
+  }
+}
+```
 
 In addtion, there is also the `Preparation` interface, which is used to define checks that have preparations. This interface defines a `prepare()` method which is used to run the logic required to prepare the environment before the check before is run.
 
@@ -13,6 +23,7 @@ Both these interfaces are implemented in the `Abstract_Runtime_Check` class, whi
 Below is the basic scaffold when creating a custom runtime check.
 
 ```php
+use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Checks\Abstract_Runtime_Check;
 
 class Custom_Check extends Abstract_Runtime_Check {
@@ -28,13 +39,7 @@ class Custom_Check extends Abstract_Runtime_Check {
 
 ## Preparations
 
-Preparations are used to prepare the environment before running the check. Preparations can include any logic from activating specific themes or plugins, or creating test content required to perform the check.
-
-Preparations will use the `Preparation` interface which defines a single `prepare()` method. This method is required to be implemented in runtime checks and handles any logic needed to prepare the environent.
-
-All preparations return a clean up function that reverts the changes made by the method.
-
-When creating preparations there are 3 approachs that can be used depending on circumstance.
+Preparations in the Plugin Checker are used to set up the environment before running checks, involving logic like activating themes or plugins and creating necessary test content. They utilize the `Preparation` interface, requiring the implementation of a `prepare()` method, and return cleanup functions to revert changes made during preparation. Three different approaches can be used for creating preparations based on the circumstances.
 
 ### Check Preperations
 
@@ -116,7 +121,28 @@ Below is an example of how the `Enqueued_Scripts_Size_Check` uses shared prepara
 	}
 ```
 
-## Check run method
+## Add the Check to the Plugin Checker
+
+In order to run the check as part of the Plugin Checker process it needs to be added to the Plugin Checkers list of available checks.
+
+This is done by using the `wp_plugin_check_checks` filter to register an instance of the check with its slug.
+
+- If you're contributing to the actual plugin checker, add the check to the list in the `Abstract_Check_Runner::register_checks()` method.
+- If you're implementing a check in code outside of the actual plugin checker, use the approach you've described here so far.
+
+```php
+add_filter(
+  'wp_plugin_check_checks',
+  function ( array $checks ) {
+    // Add the check to the map of all available checks.
+    $checks[ 'runtime_check' ] = new Runtime_Check();
+
+    return $checks;
+  }
+)
+```
+
+# Amending the check result object
 
 The checks `run()` method will hold all the logic to test the plugin and raise any warnings or errors that are found.
 
@@ -164,18 +190,3 @@ Below is an example showing how to access the plugin context and add messages us
     );
   }
 ```
-
-## Add the Check to the Plugin Checker
-
-Checks are added to the Plugin Checker using the `wp_plugin_check_checks` filter. The filter passes an array of checks where developers can add their own by creating an instance of the new check class with a unique slug.
-
-```php
-add_filter(
-  'wp_plugin_check_checks',
-  function ( array $checks ) {
-    // Add the check to the map of all available checks.
-    $checks[ 'runtime_check' ] = new Runtime_Check();
-
-    return $checks;
-  }
-)
