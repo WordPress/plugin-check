@@ -10,8 +10,8 @@ namespace WordPress\Plugin_Check\Checker\Checks;
 use Exception;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Preparations\Demo_Posts_Creation_Preparation;
-use WordPress\Plugin_Check\Traits\Stable_Check;
 use WordPress\Plugin_Check\Checker\With_Shared_Preparations;
+use WordPress\Plugin_Check\Traits\Stable_Check;
 use WordPress\Plugin_Check\Traits\URL_Aware;
 
 /**

@@ -179,6 +179,8 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @since n.e.x.t
 	 *
 	 * @param bool $include_experimental True to include experimental checks. False to exclude.
+	 *
+	 * @throws Exception Thrown if the flag set does not match the original request parameter.
 	 */
 	final public function set_experimental_flag( $include_experimental ) {
 		if ( $this->initialized_early ) {

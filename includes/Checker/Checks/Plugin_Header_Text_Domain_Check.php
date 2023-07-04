@@ -9,8 +9,8 @@ namespace WordPress\Plugin_Check\Checker\Checks;
 
 use Exception;
 use WordPress\Plugin_Check\Checker\Check_Result;
-use WordPress\Plugin_Check\Traits\Stable_Check;
 use WordPress\Plugin_Check\Checker\Static_Check;
+use WordPress\Plugin_Check\Traits\Stable_Check;
 
 /**
  * Check for plugin header text domain.

@@ -119,13 +119,15 @@ class Default_Check_Repository_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_get_checks_returns_no_experimental_checks_by_default() {
-		$static_check       = new Static_Check();
-		$runtime_check      = new Runtime_Check();
-		$experimental_check = new Experimental_Static_Check();
+		$static_check               = new Static_Check();
+		$runtime_check              = new Runtime_Check();
+		$experimental_static_check  = new Experimental_Static_Check();
+		$experimental_runtime_check = new Experimental_Runtime_Check();
 
 		$this->repository->register_check( 'static_check', $static_check );
 		$this->repository->register_check( 'runtime_check', $runtime_check );
-		$this->repository->register_check( 'experimental_static_check', $experimental_check );
+		$this->repository->register_check( 'experimental_static_check', $experimental_static_check );
+		$this->repository->register_check( 'experimental_runtime_check', $experimental_runtime_check );
 
 		$expected = array(
 			'static_check'  => $static_check,
