@@ -80,7 +80,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @since n.e.x.t
 	 * @var bool
 	 */
-	protected $include_experimental = false;
+	protected $include_experimental = null;
 
 	/**
 	 * Determines if the current request is intended for the plugin checker.
@@ -108,6 +108,15 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @return array An array of Check slugs.
 	 */
 	abstract protected function get_check_slugs_param();
+
+	/**
+	 * Returns the include experimental paramater based on the request.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return bool Returns true to include experimental checks else false.
+	 */
+	abstract protected function get_include_experimental_param();
 
 	/**
 	 * Sets whether the runner class was initialized early.
@@ -172,6 +181,14 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @param bool $include_experimental True to include experimental checks. False to exclude.
 	 */
 	final public function set_experimental_flag( $include_experimental ) {
+		if ( $this->initialized_early ) {
+			if ( $include_experimental !== $this->get_include_experimental_param() ) {
+				throw new Exception(
+					__( 'Invalid flag: The include-experimental flag does not match the original request parameter.', 'plugin-check' )
+				);
+			}
+		}
+
 		$this->include_experimental = $include_experimental;
 	}
 
