@@ -96,29 +96,29 @@ The Check class should then implement the get_shared_preparations() method defin
 Below is an example of how the `Enqueued_Scripts_Size_Check` uses shared preparations.
 
 ```php
-	/**
-	 * Returns an array of shared preparations for the check.
-	 *
-	 * @return array Returns a map of $class_name => $constructor_args pairs. If the class does not
-	 *               need any constructor arguments, it would just be an empty array.
-	 */
-	public function get_shared_preparations() {
-		$demo_posts = array_map(
-			function( $post_type ) {
-				return array(
-					'post_title'   => "Demo {$post_type} post",
-					'post_content' => 'Test content',
-					'post_type'    => $post_type,
-					'post_status'  => 'publish',
-				);
-			},
-			$this->viewable_post_types
-		);
+  /**
+   * Returns an array of shared preparations for the check.
+   *
+   * @return array Returns a map of $class_name => $constructor_args pairs. If the class does not
+   *               need any constructor arguments, it would just be an empty array.
+   */
+  public function get_shared_preparations() {
+    $demo_posts = array_map(
+      function( $post_type ) {
+        return array(
+          'post_title'   => "Demo {$post_type} post",
+          'post_content' => 'Test content',
+          'post_type'    => $post_type,
+          'post_status'  => 'publish',
+        );
+      },
+      $this->viewable_post_types
+    );
 
-		return array(
-			Demo_Posts_Creation_Preparation::class => array( $demo_posts ),
-		);
-	}
+    return array(
+      Demo_Posts_Creation_Preparation::class => array( $demo_posts ),
+    );
+  }
 ```
 
 ## Add the Check to the Plugin Checker
@@ -172,21 +172,21 @@ Below is an example showing how to access the plugin context and add messages us
  */
 public function run( Check_Result $result ) {
 
-	// Get the absolute file path for a specific file in the plugin.
-	$plugin_file = $result->plugin()->path( 'plugin-file.php' );
+  // Get the absolute file path for a specific file in the plugin.
+  $plugin_file = $result->plugin()->path( 'plugin-file.php' );
 
-	// Run logic to test the plugin for warnings/errors...
+  // Run logic to test the plugin for warnings/errors...
 
-	// When an issue is found add a warning.
-	$result->add_message(
-		false, 
-			'Warning message content.', 
-			array(
-				'code'   => 'warning_code',
-				'file'   => $pluging_file,
-				'line'   => 1,
-				'column' => 10,
-			)
-	);
+  // When an issue is found add a warning.
+  $result->add_message(
+    false, 
+    'Warning message content.', 
+    array(
+      'code'   => 'warning_code',
+      'file'   => $pluging_file,
+      'line'   => 1,
+      'column' => 10,
+    )
+  );
 }
 ```
