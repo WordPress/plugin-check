@@ -5,7 +5,7 @@
  * @package plugin-check
  */
 
-namespace WordPress\Plugin_Check\Checker;
+namespace WordPress\Plugin_Check\Traits;
 
 /**
  * Trait for stable checks.
@@ -14,9 +14,9 @@ namespace WordPress\Plugin_Check\Checker;
  */
 trait Experimental_Check {
 	/**
-	 * Returns the checks stability
+	 * Returns the checks stability.
 	 *
-	 * @return int
+	 * @return string
 	 */
 	public function get_stability() {
 		return self::STABILITY_EXPERIMENTAL;

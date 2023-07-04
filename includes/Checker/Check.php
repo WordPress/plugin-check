@@ -16,27 +16,27 @@ use Exception;
  */
 interface Check {
 	/**
-	 * Flag for stable checks.
+	 * Stability value for stable checks.
 	 *
 	 * @since n.e.x.t
-	 * @var int
+	 * @var string
 	 */
-	const STABILITY_STABLE = 1;
+	const STABILITY_STABLE = 'STABLE';
 
 	/**
-	 * Flag for experimental checks.
+	 * Stability value for experimental checks.
 	 *
 	 * @since n.e.x.t
-	 * @var int
+	 * @var string
 	 */
-	const STABILITY_EXPERIMENTAL = 2;
+	const STABILITY_EXPERIMENTAL = 'EXPERIMENTAL';
 
 	/**
-	 * Returns the checks stability.
+	 * Returns the check's stability.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return int
+	 * @return string string One of the check stability constant values.
 	 */
 	public function get_stability();
 

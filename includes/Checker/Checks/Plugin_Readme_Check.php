@@ -8,7 +8,7 @@
 namespace WordPress\Plugin_Check\Checker\Checks;
 
 use WordPress\Plugin_Check\Checker\Check_Result;
-use WordPress\Plugin_Check\Checker\Stable_Check;
+use WordPress\Plugin_Check\Traits\Stable_Check;
 
 /**
  * Check the plugins readme.txt file and contents.

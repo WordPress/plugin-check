@@ -1,11 +1,11 @@
 <?php
 /**
- * Trait WordPress\Plugin_Check\Checker\Stable_Check
+ * Trait WordPress\Plugin_Check\Traits\Stable_Check
  *
  * @package plugin-check
  */
 
-namespace WordPress\Plugin_Check\Checker;
+namespace WordPress\Plugin_Check\Traits;
 
 /**
  * Trait for stable checks.
@@ -14,9 +14,9 @@ namespace WordPress\Plugin_Check\Checker;
  */
 trait Stable_Check {
 	/**
-	 * Returns the checks stability
+	 * Returns the checks stability.
 	 *
-	 * @return int
+	 * @return string
 	 */
 	public function get_stability() {
 		return self::STABILITY_STABLE;
