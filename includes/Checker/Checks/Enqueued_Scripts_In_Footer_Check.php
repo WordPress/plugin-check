@@ -24,7 +24,7 @@ class Enqueued_Scripts_In_Footer_Check extends Abstract_PHP_CodeSniffer_Check {
 	 * @return string The category of the check.
 	 */
 	public function get_category() {
-		return Check_Categories::CATEGORY_GENERAL;
+		return Check_Categories::CATEGORY_PERFORMANCE;
 	}
 
 	/**

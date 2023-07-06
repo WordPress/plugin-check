@@ -25,7 +25,7 @@ class Localhost_Check extends Abstract_File_Check {
 	 * @return string The category of the check.
 	 */
 	public function get_category() {
-		return Check_Categories::CATEGORY_SECURITY;
+		return Check_Categories::CATEGORY_PLUGIN_REPO;
 	}
 
 	/**

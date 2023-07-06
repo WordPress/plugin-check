@@ -55,7 +55,7 @@ class Enqueued_Styles_Scope_Check extends Abstract_Runtime_Check implements With
 	 * @return string The category of the check.
 	 */
 	public function get_category() {
-		return Check_Categories::CATEGORY_GENERAL;
+		return Check_Categories::CATEGORY_PERFORMANCE;
 	}
 
 	/**
