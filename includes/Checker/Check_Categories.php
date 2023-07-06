@@ -29,13 +29,27 @@ class Check_Categories {
 	 * @return array An array of available categories.
 	 */
 	public static function get_categories() {
-		return array(
-			self::CATEGORY_GENERAL,
-			self::CATEGORY_PLUGIN_REPO,
-			self::CATEGORY_SECURITY,
-			self::CATEGORY_PERFORMANCE,
-			self::CATEGORY_ACCESSIBILITY,
-		);
+		static $categories = '';
+		if ( ! $categories ) {
+			$constants = ( new \ReflectionClass( __CLASS__ ) )->getConstants();
+
+			/**
+			 * List of categories.
+			 *
+			 * @var string[] $categories
+			 */
+			$categories = array_values(
+				array_filter(
+					$constants,
+					static function( $key ) {
+						return strpos( $key, 'CATEGORY_' ) === 0;
+					},
+					ARRAY_FILTER_USE_KEY
+				)
+			);
+		}
+
+		return $categories;
 	}
 
 	/**
@@ -45,7 +59,7 @@ class Check_Categories {
 	 *
 	 * @param array $checks     An array of Check instances.
 	 * @param array $categories An array of available categories.
-	 * @return array Filtered $categories list.
+	 * @return array Filtered $checks list.
 	 */
 	public static function filter_checks_by_categories( array $checks, array $categories ) {
 		return array_filter(
