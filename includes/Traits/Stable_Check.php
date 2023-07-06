@@ -16,7 +16,7 @@ trait Stable_Check {
 	/**
 	 * Returns the checks stability.
 	 *
-	 * @return string
+	 * @return string One of the check stability constant values.
 	 */
 	public function get_stability() {
 		return self::STABILITY_STABLE;

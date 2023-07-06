@@ -97,10 +97,8 @@ class CLI_Runner extends Abstract_Check_Runner {
 	 * @return bool Returns true to include experimental checks else false.
 	 */
 	protected function get_include_experimental_param() {
-		foreach ( $_SERVER['argv'] as $value ) {
-			if ( '--include-experimental' === $value ) {
-				return true;
-			}
+		if ( in_array( '--include-experimental', $_SERVER['argv'], true ) ) {
+			return true;
 		}
 
 		return false;

@@ -8,7 +8,7 @@
 namespace WordPress\Plugin_Check\Traits;
 
 /**
- * Trait for stable checks.
+ * Trait for experimental checks.
  *
  * @since n.e.x.t
  */
@@ -16,7 +16,7 @@ trait Experimental_Check {
 	/**
 	 * Returns the checks stability.
 	 *
-	 * @return string
+	 * @return string One of the check stability constant values.
 	 */
 	public function get_stability() {
 		return self::STABILITY_EXPERIMENTAL;

@@ -36,7 +36,7 @@ interface Check {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return string string One of the check stability constant values.
+	 * @return string One of the check stability constant values.
 	 */
 	public function get_stability();
 

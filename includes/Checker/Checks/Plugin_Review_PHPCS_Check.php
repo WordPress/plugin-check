@@ -8,6 +8,7 @@
 namespace WordPress\Plugin_Check\Checker\Checks;
 
 use WordPress\Plugin_Check\Traits\Stable_Check;
+
 /**
  * Check for running WordPress plugin review PHPCS standard.
  *
