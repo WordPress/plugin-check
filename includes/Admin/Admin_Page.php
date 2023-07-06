@@ -48,7 +48,7 @@ final class Admin_Page {
 	 */
 	public function add_hooks() {
 		add_action( 'admin_menu', array( $this, 'add_and_initialize_page' ) );
-		add_filter( 'plugin_action_links', array( $this, 'filter_plugin_action_links' ), 10, 2 );
+		add_filter( 'plugin_action_links', array( $this, 'filter_plugin_action_links' ), 10, 4 );
 
 		$this->admin_ajax->add_hooks();
 	}
@@ -166,9 +166,18 @@ final class Admin_Page {
 	 *
 	 * @param array  $actions     List of actions.
 	 * @param string $plugin_file Plugin main file.
+	 * @param array  $plugin_data An array of plugin data.
+	 * @param string $context     The plugin context. By default this can include 'all',
+	 *                            'active', 'inactive', 'recently_activated', 'upgrade',
+	 *                            'mustuse', 'dropins', and 'search'.
 	 * @return array The modified list of actions.
 	 */
-	public function filter_plugin_action_links( $actions, $plugin_file ) {
+	public function filter_plugin_action_links( $actions, $plugin_file, $plugin_data, $context ) {
+
+		if ( in_array( $context, array( 'mustuse', 'dropins' ), true ) ) {
+			return $actions;
+		}
+
 		if ( current_user_can( 'activate_plugins' ) ) {
 			$actions[] = sprintf(
 				'<a href="%1$s">%2$s</a>',
