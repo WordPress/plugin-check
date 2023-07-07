@@ -145,15 +145,7 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 		}
 		wp_set_current_user( $admin_user );
 		$action_links = $this->admin_page->filter_plugin_action_links( array(), $base_file, array(), 'all' );
-
-		$this->assertEquals(
-			sprintf(
-				'<a href="%1$s">%2$s</a>',
-				esc_url( admin_url( "tools.php?page=plugin-check&plugin={$base_file}" ) ),
-				esc_html__( 'Check this plugin', 'plugin-check' )
-			),
-			$action_links[0]
-		);
+		$this->assertEmpty( $action_links );
 	}
 
 	/**
