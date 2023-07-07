@@ -16,6 +16,8 @@ trait Experimental_Check {
 	/**
 	 * Returns the checks stability.
 	 *
+	 * @since n.e.x.t
+	 *
 	 * @return string One of the check stability constant values.
 	 */
 	public function get_stability() {
