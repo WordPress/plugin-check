@@ -15,6 +15,30 @@ use Exception;
  * @since n.e.x.t
  */
 interface Check {
+	/**
+	 * Stability value for stable checks.
+	 *
+	 * @since n.e.x.t
+	 * @var string
+	 */
+	const STABILITY_STABLE = 'STABLE';
+
+	/**
+	 * Stability value for experimental checks.
+	 *
+	 * @since n.e.x.t
+	 * @var string
+	 */
+	const STABILITY_EXPERIMENTAL = 'EXPERIMENTAL';
+
+	/**
+	 * Returns the check's stability.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return string One of the check stability constant values.
+	 */
+	public function get_stability();
 
 	/**
 	 * Amends the given result by running the check on the associated plugin.

@@ -9,6 +9,7 @@ namespace WordPress\Plugin_Check\Checker\Checks;
 
 use Exception;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Traits\Stable_Check;
 
 /**
  * Check to detect PHP code obfuscation.
@@ -16,6 +17,8 @@ use WordPress\Plugin_Check\Checker\Check_Result;
  * @since n.e.x.t
  */
 class Code_Obfuscation_Check extends Abstract_File_Check {
+
+	use Stable_Check;
 
 	const TYPE_ZEND           = 1;
 	const TYPE_SOURCEGUARDIAN = 2;
