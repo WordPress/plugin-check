@@ -75,4 +75,15 @@ class AJAX_Runner extends Abstract_Check_Runner {
 
 		return $checks;
 	}
+
+	/**
+	 * Returns the include experimental paramater based on the request.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return bool Returns true to include experimental checks else false.
+	 */
+	protected function get_include_experimental_param() {
+		return false;
+	}
 }

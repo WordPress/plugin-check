@@ -8,6 +8,7 @@
 namespace WordPress\Plugin_Check\Checker\Checks;
 
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Traits\Stable_Check;
 
 /**
  * Check for detecting localhost in plugin files.
@@ -15,6 +16,8 @@ use WordPress\Plugin_Check\Checker\Check_Result;
  * @since n.e.x.t
  */
 class Localhost_Check extends Abstract_File_Check {
+
+	use Stable_Check;
 
 	/**
 	 * Check the localhost in files.
