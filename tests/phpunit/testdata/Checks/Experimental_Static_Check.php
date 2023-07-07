@@ -13,4 +13,8 @@ class Experimental_Static_Check implements Static_Check {
 	public function run( Check_Result $check_result ) {
 		return;
 	}
+
+	public function get_category() {
+		return Check_Categories::CATEGORY_GENERAL;
+	}
 }
