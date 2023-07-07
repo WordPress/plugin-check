@@ -103,6 +103,17 @@ class Default_Check_Repository implements Check_Repository {
 			);
 		}
 
-		return $checks;
+		// Return all checks, including experimental if requested.
+		if ( $flags & self::INCLUDE_EXPERIMENTAL ) {
+			return $checks;
+		}
+
+		// Remove experimental checks before returning.
+		return array_filter(
+			$checks,
+			static function ( $check ) {
+				return $check->get_stability() !== Check::STABILITY_EXPERIMENTAL;
+			}
+		);
 	}
 }

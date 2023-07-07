@@ -8,6 +8,7 @@
 namespace WordPress\Plugin_Check\Checker\Checks;
 
 use WordPress\Plugin_Check\Checker\Check_Categories;
+use WordPress\Plugin_Check\Traits\Stable_Check;
 
 /**
  * Check for running WordPress internationalization sniffs.
@@ -15,6 +16,8 @@ use WordPress\Plugin_Check\Checker\Check_Categories;
  * @since n.e.x.t
  */
 class I18n_Usage_Check extends Abstract_PHP_CodeSniffer_Check {
+
+	use Stable_Check;
 
 	/**
 	 * Gets the category of the check.

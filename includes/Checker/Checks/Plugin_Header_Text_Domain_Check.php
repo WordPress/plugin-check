@@ -11,6 +11,7 @@ use Exception;
 use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Static_Check;
+use WordPress\Plugin_Check\Traits\Stable_Check;
 
 /**
  * Check for plugin header text domain.
@@ -18,6 +19,8 @@ use WordPress\Plugin_Check\Checker\Static_Check;
  * @since n.e.x.t
  */
 class Plugin_Header_Text_Domain_Check implements Static_Check {
+
+	use Stable_Check;
 
 	/**
 	 * Gets the category of the check.
