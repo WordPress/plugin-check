@@ -35,7 +35,7 @@ class Check_Categories_Tests extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @dataProvider filterChecksByCategoriesDataProvider
+	 * @dataProvider data_checks_by_categories
 	 */
 	public function test_filter_checks_by_categories( array $categories, array $all_checks, array $expected_filtered_checks ) {
 
@@ -51,7 +51,7 @@ class Check_Categories_Tests extends WP_UnitTestCase {
 		$this->assertEquals( $expected_filtered_checks, $filtered_checks );
 	}
 
-	public function filterChecksByCategoriesDataProvider() {
+	public function data_checks_by_categories() {
 
 		require TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/Checks/Category_Check_One.php';
 		require TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/Checks/Category_Check_Two.php';
