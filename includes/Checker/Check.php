@@ -53,11 +53,11 @@ interface Check {
 	public function run( Check_Result $result );
 
 	/**
-	 * Gets the category for the check.
+	 * Gets the categories for the check.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return string The category for the check.
+	 * @return array The categories for the check.
 	 */
-	public function get_category();
+	public function get_categories();
 }

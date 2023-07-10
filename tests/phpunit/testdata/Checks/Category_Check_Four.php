@@ -15,7 +15,7 @@ class Category_Check_Four implements Static_Check {
 		return;
 	}
 
-	public function get_category() {
-		return Check_Categories::CATEGORY_PERFORMANCE;
+	public function get_categories() {
+		return array( Check_Categories::CATEGORY_PERFORMANCE );
 	}
 }

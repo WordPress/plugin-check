@@ -23,14 +23,14 @@ class Plugin_Header_Text_Domain_Check implements Static_Check {
 	use Stable_Check;
 
 	/**
-	 * Gets the category of the check.
+	 * Gets the categories for the check.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return string The category of the check.
+	 * @return array The categories for the check.
 	 */
-	public function get_category() {
-		return Check_Categories::CATEGORY_PLUGIN_REPO;
+	public function get_categories() {
+		return array( Check_Categories::CATEGORY_PLUGIN_REPO );
 	}
 
 	/**

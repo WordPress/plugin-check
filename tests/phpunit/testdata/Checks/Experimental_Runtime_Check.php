@@ -14,7 +14,7 @@ class Experimental_Runtime_Check implements Runtime_Check {
 		return;
 	}
 
-	public function get_category() {
-		return Check_Categories::CATEGORY_GENERAL;
+	public function get_categories() {
+		return array( Check_Categories::CATEGORY_GENERAL );
 	}
 }

@@ -7,7 +7,7 @@ use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Static_Check;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 
-class Category_Check_One implements Static_Check {
+class Category_Check_Seven implements Static_Check {
 
 	use Stable_Check;
 
@@ -16,6 +16,6 @@ class Category_Check_One implements Static_Check {
 	}
 
 	public function get_categories() {
-		return array( Check_Categories::CATEGORY_GENERAL );
+		return array( Check_Categories::CATEGORY_GENERAL, Check_Categories::CATEGORY_PLUGIN_REPO );
 	}
 }

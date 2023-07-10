@@ -49,14 +49,14 @@ class Enqueued_Styles_Scope_Check extends Abstract_Runtime_Check implements With
 	private $plugin_style_count = array();
 
 	/**
-	 * Gets the category of the check.
+	 * Gets the categories for the check.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return string The category of the check.
+	 * @return array The categories for the check.
 	 */
-	public function get_category() {
-		return Check_Categories::CATEGORY_PERFORMANCE;
+	public function get_categories() {
+		return array( Check_Categories::CATEGORY_PERFORMANCE );
 	}
 
 	/**

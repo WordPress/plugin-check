@@ -15,7 +15,7 @@ class Empty_Check implements Static_Check {
 		return;
 	}
 
-	public function get_category() {
-		return Check_Categories::CATEGORY_GENERAL;
+	public function get_categories() {
+		return array( Check_Categories::CATEGORY_GENERAL );
 	}
 }

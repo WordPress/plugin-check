@@ -65,7 +65,7 @@ class Check_Categories {
 		return array_filter(
 			$checks,
 			static function( $check ) use ( $categories ) {
-				return in_array( $check->get_category(), $categories, true );
+				return array_intersect( $check->get_categories(), $categories );
 			}
 		);
 	}
