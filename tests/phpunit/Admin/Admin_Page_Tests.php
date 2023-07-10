@@ -132,7 +132,7 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 
 	public function test_filter_plugin_action_links() {
 
-		$base_file = plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE );
+		$base_file = 'akismet/akismet.php';
 
 		$action_links = $this->admin_page->filter_plugin_action_links( array(), $base_file, array(), 'all' );
 		$this->assertEmpty( $action_links );
@@ -154,6 +154,25 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 			),
 			$action_links[0]
 		);
+	}
+
+	public function test_filter_plugin_action_links_should_not_add_check_link_for_plugin_checker() {
+
+		$base_file = plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE );
+
+		$action_links = $this->admin_page->filter_plugin_action_links( array(), $base_file, array(), 'all' );
+		$this->assertEmpty( $action_links );
+
+		/** Administrator check */
+		$admin_user = self::factory()->user->create( array( 'role' => 'administrator' ) );
+
+		if ( is_multisite() ) {
+			grant_super_admin( $admin_user );
+		}
+		wp_set_current_user( $admin_user );
+		$action_links = $this->admin_page->filter_plugin_action_links( array(), $base_file, array(), 'all' );
+
+		$this->assertEmpty( $action_links );
 	}
 
 	/**
