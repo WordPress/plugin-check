@@ -58,14 +58,15 @@ class Check_Categories {
 	 * @since n.e.x.t
 	 *
 	 * @param array $checks     An array of Check instances.
-	 * @param array $categories An array of available categories.
+	 * @param array $categories An array of categories to filter by.
 	 * @return array Filtered $checks list.
 	 */
 	public static function filter_checks_by_categories( array $checks, array $categories ) {
 		return array_filter(
 			$checks,
 			static function( $check ) use ( $categories ) {
-				return array_intersect( $check->get_categories(), $categories );
+				// Return true if at least one of the check categories is among the filter categories.
+				return (bool) array_intersect( $check->get_categories(), $categories );
 			}
 		);
 	}
