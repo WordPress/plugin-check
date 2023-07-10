@@ -66,6 +66,13 @@ class Default_Check_Repository_Tests extends WP_UnitTestCase {
 		$this->repository->register_check( 'check', new Runtime_Check() );
 	}
 
+	public function test_register_exception_thrown_for_missing_categories() {
+		$this->expectException( 'Exception' );
+		$this->expectExceptionMessage( 'Check with slug "check" has no categories associated with it.' );
+
+		$this->repository->register_check( 'check', new Check_Without_Category() );
+	}
+
 	public function test_get_checks_returns_all_checks() {
 		$static_check  = new Static_Check();
 		$runtime_check = new Runtime_Check();
