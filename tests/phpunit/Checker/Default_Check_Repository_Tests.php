@@ -7,6 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Repository;
 use WordPress\Plugin_Check\Checker\Default_Check_Repository;
+use WordPress\Plugin_Check\Test_Data\Check_Without_Category;
 use WordPress\Plugin_Check\Test_Data\Experimental_Runtime_Check;
 use WordPress\Plugin_Check\Test_Data\Experimental_Static_Check;
 use WordPress\Plugin_Check\Test_Data\Invalid_Check;
