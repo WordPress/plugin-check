@@ -38,7 +38,7 @@ class Default_Check_Repository_Tests extends WP_UnitTestCase {
 
 	public function test_register_exception_thrown_for_invalid_check() {
 		$this->expectException( 'Exception' );
-		$this->expectExceptionMessage( 'Check must be an instance of Runtime_Check or Static_Check.' );
+		$this->expectExceptionMessage( 'Check with slug "empty_check" must be an instance of Runtime_Check or Static_Check.' );
 
 		$this->repository->register_check( 'empty_check', new Invalid_Check() );
 	}
