@@ -8,6 +8,7 @@
 namespace WordPress\Plugin_Check\Checker\Checks;
 
 use Exception;
+use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Preparations\Demo_Posts_Creation_Preparation;
 use WordPress\Plugin_Check\Checker\With_Shared_Preparations;
@@ -46,6 +47,17 @@ class Enqueued_Styles_Scope_Check extends Abstract_Runtime_Check implements With
 	 * @var array
 	 */
 	private $plugin_style_count = array();
+
+	/**
+	 * Gets the categories for the check.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array The categories for the check.
+	 */
+	public function get_categories() {
+		return array( Check_Categories::CATEGORY_PERFORMANCE );
+	}
 
 	/**
 	 * Runs this preparation step for the environment and returns a cleanup function.

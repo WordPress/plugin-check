@@ -7,6 +7,7 @@
 
 namespace WordPress\Plugin_Check\Checker\Checks;
 
+use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 
@@ -18,6 +19,17 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
 class No_Unfiltered_Uploads_Check extends Abstract_File_Check {
 
 	use Stable_Check;
+
+	/**
+	 * Gets the categories for the check.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array The categories for the check.
+	 */
+	public function get_categories() {
+		return array( Check_Categories::CATEGORY_PLUGIN_REPO );
+	}
 
 	/**
 	 * Check the "ALLOW_UNFILTERED_UPLOADS" constant in file.
