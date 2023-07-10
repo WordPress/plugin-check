@@ -23,6 +23,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	/**
 	 * Gets the categories for the check.
 	 *
+	 * Every check must have at least one category.
+	 *
 	 * @since n.e.x.t
 	 *
 	 * @return array The categories for the check.
