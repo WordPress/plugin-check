@@ -7,6 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Repository;
 use WordPress\Plugin_Check\Checker\Default_Check_Repository;
+use WordPress\Plugin_Check\Test_Data\Check_Without_Category;
 use WordPress\Plugin_Check\Test_Data\Experimental_Runtime_Check;
 use WordPress\Plugin_Check\Test_Data\Experimental_Static_Check;
 use WordPress\Plugin_Check\Test_Data\Invalid_Check;
@@ -37,7 +38,7 @@ class Default_Check_Repository_Tests extends WP_UnitTestCase {
 
 	public function test_register_exception_thrown_for_invalid_check() {
 		$this->expectException( 'Exception' );
-		$this->expectExceptionMessage( 'Check must be an instance of Runtime_Check or Static_Check.' );
+		$this->expectExceptionMessage( 'Check with slug "empty_check" must be an instance of Runtime_Check or Static_Check.' );
 
 		$this->repository->register_check( 'empty_check', new Invalid_Check() );
 	}
@@ -64,6 +65,13 @@ class Default_Check_Repository_Tests extends WP_UnitTestCase {
 
 		$this->repository->register_check( 'check', new Static_Check() );
 		$this->repository->register_check( 'check', new Runtime_Check() );
+	}
+
+	public function test_register_exception_thrown_for_missing_categories() {
+		$this->expectException( 'Exception' );
+		$this->expectExceptionMessage( 'Check with slug "check" has no categories associated with it.' );
+
+		$this->repository->register_check( 'check', new Check_Without_Category() );
 	}
 
 	public function test_get_checks_returns_all_checks() {

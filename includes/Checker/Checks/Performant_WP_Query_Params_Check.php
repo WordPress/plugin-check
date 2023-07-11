@@ -22,6 +22,8 @@ class Performant_WP_Query_Params_Check extends Abstract_PHP_CodeSniffer_Check {
 	/**
 	 * Gets the categories for the check.
 	 *
+	 * Every check must have at least one category.
+	 *
 	 * @since n.e.x.t
 	 *
 	 * @return array The categories for the check.
