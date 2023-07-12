@@ -7,6 +7,13 @@
 
 use WordPress\Plugin_Check\Checker\Check_Repository;
 use WordPress\Plugin_Check\Checker\Default_Check_Repository;
+use WordPress\Plugin_Check\Test_Data\Category_Check_Five;
+use WordPress\Plugin_Check\Test_Data\Category_Check_Four;
+use WordPress\Plugin_Check\Test_Data\Category_Check_One;
+use WordPress\Plugin_Check\Test_Data\Category_Check_Seven;
+use WordPress\Plugin_Check\Test_Data\Category_Check_Six;
+use WordPress\Plugin_Check\Test_Data\Category_Check_Three;
+use WordPress\Plugin_Check\Test_Data\Category_Check_Two;
 use WordPress\Plugin_Check\Test_Data\Experimental_Runtime_Check;
 use WordPress\Plugin_Check\Test_Data\Experimental_Static_Check;
 use WordPress\Plugin_Check\Test_Data\Invalid_Check;

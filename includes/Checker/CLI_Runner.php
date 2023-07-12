@@ -103,4 +103,24 @@ class CLI_Runner extends Abstract_Check_Runner {
 
 		return false;
 	}
+
+	/**
+	 * Returns an array of categories for filtering the checks.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array An array of categories.
+	 */
+	protected function get_categories_param() {
+		$categories = array();
+
+		foreach ( $_SERVER['argv'] as $value ) {
+			if ( false !== strpos( $value, '--categories=' ) ) {
+				$categories = explode( ',', str_replace( '--categories=', '', $value ) );
+				break;
+			}
+		}
+
+		return $categories;
+	}
 }

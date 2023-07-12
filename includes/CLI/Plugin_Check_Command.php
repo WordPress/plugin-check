@@ -72,6 +72,9 @@ final class Plugin_Check_Command {
 	 *   - json
 	 * ---
 	 *
+	 * [--categories]
+	 * : Limit displayed results to include only specific categories Checks.
+	 *
 	 * [--fields=<fields>]
 	 * : Limit displayed results to a subset of fields provided.
 	 *
@@ -109,6 +112,9 @@ final class Plugin_Check_Command {
 		$plugin = isset( $args[0] ) ? $args[0] : '';
 		$checks = wp_parse_list( $options['checks'] );
 
+		// Create the categories array from CLI arguments.
+		$categories = isset( $options['categories'] ) ? wp_parse_list( $options['categories'] ) : array();
+
 		// Get the CLI Runner.
 		$runner = Plugin_Request_Utility::get_runner();
 
@@ -129,6 +135,7 @@ final class Plugin_Check_Command {
 			$runner->set_experimental_flag( $options['include-experimental'] );
 			$runner->set_check_slugs( $checks );
 			$runner->set_plugin( $plugin );
+			$runner->filter_checks_by_specific_categories( $categories );
 
 			$checks_to_run = $runner->get_checks_to_run();
 		} catch ( Exception $error ) {

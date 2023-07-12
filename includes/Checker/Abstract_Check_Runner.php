@@ -83,6 +83,14 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	protected $include_experimental;
 
 	/**
+	 * Checks category for the filter.
+	 *
+	 * @since n.e.x.t
+	 * @var array
+	 */
+	protected $check_categories;
+
+	/**
 	 * Determines if the current request is intended for the plugin checker.
 	 *
 	 * @since n.e.x.t
@@ -117,6 +125,15 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @return bool Returns true to include experimental checks else false.
 	 */
 	abstract protected function get_include_experimental_param();
+
+	/**
+	 * Returns an array of categories for filtering the checks.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array An array of categories.
+	 */
+	abstract protected function get_categories_param();
 
 	/**
 	 * Sets whether the runner class was initialized early.
@@ -192,6 +209,24 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		}
 
 		$this->include_experimental = $include_experimental;
+	}
+
+	/**
+	 * Sets categories for filtering the checks.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param array $categories An array of categories for filtering.
+	 *
+	 * @throws Exception Thrown if the getegories does not match the original request parameter.
+	 */
+	final public function filter_checks_by_specific_categories( $categories ) {
+		if ( $categories !== $this->get_categories_param() ) {
+			throw new Exception(
+				__( 'Invalid flag: The include-experimental flag does not match the original request parameter.', 'plugin-check' )
+			);
+		}
+		$this->check_categories = $categories;
 	}
 
 	/**
@@ -330,7 +365,16 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			$check_flags = $check_flags | Check_Repository::INCLUDE_EXPERIMENTAL;
 		}
 
-		return $this->check_repository->get_checks( $check_flags, $check_slugs );
+		$checks = $this->check_repository->get_checks( $check_flags, $check_slugs );
+
+		// Filters the checks by specific categories.
+		$get_categories = $this->get_categories();
+		if ( $get_categories ) {
+			$check_categories = new Check_Categories();
+			$checks           = $check_categories->filter_checks_by_categories( $checks, $get_categories );
+		}
+
+		return $checks;
 	}
 
 	/**
@@ -396,6 +440,21 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		}
 
 		return $this->get_include_experimental_param();
+	}
+
+	/**
+	 * Returns an array of categories for filtering the checks.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array An array of categories.
+	 */
+	final public function get_categories() {
+		if ( null !== $this->check_categories ) {
+			return $this->check_categories;
+		}
+
+		return $this->get_categories_param();
 	}
 
 	/** Gets the Check_Context for the plugin.

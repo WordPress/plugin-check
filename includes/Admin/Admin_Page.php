@@ -7,6 +7,8 @@
 
 namespace WordPress\Plugin_Check\Admin;
 
+use WordPress\Plugin_Check\Checker\Check_Categories;
+
 /**
  * Class is handling admin tools page functionality.
  *
@@ -150,11 +152,14 @@ final class Admin_Page {
 	 * @since n.e.x.t
 	 */
 	public function render_page() {
-		global $available_plugins, $selected_plugin_basename;
+		global $available_plugins, $selected_plugin_basename, $categories;
 
 		$available_plugins = $this->get_available_plugins();
 
 		$selected_plugin_basename = filter_input( INPUT_GET, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+
+		$check_categories = new Check_Categories();
+		$categories       = $check_categories->get_categories();
 
 		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'templates/admin-page.php';
 	}

@@ -108,12 +108,17 @@ final class Admin_AJAX {
 			);
 		}
 
-		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
-		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$categories = filter_input( INPUT_POST, 'categories', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
+		$categories = is_null( $categories ) ? array() : $categories;
+		$checks     = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
+		$checks     = is_null( $checks ) ? array() : $checks;
+		$plugin     = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		try {
 			$runner->set_check_slugs( $checks );
 			$runner->set_plugin( $plugin );
+			$runner->filter_checks_by_specific_categories( $categories );
+
 			$checks_to_run = $runner->get_checks_to_run();
 		} catch ( Exception $error ) {
 			wp_send_json_error(
@@ -189,10 +194,12 @@ final class Admin_AJAX {
 			wp_send_json_error( $valid_request, 403 );
 		}
 
-		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
-		$checks = is_null( $checks ) ? array() : $checks;
-		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		$runner = Plugin_Request_Utility::get_runner();
+		$categories = filter_input( INPUT_POST, 'categories', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
+		$categories = is_null( $categories ) ? array() : $categories;
+		$checks     = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
+		$checks     = is_null( $checks ) ? array() : $checks;
+		$plugin     = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$runner     = Plugin_Request_Utility::get_runner();
 
 		if ( is_null( $runner ) ) {
 			$runner = new AJAX_Runner();
@@ -221,8 +228,9 @@ final class Admin_AJAX {
 
 		wp_send_json_success(
 			array(
-				'plugin' => $plugin_basename,
-				'checks' => array_keys( $checks_to_run ),
+				'plugin'     => $plugin_basename,
+				'checks'     => array_keys( $checks_to_run ),
+				'categories' => $categories,
 			)
 		);
 	}

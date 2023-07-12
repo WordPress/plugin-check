@@ -5,6 +5,7 @@
 	const pluginsList = document.getElementById(
 		'plugin-check__plugins-dropdown'
 	);
+	const categoriesList = document.querySelectorAll( 'input[name=categories]' );
 	const templates = {};
 
 	// Return early if the elements cannot be found on the page.
@@ -34,6 +35,9 @@
 		checkItButton.disabled = true;
 		pluginsList.disabled = true;
 		spinner.classList.add( 'is-active' );
+		for ( let i = 0; i < categoriesList.length; i++ ) {
+			categoriesList[ i ].disabled = true;
+		}
 
 		getChecksToRun()
 			.then( setUpEnvironment )
@@ -70,6 +74,9 @@
 		spinner.classList.remove( 'is-active' );
 		checkItButton.disabled = false;
 		pluginsList.disabled = false;
+		for ( let i = 0; i < categoriesList.length; i++ ) {
+			categoriesList[ i ].disabled = false;
+		}
 	}
 
 	/**
@@ -87,6 +94,10 @@
 			'action',
 			pluginCheck.actionSetUpRuntimeEnvironment
 		);
+
+			for ( let i = 0; i < data.categories.length; i++ ) {
+				pluginCheckData.append( 'categories[]', data.categories[ i ] );
+			}
 
 		for ( let i = 0; i < data.checks.length; i++ ) {
 			pluginCheckData.append( 'checks[]', data.checks[ i ] );
@@ -155,6 +166,12 @@
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append( 'plugin', pluginsList.value );
 		pluginCheckData.append( 'action', pluginCheck.actionGetChecksToRun );
+
+		for ( let i = 0; i < categoriesList.length; i++ ) {
+			if ( categoriesList[i].checked ) {
+				pluginCheckData.append( 'categories[]', categoriesList[ i ].value );
+			}
+		}
 
 		return fetch( ajaxurl, {
 			method: 'POST',

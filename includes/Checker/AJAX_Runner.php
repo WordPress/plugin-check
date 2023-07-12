@@ -86,4 +86,18 @@ class AJAX_Runner extends Abstract_Check_Runner {
 	protected function get_include_experimental_param() {
 		return false;
 	}
+
+	/**
+	 * Returns an array of categories for filtering the checks.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array An array of categories for filtering the checks.
+	 */
+	protected function get_categories_param() {
+		$categories = filter_input( INPUT_POST, 'categories', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
+		$categories = is_null( $categories ) ? array() : $categories;
+
+		return $categories;
+	}
 }
