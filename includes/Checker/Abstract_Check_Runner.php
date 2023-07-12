@@ -231,7 +231,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			throw new Exception(
 				sprintf(
 					/* translators: %s: categories */
-					__( 'Invalid categories: The %s does not match the original request parameter.', 'plugin-check' ),
+					__( 'Invalid categories: The %s flag does not match the original request parameter.', 'plugin-check' ),
 					'categories'
 				)
 			);
