@@ -9,7 +9,7 @@
 	const templates = {};
 
 	// Return early if the elements cannot be found on the page.
-	if ( ! checkItButton || ! pluginsList || ! resultsContainer || ! spinner ) {
+	if ( ! checkItButton || ! pluginsList || ! resultsContainer || ! spinner || ! categoriesList ) {
 		console.error( 'Missing form elements on page' );
 		return;
 	}
@@ -95,9 +95,9 @@
 			pluginCheck.actionSetUpRuntimeEnvironment
 		);
 
-			for ( let i = 0; i < data.categories.length; i++ ) {
-				pluginCheckData.append( 'categories[]', data.categories[ i ] );
-			}
+		for ( let i = 0; i < data.categories.length; i++ ) {
+			pluginCheckData.append( 'categories[]', data.categories[ i ] );
+		}
 
 		for ( let i = 0; i < data.checks.length; i++ ) {
 			pluginCheckData.append( 'checks[]', data.checks[ i ] );
@@ -168,7 +168,7 @@
 		pluginCheckData.append( 'action', pluginCheck.actionGetChecksToRun );
 
 		for ( let i = 0; i < categoriesList.length; i++ ) {
-			if ( categoriesList[i].checked ) {
+			if ( categoriesList[ i ].checked ) {
 				pluginCheckData.append( 'categories[]', categoriesList[ i ].value );
 			}
 		}
