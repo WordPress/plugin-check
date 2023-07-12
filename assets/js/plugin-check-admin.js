@@ -5,11 +5,19 @@
 	const pluginsList = document.getElementById(
 		'plugin-check__plugins-dropdown'
 	);
-	const categoriesList = document.querySelectorAll( 'input[name=categories]' );
+	const categoriesList = document.querySelectorAll(
+		'input[name=categories]'
+	);
 	const templates = {};
 
 	// Return early if the elements cannot be found on the page.
-	if ( ! checkItButton || ! pluginsList || ! resultsContainer || ! spinner || ! categoriesList ) {
+	if (
+		! checkItButton ||
+		! pluginsList ||
+		! resultsContainer ||
+		! spinner ||
+		! categoriesList
+	) {
 		console.error( 'Missing form elements on page' );
 		return;
 	}
@@ -169,7 +177,10 @@
 
 		for ( let i = 0; i < categoriesList.length; i++ ) {
 			if ( categoriesList[ i ].checked ) {
-				pluginCheckData.append( 'categories[]', categoriesList[ i ].value );
+				pluginCheckData.append(
+					'categories[]',
+					categoriesList[ i ].value
+				);
 			}
 		}
 
