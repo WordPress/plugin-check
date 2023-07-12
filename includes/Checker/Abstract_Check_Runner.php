@@ -15,6 +15,8 @@ use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
  * Abstract Check Runner class.
  *
  * @since n.e.x.t
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class Abstract_Check_Runner implements Check_Runner {
 
@@ -203,7 +205,11 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		if ( $this->initialized_early ) {
 			if ( $include_experimental !== $this->get_include_experimental_param() ) {
 				throw new Exception(
-					__( 'Invalid flag: The include-experimental flag does not match the original request parameter.', 'plugin-check' )
+					sprintf(
+						/* translators: %s: include-experimental */
+						__( 'Invalid flag: The %s flag does not match the original request parameter.', 'plugin-check' ),
+						'include-experimental'
+					)
 				);
 			}
 		}
@@ -223,7 +229,11 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	final public function filter_checks_by_specific_categories( $categories ) {
 		if ( $categories !== $this->get_categories_param() ) {
 			throw new Exception(
-				__( 'Invalid flag: The include-experimental flag does not match the original request parameter.', 'plugin-check' )
+				sprintf(
+					/* translators: %s: categories */
+					__( 'Invalid categories: The %s does not match the original request parameter.', 'plugin-check' ),
+					'categories'
+				)
 			);
 		}
 		$this->check_categories = $categories;
