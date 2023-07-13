@@ -33,6 +33,27 @@
 
 				<input type="submit" value="<?php esc_attr_e( 'Check it!', 'plugin-check' ); ?>" id="plugin-check__submit" class="button button-primary" />
 				<span id="plugin-check__spinner" class="spinner" style="float: none;"></span>
+				<h4><?php esc_attr_e( 'Categories', 'plugin-check' ); ?></h4>
+				<?php
+				if ( ! empty( $categories ) ) {
+				?>
+				<table>
+				<?php
+				foreach ( $categories as $category ) { ?>
+					<tr>
+						<td>
+							<fieldset>
+								<legend class="screen-reader-text"><?php esc_html_e( $category ); ?></legend>
+								<label for="<?php echo esc_attr( $category ); ?>">
+									<input type="checkbox" id="<?php echo esc_attr( $category ); ?>" name="categories" value="<?php echo esc_attr( $category ); ?>" checked="checked" />
+									<?php esc_html_e( ucfirst( str_replace( '_', ' ', $category ) ) ); ?>
+								</label>
+							</fieldset>
+						</td>
+					</tr>
+				<?php } ?>
+				</table>
+				<?php } ?>
 			</form>
 
 		<?php } else { ?>
