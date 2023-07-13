@@ -132,9 +132,9 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 
 	public function test_filter_plugin_action_links() {
 
-		$base_file = plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE );
+		$base_file = 'akismet/akismet.php';
 
-		$action_links = $this->admin_page->filter_plugin_action_links( array(), $base_file );
+		$action_links = $this->admin_page->filter_plugin_action_links( array(), $base_file, array(), 'all' );
 		$this->assertEmpty( $action_links );
 
 		/** Administrator check */
@@ -144,7 +144,7 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 			grant_super_admin( $admin_user );
 		}
 		wp_set_current_user( $admin_user );
-		$action_links = $this->admin_page->filter_plugin_action_links( array(), $base_file );
+		$action_links = $this->admin_page->filter_plugin_action_links( array(), $base_file, array(), 'all' );
 
 		$this->assertEquals(
 			sprintf(
@@ -153,6 +153,65 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 				esc_html__( 'Check this plugin', 'plugin-check' )
 			),
 			$action_links[0]
+		);
+	}
+
+	public function test_filter_plugin_action_links_should_not_add_check_link_for_plugin_checker() {
+
+		$base_file = plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE );
+
+		$action_links = $this->admin_page->filter_plugin_action_links( array(), $base_file, array(), 'all' );
+		$this->assertEmpty( $action_links );
+
+		/** Administrator check */
+		$admin_user = self::factory()->user->create( array( 'role' => 'administrator' ) );
+
+		if ( is_multisite() ) {
+			grant_super_admin( $admin_user );
+		}
+		wp_set_current_user( $admin_user );
+		$action_links = $this->admin_page->filter_plugin_action_links( array(), $base_file, array(), 'all' );
+
+		$this->assertEmpty( $action_links );
+	}
+
+	/**
+	 * @dataProvider data_status_mustuse_and_dropins
+	 */
+	public function test_filter_plugin_action_links_should_not_add_check( $context, $is_admin ) {
+
+		if ( $is_admin ) {
+			/** Administrator check */
+			$admin_user = self::factory()->user->create( array( 'role' => 'administrator' ) );
+
+			if ( is_multisite() ) {
+				grant_super_admin( $admin_user );
+			}
+			wp_set_current_user( $admin_user );
+		}
+
+		$actions = array( 'Test Action' );
+		$actual  = $this->admin_page->filter_plugin_action_links(
+			$actions,
+			plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE ),
+			array(),
+			$context
+		);
+
+		$this->assertSame( $actions, $actual );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_status_mustuse_and_dropins() {
+		return array(
+			'Must-Use'                            => array( 'mustuse', false ),
+			'Must-Use with Admininistrator check' => array( 'mustuse', true ),
+			'Drop-ins'                            => array( 'dropins', false ),
+			'Drop-ins with Admininistrator check' => array( 'dropins', true ),
 		);
 	}
 }

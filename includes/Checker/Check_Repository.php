@@ -41,6 +41,14 @@ interface Check_Repository {
 	const TYPE_ALL = 3;
 
 	/**
+	 * Bitwise flag for experimental checks.
+	 *
+	 * @since n.e.x.t
+	 * @var int
+	 */
+	const INCLUDE_EXPERIMENTAL = 4;
+
+	/**
 	 * Registers a check to the repository.
 	 *
 	 * @since n.e.x.t

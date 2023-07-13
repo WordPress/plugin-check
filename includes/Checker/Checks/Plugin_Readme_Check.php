@@ -7,7 +7,9 @@
 
 namespace WordPress\Plugin_Check\Checker\Checks;
 
+use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Traits\Stable_Check;
 
 /**
  * Check the plugins readme.txt file and contents.
@@ -15,6 +17,21 @@ use WordPress\Plugin_Check\Checker\Check_Result;
  * @since n.e.x.t
  */
 class Plugin_Readme_Check extends Abstract_File_Check {
+
+	use Stable_Check;
+
+	/**
+	 * Gets the categories for the check.
+	 *
+	 * Every check must have at least one category.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array The categories for the check.
+	 */
+	public function get_categories() {
+		return array( Check_Categories::CATEGORY_PLUGIN_REPO );
+	}
 
 	/**
 	 * Check the readme.txt file.

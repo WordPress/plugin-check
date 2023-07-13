@@ -47,7 +47,7 @@ WP_CLI::add_hook(
 	function() {
 		if ( CLI_Runner::is_plugin_check() ) {
 			if ( ! file_exists( ABSPATH . 'wp-content/object-cache.php' ) ) {
-				if ( ! copy(  __DIR__ . '/object-cache.copy.php', ABSPATH . 'wp-content/object-cache.php' ) ) {
+				if ( ! copy(  __DIR__ . '/drop-ins/object-cache.copy.php', ABSPATH . 'wp-content/object-cache.php' ) ) {
 					WP_CLI::error( 'Unable to copy object-cache.php file.' );
 				}
 			}

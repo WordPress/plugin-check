@@ -44,7 +44,13 @@ class Default_Check_Repository implements Check_Repository {
 	 */
 	public function register_check( $slug, Check $check ) {
 		if ( ! $check instanceof Runtime_Check && ! $check instanceof Static_Check ) {
-			throw new Exception( __( 'Check must be an instance of Runtime_Check or Static_Check.', 'plugin-check' ) );
+			throw new Exception(
+				sprintf(
+					/* translators: %s: The Check slug. */
+					__( 'Check with slug "%s" must be an instance of Runtime_Check or Static_Check.', 'plugin-check' ),
+					$slug
+				)
+			);
 		}
 
 		if ( isset( $this->runtime_checks[ $slug ] ) || isset( $this->static_checks[ $slug ] ) ) {
@@ -52,6 +58,16 @@ class Default_Check_Repository implements Check_Repository {
 				sprintf(
 					/* translators: %s: The Check slug. */
 					__( 'Check slug "%s" is already in use.', 'plugin-check' ),
+					$slug
+				)
+			);
+		}
+
+		if ( ! $check->get_categories() ) {
+			throw new Exception(
+				sprintf(
+					/* translators: %s: The Check slug. */
+					__( 'Check with slug "%s" has no categories associated with it.', 'plugin-check' ),
 					$slug
 				)
 			);
@@ -103,6 +119,17 @@ class Default_Check_Repository implements Check_Repository {
 			);
 		}
 
-		return $checks;
+		// Return all checks, including experimental if requested.
+		if ( $flags & self::INCLUDE_EXPERIMENTAL ) {
+			return $checks;
+		}
+
+		// Remove experimental checks before returning.
+		return array_filter(
+			$checks,
+			static function ( $check ) {
+				return $check->get_stability() !== Check::STABILITY_EXPERIMENTAL;
+			}
+		);
 	}
 }
