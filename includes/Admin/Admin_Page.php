@@ -158,8 +158,7 @@ final class Admin_Page {
 
 		$selected_plugin_basename = filter_input( INPUT_GET, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
-		$check_categories = new Check_Categories();
-		$categories       = $check_categories->get_categories();
+		$categories = Check_Categories::get_categories();
 
 		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'templates/admin-page.php';
 	}

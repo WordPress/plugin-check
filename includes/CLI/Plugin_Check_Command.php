@@ -135,7 +135,7 @@ final class Plugin_Check_Command {
 			$runner->set_experimental_flag( $options['include-experimental'] );
 			$runner->set_check_slugs( $checks );
 			$runner->set_plugin( $plugin );
-			$runner->filter_checks_by_specific_categories( $categories );
+			$runner->set_categories( $categories );
 
 			$checks_to_run = $runner->get_checks_to_run();
 		} catch ( Exception $error ) {

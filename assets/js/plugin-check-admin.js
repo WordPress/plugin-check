@@ -16,7 +16,7 @@
 		! pluginsList ||
 		! resultsContainer ||
 		! spinner ||
-		! categoriesList
+		! categoriesList.length
 	) {
 		console.error( 'Missing form elements on page' );
 		return;
@@ -102,10 +102,6 @@
 			'action',
 			pluginCheck.actionSetUpRuntimeEnvironment
 		);
-
-		for ( let i = 0; i < data.categories.length; i++ ) {
-			pluginCheckData.append( 'categories[]', data.categories[ i ] );
-		}
 
 		for ( let i = 0; i < data.checks.length; i++ ) {
 			pluginCheckData.append( 'checks[]', data.checks[ i ] );

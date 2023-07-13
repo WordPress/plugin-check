@@ -207,7 +207,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 				throw new Exception(
 					sprintf(
 						/* translators: %s: include-experimental */
-						__( 'Invalid flag: The %s flag does not match the original request parameter.', 'plugin-check' ),
+						__( 'Invalid flag: The %s value does not match the original request parameter.', 'plugin-check' ),
 						'include-experimental'
 					)
 				);
@@ -226,15 +226,17 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @throws Exception Thrown if the getegories does not match the original request parameter.
 	 */
-	final public function filter_checks_by_specific_categories( $categories ) {
-		if ( $categories !== $this->get_categories_param() ) {
-			throw new Exception(
-				sprintf(
-					/* translators: %s: categories */
-					__( 'Invalid categories: The %s flag does not match the original request parameter.', 'plugin-check' ),
-					'categories'
-				)
-			);
+	final public function set_categories( $categories ) {
+		if ( $this->initialized_early ) {
+			if ( $categories !== $this->get_categories_param() ) {
+				throw new Exception(
+					sprintf(
+						/* translators: %s: categories */
+						__( 'Invalid categories: The %s value does not match the original request parameter.', 'plugin-check' ),
+						'categories'
+					)
+				);
+			}
 		}
 		$this->check_categories = $categories;
 	}
@@ -378,10 +380,9 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		$checks = $this->check_repository->get_checks( $check_flags, $check_slugs );
 
 		// Filters the checks by specific categories.
-		$get_categories = $this->get_categories();
-		if ( $get_categories ) {
-			$check_categories = new Check_Categories();
-			$checks           = $check_categories->filter_checks_by_categories( $checks, $get_categories );
+		$categories = $this->get_categories();
+		if ( $categories ) {
+			$checks = Check_Categories::filter_checks_by_categories( $checks, $categories );
 		}
 
 		return $checks;
@@ -444,7 +445,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @return bool True if experimental checks are included. False if not.
 	 */
-	final public function get_include_experimental() {
+	final protected function get_include_experimental() {
 		if ( null !== $this->include_experimental ) {
 			return $this->include_experimental;
 		}
@@ -459,7 +460,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @return array An array of categories.
 	 */
-	final public function get_categories() {
+	final protected function get_categories() {
 		if ( null !== $this->check_categories ) {
 			return $this->check_categories;
 		}

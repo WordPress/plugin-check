@@ -81,7 +81,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 
 		foreach ( $_SERVER['argv'] as $value ) {
 			if ( false !== strpos( $value, '--checks=' ) ) {
-				$checks = explode( ',', str_replace( '--checks=', '', $value ) );
+				$checks = wp_parse_list( str_replace( '--checks=', '', $value ) );
 				break;
 			}
 		}
@@ -116,7 +116,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 
 		foreach ( $_SERVER['argv'] as $value ) {
 			if ( false !== strpos( $value, '--categories=' ) ) {
-				$categories = explode( ',', str_replace( '--categories=', '', $value ) );
+				$categories = wp_parse_list( str_replace( '--categories=', '', $value ) );
 				break;
 			}
 		}
