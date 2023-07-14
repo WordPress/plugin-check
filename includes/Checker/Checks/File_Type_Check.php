@@ -8,7 +8,9 @@
 namespace WordPress\Plugin_Check\Checker\Checks;
 
 use Exception;
+use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Traits\Stable_Check;
 
 /**
  * Check to detect disallowed file types.
@@ -16,6 +18,8 @@ use WordPress\Plugin_Check\Checker\Check_Result;
  * @since n.e.x.t
  */
 class File_Type_Check extends Abstract_File_Check {
+
+	use Stable_Check;
 
 	const TYPE_COMPRESSED = 1;
 	const TYPE_PHAR       = 2;
@@ -40,6 +44,19 @@ class File_Type_Check extends Abstract_File_Check {
 	 */
 	public function __construct( $flags = self::TYPE_ALL ) {
 		$this->flags = $flags;
+	}
+
+	/**
+	 * Gets the categories for the check.
+	 *
+	 * Every check must have at least one category.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array The categories for the check.
+	 */
+	public function get_categories() {
+		return array( Check_Categories::CATEGORY_PLUGIN_REPO );
 	}
 
 	/**

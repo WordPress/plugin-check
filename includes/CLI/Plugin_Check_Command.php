@@ -72,6 +72,9 @@ final class Plugin_Check_Command {
 	 *   - json
 	 * ---
 	 *
+	 * [--categories]
+	 * : Limit displayed results to include only specific categories Checks.
+	 *
 	 * [--fields=<fields>]
 	 * : Limit displayed results to a subset of fields provided.
 	 *
@@ -81,6 +84,8 @@ final class Plugin_Check_Command {
 	 * [--ignore-errors]
 	 * : Limit displayed results to exclude errors.
 	 *
+	 * [--include-experimental]
+	 * : Include experimental checks.
 	 *
 	 * ## EXAMPLES
 	 *
@@ -107,6 +112,9 @@ final class Plugin_Check_Command {
 		$plugin = isset( $args[0] ) ? $args[0] : '';
 		$checks = wp_parse_list( $options['checks'] );
 
+		// Create the categories array from CLI arguments.
+		$categories = isset( $options['categories'] ) ? wp_parse_list( $options['categories'] ) : array();
+
 		// Get the CLI Runner.
 		$runner = Plugin_Request_Utility::get_runner();
 
@@ -124,8 +132,10 @@ final class Plugin_Check_Command {
 
 		$checks_to_run = array();
 		try {
+			$runner->set_experimental_flag( $options['include-experimental'] );
 			$runner->set_check_slugs( $checks );
 			$runner->set_plugin( $plugin );
+			$runner->set_categories( $categories );
 
 			$checks_to_run = $runner->get_checks_to_run();
 		} catch ( Exception $error ) {
@@ -204,10 +214,11 @@ final class Plugin_Check_Command {
 	 */
 	private function get_options( $assoc_args ) {
 		$defaults = array(
-			'checks'          => '',
-			'format'          => 'table',
-			'ignore-warnings' => false,
-			'ignore-errors'   => false,
+			'checks'               => '',
+			'format'               => 'table',
+			'ignore-warnings'      => false,
+			'ignore-errors'        => false,
+			'include-experimental' => false,
 		);
 
 		$options = wp_parse_args( $assoc_args, $defaults );

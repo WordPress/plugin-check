@@ -15,6 +15,8 @@ use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
  * Abstract Check Runner class.
  *
  * @since n.e.x.t
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class Abstract_Check_Runner implements Check_Runner {
 
@@ -75,6 +77,22 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	protected $runtime_environment;
 
 	/**
+	 * Whether to include experimental checks.
+	 *
+	 * @since n.e.x.t
+	 * @var bool
+	 */
+	protected $include_experimental;
+
+	/**
+	 * Checks category for the filter.
+	 *
+	 * @since n.e.x.t
+	 * @var array
+	 */
+	protected $check_categories;
+
+	/**
 	 * Determines if the current request is intended for the plugin checker.
 	 *
 	 * @since n.e.x.t
@@ -100,6 +118,24 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @return array An array of Check slugs.
 	 */
 	abstract protected function get_check_slugs_param();
+
+	/**
+	 * Returns the include experimental paramater based on the request.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return bool Returns true to include experimental checks else false.
+	 */
+	abstract protected function get_include_experimental_param();
+
+	/**
+	 * Returns an array of categories for filtering the checks.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array An array of categories.
+	 */
+	abstract protected function get_categories_param();
 
 	/**
 	 * Sets whether the runner class was initialized early.
@@ -154,6 +190,55 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		}
 
 		$this->plugin = $plugin;
+	}
+
+	/**
+	 * Sets whether to include experimental checks in the process.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param bool $include_experimental True to include experimental checks. False to exclude.
+	 *
+	 * @throws Exception Thrown if the flag set does not match the original request parameter.
+	 */
+	final public function set_experimental_flag( $include_experimental ) {
+		if ( $this->initialized_early ) {
+			if ( $include_experimental !== $this->get_include_experimental_param() ) {
+				throw new Exception(
+					sprintf(
+						/* translators: %s: include-experimental */
+						__( 'Invalid flag: The %s value does not match the original request parameter.', 'plugin-check' ),
+						'include-experimental'
+					)
+				);
+			}
+		}
+
+		$this->include_experimental = $include_experimental;
+	}
+
+	/**
+	 * Sets categories for filtering the checks.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param array $categories An array of categories for filtering.
+	 *
+	 * @throws Exception Thrown if the getegories does not match the original request parameter.
+	 */
+	final public function set_categories( $categories ) {
+		if ( $this->initialized_early ) {
+			if ( $categories !== $this->get_categories_param() ) {
+				throw new Exception(
+					sprintf(
+						/* translators: %s: categories */
+						__( 'Invalid categories: The %s value does not match the original request parameter.', 'plugin-check' ),
+						'categories'
+					)
+				);
+			}
+		}
+		$this->check_categories = $categories;
 	}
 
 	/**
@@ -287,7 +372,20 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			$check_flags = Check_Repository::TYPE_ALL;
 		}
 
-		return $this->check_repository->get_checks( $check_flags, $check_slugs );
+		// Check whether to include experimental checks.
+		if ( $this->get_include_experimental() ) {
+			$check_flags = $check_flags | Check_Repository::INCLUDE_EXPERIMENTAL;
+		}
+
+		$checks = $this->check_repository->get_checks( $check_flags, $check_slugs );
+
+		// Filters the checks by specific categories.
+		$categories = $this->get_categories();
+		if ( $categories ) {
+			$checks = Check_Categories::filter_checks_by_categories( $checks, $categories );
+		}
+
+		return $checks;
 	}
 
 	/**
@@ -338,6 +436,36 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		}
 
 		return $this->plugin_basename;
+	}
+
+	/**
+	 * Returns the value for the include experimental flag.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return bool True if experimental checks are included. False if not.
+	 */
+	final protected function get_include_experimental() {
+		if ( null !== $this->include_experimental ) {
+			return $this->include_experimental;
+		}
+
+		return $this->get_include_experimental_param();
+	}
+
+	/**
+	 * Returns an array of categories for filtering the checks.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array An array of categories.
+	 */
+	final protected function get_categories() {
+		if ( null !== $this->check_categories ) {
+			return $this->check_categories;
+		}
+
+		return $this->get_categories_param();
 	}
 
 	/** Gets the Check_Context for the plugin.

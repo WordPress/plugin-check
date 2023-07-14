@@ -8,8 +8,10 @@
 namespace WordPress\Plugin_Check\Checker\Checks;
 
 use Exception;
+use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Static_Check;
+use WordPress\Plugin_Check\Traits\Stable_Check;
 
 /**
  * Check for plugin header text domain.
@@ -17,6 +19,21 @@ use WordPress\Plugin_Check\Checker\Static_Check;
  * @since n.e.x.t
  */
 class Plugin_Header_Text_Domain_Check implements Static_Check {
+
+	use Stable_Check;
+
+	/**
+	 * Gets the categories for the check.
+	 *
+	 * Every check must have at least one category.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array The categories for the check.
+	 */
+	public function get_categories() {
+		return array( Check_Categories::CATEGORY_PLUGIN_REPO );
+	}
 
 	/**
 	 * Amends the given result by running the check on the associated plugin.

@@ -81,11 +81,46 @@ class CLI_Runner extends Abstract_Check_Runner {
 
 		foreach ( $_SERVER['argv'] as $value ) {
 			if ( false !== strpos( $value, '--checks=' ) ) {
-				$checks = explode( ',', str_replace( '--checks=', '', $value ) );
+				$checks = wp_parse_list( str_replace( '--checks=', '', $value ) );
 				break;
 			}
 		}
 
 		return $checks;
+	}
+
+	/**
+	 * Returns the include experimental paramater based on the request.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return bool Returns true to include experimental checks else false.
+	 */
+	protected function get_include_experimental_param() {
+		if ( in_array( '--include-experimental', $_SERVER['argv'], true ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Returns an array of categories for filtering the checks.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array An array of categories.
+	 */
+	protected function get_categories_param() {
+		$categories = array();
+
+		foreach ( $_SERVER['argv'] as $value ) {
+			if ( false !== strpos( $value, '--categories=' ) ) {
+				$categories = wp_parse_list( str_replace( '--categories=', '', $value ) );
+				break;
+			}
+		}
+
+		return $categories;
 	}
 }

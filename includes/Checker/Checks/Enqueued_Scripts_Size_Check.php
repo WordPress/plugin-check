@@ -8,9 +8,11 @@
 namespace WordPress\Plugin_Check\Checker\Checks;
 
 use Exception;
+use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Preparations\Demo_Posts_Creation_Preparation;
 use WordPress\Plugin_Check\Checker\With_Shared_Preparations;
+use WordPress\Plugin_Check\Traits\Stable_Check;
 use WordPress\Plugin_Check\Traits\URL_Aware;
 
 /**
@@ -20,7 +22,7 @@ use WordPress\Plugin_Check\Traits\URL_Aware;
  */
 class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With_Shared_Preparations {
 
-	use URL_Aware;
+	use URL_Aware, Stable_Check;
 
 	/**
 	 * Threshold for script size to surface a warning for.
@@ -47,6 +49,19 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	 */
 	public function __construct( $threshold_size = 300000 ) {
 		$this->threshold_size = $threshold_size;
+	}
+
+	/**
+	 * Gets the categories for the check.
+	 *
+	 * Every check must have at least one category.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array The categories for the check.
+	 */
+	public function get_categories() {
+		return array( Check_Categories::CATEGORY_PERFORMANCE );
 	}
 
 	/**
