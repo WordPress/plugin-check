@@ -146,8 +146,9 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 				$tool_name
 			),
 			array(
-				'code' => 'obfuscated_code_detected',
-				'file' => str_replace( $result->plugin()->path(), '', $obfuscated_file ),
+				'code'       => 'obfuscated_code_detected',
+				'file'       => str_replace( $result->plugin()->path(), '', $obfuscated_file ),
+				'categories' => $this->get_categories(),
 			)
 		);
 	}

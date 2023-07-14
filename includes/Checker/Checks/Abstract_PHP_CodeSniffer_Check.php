@@ -120,10 +120,11 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 					strtoupper( $file_message['type'] ) === 'ERROR',
 					$file_message['message'],
 					array(
-						'code'   => $file_message['source'],
-						'file'   => $file_name,
-						'line'   => $file_message['line'],
-						'column' => $file_message['column'],
+						'code'       => $file_message['source'],
+						'file'       => $file_name,
+						'line'       => $file_message['line'],
+						'column'     => $file_message['column'],
+						'categories' => $this->get_categories(),
 					)
 				);
 			}

@@ -237,8 +237,9 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 			$error,
 			$message,
 			array(
-				'code' => $code,
-				'file' => str_replace( $result->plugin()->path(), '', $updater_file ),
+				'code'       => $code,
+				'file'       => str_replace( $result->plugin()->path(), '', $updater_file ),
+				'categories' => $this->get_categories(),
 			)
 		);
 	}

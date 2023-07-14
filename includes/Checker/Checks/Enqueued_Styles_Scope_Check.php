@@ -137,8 +137,9 @@ class Enqueued_Styles_Scope_Check extends Abstract_Runtime_Check implements With
 						false,
 						__( 'This style is being loaded in all contexts.', 'plugin-check' ),
 						array(
-							'code' => 'EnqueuedStylesScope.StyleLoadedInAllContext',
-							'file' => $plugin_style['path'],
+							'code'       => 'EnqueuedStylesScope.StyleLoadedInAllContext',
+							'file'       => $plugin_style['path'],
+							'categories' => $this->get_categories(),
 						)
 					);
 				}

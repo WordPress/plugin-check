@@ -49,8 +49,9 @@ class Localhost_Check extends Abstract_File_Check {
 				true,
 				__( 'Do not use Localhost/127.0.0.1 in your code.', 'plugin-check' ),
 				array(
-					'code' => 'localhost_code_detected',
-					'file' => $file,
+					'code'       => 'localhost_code_detected',
+					'file'       => $file,
+					'categories' => $this->get_categories(),
 				)
 			);
 		}

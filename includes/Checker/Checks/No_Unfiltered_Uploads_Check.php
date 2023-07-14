@@ -49,8 +49,9 @@ class No_Unfiltered_Uploads_Check extends Abstract_File_Check {
 				true,
 				__( 'ALLOW_UNFILTERED_UPLOADS is not permitted.', 'plugin-check' ),
 				array(
-					'code' => 'allow_unfiltered_uploads_detected',
-					'file' => $file,
+					'code'       => 'allow_unfiltered_uploads_detected',
+					'file'       => $file,
+					'categories' => $this->get_categories(),
 				)
 			);
 		}

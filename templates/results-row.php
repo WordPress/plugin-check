@@ -12,6 +12,9 @@
 		{{data.code}}
 	</td>
 	<td>
+		{{data.categories}}
+	</td>
+	<td>
 		{{data.message}}
 	</td>
 </tr>
