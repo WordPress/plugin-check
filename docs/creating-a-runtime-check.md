@@ -8,8 +8,17 @@ The Plugin Checker provides the `Runtime_Check` interface, which is used to iden
 
 ```php
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Runtime_Check;
+use WordPress\Plugin_Check\Traits\Stable_Check;
 
 class Custom_Check extends Runtime_Check {
+  
+  use Stable_Check;
+  
+  public function get_categories() {
+    // Return an array of check categories.
+  }
+  
   public function run( Check_Result $result );
     // Handle running the check and adding warnings or errors to the result.
   }
@@ -25,14 +34,15 @@ Below is the basic scaffold when creating a custom runtime check.
 ```php
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Checks\Abstract_Runtime_Check;
+use WordPress\Plugin_Check\Traits\Stable_Check;
 
 class Custom_Check extends Abstract_Runtime_Check {
 
   use Stable_Check;
   
-	public function get_categories() {
-		// Return an array of check categories.
-	}
+  public function get_categories() {
+    // Return an array of check categories.
+  }
 
   public function prepare() {
     // Handle the Checks preparations and return a cleanup function.

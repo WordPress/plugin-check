@@ -6,8 +6,18 @@ The Static checks, which analyze the code, either using PHP CodeSniffer sniffs o
 
 ```php
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Check_Categories;
+use WordPress\Plugin_Check\Checker\Static_Check;
+use WordPress\Plugin_Check\Traits\Stable_Check;
 
 class Custom_Check extends Static_Check {
+
+  use Stable_Check;
+  
+  public function get_categories() {
+    // Return an array of check categories.
+  }
+
   public function run( Check_Result $result );
     // Handle running the check and adding warnings or errors to the result.
   }
@@ -43,25 +53,31 @@ The `get_args()` method should return an associative array containing the PHPCS 
 Below is an example of a Static Check class that checks for i18n usage in the plugins codebase.
 
 ```php
+
+use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Check_Categories;
+use WordPress\Plugin_Check\Checker\Checks\Abstract_PHP_CodeSniffer_Check;
+use WordPress\Plugin_Check\Traits\Stable_Check;
+
 /**
  * Check for running WordPress internationalization sniffs.
  */
 class I18n_Usage_Check extends Abstract_PHP_CodeSniffer_Check {
-	
+  
   use Stable_Check;
 
-	/**
-	 * Gets the categories for the check.
-	 *
-	 * Every check must have at least one category.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @return array The categories for the check.
-	 */
-	public function get_categories() {
-		return array( Check_Categories::CATEGORY_GENERAL );
-	}
+  /**
+   * Gets the categories for the check.
+   *
+   * Every check must have at least one category.
+   *
+   * @since n.e.x.t
+   *
+   * @return array The categories for the check.
+   */
+  public function get_categories() {
+    return array( Check_Categories::CATEGORY_GENERAL );
+  }
 
   /**
    * Returns an associative array of arguments to pass to PHPCS.
