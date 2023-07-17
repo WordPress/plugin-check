@@ -27,6 +27,13 @@ use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Checks\Abstract_Runtime_Check;
 
 class Custom_Check extends Abstract_Runtime_Check {
+
+  use Stable_Check;
+  
+	public function get_categories() {
+		// Return an array of check categories.
+	}
+
   public function prepare() {
     // Handle the Checks preparations and return a cleanup function.
   }

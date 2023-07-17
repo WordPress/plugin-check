@@ -23,11 +23,25 @@ Static checks are used to perform tests against the codebase without running any
 
 Static checks can run existing PHPCodeSniffer sniffs, such as those in the [WordPress Coding Standards](https://github.com/WordPress/WordPress-Coding-Standards), or they can be implemented in a more manual way, e.g. searching for specific patterns across all files, similar to how the checks of the [WordPress Theme Check tool](https://github.com/WordPress/theme-check) are implemented.
 
+Static checks implement the `Static_Check` interface.
+
 ### Runtime Checks
 
 Runtime checks perform tests by executing the code within a test environment. The plugin code is required to run in order to test a specific output.
 
 As runtime checks execute code against a test environment they often include preparations in order to prepare the runtime environment with required configuration ahead of check being performed.
+
+Runtime checks implement the `Runtime_Check` interface.
+
+### Check Stabilities
+
+Every check is assigned a stability value so the correct checks are run for each use case. There are currently 2 stability values, Stable and Experimental.
+
+Checks are a assigned a stability value using either the `Stable_Check` or `Experimental_Check` trait. Checks with the `Stable_Check` trait are always run by both the CLI and WordPress admin screens. Experimental checks are only run via the CLI with the `--include-experimental` flag.
+
+### Check Categories
+
+Check categories allow checks to be run for specific use cases. All checks require a category which is set by implementing a `get_categories` method within the check class. This method returns an array containing one or more categories the check belongs to. The categories set should be made up by the constants found in the `Check_Categories` class rather than setting them as strings.
 
 ### Preparations
 
