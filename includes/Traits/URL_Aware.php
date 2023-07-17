@@ -7,6 +7,11 @@
 
 namespace WordPress\Plugin_Check\Traits;
 
+/**
+ * URL Aware trait.
+ *
+ * @since n.e.x.t
+ */
 trait URL_Aware {
 
 	/**
