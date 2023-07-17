@@ -13,7 +13,7 @@ use WordPress\Plugin_Check\Checker\Preparation;
 use WordPress\Plugin_Check\Checker\Runtime_Check;
 
 /**
- * Check for running one or more PHP CodeSniffer sniffs.
+ * Abstract Runtime Check class.
  *
  * @since n.e.x.t
  */
