@@ -113,29 +113,29 @@ The Check class should then implement the get_shared_preparations() method defin
 Below is an example of how the `Enqueued_Scripts_Size_Check` uses shared preparations.
 
 ```php
-  /**
-   * Returns an array of shared preparations for the check.
-   *
-   * @return array Returns a map of $class_name => $constructor_args pairs. If the class does not
-   *               need any constructor arguments, it would just be an empty array.
-   */
-  public function get_shared_preparations() {
-    $demo_posts = array_map(
-      function( $post_type ) {
-        return array(
-          'post_title'   => "Demo {$post_type} post",
-          'post_content' => 'Test content',
-          'post_type'    => $post_type,
-          'post_status'  => 'publish',
-        );
-      },
-      $this->viewable_post_types
-    );
+/**
+ * Returns an array of shared preparations for the check.
+ *
+ * @return array Returns a map of $class_name => $constructor_args pairs. If the class does not
+ *               need any constructor arguments, it would just be an empty array.
+ */
+public function get_shared_preparations() {
+  $demo_posts = array_map(
+    function( $post_type ) {
+      return array(
+        'post_title'   => "Demo {$post_type} post",
+        'post_content' => 'Test content',
+        'post_type'    => $post_type,
+        'post_status'  => 'publish',
+      );
+    },
+    $this->viewable_post_types
+  );
 
-    return array(
-      Demo_Posts_Creation_Preparation::class => array( $demo_posts ),
-    );
-  }
+  return array(
+    Demo_Posts_Creation_Preparation::class => array( $demo_posts ),
+  );
+}
 ```
 
 ## Add the Check to the Plugin Checker

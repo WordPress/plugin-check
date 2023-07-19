@@ -53,7 +53,6 @@ The `get_args()` method should return an associative array containing the PHPCS 
 Below is an example of a Static Check class that checks for i18n usage in the plugins codebase.
 
 ```php
-
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Checks\Abstract_PHP_CodeSniffer_Check;
