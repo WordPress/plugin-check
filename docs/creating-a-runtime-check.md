@@ -145,6 +145,8 @@ public function get_shared_preparations() {
 }
 ```
 
+A check can have both a check preparation and a shared preparations combined. When a check implements both types of checks it is worth noting that shared preparations are run before check preparations.
+
 ## Global preparations
 
 Plugin Checker also includes some preparation classes that are used to prepare the overall environment, i.e. before any runtime check. Global preparations cannot be controlled outside of the Plugin Checker at this point.
