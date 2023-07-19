@@ -11,12 +11,13 @@ use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Runtime_Check;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 
-class Custom_Check extends Runtime_Check {
+class My_Custom_Check implements Runtime_Check {
   
   use Stable_Check;
   
   public function get_categories() {
     // Return an array of check categories.
+    // See the `WordPress\Plugin_Check\Checker\Check_Categories` class for available categories.
   }
   
   public function run( Check_Result $result );
@@ -25,7 +26,7 @@ class Custom_Check extends Runtime_Check {
 }
 ```
 
-In addtion, there is also the `Preparation` interface, which is used to define checks that have preparations. This interface defines a `prepare()` method which is used to run the logic required to prepare the environment before the check before is run.
+In addtion, there is also the `Preparation` interface, which can be implemented by a check to prepare the WordPress environment. This interface defines a `prepare()` method which is used to run the logic required to prepare the environment before the check before is run.
 
 Both these interfaces are implemented in the `Abstract_Runtime_Check` class, which developers can use when building out their own runtime checks. This class defines both the `prepare()` and `run()` methods which are required to be implemented for every runtime check.
 
@@ -36,12 +37,13 @@ use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Checks\Abstract_Runtime_Check;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 
-class Custom_Check extends Abstract_Runtime_Check {
+class My_Custom_Check extends Abstract_Runtime_Check {
 
   use Stable_Check;
   
   public function get_categories() {
     // Return an array of check categories.
+    // See the `WordPress\Plugin_Check\Checker\Check_Categories` class for available categories.
   }
 
   public function prepare() {
@@ -56,9 +58,14 @@ class Custom_Check extends Abstract_Runtime_Check {
 
 ## Preparations
 
-Preparations in the Plugin Checker are used to set up the environment before running checks, involving logic like activating themes or plugins and creating necessary test content. They utilize the `Preparation` interface, requiring the implementation of a `prepare()` method, and return cleanup functions to revert changes made during preparation. Three different approaches can be used for creating preparations based on the circumstances.
+Preparations in the Plugin Checker are used to set up the environment before running checks, involving logic like adding actions and filters, and creating necessary test content. They utilize the `Preparation` interface, requiring the implementation of a `prepare()` method, and return cleanup functions to revert changes made during preparation.
+Three different approaches can be used for creating preparations based on the circumstances:
 
-### Check Preperations
+* Check preparations
+* Shared preparations
+* Global preparations
+
+### Check preparations
 
 Check preparations are created using the `prepare()` method within a check class.
 
@@ -69,7 +76,7 @@ Below is an example of a preparation that creates a test post and returns a clea
 ```php
 use WordPress\Plugin_Check\Checker\Checks\Abstract_Runtime_Check;
 
-class Custom_Check extends Abstract_Runtime_Check {
+class My_Custom_Check extends Abstract_Runtime_Check {
   /**
    * Check Preparation.
    */
@@ -92,23 +99,23 @@ class Custom_Check extends Abstract_Runtime_Check {
 }
 ```
 
-### Preparation Classes
+### Shared Preparations
 
-Preparation classes are individual classes created to handle specific preparation logic in a single place.
+Shared preparations are individual classes created to handle specific preparation logic in a single place.
 
-The [`Force_Single_Plugin_Preparation`](https://github.com/10up/plugin-check/blob/trunk/includes/Checker/Preparations/Force_Single_Plugin_Preparation.php) in the Plugin Checker is an example of a preparation class.
+The [`Demo_Posts_Creation_Preparation`](https://github.com/10up/plugin-check/blob/trunk/includes/Checker/Preparations/Demo_Posts_Creation_Preparation.php) in the Plugin Checker is an example of a preparation class.
 
 Preparation classes are useful for implementing the same preparation logic across multiple checks using the concept of shared preparations.
-
-### Shared Preparations
 
 Shared preparations are used to prevent running the same preparations multiple times.
 
 Before running checks against a plugin all shared preparations are collected and processed to remove any shared preparations that are the same. 
 
+Any preparation class can be used as a shared preparation including [preparations already available in the Plugin Checker](https://github.com/10up/plugin-check/blob/trunk/includes/Checker/Preparations).
+
 Check classes can define the shared preparations the use by using the `With_Shared_Preparation` interface.
 
-The Check class should then implement the get_shared_preparations() method defined by the interface. This method returns an map of shared preparations where the preparation class name is the key and an array of constructor parameters as the value.
+The Check class should then implement the `get_shared_preparations()` method defined by the interface. This method returns an map of shared preparations where the preparation class name is the key and an array of constructor parameters as the value.
 
 Below is an example of how the `Enqueued_Scripts_Size_Check` uses shared preparations.
 
@@ -138,72 +145,16 @@ public function get_shared_preparations() {
 }
 ```
 
+## Global preparations
+
+Plugin Checker also includes some preparation classes that are used to prepare the overall environment, i.e. before any runtime check. Global preparations cannot be controlled outside of the Plugin Checker at this point.
+
+An example for a global preparation is the [`Force_Single_Plugin_Preparation`](https://github.com/10up/plugin-check/blob/trunk/includes/Checker/Preparations/Force_Single_Plugin_Preparation.php) class, which ensures that only the plugin to check is actually active.
+
+## Amending the check result object
+
+Amending results to the `Check_Result` object works in the same way as static checks. [See the documentation here](./creating-a-static-check.md#amending-the-check-result-object) for details on adding results.
+
 ## Add the Check to the Plugin Checker
 
-In order to run the check as part of the Plugin Checker process it needs to be added to the Plugin Checkers list of available checks.
-
-This is done by using the `wp_plugin_check_checks` filter to register an instance of the check with its slug.
-
-- If you're contributing to the actual plugin checker, add the check to the list in the `Abstract_Check_Runner::register_checks()` method.
-- If you're implementing a check in code outside of the actual plugin checker, use the approach you've described here so far.
-
-```php
-add_filter(
-  'wp_plugin_check_checks',
-  function ( array $checks ) {
-    // Add the check to the map of all available checks.
-    $checks[ 'runtime_check' ] = new Runtime_Check();
-
-    return $checks;
-  }
-)
-```
-
-# Amending the check result object
-
-The checks `run()` method will hold all the logic to test the plugin and raise any warnings or errors that are found.
-
-The run method accepts an instance of the `Check_Results` class which is used to add messages to the results list.
-
-The warnings and errors are added via the `add_message()` method which accepts 3 parameters.
-
-- `$error (bool)` - Whether the message is an error or warning. True for error, false for warning.
-- `$message (string)` - The error/warning message.
-- `$args (array)` - Additional message arguements to add context.
-  - `$code (string)` - Violation code according to the message. Default empty string.
-  - `$file (string)` - The file in which the message occurred. Default empty string (unknown file).
-  - `$line (int)` - The line on which the message occurred. Default 0 (unknown line).
-  - `$column (int)` - The column on which the message occurred. Default 0 (unknown column).
-
-In addition to adding messages, the `Check_Result` instance also provides access to the `Plugin_Context`. The plugin context is useful for getting the plugins path and urls when performing checks.
-
-Below is an example showing how to access the plugin context and add messages using the `Check_Results` instance.
-
-```php
-/**
- * Runs the check on the plugin and amends results.
- *
- * @since n.e.x.t
- *
- * @param Check_Result $result The check results to amend and the plugin context.
- */
-public function run( Check_Result $result ) {
-
-  // Get the absolute file path for a specific file in the plugin.
-  $plugin_file = $result->plugin()->path( 'plugin-file.php' );
-
-  // Run logic to test the plugin for warnings/errors...
-
-  // When an issue is found add a warning.
-  $result->add_message(
-    false, 
-    'Warning message content.', 
-    array(
-      'code'   => 'warning_code',
-      'file'   => $pluging_file,
-      'line'   => 1,
-      'column' => 10,
-    )
-  );
-}
-```
+[See here](./creating-a-static-check.md#add-the-check-to-the-plugin-checker) for details on how to add a check to the Plugin Checker.

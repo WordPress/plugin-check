@@ -40,7 +40,7 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
 /**
  * Check for running WordPress internationalization sniffs.
  */
-class I18n_Usage_Check extends Abstract_PHP_CodeSniffer_Check {
+class My_Custom_Check extends Abstract_PHP_CodeSniffer_Check {
   
   use Stable_Check;
 

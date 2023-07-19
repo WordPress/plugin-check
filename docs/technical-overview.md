@@ -49,8 +49,6 @@ Preparations are used to prepare the test environment ahead of running a runtime
 
 Preparations can include any logic from adding filters, or creating test content to perform checks against.
 
-Every preparation contains a `prepare()` method, which returns a cleanup function that is called to revert the changes made by that method. Preparations can be implemented as their individual classes or alternatively as part of a specific check.
-
 ## The Test Environment
 
 In the context of runtime checks, the Plugin Checker ensures that the checks are performed in a controlled environment separate from the production site. This approach prevents any unintended changes to the actual WordPress site.
