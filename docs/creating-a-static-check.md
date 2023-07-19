@@ -66,7 +66,7 @@ class My_Custom_Check extends Abstract_PHP_CodeSniffer_Check {
     return array(
       'extensions' => 'php',
       'standard'   => 'WordPress',
-      'sniffs'     => 'WordPress.WP.I18n',
+      'sniffs'     => 'WordPress.WP.CapitalPDangit',
     );
   }
 }
@@ -82,11 +82,11 @@ use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 
 /**
- * Check for detecting "ALLOW_UNFILTERED_UPLOADS" constant in plugin files.
+ * Check for detecting "Wordpress" in plugin files.
  *
  * @since n.e.x.t
  */
-class No_Unfiltered_Uploads_Check extends Abstract_File_Check {
+class My_Custom_Check extends Abstract_File_Check {
 
 	use Stable_Check;
 
@@ -104,7 +104,7 @@ class No_Unfiltered_Uploads_Check extends Abstract_File_Check {
 	}
 
 	/**
-	 * Check the "ALLOW_UNFILTERED_UPLOADS" constant in file.
+	 * Check the "Wordpress" in files.
 	 *
 	 * @since n.e.x.t
 	 *
@@ -115,15 +115,15 @@ class No_Unfiltered_Uploads_Check extends Abstract_File_Check {
     // Get all php files in the plugin.
 		$php_files = self::filter_files_by_extension( $files, 'php' );
 
-    // Check files for instances of the ALLOW_UNFILTERED_UPLOADS constant.
-		$file = self::file_str_contains( $php_files, 'ALLOW_UNFILTERED_UPLOADS' );
+    // Check files for instances of the "Wordpress".
+		$file = self::file_str_contains( $php_files, 'Wordpress' );
 
 		if ( $file ) {
 			$result->add_message(
 				true,
-				__( 'ALLOW_UNFILTERED_UPLOADS is not permitted.', 'plugin-check' ),
+				__( 'Please spell "WordPress" correctly.', 'plugin-check' ),
 				array(
-					'code' => 'allow_unfiltered_uploads_detected',
+					'code' => 'misspelled_wordpress_in_files',
 					'file' => $file,
 				)
 			);
