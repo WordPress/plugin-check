@@ -57,8 +57,8 @@ In the context of runtime checks, the Plugin Checker ensures that the checks are
 
 To achieve this, the Plugin Checker employs the following practices:
 
-Separate Database Tables: During runtime checks, a distinct set of database tables is utilized. This isolation ensures that the checks do not interfere with the data of the production site.
+* Separate Database Tables: During runtime checks, a distinct set of database tables is utilized. This isolation ensures that the checks do not interfere with the data of the production site.
 
-Restricted Plugin Activation: Only the plugin being tested is activated in the runtime environment. By keeping other plugins deactivated, the checks focus solely on the plugin under examination.
+* Restricted Plugin Activation: Only the plugin being tested is activated in the runtime environment. By keeping other plugins deactivated, the checks focus solely on the plugin under examination.
 
 It's important to note that while these measures aim to minimize the impact on the WordPress site, it is strongly advised not to perform runtime checks using the Plugin Checker on a production site. Despite the precautions taken, there is still a possibility of unintended consequences or conflicts.

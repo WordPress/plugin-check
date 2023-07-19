@@ -2,7 +2,7 @@
 
 Static checks are used to perform static analysis against a plugin's codebase.
 
-The Static checks, which analyze the code, either using PHP CodeSniffer sniffs or custom logic e.g. using regular expressions.
+Static checks analyze the code, either using PHP CodeSniffer sniffs or custom logic e.g. using regular expressions.
 
 ```php
 use WordPress\Plugin_Check\Checker\Check_Result;
@@ -10,12 +10,13 @@ use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Static_Check;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 
-class Custom_Check extends Static_Check {
+class My_Custom_Check implements Static_Check {
 
   use Stable_Check;
   
   public function get_categories() {
     // Return an array of check categories.
+    // See the `WordPress\Plugin_Check\Checker\Check_Categories` class for available categories.
   }
 
   public function run( Check_Result $result );
@@ -26,31 +27,9 @@ class Custom_Check extends Static_Check {
 
 Here are two more concrete ways to write static checks.
 
-## Creating a new Check using PHP CodeSniffer.
+## Creating a new check using PHP CodeSniffer
 
-A new Check class should be created for the static check and should implement the following attributes.
-
-- The class name should be suffixed with `_Check`.
-- The class should extend the `Abstract_PHP_CodeSniffer_Check` class.
-- The class should implement the `get_args()` method.
-
-## Creating a new Check using Abstract_File_Check.
-
-A new Check class should be created for the static check and should implement the following attributes.
-
-- The class name should be suffixed with `_Check`.
-- The class should extend the `Abstract_File_Check` class.
-- The class should implement the `check_files()` method.
-
-### PHPCS Arguments
-
-Rather than write all the logic required to run PHPCS, the `Abstract_PHP_CodeSniffer_Check` handles this logic so developers only need to supply the arguements to PHPCS in order to get their check working.
-
-This is done by implementing the `get_args()` method in the new Check class defined within the `Abstract_PHP_CodeSniffer_Check`.
-
-The `get_args()` method should return an associative array containing the PHPCS arguments including the file extension, code standard and specific sniff to run.
-
-Below is an example of a Static Check class that checks for i18n usage in the plugins codebase.
+A new class should be created for the static check, extending the `Abstract_PHP_CodeSniffer_Check` class. Here is an example:
 
 ```php
 use WordPress\Plugin_Check\Checker\Check_Result;
@@ -93,32 +72,71 @@ class I18n_Usage_Check extends Abstract_PHP_CodeSniffer_Check {
 }
 ```
 
-## Add the Check to the Plugin Checker
+## Creating a new check using file search for strings / regular expressions
 
-In order to run the check as part of the Plugin Checker process it needs to be added to the Plugin Checkers list of available checks.
-
-This is done by using the `wp_plugin_check_checks` filter to register an instance of the check with its slug.
-
-- If you're contributing to the actual plugin checker, add the check to the list in the `Abstract_Check_Runner::register_checks()` method.
-- If you're implementing a check in code outside of the actual plugin checker, use the approach you've described here so far.
+A new class should be created for the static check, extending the `Abstract_File_Check` class. Here is an example:
 
 ```php
-add_filter(
-  'wp_plugin_check_checks',
-  function ( array $checks ) {
-    // Add the check to the map of all available checks.
-    $checks[ 'i18n_usage' ] = new I18n_Usage_Check();
+use WordPress\Plugin_Check\Checker\Check_Categories;
+use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Traits\Stable_Check;
 
-    return $checks;
-  }
-)
+/**
+ * Check for detecting "ALLOW_UNFILTERED_UPLOADS" constant in plugin files.
+ *
+ * @since n.e.x.t
+ */
+class No_Unfiltered_Uploads_Check extends Abstract_File_Check {
+
+	use Stable_Check;
+
+	/**
+	 * Gets the categories for the check.
+	 *
+	 * Every check must have at least one category.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array The categories for the check.
+	 */
+	public function get_categories() {
+		return array( Check_Categories::CATEGORY_PLUGIN_REPO );
+	}
+
+	/**
+	 * Check the "ALLOW_UNFILTERED_UPLOADS" constant in file.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param Check_Result $result The Check Result to amend.
+	 * @param array        $files  Array of plugin files.
+	 */
+	protected function check_files( Check_Result $result, array $files ) {
+    // Get all php files in the plugin.
+		$php_files = self::filter_files_by_extension( $files, 'php' );
+
+    // Check files for instances of the ALLOW_UNFILTERED_UPLOADS constant.
+		$file = self::file_str_contains( $php_files, 'ALLOW_UNFILTERED_UPLOADS' );
+
+		if ( $file ) {
+			$result->add_message(
+				true,
+				__( 'ALLOW_UNFILTERED_UPLOADS is not permitted.', 'plugin-check' ),
+				array(
+					'code' => 'allow_unfiltered_uploads_detected',
+					'file' => $file,
+				)
+			);
+		}
+	}
+}
 ```
 
-# Amending the check result object
+## Amending the check result object
 
-The checks `run()` method will hold all the logic to test the plugin and raise any warnings or errors that are found.
+The check's `run()` method will hold all the logic to test the plugin and raise any warnings or errors that are found.
 
-The run method accepts an instance of the `Check_Results` class which is used to add messages to the results list.
+The run method accepts an instance of the `Check_Result` class which is used to add errors and warnings to the results list.
 
 The warnings and errors are added via the `add_message()` method which accepts 3 parameters.
 
@@ -130,9 +148,9 @@ The warnings and errors are added via the `add_message()` method which accepts 3
   - `$line (int)` - The line on which the message occurred. Default 0 (unknown line).
   - `$column (int)` - The column on which the message occurred. Default 0 (unknown column).
 
-In addition to adding messages, the `Check_Result` instance also provides access to the `Plugin_Context`. The plugin context is useful for getting the plugins path and urls when performing checks.
+In addition to adding messages, the `Check_Result` instance also provides access to the plugin's `Check_Context`. The plugin context is useful for getting the plugin's path and URL when performing checks.
 
-Below is an example showing how to access the plugin context and add messages using the `Check_Results` instance.
+Below is an example showing how to access the plugin context and add messages using the `Check_Result` instance.
 
 ```php
 /**
@@ -161,4 +179,23 @@ public function run( Check_Result $result ) {
     )
   );
 }
+```
+
+## Add the Check to the Plugin Checker
+
+In order to run the check as part of the Plugin Checker process, it needs to be added to the Plugin Checker's list of available checks.
+
+- If you're contributing to the actual plugin checker, add the check to the list in the `Abstract_Check_Runner::register_checks()` method.
+- If you're implementing a check in code outside of the actual plugin checker, use the `wp_plugin_check_checks` filter, as seen in the example below.
+
+```php
+add_filter(
+  'wp_plugin_check_checks',
+  function ( array $checks ) {
+    // Add the check to the map of all available checks.
+    $checks['my_custom_check'] = new My_Custom_Check();
+
+    return $checks;
+  }
+);
 ```
