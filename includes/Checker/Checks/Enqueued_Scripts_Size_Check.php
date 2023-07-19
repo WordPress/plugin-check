@@ -16,7 +16,7 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
 use WordPress\Plugin_Check\Traits\URL_Aware;
 
 /**
- * Check for running WordPress internationalization sniffs.
+ * Check for enqueued script sizes.
  *
  * @since n.e.x.t
  */

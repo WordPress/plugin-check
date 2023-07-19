@@ -34,6 +34,9 @@ After having the plugin activated, you can analyze any other plugin installed on
 * To check a plugin using WP-CLI, please use the `wp plugin check` command. For example, to check the "Hello Dolly" plugin: `wp plugin check hello.php`
     * Note that by default when using WP-CLI, only static checks can be executed. In order to also include runtime checks, a workaround is currently necessary using the `--require` argument of WP-CLI, to manually load the `cli.php` file within the plugin checker directory before WordPress is loaded. For example: `wp plugin check hello.php --require=./wp-content/plugins/plugin-check/cli.php`
 
+<img alt="WordPress plugin checker UI in WP Admin" src="https://github.com/10up/plugin-check/assets/3531426/19d0c1ce-8c37-4efd-b8c6-d252e6ce29c9">
+<em>Screenshot of the plugin checker's UI in WP Admin</em>
+
 ## Contributing
 
 To set up the repository locally, you will need to clone this GitHub repository (or a fork of it) and then install the relevant dependencies:

@@ -8,7 +8,7 @@
 namespace WordPress\Plugin_Check\Checker;
 
 /**
- * Abstract Check Runner class.
+ * Check Categories class.
  *
  * @since n.e.x.t
  */
