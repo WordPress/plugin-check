@@ -26,7 +26,7 @@ class My_Custom_Check implements Runtime_Check {
 }
 ```
 
-In addtion, there is also the `Preparation` interface, which can be implemented by a check to prepare the WordPress environment. This interface defines a `prepare()` method which is used to run the logic required to prepare the environment before the check before is run.
+In addition, there is also the `Preparation` interface, which can be implemented by a check to prepare the WordPress environment. This interface defines a `prepare()` method which is used to run the logic required to prepare the environment before the check before is run.
 
 Both these interfaces are implemented in the `Abstract_Runtime_Check` class, which developers can use when building out their own runtime checks. This class defines both the `prepare()` and `run()` methods which are required to be implemented for every runtime check.
 
@@ -109,7 +109,7 @@ Preparation classes are useful for implementing the same preparation logic acros
 
 Shared preparations are used to prevent running the same preparations multiple times.
 
-Before running checks against a plugin all shared preparations are collected and processed to remove any shared preparations that are the same. 
+Before running checks against a plugin all shared preparations are collected and processed to avoid duplicate execution of any shared preparations that are the same. 
 
 Any preparation class can be used as a shared preparation including [preparations already available in the Plugin Checker](https://github.com/10up/plugin-check/blob/trunk/includes/Checker/Preparations).
 
@@ -117,7 +117,7 @@ Check classes can define the shared preparations the use by using the `With_Shar
 
 The Check class should then implement the `get_shared_preparations()` method defined by the interface. This method returns an map of shared preparations where the preparation class name is the key and an array of constructor parameters as the value.
 
-Below is an example of how the `Enqueued_Scripts_Size_Check` uses shared preparations.
+Below is an example of how the ` Demo_Posts_Creation_Preparation` preparation class can be used to generate a demo post for every viewable post type, which are then removed again after running the checks.
 
 ```php
 /**

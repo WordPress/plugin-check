@@ -4,6 +4,8 @@ Static checks are used to perform static analysis against a plugin's codebase.
 
 Static checks analyze the code, either using PHP CodeSniffer sniffs or custom logic e.g. using regular expressions.
 
+The Plugin Checker provides the `Static_Check` interface, which is used to identify a static check. This interface does not contain any methods but serves as a marker for static checks.
+
 ```php
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Check_Categories;
@@ -38,7 +40,7 @@ use WordPress\Plugin_Check\Checker\Checks\Abstract_PHP_CodeSniffer_Check;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 
 /**
- * Check for running WordPress internationalization sniffs.
+ * Check for detecting incorrect casing of the word "WordPress" using PHP CodeSniffer.
  */
 class My_Custom_Check extends Abstract_PHP_CodeSniffer_Check {
   
@@ -82,7 +84,7 @@ use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 
 /**
- * Check for detecting "Wordpress" in plugin files.
+ * Check for detecting incorrect casing of the term "WordPress" (specifically "Wordpress") using string search in files.
  *
  * @since n.e.x.t
  */
@@ -112,10 +114,10 @@ class My_Custom_Check extends Abstract_File_Check {
 	 * @param array        $files  Array of plugin files.
 	 */
 	protected function check_files( Check_Result $result, array $files ) {
-    // Get all php files in the plugin.
+    	// Get all php files in the plugin.
 		$php_files = self::filter_files_by_extension( $files, 'php' );
 
-    // Check files for instances of the "Wordpress".
+    	// Check files for instances of the "Wordpress".
 		$file = self::file_str_contains( $php_files, 'Wordpress' );
 
 		if ( $file ) {
