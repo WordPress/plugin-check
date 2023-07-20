@@ -21,7 +21,7 @@ class My_Custom_Check implements Static_Check {
     // See the `WordPress\Plugin_Check\Checker\Check_Categories` class for available categories.
   }
 
-  public function run( Check_Result $result );
+  public function run( Check_Result $result ) {
     // Handle running the check and adding warnings or errors to the result.
   }
 }
@@ -90,47 +90,47 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
  */
 class My_Custom_Check extends Abstract_File_Check {
 
-	use Stable_Check;
+  use Stable_Check;
 
-	/**
-	 * Gets the categories for the check.
-	 *
-	 * Every check must have at least one category.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @return array The categories for the check.
-	 */
-	public function get_categories() {
-		return array( Check_Categories::CATEGORY_PLUGIN_REPO );
-	}
+  /**
+   * Gets the categories for the check.
+   *
+   * Every check must have at least one category.
+   *
+   * @since n.e.x.t
+   *
+   * @return array The categories for the check.
+   */
+  public function get_categories() {
+    return array( Check_Categories::CATEGORY_PLUGIN_REPO );
+  }
 
-	/**
-	 * Check the "Wordpress" in files.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @param Check_Result $result The Check Result to amend.
-	 * @param array        $files  Array of plugin files.
-	 */
-	protected function check_files( Check_Result $result, array $files ) {
-    	// Get all php files in the plugin.
-		$php_files = self::filter_files_by_extension( $files, 'php' );
+  /**
+   * Check the "Wordpress" in files.
+   *
+   * @since n.e.x.t
+   *
+   * @param Check_Result $result The Check Result to amend.
+   * @param array        $files  Array of plugin files.
+   */
+  protected function check_files( Check_Result $result, array $files ) {
+    // Get all php files in the plugin.
+    $php_files = self::filter_files_by_extension( $files, 'php' );
 
-    	// Check files for instances of the "Wordpress".
-		$file = self::file_str_contains( $php_files, 'Wordpress' );
+    // Check files for instances of the "Wordpress".
+    $file = self::file_str_contains( $php_files, 'Wordpress' );
 
-		if ( $file ) {
-			$result->add_message(
-				true,
-				__( 'Please spell "WordPress" correctly.', 'plugin-check' ),
-				array(
-					'code' => 'misspelled_wordpress_in_files',
-					'file' => $file,
-				)
-			);
-		}
-	}
+    if ( $file ) {
+      $result->add_message(
+        true,
+        __( 'Please spell "WordPress" correctly.', 'plugin-check' ),
+        array(
+          'code' => 'misspelled_wordpress_in_files',
+          'file' => $file,
+        )
+      );
+    }
+  }
 }
 ```
 

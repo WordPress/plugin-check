@@ -12,15 +12,15 @@ use WordPress\Plugin_Check\Checker\Runtime_Check;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 
 class My_Custom_Check implements Runtime_Check {
-  
+
   use Stable_Check;
-  
+
   public function get_categories() {
     // Return an array of check categories.
     // See the `WordPress\Plugin_Check\Checker\Check_Categories` class for available categories.
   }
-  
-  public function run( Check_Result $result );
+
+  public function run( Check_Result $result ) {
     // Handle running the check and adding warnings or errors to the result.
   }
 }
@@ -77,6 +77,7 @@ Below is an example of a preparation that creates a test post and returns a clea
 use WordPress\Plugin_Check\Checker\Checks\Abstract_Runtime_Check;
 
 class My_Custom_Check extends Abstract_Runtime_Check {
+
   /**
    * Check Preparation.
    */
@@ -117,7 +118,7 @@ Check classes can define the shared preparations the use by using the `With_Shar
 
 The Check class should then implement the `get_shared_preparations()` method defined by the interface. This method returns an map of shared preparations where the preparation class name is the key and an array of constructor parameters as the value.
 
-Below is an example of how the ` Demo_Posts_Creation_Preparation` preparation class can be used to generate a demo post for every viewable post type, which are then removed again after running the checks.
+Below is an example of how the `Demo_Posts_Creation_Preparation` preparation class can be used to generate a demo post for every viewable post type, which are then removed again after running the checks.
 
 ```php
 /**
