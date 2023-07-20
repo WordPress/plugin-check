@@ -137,7 +137,7 @@ public function get_shared_preparations() {
         'post_status'  => 'publish',
       );
     },
-    $this->viewable_post_types
+    array_filter( get_post_types(), 'is_post_type_viewable' )
   );
 
   return array(
