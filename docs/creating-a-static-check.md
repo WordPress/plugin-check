@@ -1,3 +1,5 @@
+[Back to overview](./README.md)
+
 # Creating a Static Check
 
 Static checks are employed to conduct static analysis on a plugin's codebase.
@@ -138,7 +140,7 @@ class My_Custom_Check extends Abstract_File_Check {
 
 The `run()` method of the check will encompass all the logic required to test the plugin and raise any warnings or errors that are detected.
 
-The `run` method accepts an instance of the `Check_Result` class, enabling the addition of errors and warnings to the results list.
+The `run()` method accepts an instance of the `Check_Result` class, enabling the addition of errors and warnings to the results list.
 
 The warnings and errors are added using the `add_message()` method, which accepts three parameters.
 

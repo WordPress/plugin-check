@@ -1,3 +1,5 @@
+[Back to overview](./README.md)
+
 # Technical Overview
 
 The Plugin Checker works by executing checks against a single plugin. Each check will test for a specific issue and raise either an error or a warning depending on the severity.
