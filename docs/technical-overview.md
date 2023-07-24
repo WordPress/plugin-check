@@ -45,6 +45,8 @@ Checks are assigned a stability value using either the `Stable_Check` or `Experi
 
 Check categories enable the execution of checks for specific use cases. Each check requires a category, which is determined by implementing a `get_categories` method within the check class. This method returns an array containing one or more categories to which the check belongs. The categories should be specified using the constants found in the `Check_Categories` class, rather than setting them as strings.
 
+It should be noted that if categories are assigned that are _not_ part of the constants found in the `Check_Categories` class, said checks may not appear in the dashboard (unless they also contain other categories that _are_ defined in the `Check_Categories` class as constants). They will, however, be able to be surfaced via the wp-cli method of running checks, where checks assigned to any category (existing or custom) will be able to be surfaced and filtered via applicable cli arguments. 
+
 ### Preparations
 
 Preparations are utilized to set up the test environment before running a runtime check, ensuring their successful execution.
