@@ -115,7 +115,7 @@ Before executing checks against a plugin, all shared preparations are gathered a
 
 Any preparation class can be used as a shared preparation including [preparations already available in the Plugin Checker](https://github.com/10up/plugin-check/blob/trunk/includes/Checker/Preparations).
 
-Check classes can define the shared preparations the use by using the `With_Shared_Preparation` interface.
+Check classes can define and utilize shared preparations by implementing the `With_Shared_Preparation`interface.
 
 The Check class should then implement the `get_shared_preparations()` method as defined by the interface. This method returns a map of shared preparations, with the preparation class name as the key and an array of constructor parameters as the value.
 
@@ -157,7 +157,7 @@ An example of a global preparation is the [`Force_Single_Plugin_Preparation`](ht
 
 ## Amending the check result object
 
-Amending results to the `Check_Result` object works in the same way as static checks. [See the documentation here](./creating-a-static-check.md#amending-the-check-result-object) for details on adding results.
+Amending results within the `Check_Result` object functions similarly to static checks. For more information on adding results, [refer to the documentation available here](./creating-a-static-check.md#amending-the-check-result-object).
 
 ## Add the Check to the Plugin Checker
 

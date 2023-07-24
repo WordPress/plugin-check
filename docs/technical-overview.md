@@ -5,8 +5,8 @@ The Plugin Checker works by executing checks against a single plugin. Each check
 The Plugin Checker performs these checks by following the process below:
 
 1. Determine which checks to run based on the request.
-2. Run any check preparations required to prepare the environment.
-3. Run all checks against the plugin.
+2. Execute necessary check preparations to set up the environment.
+3. Execute a comprehensive set of checks against the plugin.
 4. Ensure all errors and warnings raised during the checks are reported.
 
 

@@ -138,7 +138,7 @@ class My_Custom_Check extends Abstract_File_Check {
 
 The `run()` method of the check will encompass all the logic required to test the plugin and raise any warnings or errors that are detected.
 
-The run method accepts an instance of the `Check_Result` class which is used to add errors and warnings to the results list.
+The `run` method accepts an instance of the `Check_Result` class, enabling the addition of errors and warnings to the results list.
 
 The warnings and errors are added using the `add_message()` method, which accepts three parameters.
 
@@ -146,9 +146,9 @@ The warnings and errors are added using the `add_message()` method, which accept
 - `$message (string)` - The error/warning message.
 - `$args (array)` - Additional message arguments to add context.
   - `$code (string)` - The violation code associated with the message. Default is an empty string.
-  - `$file (string)` - The file in which the message occurred. Default empty string (unknown file).
-  - `$line (int)` - The line on which the message occurred. Default 0 (unknown line).
-  - `$column (int)` - The column on which the message occurred. Default 0 (unknown column).
+  - `$file (string)` - The file for which the message occurred. Default empty string (unknown file).
+  - `$line (int)` - The line for which the message occurred. Default 0 (unknown line).
+  - `$column (int)` - The column for which the message occurred. Default 0 (unknown column).
 
 In addition to adding messages, the `Check_Result` instance also grants access to the plugin's `Check_Context` instance, which proves useful for retrieving the plugin's path and URL during check execution.
 
