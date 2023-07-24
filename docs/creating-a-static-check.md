@@ -1,10 +1,10 @@
 # Creating a Static Check
 
-Static checks are used to perform static analysis against a plugin's codebase.
+Static checks are employed to conduct static analysis on a plugin's codebase.
 
-Static checks analyze the code, either using PHP CodeSniffer sniffs or custom logic e.g. using regular expressions.
+Static checks analyze the code, either by using PHP CodeSniffer sniffs or custom logic, such as regular expressions.
 
-The Plugin Checker provides the `Static_Check` interface, which is used to identify a static check. This interface does not contain any methods but serves as a marker for static checks.
+The Plugin Checker offers the `Static_Check` interface, which serves to identify a static check. This interface does not include any methods but acts as a marker for static checks.
 
 ```php
 use WordPress\Plugin_Check\Checker\Check_Result;
@@ -27,11 +27,11 @@ class My_Custom_Check implements Static_Check {
 }
 ```
 
-Here are two more concrete ways to write static checks.
+Here are two more specific approaches to writing static checks.
 
 ## Creating a new check using PHP CodeSniffer
 
-A new class should be created for the static check, extending the `Abstract_PHP_CodeSniffer_Check` class. Here is an example:
+To create the static check, you should develop a new class that extends the `Abstract_PHP_CodeSniffer_Check` class. Below is an example:
 
 ```php
 use WordPress\Plugin_Check\Checker\Check_Result;
@@ -76,7 +76,7 @@ class My_Custom_Check extends Abstract_PHP_CodeSniffer_Check {
 
 ## Creating a new check using file search for strings / regular expressions
 
-A new class should be created for the static check, extending the `Abstract_File_Check` class. Here is an example:
+To create the static check, you should develop a new class that extends the `Abstract_File_Check` class. Below is an example:
 
 ```php
 use WordPress\Plugin_Check\Checker\Check_Categories;
@@ -136,23 +136,23 @@ class My_Custom_Check extends Abstract_File_Check {
 
 ## Amending the check result object
 
-The check's `run()` method will hold all the logic to test the plugin and raise any warnings or errors that are found.
+The `run()` method of the check will encompass all the logic required to test the plugin and raise any warnings or errors that are detected.
 
 The run method accepts an instance of the `Check_Result` class which is used to add errors and warnings to the results list.
 
-The warnings and errors are added via the `add_message()` method which accepts 3 parameters.
+The warnings and errors are added using the `add_message()` method, which accepts three parameters.
 
-- `$error (bool)` - Whether the message is an error or warning. True for error, false for warning.
+- `$error (bool)` - Whether the message is an error or warning. `true` for error, `false` for warning.
 - `$message (string)` - The error/warning message.
-- `$args (array)` - Additional message arguements to add context.
-  - `$code (string)` - Violation code according to the message. Default empty string.
+- `$args (array)` - Additional message arguments to add context.
+  - `$code (string)` - The violation code associated with the message. Default is an empty string.
   - `$file (string)` - The file in which the message occurred. Default empty string (unknown file).
   - `$line (int)` - The line on which the message occurred. Default 0 (unknown line).
   - `$column (int)` - The column on which the message occurred. Default 0 (unknown column).
 
-In addition to adding messages, the `Check_Result` instance also provides access to the plugin's `Check_Context`. The plugin context is useful for getting the plugin's path and URL when performing checks.
+In addition to adding messages, the `Check_Result` instance also grants access to the plugin's `Check_Context` instance, which proves useful for retrieving the plugin's path and URL during check execution.
 
-Below is an example showing how to access the plugin context and add messages using the `Check_Result` instance.
+Below is an example demonstrating how to access the plugin context and add messages using the `Check_Result` instance.
 
 ```php
 /**
@@ -183,12 +183,12 @@ public function run( Check_Result $result ) {
 }
 ```
 
-## Add the Check to the Plugin Checker
+## Adding the Check to the Plugin Checker
 
-In order to run the check as part of the Plugin Checker process, it needs to be added to the Plugin Checker's list of available checks.
+To include the check as part of the Plugin Checker process, it must be added to the Plugin Checker's list of available checks.
 
-- If you're contributing to the actual plugin checker, add the check to the list in the `Abstract_Check_Runner::register_checks()` method.
-- If you're implementing a check in code outside of the actual plugin checker, use the `wp_plugin_check_checks` filter, as seen in the example below.
+- If you're contributing to the Plugin Checker, add the check to the list in the `Abstract_Check_Runner::register_checks()` method.
+- If you're implementing a check in code outside of the Plugin Checker, use the `wp_plugin_check_checks` filter, as seen in the example below.
 
 ```php
 add_filter(

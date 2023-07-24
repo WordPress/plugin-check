@@ -1,62 +1,62 @@
 # Technical Overview
 
-The Plugin Checker works by running checks against a single plugin. Each check will test for a specific issue and raise either an error or warning depending on the severity.
+The Plugin Checker works by executing checks against a single plugin. Each check will test for a specific issue and raise either an error or a warning depending on the severity.
 
-The Plugin Checker performs these checks following the process below.
+The Plugin Checker performs these checks by following the process below:
 
-1. Determine checks to run based on the request.
+1. Determine which checks to run based on the request.
 2. Run any check preparations required to prepare the environment.
 3. Run all checks against the plugin.
-4. Report all errors and warnings raised by the checks run.
+4. Ensure all errors and warnings raised during the checks are reported.
 
 
 ## Checks
-Checks are single PHP classes that run code to test a plugin for a specific problem.
+Checks are individual PHP classes designed to test a plugin for a specific problem when executed.
 
-Every check contains a `run()` method which accepts an instance of the `Check_Result` class. The `Check_Result` instance is used to add any errors or warnings raised by the check to be reported later.
+Each check contains a `run()` method that accepts an instance of the `Check_Result` class. This `Check_Result` instance is used to collect and report any errors or warnings raised by the check.
 
-Currently, static and runtime checks are the 2 types of checks that can be run by the Plugin Checker.
+The Plugin Checker currently supports two types of checks: static and runtime checks.
 
 ### Static Checks
 
-Static checks are used to perform tests against the codebase without running any code. This is similar to other static analysis tools such as PHP Code Sniffer.
+Static checks are used to perform tests against the codebase without running any code, similar to other static analysis tools like PHP Code Sniffer.
 
-Static checks can run existing PHPCodeSniffer sniffs, such as those in the [WordPress Coding Standards](https://github.com/WordPress/WordPress-Coding-Standards), or they can be implemented in a more manual way, e.g. searching for specific patterns across all files, similar to how the checks of the [WordPress Theme Check tool](https://github.com/WordPress/theme-check) are implemented.
+Static checks can utilize existing PHPCodeSniffer sniffs, such as those in the [WordPress Coding Standards](https://github.com/WordPress/WordPress-Coding-Standards), or they can be implemented manually by searching for specific patterns across all files, similar to the checks in the [WordPress Theme Check tool](https://github.com/WordPress/theme-check).
 
 Static checks implement the `Static_Check` interface.
 
 ### Runtime Checks
 
-Runtime checks perform tests by executing the code within a test environment. The plugin code is required to run in order to test a specific output.
+Runtime checks perform tests by executing the plugin code within a dedicated test environment, allowing for verification of specific outputs.
 
-As runtime checks execute code against a test environment they often include preparations in order to prepare the runtime environment with required configuration ahead of check being performed.
+Runtime checks execute code within a test environment, often requiring preparations to configure the runtime environment with the necessary configuration prior to performing the checks.
 
 Runtime checks implement the `Runtime_Check` interface.
 
 ### Check Stabilities
 
-Every check is assigned a stability value so the correct checks are run for each use case. There are currently 2 stability values, Stable and Experimental.
+Each check is assigned a stability value to ensure appropriate check selection based on specific use cases. Currently, there are two stability values: Stable and Experimental.
 
-Checks are a assigned a stability value using either the `Stable_Check` or `Experimental_Check` trait. Checks with the `Stable_Check` trait are always run by both the CLI and WordPress admin screens. Experimental checks are only run via the CLI with the `--include-experimental` flag.
+Checks are assigned a stability value using either the `Stable_Check` or `Experimental_Check` trait. Those with the `Stable_Check` trait are always executed on both the CLI and WordPress admin screens, whereas Experimental checks are exclusively run via the CLI using the `--include-experimental` flag.
 
 ### Check Categories
 
-Check categories allow checks to be run for specific use cases. All checks require a category which is set by implementing a `get_categories` method within the check class. This method returns an array containing one or more categories the check belongs to. The categories set should be made up by the constants found in the `Check_Categories` class rather than setting them as strings.
+Check categories enable the execution of checks for specific use cases. Each check requires a category, which is determined by implementing a `get_categories` method within the check class. This method returns an array containing one or more categories to which the check belongs. The categories should be specified using the constants found in the `Check_Categories` class, rather than setting them as strings.
 
 ### Preparations
 
-Preparations are used to prepare the test environment ahead of running a runtime check to ensure that they run correctly.
+Preparations are utilized to set up the test environment before running a runtime check, ensuring their successful execution.
 
-Preparations can include any logic from adding filters, or creating test content to perform checks against.
+Preparations can encompass various tasks, such as adding filters or creating test content, which are performed to enable comprehensive checks.
 
 ## The Test Environment
 
-In the context of runtime checks, the Plugin Checker ensures that the checks are performed in a controlled environment separate from the production site. This approach prevents any unintended changes to the actual WordPress site.
+In the context of runtime checks, the Plugin Checker ensures that the checks are executed within a controlled environment separate from the production site, thus preventing any unintended changes to the actual WordPress site.
 
-To achieve this, the Plugin Checker employs the following practices:
+To achieve this, the Plugin Checker implements the following practices:
 
-* Separate Database Tables: During runtime checks, a distinct set of database tables is utilized. This isolation ensures that the checks do not interfere with the data of the production site.
+* Separate Database Tables: During runtime checks, the Plugin Checker utilizes a distinct set of database tables. This isolation ensures that the checks do not interfere with the data of the production site.
 
-* Restricted Plugin Activation: Only the plugin being tested is activated in the runtime environment. By keeping other plugins deactivated, the checks focus solely on the plugin under examination.
+* Restricted Plugin Activation: In the runtime environment, only the plugin being tested is activated. By deactivating other plugins, the checks focus solely on the plugin under examination.
 
-It's important to note that while these measures aim to minimize the impact on the WordPress site, it is strongly advised not to perform runtime checks using the Plugin Checker on a production site. Despite the precautions taken, there is still a possibility of unintended consequences or conflicts.
+It is important to note that while these measures aim to minimize the impact on the WordPress site, it is strongly advised not to perform runtime checks using the Plugin Checker on a production site. Despite the precautions taken, there remains a possibility of unintended consequences or conflicts.
