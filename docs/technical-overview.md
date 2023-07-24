@@ -21,7 +21,7 @@ The Plugin Checker currently supports two types of checks: static and runtime ch
 
 ### Static Checks
 
-Static checks are used to perform tests against the codebase without running any code, similar to other static analysis tools like PHP Code Sniffer.
+Static checks are used to perform tests against the codebase without running any code within the plugin being checked, similar to other static analysis tools like PHP Code Sniffer.
 
 Static checks can utilize existing PHPCodeSniffer sniffs, such as those in the [WordPress Coding Standards](https://github.com/WordPress/WordPress-Coding-Standards), or they can be implemented manually by searching for specific patterns across all files, similar to the checks in the [WordPress Theme Check tool](https://github.com/WordPress/theme-check).
 
