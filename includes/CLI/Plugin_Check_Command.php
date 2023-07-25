@@ -105,6 +105,22 @@ final class Plugin_Check_Command {
 	 * @SuppressWarnings(PHPMD.NPathComplexity)
 	 */
 	public function check( $args, $assoc_args ) {
+		/*
+		 * Bail early if the Plugin Checker is not activated.
+		 *
+		 * If the Plugin Checker is not activated, it will throw an error and
+		 * CLI commands won't be usable.
+		 */
+		if ( is_plugin_inactive( $this->plugin_context->basename() ) ) {
+			WP_CLI::error(
+				sprintf(
+					// translators: Plugin Checker slug.
+					__( '%s is not active.', 'plugin-check' ),
+					$this->plugin_context->basename()
+				)
+			);
+		}
+
 		// Get options based on the CLI arguments.
 		$options = $this->get_options( $assoc_args );
 
