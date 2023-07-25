@@ -103,6 +103,7 @@ final class Plugin_Check_Command {
 	 * @throws Exception Throws exception.
 	 *
 	 * @SuppressWarnings(PHPMD.NPathComplexity)
+	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
 	 */
 	public function check( $args, $assoc_args ) {
 		/*
