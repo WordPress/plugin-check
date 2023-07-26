@@ -64,6 +64,10 @@ npm run wp-env stop
 
 For further information on contributing, please see the [contributing guide](/CONTRIBUTING.md).
 
+### Technical documentation
+
+To learn more about the functionality and technical details of the WordPress plugin checker, please refer to the [technical documentation](./docs/README.md).
+
 ## License
 
 The WordPress plugin checker is free software, and is released under the terms of the GNU General Public License version 2 or (at your option) any later version. See [LICENSE](/LICENSE) for complete license.
