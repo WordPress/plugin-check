@@ -93,15 +93,6 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	protected $check_categories;
 
 	/**
-	 * Determines if the current request is intended for the plugin checker.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @return bool Returns true if the check is for plugin else false.
-	 */
-	abstract public static function is_plugin_check();
-
-	/**
 	 * Returns the plugin parameter based on the request.
 	 *
 	 * @since n.e.x.t
