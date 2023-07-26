@@ -239,8 +239,9 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 						size_format( $this->threshold_size )
 					),
 					array(
-						'code' => 'EnqueuedScriptsSize.ScriptSizeGreaterThanThreshold',
-						'file' => $plugin_script['path'],
+						'code'       => 'EnqueuedScriptsSize.ScriptSizeGreaterThanThreshold',
+						'file'       => $plugin_script['path'],
+						'categories' => $this->get_categories(),
 					)
 				);
 			}

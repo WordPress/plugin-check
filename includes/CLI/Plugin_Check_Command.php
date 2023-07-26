@@ -262,6 +262,7 @@ final class Plugin_Check_Command {
 			'line',
 			'column',
 			'code',
+			'categories',
 			'message',
 		);
 
@@ -276,6 +277,7 @@ final class Plugin_Check_Command {
 				'column',
 				'type',
 				'code',
+				'categories',
 				'message',
 			);
 		}

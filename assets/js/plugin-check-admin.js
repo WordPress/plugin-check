@@ -385,6 +385,7 @@
 				for ( let i = 0; i < results[ line ][ column ].length; i++ ) {
 					const message = results[ line ][ column ][ i ].message;
 					const code = results[ line ][ column ][ i ].code;
+					const categories = results[ line ][ column ][ i ].categories;
 
 					table.innerHTML += renderTemplate(
 						'plugin-check-results-row',
@@ -394,6 +395,7 @@
 							type,
 							message,
 							code,
+							categories,
 						}
 					);
 				}

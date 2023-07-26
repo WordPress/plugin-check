@@ -152,8 +152,9 @@ class File_Type_Check extends Abstract_File_Check {
 					$is_error,
 					__( 'Version control checkouts should not be present.', 'plugin-check' ),
 					array(
-						'code' => 'vcs_present',
-						'file' => str_replace( $result->plugin()->path(), '', $dir ),
+						'code'       => 'vcs_present',
+						'file'       => str_replace( $result->plugin()->path(), '', $dir ),
+						'categories' => $this->get_categories(),
 					)
 				);
 			}
@@ -193,8 +194,9 @@ class File_Type_Check extends Abstract_File_Check {
 			true,
 			$message,
 			array(
-				'code' => $code,
-				'file' => str_replace( $result->plugin()->path(), '', $file ),
+				'code'       => $code,
+				'file'       => str_replace( $result->plugin()->path(), '', $file ),
+				'categories' => $this->get_categories(),
 			)
 		);
 	}

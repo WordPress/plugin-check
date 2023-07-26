@@ -51,8 +51,9 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				false,
 				__( 'The plugin readme.txt does not exist.', 'plugin-check' ),
 				array(
-					'code' => 'no_plugin_readme',
-					'file' => 'readme.txt',
+					'code'       => 'no_plugin_readme',
+					'file'       => 'readme.txt',
+					'categories' => $this->get_categories(),
 				)
 			);
 
@@ -87,8 +88,9 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				false,
 				__( 'The readme.txt appears to contain default text.', 'plugin-check' ),
 				array(
-					'code' => 'default_readme_text',
-					'file' => $result->plugin()->path( '/readme.txt' ),
+					'code'       => 'default_readme_text',
+					'file'       => $result->plugin()->path( '/readme.txt' ),
+					'categories' => $this->get_categories(),
 				)
 			);
 		}
@@ -117,8 +119,9 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				false,
 				__( 'Your plugin has an invalid license declared. Please update your readme.txt with a valid SPDX license identifier.', 'plugin-check' ),
 				array(
-					'code' => 'invalid_license',
-					'file' => $result->plugin()->path( '/readme.txt' ),
+					'code'       => 'invalid_license',
+					'file'       => $result->plugin()->path( '/readme.txt' ),
+					'categories' => $this->get_categories(),
 				)
 			);
 		}
@@ -146,8 +149,9 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				false,
 				__( "It's recommended not to use 'Stable Tag: trunk'.", 'plugin-check' ),
 				array(
-					'code' => 'trunk_stable_tag',
-					'file' => $result->plugin()->path( '/readme.txt' ),
+					'code'       => 'trunk_stable_tag',
+					'file'       => $result->plugin()->path( '/readme.txt' ),
+					'categories' => $this->get_categories(),
 				)
 			);
 		}
@@ -163,8 +167,9 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				false,
 				__( 'The Stable Tag in your readme.txt file does not match the version in your main plugin file.', 'plugin-check' ),
 				array(
-					'code' => 'stable_tag_mismatch',
-					'file' => $result->plugin()->path( '/readme.txt' ),
+					'code'       => 'stable_tag_mismatch',
+					'file'       => $result->plugin()->path( '/readme.txt' ),
+					'categories' => $this->get_categories(),
 				)
 			);
 		}

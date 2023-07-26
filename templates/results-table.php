@@ -15,6 +15,9 @@
 				<?php esc_html_e( 'Code', 'plugin-check' ); ?>
 			</td>
 			<td>
+				<?php esc_html_e( 'Categories', 'plugin-check' ); ?>
+			</td>
+			<td>
 				<?php esc_html_e( 'Message', 'plugin-check' ); ?>
 			</td>
 		</tr>

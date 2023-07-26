@@ -69,8 +69,9 @@ class Plugin_Header_Text_Domain_Check implements Static_Check {
 					esc_html( $plugin_slug )
 				),
 				array(
-					'code' => 'textdomain_mismatch',
-					'file' => $plugin_main_file,
+					'code'       => 'textdomain_mismatch',
+					'file'       => $plugin_main_file,
+					'categories' => $this->get_categories(),
 				)
 			);
 		}
