@@ -114,11 +114,7 @@ final class Plugin_Check_Command {
 		 */
 		if ( is_plugin_inactive( $this->plugin_context->basename() ) ) {
 			WP_CLI::error(
-				sprintf(
-					// translators: Plugin Checker slug.
-					__( '%s is not active.', 'plugin-check' ),
-					$this->plugin_context->basename()
-				)
+				__( 'Plugin Checker is not active.', 'plugin-check' )
 			);
 		}
 
