@@ -208,7 +208,14 @@ abstract class Abstract_File_Check implements Static_Check {
 					continue;
 				}
 
-				self::$file_list_cache[ $location ][] = $file->getPathname();
+				$file_path = $file->getPathname();
+
+				// Check if the current file belongs to the directory you want to ignore.
+				if ( false !== strpos( $file_path, '/vendor/' ) || false !== strpos( $file_path, '/node_modules/' ) || false !== strpos( $file_path, '/.git/' ) ) {
+					continue;
+				}
+
+				self::$file_list_cache[ $location ][] = $file_path;
 			}
 		} else {
 			self::$file_list_cache[ $location ][] = $location;
