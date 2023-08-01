@@ -177,6 +177,7 @@ abstract class Abstract_File_Check implements Static_Check {
 			return self::$file_contents_cache[ $file ];
 		}
 
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		self::$file_contents_cache[ $file ] = file_get_contents( $file );
 
 		return self::$file_contents_cache[ $file ];
