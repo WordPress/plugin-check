@@ -81,7 +81,6 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 			$result->plugin()->location(),
 			'--report=Json',
 			'--report-width=9999',
-			'--ignore=*/vendor/*,*/node_modules/*,*/.git/*',
 		);
 
 		// Set the check arguments for PHPCS.
