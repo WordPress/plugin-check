@@ -205,6 +205,11 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		$this->assertEquals( $custom_ignore_directories, $result );
 
 		// Remove the filter to avoid interfering with other tests.
-		remove_filter( $filter_name );
+        remove_filter(
+			$filter_name,
+			static function () use ( $custom_ignore_directories ) {
+            	return $custom_ignore_directories;
+        	}
+		);
 	}
 }
