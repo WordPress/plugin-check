@@ -171,4 +171,40 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 
 		$this->assertNull( $runner );
 	}
+
+	public function test_default_ignore_directories() {
+		$expected_directories = array(
+			'.git',
+			'vendor',
+			'node_modules',
+		);
+
+		$actual_directories = Plugin_Request_Utility::get_directories_to_ignore();
+
+		$this->assertEquals( $expected_directories, $actual_directories );
+	}
+
+	public function test_filter_ignore_directories() {
+		// Define custom directories to ignore for testing.
+		$custom_ignore_directories = array(
+			'custom_directory_1',
+			'custom_directory_2',
+		);
+
+		// Create a mock filter that will return our custom directories to ignore.
+		$filter_name = 'wp_plugin_check_ignore_directories';
+		add_filter(
+			$filter_name,
+			static function () use ( $custom_ignore_directories ) {
+				return $custom_ignore_directories;
+			}
+		);
+
+		$result = Plugin_Request_Utility::get_directories_to_ignore();
+
+		$this->assertEquals( $custom_ignore_directories, $result );
+
+		// Remove the filter to avoid interfering with other tests.
+		remove_filter( $filter_name );
+	}
 }
