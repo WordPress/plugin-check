@@ -234,11 +234,31 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 			}
 		);
 
+		// Define custom directories to ignore for testing.
+		$custom_ignore_directories = array( 'custom_directory' );
+
+		// Create a mock filter that will return our custom directories to ignore.
+		$filter_name = 'wp_plugin_check_ignore_directories';
+		add_filter(
+			$filter_name,
+			static function () use ( $custom_ignore_directories ) {
+				return $custom_ignore_directories;
+			}
+		);
+
 		$results = $checks->run_checks( $check_context, $checks_to_run );
 
 		$this->assertInstanceOf( Check_Result::class, $results );
 		$this->assertEmpty( $results->get_warnings() );
 		$this->assertEmpty( $results->get_errors() );
+
+		// Remove the filter to avoid interfering with other tests.
+		remove_filter(
+			$filter_name,
+			static function () use ( $custom_ignore_directories ) {
+				return $custom_ignore_directories;
+			}
+		);
 	}
 
 	public function test_plugin_with_error_for_ignore_directories() {
@@ -267,19 +287,19 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		$errors = $results->get_errors();
 
 		$this->assertNotEmpty( $errors );
-		$this->assertArrayHasKey( 'vendor/error.php', $errors );
+		$this->assertArrayHasKey( 'custom_directory/error.php', $errors );
 		$this->assertEquals( 2, $results->get_error_count() );
 
 		// Check for WordPress.WP.I18n.MissingTranslatorsComment error on Line no 26 and column no at 5.
-		$this->assertArrayHasKey( 11, $errors['vendor/error.php'] );
-		$this->assertArrayHasKey( 6, $errors['vendor/error.php'][11] );
-		$this->assertArrayHasKey( 'code', $errors['vendor/error.php'][11][6][0] );
-		$this->assertEquals( 'WordPress.WP.I18n.MissingTranslatorsComment', $errors['vendor/error.php'][11][6][0]['code'] );
+		$this->assertArrayHasKey( 11, $errors['custom_directory/error.php'] );
+		$this->assertArrayHasKey( 6, $errors['custom_directory/error.php'][11] );
+		$this->assertArrayHasKey( 'code', $errors['custom_directory/error.php'][11][6][0] );
+		$this->assertEquals( 'WordPress.WP.I18n.MissingTranslatorsComment', $errors['custom_directory/error.php'][11][6][0]['code'] );
 
 		// Check for WordPress.WP.I18n.NonSingularStringLiteralDomain error on Line no 33 and column no at 29.
-		$this->assertArrayHasKey( 18, $errors['vendor/error.php'] );
-		$this->assertArrayHasKey( 30, $errors['vendor/error.php'][18] );
-		$this->assertArrayHasKey( 'code', $errors['vendor/error.php'][18][30][0] );
-		$this->assertEquals( 'WordPress.WP.I18n.NonSingularStringLiteralDomain', $errors['vendor/error.php'][18][30][0]['code'] );
+		$this->assertArrayHasKey( 18, $errors['custom_directory/error.php'] );
+		$this->assertArrayHasKey( 30, $errors['custom_directory/error.php'][18] );
+		$this->assertArrayHasKey( 'code', $errors['custom_directory/error.php'][18][30][0] );
+		$this->assertEquals( 'WordPress.WP.I18n.NonSingularStringLiteralDomain', $errors['custom_directory/error.php'][18][30][0]['code'] );
 	}
 }
