@@ -95,14 +95,10 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		if ( $file ) {
 			$result->add_message(
 				false,
-				sprintf(
-					/* translators: %s: readme file */
-					__( 'The %s appears to contain default text.', 'plugin-check' ),
-					str_replace( $result->plugin()->path( '/' ), '', $file )
-				),
+				__( 'The readme appears to contain default text.', 'plugin-check' ),
 				array(
 					'code' => 'default_readme_text',
-					'file' => $file,
+					'file' => str_replace( $result->plugin()->path(), '', $file ),
 				)
 			);
 		}
@@ -129,14 +125,10 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		if ( ! preg_match( '/^([a-z0-9\-\+\.]+)(\sor\s([a-z0-9\-\+\.]+))*$/i', $matches[2] ) ) {
 			$result->add_message(
 				false,
-				sprintf(
-					/* translators: %s: readme file */
-					__( 'Your plugin has an invalid license declared. Please update your %s with a valid SPDX license identifier.', 'plugin-check' ),
-					str_replace( $result->plugin()->path( '/' ), '', $file )
-				),
+				__( 'Your plugin has an invalid license declared. Please update your readme with a valid SPDX license identifier.', 'plugin-check' ),
 				array(
 					'code' => 'invalid_license',
-					'file' => $file,
+					'file' => str_replace( $result->plugin()->path(), '', $file ),
 				)
 			);
 		}
@@ -166,7 +158,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				__( "It's recommended not to use 'Stable Tag: trunk'.", 'plugin-check' ),
 				array(
 					'code' => 'trunk_stable_tag',
-					'file' => $file,
+					'file' => str_replace( $result->plugin()->path(), '', $file ),
 				)
 			);
 		}
@@ -180,14 +172,10 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		) {
 			$result->add_message(
 				false,
-				sprintf(
-					/* translators: %s: readme file */
-					__( 'The Stable Tag in your %s file does not match the version in your main plugin file.', 'plugin-check' ),
-					str_replace( $result->plugin()->path( '/' ), '', $file )
-				),
+				__( 'The Stable Tag in your readme file does not match the version in your main plugin file.', 'plugin-check' ),
 				array(
 					'code' => 'stable_tag_mismatch',
-					'file' => $file,
+					'file' => str_replace( $result->plugin()->path(), '', $file ),
 				)
 			);
 		}
