@@ -6,6 +6,10 @@
  */
 
 use WordPress\Plugin_Check\Checker\AJAX_Runner;
+use WordPress\Plugin_Check\Checker\Check_Context;
+use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Checks;
+use WordPress\Plugin_Check\Checker\Checks\I18n_Usage_Check;
 use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Test_Data\Runtime_Check;
 use WordPress\Plugin_Check\Test_Utils\Traits\With_Mock_Filesystem;
@@ -211,5 +215,71 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 				return $custom_ignore_directories;
 			}
 		);
+	}
+
+	public function test_plugin_without_error_for_ignore_directories() {
+
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-ignore-directories/load.php' );
+		$checks        = new Checks();
+		$checks_to_run = array(
+			new I18n_Usage_Check(),
+		);
+
+		add_filter(
+			'wp_plugin_check_checks',
+			function( $checks ) {
+				return array(
+					'i18n_usage_check' => new I18n_Usage_Check(),
+				);
+			}
+		);
+
+		$results = $checks->run_checks( $check_context, $checks_to_run );
+
+		$this->assertInstanceOf( Check_Result::class, $results );
+		$this->assertEmpty( $results->get_warnings() );
+		$this->assertEmpty( $results->get_errors() );
+	}
+
+	public function test_plugin_with_error_for_ignore_directories() {
+
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-ignore-directories/load.php' );
+		$checks        = new Checks();
+		$checks_to_run = array(
+			new I18n_Usage_Check(),
+		);
+
+		add_filter(
+			'wp_plugin_check_checks',
+			function( $checks ) {
+				return array(
+					'i18n_usage_check' => new I18n_Usage_Check(),
+				);
+			}
+		);
+
+		add_filter( 'wp_plugin_check_ignore_directories', '__return_empty_array' );
+
+		$results = $checks->run_checks( $check_context, $checks_to_run );
+
+		$this->assertInstanceOf( Check_Result::class, $results );
+
+		$errors = $results->get_errors();
+
+		$this->assertNotEmpty( $errors );
+		$this->assertArrayHasKey( 'vendor/error.php', $errors );
+		$this->assertEquals( 2, $results->get_error_count() );
+
+		// Check for WordPress.WP.I18n.MissingTranslatorsComment error on Line no 26 and column no at 5.
+		$this->assertArrayHasKey( 11, $errors['vendor/error.php'] );
+		$this->assertArrayHasKey( 6, $errors['vendor/error.php'][11] );
+		$this->assertArrayHasKey( 'code', $errors['vendor/error.php'][11][6][0] );
+		$this->assertEquals( 'WordPress.WP.I18n.MissingTranslatorsComment', $errors['vendor/error.php'][11][6][0]['code'] );
+
+		// Check for WordPress.WP.I18n.NonSingularStringLiteralDomain error on Line no 33 and column no at 29.
+		$this->assertArrayHasKey( 18, $errors['vendor/error.php'] );
+		$this->assertArrayHasKey( 30, $errors['vendor/error.php'][18] );
+		$this->assertArrayHasKey( 'code', $errors['vendor/error.php'][18][30][0] );
+		$this->assertEquals( 'WordPress.WP.I18n.NonSingularStringLiteralDomain', $errors['vendor/error.php'][18][30][0]['code'] );
 	}
 }
