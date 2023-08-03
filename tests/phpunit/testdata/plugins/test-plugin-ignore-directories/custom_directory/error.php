@@ -16,4 +16,3 @@
  
  // This will cause a WordPress.WP.I18n.NonSingularStringLiteralDomain error as a variable is used for the text-domain.
  esc_html__( 'Hello World!', $text_domain );
- 
