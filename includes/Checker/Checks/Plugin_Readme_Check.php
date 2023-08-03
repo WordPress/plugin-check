@@ -42,8 +42,17 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 * @param array        $files  Array of plugin files.
 	 */
 	protected function check_files( Check_Result $result, array $files ) {
+
+		$plugin_relative_path = $result->plugin()->path();
+		$root_readme          = array(
+			$plugin_relative_path . 'readme.txt',
+			$plugin_relative_path . 'readme.md',
+		);
+
 		// Find the readme file.
-		$readme = self::filter_files_by_regex( $files, '/readme\.(txt|md)$/i' );
+		$readme_list = self::filter_files_by_regex( $files, '/readme\.(txt|md)$/i' );
+
+		$readme = array_intersect( $root_readme, $readme_list );
 
 		// If the readme file does not exist, add a warning and skip other tests.
 		if ( empty( $readme ) ) {
@@ -60,13 +69,13 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		}
 
 		// Check the readme file for default text.
-		$this->check_default_text( $result, $readme );
+		$this->check_default_text( $result, $readme, $plugin_relative_path );
 
 		// Check the readme file for a valid license.
-		$this->check_license( $result, $readme );
+		$this->check_license( $result, $readme, $plugin_relative_path );
 
 		// Check the readme file for a valid version.
-		$this->check_stable_tag( $result, $readme );
+		$this->check_stable_tag( $result, $readme, $plugin_relative_path );
 	}
 
 	/**
@@ -76,31 +85,28 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @param Check_Result $result The Check Result to amend.
 	 * @param array        $files  Array of plugin files.
+	 * @param string       $path   Plugin relative path.
 	 */
-	private function check_default_text( Check_Result $result, array $files ) {
+	private function check_default_text( Check_Result $result, array $files, $path ) {
 		$default_text_patterns = array(
 			'Here is a short description of the plugin.',
 			'Tags: tag1',
 			'Donate link: http://example.com/',
 		);
 
-		$file = '';
 		foreach ( $default_text_patterns as $pattern ) {
 			$file = self::file_str_contains( $files, $pattern );
 			if ( $file ) {
+				$result->add_message(
+					false,
+					__( 'The readme appears to contain default text.', 'plugin-check' ),
+					array(
+						'code' => 'default_readme_text',
+						'file' => str_replace( $path, '', $file ),
+					)
+				);
 				break;
 			}
-		}
-
-		if ( $file ) {
-			$result->add_message(
-				false,
-				__( 'The readme appears to contain default text.', 'plugin-check' ),
-				array(
-					'code' => 'default_readme_text',
-					'file' => str_replace( $result->plugin()->path(), '', $file ),
-				)
-			);
 		}
 	}
 
@@ -111,8 +117,9 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @param Check_Result $result The Check Result to amend.
 	 * @param array        $files  Array of plugin files.
+	 * @param string       $path   Plugin relative path.
 	 */
-	private function check_license( Check_Result $result, array $files ) {
+	private function check_license( Check_Result $result, array $files, $path ) {
 		$matches = array();
 		// Get the license from the readme file.
 		$file = self::file_preg_match( '/(License:|License URI:)\s*(.+)*/i', $files, $matches );
@@ -128,7 +135,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				__( 'Your plugin has an invalid license declared. Please update your readme with a valid SPDX license identifier.', 'plugin-check' ),
 				array(
 					'code' => 'invalid_license',
-					'file' => str_replace( $result->plugin()->path(), '', $file ),
+					'file' => str_replace( $path, '', $file ),
 				)
 			);
 		}
@@ -141,8 +148,9 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @param Check_Result $result The Check Result to amend.
 	 * @param array        $files  Array of plugin files.
+	 * @param string       $path   Plugin relative path.
 	 */
-	private function check_stable_tag( Check_Result $result, array $files ) {
+	private function check_stable_tag( Check_Result $result, array $files, $path ) {
 		$matches = array();
 		// Get the Stable tag from readme file.
 		$file = self::file_preg_match( '/Stable tag:\s*([a-z0-9\.]+)/i', $files, $matches );
@@ -158,7 +166,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				__( "It's recommended not to use 'Stable Tag: trunk'.", 'plugin-check' ),
 				array(
 					'code' => 'trunk_stable_tag',
-					'file' => str_replace( $result->plugin()->path(), '', $file ),
+					'file' => str_replace( $path, '', $file ),
 				)
 			);
 		}
@@ -175,7 +183,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				__( 'The Stable Tag in your readme file does not match the version in your main plugin file.', 'plugin-check' ),
 				array(
 					'code' => 'stable_tag_mismatch',
-					'file' => str_replace( $result->plugin()->path(), '', $file ),
+					'file' => str_replace( $path, '', $file ),
 				)
 			);
 		}
