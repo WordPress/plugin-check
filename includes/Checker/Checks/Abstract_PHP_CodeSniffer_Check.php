@@ -30,7 +30,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		'standard'   => true,
 		'extensions' => true,
 		'sniffs'     => true,
-		'exclude'    => true,
+		'exclude'    => true, //phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
 	);
 
 	/**

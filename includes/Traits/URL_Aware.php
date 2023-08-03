@@ -68,8 +68,8 @@ trait URL_Aware {
 	 */
 	protected function backup_globals() {
 		$this->global_values = array(
-			'get'    => $_GET,
-			'post'   => $_POST,
+			'get'    => $_GET, // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			'post'   => $_POST, // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			'server' => $_SERVER,
 		);
 
@@ -131,12 +131,13 @@ trait URL_Aware {
 			}
 		}
 
-		$parts = parse_url( $url );
+		$parts = wp_parse_url( $url );
 		if ( isset( $parts['scheme'] ) ) {
 			$req = isset( $parts['path'] ) ? $parts['path'] : '';
 			if ( isset( $parts['query'] ) ) {
 				$req .= '?' . $parts['query'];
 				// Parse the URL query vars into $_GET.
+				// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				parse_str( $parts['query'], $_GET );
 			}
 		} else {

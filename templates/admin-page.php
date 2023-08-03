@@ -43,10 +43,10 @@
 					<tr>
 						<td>
 							<fieldset>
-								<legend class="screen-reader-text"><?php esc_html_e( $category ); ?></legend>
+								<legend class="screen-reader-text"><?php echo esc_html( $category ); ?></legend>
 								<label for="<?php echo esc_attr( $category ); ?>">
 									<input type="checkbox" id="<?php echo esc_attr( $category ); ?>" name="categories" value="<?php echo esc_attr( $category ); ?>" checked="checked" />
-									<?php esc_html_e( ucfirst( str_replace( '_', ' ', $category ) ) ); ?>
+									<?php echo esc_html( ucfirst( str_replace( '_', ' ', $category ) ) ); ?>
 								</label>
 							</fieldset>
 						</td>
