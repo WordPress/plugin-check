@@ -48,7 +48,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		// Find the readme file.
 		$readme_list = self::filter_files_by_regex( $files, '/readme\.(txt|md)$/i' );
 
-		// Filter the readme files that located at rootx.
+		// Filter the readme files located at root.
 		$potential_readme_files = array_filter(
 			$readme_list,
 			function ( $file ) use ( $plugin_relative_path ) {
