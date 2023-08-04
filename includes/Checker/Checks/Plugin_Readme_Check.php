@@ -42,8 +42,41 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 * @param array        $files  Array of plugin files.
 	 */
 	protected function check_files( Check_Result $result, array $files ) {
+
+		$plugin_relative_path = $result->plugin()->path();
+
 		// Find the readme file.
-		$readme = self::filter_files_by_regex( $files, '/readme\.(txt|md)$/i' );
+		$readme_list = self::filter_files_by_regex( $files, '/readme\.(txt|md)$/i' );
+
+		// Filter the readme files located at root.
+		$potential_readme_files = array_filter(
+			$readme_list,
+			function ( $file ) use ( $plugin_relative_path ) {
+				$file = str_replace( $plugin_relative_path, '', $file );
+				if ( ! strpos( $file, '/' ) ) {
+					return true;
+				}
+			}
+		);
+
+		// Find the .txt versions of the readme files.
+		$readme_txt = array_filter(
+			$potential_readme_files,
+			function ( $file ) {
+				return preg_match( '/^readme\.txt$/i', basename( $file ) );
+			}
+		);
+
+		// Find the .md versions of the readme files.
+		$readme_md = array_filter(
+			$potential_readme_files,
+			function ( $file ) {
+				return preg_match( '/^readme\.md$/i', basename( $file ) );
+			}
+		);
+
+		// If there's a .txt version, ignore .md versions.
+		$readme = ( ! empty( $readme_txt ) ) ? $readme_txt : $readme_md;
 
 		// If the readme file does not exist, add a warning and skip other tests.
 		if ( empty( $readme ) ) {
@@ -84,23 +117,19 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 			'Donate link: http://example.com/',
 		);
 
-		$file = '';
 		foreach ( $default_text_patterns as $pattern ) {
 			$file = self::file_str_contains( $files, $pattern );
 			if ( $file ) {
+				$result->add_message(
+					false,
+					__( 'The readme appears to contain default text.', 'plugin-check' ),
+					array(
+						'code' => 'default_readme_text',
+						'file' => str_replace( $result->plugin()->path(), '', $file ),
+					)
+				);
 				break;
 			}
-		}
-
-		if ( $file ) {
-			$result->add_message(
-				false,
-				__( 'The readme appears to contain default text.', 'plugin-check' ),
-				array(
-					'code' => 'default_readme_text',
-					'file' => str_replace( $result->plugin()->path(), '', $file ),
-				)
-			);
 		}
 	}
 
