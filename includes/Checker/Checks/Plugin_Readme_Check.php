@@ -44,15 +44,39 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	protected function check_files( Check_Result $result, array $files ) {
 
 		$plugin_relative_path = $result->plugin()->path();
-		$root_readme          = array(
-			$plugin_relative_path . 'readme.txt',
-			$plugin_relative_path . 'readme.md',
-		);
 
 		// Find the readme file.
 		$readme_list = self::filter_files_by_regex( $files, '/readme\.(txt|md)$/i' );
 
-		$readme = array_intersect( $root_readme, $readme_list );
+		// Filter the readme files that located at rootx.
+		$potential_readme_files = array_filter(
+			$readme_list,
+			function ( $file ) use ( $plugin_relative_path ) {
+				$file = str_replace( $plugin_relative_path, '', $file );
+				if ( ! strpos( $file, '/' ) ) {
+					return true;
+				}
+			}
+		);
+
+		// Find the .txt versions of the readme files.
+		$readme_txt = array_filter(
+			$potential_readme_files,
+			function ( $file ) {
+				return preg_match( '/^readme\.txt$/i', basename( $file ) );
+			}
+		);
+
+		// Find the .md versions of the readme files.
+		$readme_md = array_filter(
+			$potential_readme_files,
+			function ( $file ) {
+				return preg_match( '/^readme\.md$/i', basename( $file ) );
+			}
+		);
+
+		// If there's a .txt version, ignore .md versions.
+		$readme = ( ! empty( $readme_txt ) ) ? $readme_txt : $readme_md;
 
 		// If the readme file does not exist, add a warning and skip other tests.
 		if ( empty( $readme ) ) {
