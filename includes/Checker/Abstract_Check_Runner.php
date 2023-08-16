@@ -97,7 +97,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return string The plugin paramater from the request.
+	 * @return string The plugin parameter from the request.
 	 */
 	abstract protected function get_plugin_param();
 
@@ -111,7 +111,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	abstract protected function get_check_slugs_param();
 
 	/**
-	 * Returns the include experimental paramater based on the request.
+	 * Returns the include experimental parameter based on the request.
 	 *
 	 * @since n.e.x.t
 	 *

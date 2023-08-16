@@ -49,7 +49,7 @@
     "enable-patching": true,
     "patches": {
       "automattic/vipwpcs": {
-        "Fix incompatablity wp-coding-standards/wpcs": "patches/remove-rules.patch"
+        "Fix incompatibility wp-coding-standards/wpcs": "patches/remove-rules.patch"
       }
     }
   },
