@@ -34,7 +34,7 @@ class Force_Single_Plugin_Preparation_Tests extends WP_UnitTestCase {
 	 * @throws Exception Throw exception.
 	 */
 	public function test_prepare() {
-		// Remove the WP tests active plugins filter which interfers with this test.
+		// Remove the WP tests active plugins filter which interferes with this test.
 		remove_filter( 'pre_option_active_plugins', 'wp_tests_options' );
 
 		$preparation    = new Force_Single_Plugin_Preparation( $this->plugin_basename_file );
