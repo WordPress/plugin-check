@@ -95,7 +95,7 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 		// Restore the original cache.
 		$wp_object_cache->set( 'plugins', $original_plugins, 'plugins' );
 
-		// Remove the plugin checker from exptected plugins for testing.
+		// Remove the plugin checker from expected plugins for testing.
 		unset( $expected_plugins[ $plugin_basename ] );
 
 		// Assert the Plugin Checker does not appear in the select dropdown.
@@ -208,10 +208,10 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 	 */
 	public function data_status_mustuse_and_dropins() {
 		return array(
-			'Must-Use'                            => array( 'mustuse', false ),
-			'Must-Use with Admininistrator check' => array( 'mustuse', true ),
-			'Drop-ins'                            => array( 'dropins', false ),
-			'Drop-ins with Admininistrator check' => array( 'dropins', true ),
+			'Must-Use'                          => array( 'mustuse', false ),
+			'Must-Use with Administrator check' => array( 'mustuse', true ),
+			'Drop-ins'                          => array( 'dropins', false ),
+			'Drop-ins with Administrator check' => array( 'dropins', true ),
 		);
 	}
 }
