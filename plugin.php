@@ -3,7 +3,7 @@
  * Plugin Name: Plugin Check
  * Description: Runs checks against a plugin to verify if things are looking good.
  * Author: WordPress.org
- * Version: 1.0
+ * Version: 1.0.0
  * Text Domain: plugin-check
  * License: GPLv2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -12,6 +12,15 @@
 namespace WordPressdotorg\Plugin_Check;
 use WordPressdotorg\Plugin_Directory\Readme\Parser as Readme_Parser;
 const PLUGIN_DIR = __DIR__;
+
+/**
+ * The current version of the plugin.
+ *
+ * @since 1.0.0
+ *
+ * @var string
+ */
+const PLUGIN_CHECK_VERSION = '1.0.0';
 
 include __DIR__ . '/export.php';
 include __DIR__ . '/message.php';
