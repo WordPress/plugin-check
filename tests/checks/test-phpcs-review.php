@@ -25,7 +25,6 @@ class Test_PHPCS_Review extends PluginCheck_TestCase {
 	public function data_forbidden_function_warnings() {
 		return [
 			[ 'error_reporting()',    'error_reporting( E_ALL );' ],
-			[ 'move_uploaded_file()', 'move_uploaded_file( $a, $b );' ],
 			[ 'wp_create_user()',     'wp_create_user( "admin", "admin" );' ],
 			[ 'hex2bin()',            'echo hex2bin( "313031" );' ],
 			[ 'base64_encode()',      'echo base64_encode( "WordPress" );' ],

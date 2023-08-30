@@ -42,9 +42,12 @@ class Test_PHPCS extends PluginCheck_TestCase {
 
 	public function data_forbidden_function_warnings() {
 		return [
-			[ 'create_function()', 'create_function( "example", "return 123;" );' ],
-			[ 'eval()',            'eval( $_POST["cmd"] );' ],
-			[ 'str_rot13()',       'echo str_rot13( "JbeqCerff" );' ],
+			[ 'create_function()',    'create_function( "example", "return 123;" );' ],
+			[ 'eval()',               'eval( $_POST["cmd"] );' ],
+			[ 'str_rot13()',          'echo str_rot13( "JbeqCerff" );' ],
+			[ 'move_uploaded_file()', 'move_uploaded_file( $a, $b );' ],
+			[ 'passthru()',           'passthru( $cmd );' ],
+			[ 'proc_open()',          'proc_open( $cmd, $descriptors, $pipes );' ],
 		];
 	}
 

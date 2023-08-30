@@ -39,7 +39,6 @@
 		<properties>
 			<property name="forbiddenFunctions" type="array">
 				<element key="error_reporting" value="null"/>
-				<element key="move_uploaded_file" value="null"/>
 				<element key="wp_create_user" value="null"/>
 				<element key="hex2bin" value="null"/>
 				<element key="base64_decode" value="null"/>
