@@ -14,3 +14,9 @@ Plugin Check is a tool from the WordPress.org plugin review team.
 It provides an initial check of whether your plugin meets our requirements for hosting.
 
 Development occurs within https://github.com/WordPress/plugin-check/, please submit PRs and Bug Reports there.
+
+## Changelog ##
+
+= [1.0.0] TBD =
+
+* Tweak - Disallow functions `move_uploaded_file`, `passthru`, `proc_open` - Props alexsanford at [#50](https://github.com/WordPress/plugin-check/pull/50)

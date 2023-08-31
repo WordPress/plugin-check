@@ -21,9 +21,3 @@ Setup steps:
 Commands:
  - `npm run wp-env start`
  - `npm test`
-
-## Changelog ##
-
-= [1.0.0] TBD =
-
-* Tweak - Disallow functions `move_uploaded_file`, `passthru`, `proc_open` - Props alexsanford at [#50](https://github.com/WordPress/plugin-check/pull/50)
