@@ -8,7 +8,7 @@ Plugin Check
 
 Plugin Check is a tool for the WordPress.org plugins review team.
 
-## Description #
+## Description ##
 
 Plugin Check is a tool for the WordPress.org plugins review team.
 This is intended as a generic tool that is not at all intended on being complete.
