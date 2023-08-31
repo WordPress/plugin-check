@@ -1,6 +1,6 @@
 Plugin Check
 ===============
-* Contributors: dd32, davidperezgar
+* Contributors: dd32, davidperezgar, bordoni
 * Requires at least: 6.2
 * Tested up to: 6.3
 * License: GPLv2 or later
