@@ -21,4 +21,5 @@ Development occurs within https://github.com/WordPress/plugin-check/, please sub
 
 = [1.0.0] TBD =
 
+* Feature - Include a check for the presence of the readme.txt or readme.md file - Props EvanHerman at [#42](https://github.com/WordPress/plugin-check/pull/42)
 * Tweak - Disallow functions `move_uploaded_file`, `passthru`, `proc_open` - Props alexsanford at [#50](https://github.com/WordPress/plugin-check/pull/50)
