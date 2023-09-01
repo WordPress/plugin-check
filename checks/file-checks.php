@@ -35,6 +35,13 @@ class File_Checks extends Check_Base {
 		}
 	}
 
+	/**
+	 * Checks for a number of application files that are not permitted.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return void|Error|Notice
+	 */
 	function check_application() {
 		$application_files = [
 			'.a',
@@ -66,19 +73,19 @@ class File_Checks extends Check_Base {
 			return in_array( $extension, $application_files, true );
 		} );
 
-		if ( $files ) {
-
-			return $this->throw_notice(
-				'application_detected',
-				sprintf(
-					__( 'Application files are not permitted. Found: %s', 'wporg-plugins' ),
-					implode( ', ', array_unique( array_map( function( $file ) {
-						return '<code>' . esc_html( $file ) . '</code>';
-					}, $files ) ) )
-				)
-			);
-
+		if ( ! $files ) {
+			return;
 		}
+
+		return $this->throw_notice(
+			'application_detected',
+			sprintf(
+				__( 'Application files are not permitted. Found: %s', 'wporg-plugins' ),
+				implode( ', ', array_unique( array_map( function( $file ) {
+					return '<code>' . esc_html( $file ) . '</code>';
+				}, $files ) ) )
+			)
+		);
 	}
 
 	function check_vcs() {

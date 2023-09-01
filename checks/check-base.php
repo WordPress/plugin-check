@@ -153,23 +153,35 @@ abstract class Check_Base {
 	 * @param string $file The filename.
 	 * @return string
 	 */
-	static function file_get_contents( $file ) {
+	public static function file_get_contents( $file ) {
 		static $cache = [];
 
 		return $cache[ $file ] ?? $cache[ $file ] = file_get_contents( $file );
 	}
 
 	/**
+	 * Check if the current installation is not a production environment.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return bool
+	 */
+	protected function is_not_production(): bool {
+		return ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || 'production' !== wp_get_environment_type();
+	}
+
+	/**
 	 * Throw an error or a warning, based on the environment.
 	 *
-	 * @param string $file The filename.
-	 * @return string
+	 * @since 1.0.0
+	 *
+	 * @param string $slug The filename.
+	 * @param string $message The message.
+	 *
+	 * @return Error|Notice
 	 */
-	function throw_notice( $code, $message ) {
-
-		$notice_or_error = ( ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || 'production' !== wp_get_environment_type() ) ? Notice::class : Error::class;
-
-		return new $notice_or_error( $code, $message );
-
+	protected function throw_notice( string $slug, string $message ) {
+		$notice_or_error = $this->is_not_production() ? Notice::class : Error::class;
+		return new $notice_or_error( $slug, $message );
 	}
 }
