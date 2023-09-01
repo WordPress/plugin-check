@@ -158,4 +158,18 @@ abstract class Check_Base {
 
 		return $cache[ $file ] ?? $cache[ $file ] = file_get_contents( $file );
 	}
+
+	/**
+	 * Throw an error or a warning, based on the environment.
+	 *
+	 * @param string $file The filename.
+	 * @return string
+	 */
+	function throw_notice( $code, $message ) {
+
+		$notice_or_error = ( ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || 'production' !== wp_get_environment_type() ) ? Notice::class : Error::class;
+
+		return new $notice_or_error( $code, $message );
+
+	}
 }
