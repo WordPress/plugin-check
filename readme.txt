@@ -1,6 +1,6 @@
 Plugin Check
 ===============
-* Contributors: dd32, davidperezgar, bordoni
+* Contributors: dd32, davidperezgar, bordoni, frantorres
 * Requires at least: 6.2
 * Tested up to: 6.3
 * Stable tag: 1.0.0
