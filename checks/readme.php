@@ -96,7 +96,7 @@ class Readme extends Check_Base {
 		$stable_tag = $this->readme->stable_tag ?? '';
 
 		if ( 'trunk' === $stable_tag ) {
-			return new Notice(
+			return new Error(
 				'trunk_stable_tag',
 				"It's recommended not to use 'Stable Tag: trunk'."
 			);
@@ -106,7 +106,7 @@ class Readme extends Check_Base {
 			$stable_tag && ! empty( $this->headers['Version'] ) &&
 			$stable_tag != $this->headers['Version']
 		) {
-			return new Warning(
+			return new Error(
 				'stable_tag_mismatch',
 				__( 'Stable tag does not match the plugin version.', 'wporg-plugins' ) . ' ' . sprintf(
 					/* translators: 1: readme.txt */
