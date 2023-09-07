@@ -38,7 +38,7 @@ class File_Checks extends Check_Base {
 	/**
 	 * Checks for a number of application files that are not permitted.
 	 *
-	 * @since 1.0.0
+	 * @since 0.2.0
 	 *
 	 * @return void|Error|Notice
 	 */

@@ -6,7 +6,7 @@ class Readme extends Check_Base {
 	/**
 	 * Checks for the presence of a readme.txt file and throw an error if it's missing.
 	 *
-	 * @since 1.0.0
+	 * @since 0.2.0
 	 *
 	 * @return void|Error
 	 */

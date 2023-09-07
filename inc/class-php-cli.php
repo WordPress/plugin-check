@@ -4,7 +4,7 @@ namespace WordPressdotorg\Plugin_Check;
 /**
  * Class PHP_CLI
  *
- * @since   1.0.0
+ * @since   0.2.0
  *
  * @package WordPressdotorg\Plugin_Check
  */
@@ -12,7 +12,7 @@ class PHP_CLI {
 	/**
 	 * Gets the path to the PHP cli.
 	 *
-	 * @since 1.0.0
+	 * @since 0.2.0
 	 *
 	 * @return string
 	 */
@@ -26,7 +26,7 @@ class PHP_CLI {
 		/**
 		 * Allows overriding the PHP binary used to run phpcs and other php commands.
 		 *
-		 * @since 1.0.0
+		 * @since 0.2.0
 		 *
 		 * @param string $php_binary The path to the PHP binary.
 		 */
@@ -36,7 +36,7 @@ class PHP_CLI {
 	/**
 	 * Gets the PHP base command to run scripts.
 	 *
-	 * @since 1.0.0
+	 * @since 0.2.0
 	 *
 	 * @return string
 	 */
@@ -58,7 +58,7 @@ class PHP_CLI {
 	/**
 	 * Gets the full command to run.
 	 *
-	 * @since 1.0.0
+	 * @since 0.2.0
 	 *
 	 * @param string $append
 	 *

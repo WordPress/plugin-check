@@ -162,7 +162,7 @@ abstract class Check_Base {
 	/**
 	 * Check if the current installation is not a production environment.
 	 *
-	 * @since 1.0.0
+	 * @since 0.2.0
 	 *
 	 * @return bool
 	 */
@@ -173,7 +173,7 @@ abstract class Check_Base {
 	/**
 	 * Throw an error or a warning, based on the environment.
 	 *
-	 * @since 1.0.0
+	 * @since 0.2.0
 	 *
 	 * @param string $slug The filename.
 	 * @param string $message The message.

@@ -7,14 +7,14 @@ use WordPressdotorg\Plugin_Check\Guideline_Violation;
 /**
  * Check for trademarks.
  *
- * @since 1.0.0
+ * @since 0.2.0
  */
 class Trademarks extends Check_Base {
 
 	/**
 	 * Trademarked terms that are commonly abused on WordPress.org.
 	 *
-	 * @since 1.0.0
+	 * @since 0.2.0
 	 *
 	 * @var string[]
 	 */
@@ -136,7 +136,7 @@ class Trademarks extends Check_Base {
 	 * Currently, not in use since there is no way to check the domain of the plugin author
 	 * on a public plugin, only WP.org can do this check.
 	 *
-	 * @since 1.0.0
+	 * @since 0.2.0
 	 *
 	 * @var string[]
 	 */
@@ -156,7 +156,7 @@ class Trademarks extends Check_Base {
 	/**
 	 * Trademarks that are allowed as 'for-whatever' ONLY.
 	 *
-	 * @since 1.0.0
+	 * @since 0.2.0
 	 *
 	 * @var string[]
 	 */
@@ -167,7 +167,7 @@ class Trademarks extends Check_Base {
 	/**
 	 * Commonly used 'combo' names (to prevent things like 'woopress').
 	 *
-	 * @since 1.0.0
+	 * @since 0.2.0
 	 *
 	 * @var string[]
 	 */
@@ -178,7 +178,7 @@ class Trademarks extends Check_Base {
 	/**
 	 * Validate the plugin name on the readme against trademarks.
 	 *
-	 * @since 1.0.0
+	 * @since 0.2.0
 	 *
 	 * @return Guideline_Violation|null
 	 */
@@ -191,7 +191,7 @@ class Trademarks extends Check_Base {
 	/**
 	 * Check the plugin name on the boostrap file against trademarks.
 	 *
-	 * @since 1.0.0
+	 * @since 0.2.0
 	 *
 	 * @return Guideline_Violation|null
 	 */
@@ -207,7 +207,7 @@ class Trademarks extends Check_Base {
 	 * Note that this will not run if the plugin slug is not set, which will always
 	 * be the case if this is being run against a plugin that is not in the directory.
 	 *
-	 * @since 1.0.0
+	 * @since 0.2.0
 	 *
 	 * @return Guideline_Violation|null
 	 */
@@ -287,7 +287,7 @@ class Trademarks extends Check_Base {
 	/**
 	 * Whether the uploaded plugin uses a trademark in the slug.
 	 *
-	 * @since 1.0.0
+	 * @since 0.2.0
 	 *
 	 * @param string $slug
 	 * @param ?string $email_domain_exceptions
@@ -347,7 +347,7 @@ class Trademarks extends Check_Base {
 	/**
 	 * Validate whether the trademark is valid with a for-use exception.
 	 *
-	 * @since 1.0.0
+	 * @since 0.2.0
 	 *
 	 * @param string $slug
 	 * @param string $trademark
