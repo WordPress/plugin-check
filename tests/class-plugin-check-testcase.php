@@ -38,6 +38,11 @@ class PluginCheck_TestCase extends WP_UnitTestCase {
 
 		$args[ 'path' ] = $tempname;
 
+		// Do not use the fallback of the path for the slug, as it contains a restricted trademark term.
+		if ( ! isset( $args['slug'] ) ) {
+			$args['slug'] = 'test-slug';
+		}
+
 		$results = run_all_checks( $args );
 
 		// Cleanup
