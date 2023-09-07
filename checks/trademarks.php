@@ -183,7 +183,7 @@ class Trademarks extends Check_Base {
 	 * @return Guideline_Violation|null
 	 */
 	public function check_readme(): ?Guideline_Violation {
-		$preamble = __( 'Error: The readme name includes a restricted term.', 'wporg-plugins' );
+		$preamble = __( 'Error: The readme name includes a restricted term.', 'plugin-check' );
 
 		return $this->verify_trademark( $this->readme->name ?? null, $preamble );
 	}
@@ -196,7 +196,7 @@ class Trademarks extends Check_Base {
 	 * @return Guideline_Violation|null
 	 */
 	public function check_plugin_name(): ?Guideline_Violation {
-		$preamble = __( 'Error: The plugin name includes a restricted term.', 'wporg-plugins' );
+		$preamble = __( 'Error: The plugin name includes a restricted term.', 'plugin-check' );
 
 		return $this->verify_trademark( $this->headers['Name'] ?? null, $preamble );
 	}
@@ -221,7 +221,7 @@ class Trademarks extends Check_Base {
 			return null;
 		}
 
-		$preamble = __( 'Error: The plugin slug includes a restricted term.', 'wporg-plugins' );
+		$preamble = __( 'Error: The plugin slug includes a restricted term.', 'plugin-check' );
 
 		return $this->verify_trademark( $this->slug ?? null, $preamble );
 	}
@@ -259,7 +259,7 @@ class Trademarks extends Check_Base {
 			// Trademarks that do NOT end in "-", but are within the FOR_USE_EXCEPTIONS array can be used, but only if it ends with 'for x'
 			$message = sprintf(
 			/* translators: 1: plugin slug, 2: trademarked term */
-				__( 'Your chosen plugin name - %1$s - contains the restricted term "%2$s" which cannot be used within in your plugin name, unless your plugin name ends with "for %2$s". The term must still not appear anywhere else in your name.', 'wporg-plugins' ),
+				__( 'Your chosen plugin name - %1$s - contains the restricted term "%2$s" which cannot be used within in your plugin name, unless your plugin name ends with "for %2$s". The term must still not appear anywhere else in your name.', 'plugin-check' ),
 				'<code>' . esc_html( $input ) . '</code>',
 				esc_html( trim( $check, '-' ) )
 			);
@@ -267,7 +267,7 @@ class Trademarks extends Check_Base {
 			// Trademarks that do NOT end in "-" indicate slug cannot contain term at all.
 			$message = sprintf(
 			/* translators: 1: plugin slug, 2: trademarked term */
-				__( 'Your chosen plugin name - %1$s - contains the restricted term "%2$s" which cannot be used at all in your plugin name.', 'wporg-plugins' ),
+				__( 'Your chosen plugin name - %1$s - contains the restricted term "%2$s" which cannot be used at all in your plugin name.', 'plugin-check' ),
 				'<code>' . esc_html( $input ) . '</code>',
 				esc_html( trim( $check, '-' ) )
 			);
@@ -275,7 +275,7 @@ class Trademarks extends Check_Base {
 			// Trademarks ending in "-" indicate slug cannot BEGIN with that term.
 			$message = sprintf(
 			/* translators: 1: plugin slug, 2: trademarked term  */
-				__( 'Your chosen plugin name - %1$s - contains the restricted term "%2$s" and cannot be used to begin your plugin name. We disallow the use of certain terms in ways that are abused, or potentially infringe on and/or are misleading with regards to trademarks. You may use the term "%2$s" elsewhere in your plugin name, such as "... for %2$s".', 'wporg-plugins' ),
+				__( 'Your chosen plugin name - %1$s - contains the restricted term "%2$s" and cannot be used to begin your plugin name. We disallow the use of certain terms in ways that are abused, or potentially infringe on and/or are misleading with regards to trademarks. You may use the term "%2$s" elsewhere in your plugin name, such as "... for %2$s".', 'plugin-check' ),
 				'<code>' . esc_html( $input ) . '</code>',
 				esc_html( trim( $check, '-' ) )
 			);

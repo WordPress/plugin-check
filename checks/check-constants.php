@@ -18,7 +18,7 @@ class Code_Constants extends Check_Base {
 
 		return new Error(
 			'allow_unfiltered_uploads_detected',
-			__( 'ALLOW_UNFILTERED_UPLOADS is not permitted.', 'wporg-plugins' )
+			__( 'ALLOW_UNFILTERED_UPLOADS is not permitted.', 'plugin-check' )
 		);
 	}
 

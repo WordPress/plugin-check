@@ -12,6 +12,7 @@
 
 namespace WordPressdotorg\Plugin_Check;
 use WordPressdotorg\Plugin_Directory\Readme\Parser as Readme_Parser;
+
 const PLUGIN_DIR = __DIR__;
 
 /**

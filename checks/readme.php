@@ -17,7 +17,7 @@ class Readme extends Check_Base {
 
 		return new Error(
 			'readme_missing',
-			__( 'No readme.txt or readme.md was not found. readme.txt/readme.md is a required file.', 'wporg-plugins' )
+			__( 'No readme.txt or readme.md was not found. readme.txt/readme.md is a required file.', 'plugin-check' )
 		);
 	}
 
@@ -25,9 +25,9 @@ class Readme extends Check_Base {
 		if ( $this->readme && empty( $this->readme->license ) ) {
 			return new Error(
 				'no_license',
-				__( 'No license defined.', 'wporg-plugins' ) . ' ' . sprintf(
+				__( 'No license defined.', 'plugin-check' ) . ' ' . sprintf(
 					/* translators: 1: readme.txt */
-					__( 'Your plugin has no license declared. Please update your %1$s with a GPLv2 (or later) compatible license.', 'wporg-plugins' ),
+					__( 'Your plugin has no license declared. Please update your %1$s with a GPLv2 (or later) compatible license.', 'plugin-check' ),
 					'<code>readme.txt</code>'
 				)
 			);
@@ -49,9 +49,9 @@ class Readme extends Check_Base {
 		if ( ! preg_match( '/^([a-z0-9\-\+\.]+)(\sor\s([a-z0-9\-\+\.]+))*$/i', $license ) ) {
 			return new Warning(
 				'invalid_license',
-				__( 'Invalid license specified.', 'wporg-plugins' ) . ' ' . sprintf(
+				__( 'Invalid license specified.', 'plugin-check' ) . ' ' . sprintf(
 					/* translators: 1: readme.txt */
-					__( 'Your plugin has an invalid license declared. Please update your %1$s with a valid SPDX license identifier.', 'wporg-plugins' ),
+					__( 'Your plugin has an invalid license declared. Please update your %1$s with a valid SPDX license identifier.', 'plugin-check' ),
 					'<code>readme.txt</code>'
 				)
 			);
@@ -108,9 +108,9 @@ class Readme extends Check_Base {
 		) {
 			return new Error(
 				'stable_tag_mismatch',
-				__( 'Stable tag does not match the plugin version.', 'wporg-plugins' ) . ' ' . sprintf(
+				__( 'Stable tag does not match the plugin version.', 'plugin-check' ) . ' ' . sprintf(
 					/* translators: 1: readme.txt */
-					__( 'The Stable Tag in your %1$s file does not match the version in your main plugin file.', 'wporg-plugins' ),
+					__( 'The Stable Tag in your %1$s file does not match the version in your main plugin file.', 'plugin-check' ),
 					'<code>readme.txt</code>'
 				)
 			);
