@@ -4,6 +4,7 @@ use const WordPressdotorg\Plugin_Check\{ PLUGIN_DIR, HAS_VENDOR };
 use WordPressdotorg\Plugin_Check\{Error, Guideline_Violation, Message, Notice, Warning};
 use WordPressdotorg\Plugin_Check\PHPCS;
 
+include PLUGIN_DIR . '/inc/class-php-cli.php';
 include PLUGIN_DIR . '/inc/class-phpcs.php';
 
 class PHPCS_Checks extends Check_Base {
@@ -57,6 +58,13 @@ class PHPCS_Checks extends Check_Base {
 			$args,
 			'array'
 		);
+
+		if ( is_wp_error( $report ) ) {
+			return new Error(
+				$report->get_error_code(),
+				$report->get_error_message()
+			);
+		}
 
 		// If no response, either malformed output or PHP encountered an error.
 		if ( ! $report || empty( $report['files'] ) ) {

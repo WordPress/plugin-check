@@ -22,11 +22,12 @@ jobs:
           php-version: '7.4'
           tools: composer:v2
 
-      - name: Install NPM dependencies
-        run: npm install
-
-      - name: Start the Docker testing environment
-        run: npm run wp-env start
+      - name: Install all dependencies
+        run: |
+            npm install
+            npm run wp-env start
+            npm run wp-env run composer 'install --no-dev'
+            npm run setup:readme-parser
 
       - name: Setup environment tools
         run: npm run setup:tools
