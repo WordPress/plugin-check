@@ -1,9 +1,10 @@
 <?php
 /**
  * Plugin Name: Plugin Check
- * Description: Runs checks against a plugin to verify if things are looking good.
- * Author: WordPress.org
- * Version: 1.0.0
+ * Plugin URI: https://github.com/WordPress/plugin-check/
+ * Description: Runs checks against a plugin to verify the latest WordPress standards and practices.
+ * Author: Plugin Review Team
+ * Version: 0.2.0
  * Text Domain: plugin-check
  * License: GPLv2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -20,7 +21,7 @@ const PLUGIN_DIR = __DIR__;
  *
  * @var string
  */
-const PLUGIN_CHECK_VERSION = '1.0.0';
+const PLUGIN_CHECK_VERSION = '0.2.0';
 
 include __DIR__ . '/export.php';
 include __DIR__ . '/message.php';
