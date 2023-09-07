@@ -17,7 +17,8 @@
 		"phpcompatibility/phpcompatibility-wp": "^2",
 		"sirbrillig/phpcs-variable-analysis": "^2",
 		"wp-coding-standards/wpcs": "^2",
-		"phpcsstandards/phpcsutils": "^1.x-dev"
+		"phpcsstandards/phpcsutils": "^1.x-dev",
+		"afragen/wordpress-plugin-readme-parser": "dev-master"
 	},
 	"require-dev": {
 		"phpunit/phpunit": "^7",
