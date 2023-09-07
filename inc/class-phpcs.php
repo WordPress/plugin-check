@@ -16,9 +16,9 @@ class PHPCS {
 	protected $phpcs;
 
 	/**
-	 * @var string The path to the php process, including any custom php.ini settings.
+	 * @var PHP_CLI Instance of the PHP_CLI class.
 	 */
-	protected $php = '/usr/bin/env php -dmemory_limit=1G';
+	protected $php;
 
 	/**
 	 * @var string The name or path of the coding standard to use with phpcs.
@@ -56,10 +56,7 @@ class PHPCS {
 			$this->cache_file = '/tmp/wporg-code-analysis/phpcs-cache';
 		}
 
-		// Give the CLI process the same max_execution_time as the calling script.
-		if ( ini_get( 'max_execution_time' ) ) {
-			$this->php .= ' -dmax_execution_time=' . ini_get( 'max_execution_time' );
-		}
+		$this->php = new PHP_CLI();
 	}
 
 	/**
@@ -168,9 +165,17 @@ class PHPCS {
 		}
 		$arg_string = implode( ' ', $arg_array );
 
-		$command = "{$this->php} {$this->phpcs} $arg_string $path";
+		$command = $this->php->get_cmd( "{$this->phpcs} $arg_string $path 2>&1" );
+		$response = shell_exec( $command );
 
-		return shell_exec( $command );
+		if ( strpos( $response, 'No such file or directory' ) !== false ) {
+			return new \WP_Error(
+				'plugin_check_php_binary_not_found',
+				__( 'Cannot find the PHP Binary file, please define it using the <code>`PLUGIN_CHECK_PHP_BIN`</code> constant', 'plugin-check' )
+			);
+		}
+
+		return $response;
 	}
 
 	/**
@@ -230,6 +235,13 @@ class PHPCS {
 		);
 
 		$result = $this->run( $path, $args );
+
+		if ( is_wp_error( $result ) ) {
+			return new Error(
+				$result->get_error_code(),
+				$result->get_error_message()
+			);
+		}
 
 		if ( in_array( $output, array( 'object', 'array' ), true ) ) {
 			$assoc = 'array' === $output;
