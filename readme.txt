@@ -32,8 +32,6 @@ Many sites use custom plugins, and that’s perfectly okay. But plugins that are
 
 This plugin checker is not perfect, and never will be. It is only a tool to help plugin authors, or anybody else who wants to make their plugin more capable. All plugins submitted to WordPress.org are hand-reviewed by a team of experts. The automated plugin checker is meant to be a useful tool only, not an absolute system of measurement.
 
-This plugin does not decide the guidelines used. Any issues with particular plugin review guidelines should be discussed on the [Make Plugins site](https://make.wordpress.org/plugins/).
-
 == Changelog ==
 
 = [0.2.0] TBD =
