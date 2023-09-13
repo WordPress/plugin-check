@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="WPPluginCheck" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/squizlabs/PHP_CodeSniffer/master/phpcs.xsd">
+	<!--
+		This file should have any rules that are not appropriate for the main plugin-check.xml file.
+		These should be items that are strictly needs to be manually reviewed.
+	-->
+
+	<!-- For more information: https://make.wordpress.org/plugins/handbook/review/ -->
+	<description>Standards any plugin to be published on wordpress.org should comply with.</description>
+
+	<!--
+	Prevent errors caused by WordPress Coding Standards not supporting PHP 8.0+.
+	See https://github.com/WordPress/WordPress-Coding-Standards/issues/2035
+	-->
+	<ini name="error_reporting" value="E_ALL &#38; ~E_DEPRECATED" />
+
+	<arg name="report" value="code"/>
+	<arg value="s"/>
+
+	<!-- Plugins should be compatible with PHP 5.2 and higher. -->
+	<config name="testVersion" value="5.2-"/>
+
+	<exclude-pattern>*/tgm-plugin-activation/*</exclude-pattern>
+	<exclude-pattern>*/freemius/*</exclude-pattern>
+	<exclude-pattern>*/dompdf/*</exclude-pattern>
+	<exclude-pattern>*/cmb2/*</exclude-pattern>
+	<exclude-pattern>*/redux-framework/*</exclude-pattern>
+	<exclude-pattern>*/cherry-framework/*</exclude-pattern>
+	<exclude-pattern>*/titan-framework/*</exclude-pattern>
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/guzzlehttp/*</exclude-pattern>
+	<exclude-pattern>*/vendors/*</exclude-pattern>
+	<exclude-pattern>*/plugin-update-checker/*</exclude-pattern>
+	<exclude-pattern>*/composer_directory/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+
+	<rule ref="Generic.PHP.ForbiddenFunctions">
+		<type>warning</type>
+		<properties>
+			<property name="forbiddenFunctions" type="array">
+				<element key="error_reporting" value="null"/>
+				<element key="wp_create_user" value="null"/>
+				<element key="hex2bin" value="null"/>
+				<element key="base64_decode" value="null"/>
+				<element key="base64_encode" value="null"/>
+				<element key="shell_exec" value="null"/>
+				<element key="exec" value="null"/>
+			</property>
+		</properties>
+	</rule>
+
+</ruleset>

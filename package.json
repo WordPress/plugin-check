@@ -1,0 +1,28 @@
+{
+  "name": "plugin-check",
+  "version": "0.2.0",
+  "description": "WordPress.org Plugin Check",
+  "directories": {
+    "test": "tests"
+  },
+  "private": true,
+  "scripts": {
+    "wp-env": "wp-env",
+    "setup:tools": "npm run wp-env run composer install",
+    "setup:readme-parser": "curl -so readme-parser.php https://meta.svn.wordpress.org/sites/trunk/wordpress.org/public_html/wp-content/plugins/plugin-directory/readme/class-parser.php",
+    "test": "npm run wp-env run phpunit 'phpunit -c /var/www/html/wp-content/plugins/plugin-check/phpunit.xml.dist'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WordPress/plugin-check.git"
+  },
+  "author": "",
+  "license": "GPL-2.0-or-later",
+  "bugs": {
+    "url": "https://github.com/WordPress/plugin-check/issues"
+  },
+  "homepage": "https://github.com/WordPress/plugin-check#readme",
+  "dependencies": {
+    "@wordpress/env": "^5.13.0"
+  }
+}

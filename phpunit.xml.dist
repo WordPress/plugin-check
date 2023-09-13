@@ -1,0 +1,22 @@
+<phpunit
+	bootstrap="tests/bootstrap.php"
+	backupGlobals="false"
+	colors="true"
+	convertErrorsToExceptions="true"
+	convertNoticesToExceptions="true"
+	convertWarningsToExceptions="true"
+	cacheResultFile="./tests/.phpunit.result.cache"
+	>
+
+	<php>
+		<const name="WP_ENVIRONMENT_TYPE" value="local" />
+	</php>
+
+	<testsuites>
+		<testsuite name="wporg-two-factor">
+			<directory prefix="test-" suffix=".php">
+				./tests/
+			</directory>
+		</testsuite>
+	</testsuites>
+</phpunit>
