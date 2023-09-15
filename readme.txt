@@ -22,7 +22,7 @@ Keep in mind that this plugin is not yet a replacement for the manual review pro
 
 = Where can I contribute to the plugin? =
 
-All development for this plugin is handled via [GitHub](https://github.com/WordPress/plugin-check/) any issues or pull requests should be posted there.
+All development for this plugin is handled via [GitHub](https://github.com/10up/plugin-check/) any issues or pull requests should be posted there.
 
 = Why does it flag something as bad? =
 
