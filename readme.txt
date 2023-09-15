@@ -34,7 +34,7 @@ This plugin checker is not perfect, and never will be. It is only a tool to help
 
 == Changelog ==
 
-= [0.2.0] TBD =
+= [0.2.0] 2023-09-18 =
 
 * Feature - Enable modification of the PHP Binary path used by the plugin with `PLUGIN_CHECK_PHP_BIN` constant.
 * Feature - Include a check for the usage of `ALLOW_UNFILTERED_UPLOADS` on any PHP files - Props EvanHerman at [#45](https://github.com/WordPress/plugin-check/pull/45)
