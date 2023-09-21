@@ -73,6 +73,9 @@ function render_page() {
 	}
 }
 
+/**
+ * Jump to the requested line when opening the file editor.
+ */
 add_action(
 	'admin_enqueue_scripts',
 	function ( $hook_suffix ) {
