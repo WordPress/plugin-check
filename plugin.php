@@ -88,7 +88,7 @@ function run_all_checks( $args ) {
 		$readme_md  = preg_grep( '!(^|/)readme.md$!i', $top_level_files );
 		if ( ! empty( $readme_txt ) ) {
 			$args['readme'] = new Readme_Parser( end( $readme_txt ) );
-		} elseif ( file_exists( $readme_md ) ) {
+		} elseif ( ! empty( $readme_md ) ) {
 			$args['readme'] = new Readme_Parser( end( $readme_md ) );
 		}
 	}
