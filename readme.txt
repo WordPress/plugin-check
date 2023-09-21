@@ -1,4 +1,4 @@
-Plugin Check
+                                                  Plugin Check
 ===============
 * Contributors: dd32, davidperezgar, bordoni, frantorres
 * Requires at least: 6.2
