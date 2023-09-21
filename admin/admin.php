@@ -72,3 +72,32 @@ function render_page() {
 		}
 	}
 }
+
+add_action(
+	'admin_enqueue_scripts',
+	function ( $hook_suffix ) {
+		if ( ! isset( $_GET['line'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return;
+		}
+		$line = (int) $_GET['line']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		if ( 'plugin-editor.php' === $hook_suffix || 'theme-editor.php' === $hook_suffix ) {
+			wp_add_inline_script(
+				'wp-theme-plugin-editor',
+				sprintf(
+					'
+						(
+							function( originalInitCodeEditor ) {
+								wp.themePluginEditor.initCodeEditor = function init() {
+									originalInitCodeEditor.apply( this, arguments );
+									this.instance.codemirror.doc.setCursor( %d - 1 );
+								};
+							}
+						)( wp.themePluginEditor.initCodeEditor );
+					',
+					wp_json_encode( $line )
+				)
+			);
+		}
+	}
+);

@@ -110,16 +110,34 @@ class PHPCS_Checks extends Check_Base {
 				}
 
 				$source_code = esc_html( trim( file( $this->path . '/' . $filename )[ $message['line'] - 1 ] ) );
+				$plugin_data = get_plugins( '/' . $this->slug );
+				$view_link   = '';
+
+				if ( ! defined( 'DISALLOW_FILE_EDIT' ) || ! DISALLOW_FILE_EDIT ) {
+					$view_link = sprintf(
+						'<a href="%1$s" target="_blank">%2$s</a>',
+						add_query_arg(
+							[
+								'plugin' => rawurlencode( $this->slug . '/' . array_key_first( $plugin_data ) ),
+								'file'   => rawurlencode( $this->slug . '/' . $filename ),
+								'line'   => rawurlencode( $message['line'] ),
+							],
+							admin_url( 'plugin-editor.php' )
+						),
+						esc_html__( 'View in code editor', 'plugin-check' )
+					);
+				}
 
 				$return[] = new $notice_class(
 					$message['source'],
 					sprintf(
-						'%s Line %d of file %s.<br>%s.<br>%s',
+						'%s Line %d of file %s.<br>%s.<br>%s%s',
 						"<strong>{$message['source']}</strong>",
 						$message['line'],
 						$filename,
 						rtrim( $message['message'], '.' ),
-						"<pre><code>{$source_code}</code></pre>"
+						"<pre><code>{$source_code}</code></pre>",
+						$view_link
 					)
 				);
 			}
