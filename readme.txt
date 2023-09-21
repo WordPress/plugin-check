@@ -24,6 +24,12 @@ Keep in mind that this plugin is not yet a replacement for the manual review pro
 
 All development for this plugin is handled via [GitHub](https://github.com/10up/plugin-check/) any issues or pull requests should be posted there.
 
+= What if the plugin reports as “error” something that’s correct? =
+
+We strived to write a plugin in a way that minimises false positives but If you find one, please report it in the GitHub repo.
+
+If you can, please consider submitting a Pull Request to fix it.
+
 = Why does it flag something as bad? =
 
 It’s not flagging “bad” things, as such. The plugin check is designed to be a non-perfect way to test for compliance with the [Plugin Review guidelines](https://make.wordpress.org/plugins/handbook/performing-reviews/review-checklist/). Not all plugins must adhere to these guidelines. The purpose of the checking tool is to ensure that plugins uploaded to the [central WordPress.org plugin repository](https://wordpress.org/plugins/) meet the latest standards of WordPress plugin and will work on a wide variety of sites.
