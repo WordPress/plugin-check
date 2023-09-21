@@ -110,10 +110,11 @@ class PHPCS_Checks extends Check_Base {
 				}
 
 				$source_code = esc_html( trim( file( $this->path . '/' . $filename )[ $message['line'] - 1 ] ) );
-				$plugin_data = get_plugins( '/' . $this->slug );
 				$edit_link   = '';
 
 				if ( ! defined( 'DISALLOW_FILE_EDIT' ) || ! DISALLOW_FILE_EDIT ) {
+					$plugin_data = get_plugins( '/' . $this->slug );
+
 					$edit_link = sprintf(
 						'<a href="%1$s" title="%2$s" aria-label="%2$s" target="_blank">%3$s</a>',
 						esc_url(
