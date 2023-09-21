@@ -42,6 +42,10 @@ This plugin checker is not perfect, and never will be. It is only a tool to help
 
 == Changelog ==
 
+= [0.2.1] 2023-09-?? =
+
+* Fix - Ensure `readme.txt` has priority over `readme.md` when both are present. Props @bordoni, @afragen [#258](https://github.com/10up/plugin-check/pull/258)
+
 = [0.2.0] 2023-09-18 =
 
 * Feature - Enable modification of the PHP Binary path used by the plugin with `PLUGIN_CHECK_PHP_BIN` constant.
