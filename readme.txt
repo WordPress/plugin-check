@@ -7,6 +7,8 @@ Plugin Check
 * License: GPLv2 or later
 * Requires PHP: 7.2
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
+* Author URI: https://make.wordpress.org/plugins/
+* Plugin URL: https://github.com/10up/plugin-check/
 
 Plugin Check is a tool from the WordPress.org plugin review team, it provides an initial check of whether your plugin meets our requirements for hosting.
 
@@ -23,6 +25,12 @@ Keep in mind that this plugin is not yet a replacement for the manual review pro
 = Where can I contribute to the plugin? =
 
 All development for this plugin is handled via [GitHub](https://github.com/10up/plugin-check/) any issues or pull requests should be posted there.
+
+= What if the plugin reports as “error” something that’s correct? =
+
+We strived to write a plugin in a way that minimises false positives but If you find one, please report it in the GitHub repo.
+
+If you can, please consider submitting a Pull Request to fix it.
 
 = Why does it flag something as bad? =
 
