@@ -84,9 +84,12 @@ function run_all_checks( $args ) {
 	}
 
 	if ( ! $args['readme'] ) {
-		$readme_files = preg_grep( '!(^|/)readme.(txt|md)$!i', $top_level_files );
-		if ( $readme_files ) {
-			$args['readme'] = new Readme_Parser( array_shift( $readme_files ) );
+		$readme_txt = preg_grep( '!(^|/)readme.txt$!i', $top_level_files );
+		$readme_md  = preg_grep( '!(^|/)readme.md$!i', $top_level_files );
+		if ( ! empty( $readme_txt ) ) {
+			$args['readme'] = new Readme_Parser( end( $readme_txt ) );
+		} elseif ( file_exists( $readme_md ) ) {
+			$args['readme'] = new Readme_Parser( end( $readme_md ) );
 		}
 	}
 
