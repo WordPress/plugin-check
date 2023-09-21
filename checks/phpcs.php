@@ -111,10 +111,10 @@ class PHPCS_Checks extends Check_Base {
 
 				$source_code = esc_html( trim( file( $this->path . '/' . $filename )[ $message['line'] - 1 ] ) );
 				$plugin_data = get_plugins( '/' . $this->slug );
-				$view_link   = '';
+				$edit_link   = '';
 
 				if ( ! defined( 'DISALLOW_FILE_EDIT' ) || ! DISALLOW_FILE_EDIT ) {
-					$view_link = sprintf(
+					$edit_link = sprintf(
 						'<a href="%1$s" target="_blank">%2$s</a>',
 						add_query_arg(
 							[
@@ -137,7 +137,7 @@ class PHPCS_Checks extends Check_Base {
 						$filename,
 						rtrim( $message['message'], '.' ),
 						"<pre><code>{$source_code}</code></pre>",
-						$view_link
+						$edit_link
 					)
 				);
 			}
