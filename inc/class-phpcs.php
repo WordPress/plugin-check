@@ -120,7 +120,7 @@ class PHPCS {
 	 * @return string|WP_Error|null
 	 */
 	public function run( $path, array $args = array() ) {
-		if ( ! is_executable( $this->phpcs ) ) {
+		if ( ! file_exists( $this->phpcs ) ) {
 			return new \WP_Error(
 				'missing_dependency',
 				'PHP Code Sniffer is not available. Try running <code>composer install</code> first.'
