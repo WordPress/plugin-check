@@ -81,7 +81,7 @@ add_action(
 		}
 		$line = (int) $_GET['line']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-		if ( 'plugin-editor.php' === $hook_suffix || 'theme-editor.php' === $hook_suffix ) {
+		if ( 'plugin-editor.php' === $hook_suffix ) {
 			wp_add_inline_script(
 				'wp-theme-plugin-editor',
 				sprintf(
