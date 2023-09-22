@@ -18,7 +18,7 @@ class PHPCS_Checks extends Check_Base {
 		if ( ! HAS_VENDOR ) {
 			return new Notice(
 				'phpcs_not_tested',
-				'PHP CS rulesets have not been tested, as the vendor directory is missing. Perhaps you need to run <code>`composer install`</code>.'
+				__( 'PHP Code Sniffer rulesets have not been tested, as the vendor directory is missing. Perhaps you need to run <code>`composer install`</code>.', 'plugin-check' )
 			);
 		}
 
@@ -31,7 +31,7 @@ class PHPCS_Checks extends Check_Base {
 		if ( ! HAS_VENDOR ) {
 			return new Notice(
 				'phpcs_not_tested',
-				'PHP CS rulesets have not been tested, as the vendor directory is missing. Perhaps you need to run <code>`composer install`</code>.'
+				__( 'PHP Code Sniffer rulesets have not been tested, as the vendor directory is missing. Perhaps you need to run <code>`composer install`</code>.', 'plugin-check' )
 			);
 		}
 
@@ -113,6 +113,7 @@ class PHPCS_Checks extends Check_Base {
 
 				if ( current_user_can( 'edit_plugins' ) ) {
 					$edit_link   = sprintf(
+						/* translators: 1: URL to edit 2: Title of the Anchor 3: Aria Label 4: Text of the Anchor */
 						'<a href="%1$s" title="%2$s" aria-label="%2$s" target="_blank">%3$s</a>',
 						$this->get_file_editor_url( $filename, $message['line'] ),
 						sprintf(
@@ -127,7 +128,8 @@ class PHPCS_Checks extends Check_Base {
 				$return[] = new $notice_class(
 					$message['source'],
 					sprintf(
-						'%s Line %d of file %s.<br>%s.<br>%s%s',
+						/* translators: 1: Type of Error 2: Line 3: File 4: Message 5: Code Example 6: Edit Link */
+						'%1$s Line %2$d of file %3$s.<br>%4$s.<br>%5$s%6$s',
 						"<strong>{$message['source']}</strong>",
 						$message['line'],
 						$filename,
