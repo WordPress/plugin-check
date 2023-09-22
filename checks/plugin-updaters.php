@@ -8,7 +8,7 @@ class Plugin_Updaters extends Check_Base {
 		if ( ! empty( $this->headers['UpdateURI'] ) ) {
 			return new Error(
 				'plugin_updater_detected',
-				'Plugin Updater detected. Use of the Update URI header is not helpful in plugins hosted on WordPress.org.',
+				'Plugin Updater detected. Use of the Update URI header is not helpful in plugins hosted on WordPress.org.'
 			);
 		}
 	}
