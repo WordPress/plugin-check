@@ -228,7 +228,7 @@ class PHPCS_Checks extends Check_Base {
 			return esc_url(
 				add_query_arg(
 					[
-						'plugin' => rawurlencode( $this->slug . '/' . array_first_key( $plugin_data ) ),
+						'plugin' => rawurlencode( $this->slug . '/' . array_key_first( $plugin_data ) ),
 						'file'   => rawurlencode( $this->slug . '/' . $filename ),
 						'line'   => rawurlencode( $line ),
 					],
