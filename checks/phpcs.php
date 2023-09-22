@@ -113,7 +113,6 @@ class PHPCS_Checks extends Check_Base {
 
 				if ( current_user_can( 'edit_plugins' ) ) {
 					$edit_link   = sprintf(
-						/* translators: 1: URL to edit 2: Title of the Anchor 3: Aria Label 4: Text of the Anchor */
 						'<a href="%1$s" title="%2$s" aria-label="%2$s" target="_blank">%3$s</a>',
 						$this->get_file_editor_url( $filename, $message['line'] ),
 						sprintf(
