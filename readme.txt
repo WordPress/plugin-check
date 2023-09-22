@@ -42,6 +42,10 @@ This plugin checker is not perfect, and never will be. It is only a tool to help
 
 == Changelog ==
 
+= [0.3.0] 2023-09-? =
+
+* Added - 'View in code editor' link beneath each PHPCS error or warning.
+
 = [0.2.0] 2023-09-18 =
 
 * Feature - Enable modification of the PHP Binary path used by the plugin with `PLUGIN_CHECK_PHP_BIN` constant.
