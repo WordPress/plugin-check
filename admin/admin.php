@@ -74,33 +74,43 @@ function render_page() {
 }
 
 /**
+ * Includes JS to jump to a specific line in the code editor.
+ *
+ * @since 0.2.1
+ *
+ * @param string $hook_suffix Which admin page we're on.
+ *
+ * @return void
+ */
+function jump_to_line_code_editor( $hook_suffix ) {
+	$line = (int) ( $_GET['line'] ?? 0 ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( ! $line ) {
+		return;
+	}
+
+	if ( 'plugin-editor.php' !== $hook_suffix ) {
+		return;
+	}
+
+	wp_add_inline_script(
+		'wp-theme-plugin-editor',
+		sprintf(
+			'
+				(
+					( originalInitCodeEditor ) => {
+						wp.themePluginEditor.initCodeEditor = function() {
+							originalInitCodeEditor.apply( this, arguments );
+							this.instance.codemirror.doc.setCursor( %d - 1 );
+						};
+					}
+				)( wp.themePluginEditor.initCodeEditor );
+			',
+			wp_json_encode( $line )
+		)
+	);
+}
+
+/**
  * Jump to the requested line when opening the file editor.
  */
-add_action(
-	'admin_enqueue_scripts',
-	function ( $hook_suffix ) {
-		if ( ! isset( $_GET['line'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			return;
-		}
-		$line = (int) $_GET['line']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-
-		if ( 'plugin-editor.php' === $hook_suffix ) {
-			wp_add_inline_script(
-				'wp-theme-plugin-editor',
-				sprintf(
-					'
-						(
-							function( originalInitCodeEditor ) {
-								wp.themePluginEditor.initCodeEditor = function init() {
-									originalInitCodeEditor.apply( this, arguments );
-									this.instance.codemirror.doc.setCursor( %d - 1 );
-								};
-							}
-						)( wp.themePluginEditor.initCodeEditor );
-					',
-					wp_json_encode( $line )
-				)
-			);
-		}
-	}
-);
+add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\jump_to_line_code_editor' );
