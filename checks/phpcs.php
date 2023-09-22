@@ -110,7 +110,8 @@ class PHPCS_Checks extends Check_Base {
 				}
 
 				$source_code = esc_html( trim( file( $this->path . '/' . $filename )[ $message['line'] - 1 ] ) );
-				if ( current_user_can( 'edit_plugins' ) {
+
+				if ( current_user_can( 'edit_plugins' ) ) {
 					$edit_link   = sprintf(
 						'<a href="%1$s" title="%2$s" aria-label="%2$s" target="_blank">%3$s</a>',
 						$this->get_file_editor_url( $filename, $message['line'] ),
@@ -132,7 +133,7 @@ class PHPCS_Checks extends Check_Base {
 						$filename,
 						rtrim( $message['message'], '.' ),
 						"<pre class='wp-plugin-check-code'><code>{$source_code}</code></pre>",
-						$edit_link
+						$edit_link ?? ''
 					)
 				);
 			}
