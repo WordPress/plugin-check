@@ -47,7 +47,8 @@ This plugin checker is not perfect, and never will be. It is only a tool to help
 * Fix - Ensure `readme.txt` has priority over `readme.md` when both are present. Props @bordoni, @afragen [#258](https://github.com/10up/plugin-check/pull/258)
 * Fix - Ensure that the PHPCS check runs even when the PHPCS binary is not executable. Props @bordoni, @shawn-digitalpoint, @mrfoxtalbot [#254](https://github.com/10up/plugin-check/pull/254)
 * Fix - Readme changes and typos. Props @aaronjorbin. [#261](https://github.com/10up/plugin-check/pull/261)
-* Fix - Long lines of code with PHPCS check no longer expand over the size of the notice. Props @bordoni @felixarntz. [#263](https://github.com/10up/plugin-check/pull/263)
+* Added - 'View in code editor' link beneath each PHPCS error or warning. Props @EvanHerman, @westonruter, @felixarntz, @mukeshpanchal27 [#262](https://github.com/10up/plugin-check/pull/262)
+* Fix - Long lines of code with PHPCS check no longer expand over the size of the notice. Props @bordoni, @felixarntz. [#263](https://github.com/10up/plugin-check/pull/263)
 
 = [0.2.0] 2023-09-18 =
 
