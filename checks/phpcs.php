@@ -167,12 +167,12 @@ class PHPCS_Checks extends Check_Base {
 		 * be provided if available. For example, for an extension plugin to cause file edit links to
 		 * open in an IDE, the following filters can be used:
 		 *
-		 * # PHPStorm
+		 * # PhpStorm
 		 * add_filter( 'pcp_validation_error_source_file_editor_url_template', function () {
 		 *     return 'phpstorm://open?file={{file}}&line={{line}}';
 		 * } );
 		 *
-		 * # VSCode
+		 * # VS Code
 		 * add_filter( 'pcp_validation_error_source_file_editor_url_template', function () {
 		 *     return 'vscode://file/{{file}}:{{line}}';
 		 * } );
