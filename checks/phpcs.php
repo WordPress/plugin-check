@@ -119,7 +119,7 @@ class PHPCS_Checks extends Check_Base {
 						$message['line'],
 						$filename,
 						rtrim( $message['message'], '.' ),
-						"<pre><code>{$source_code}</code></pre>"
+						"<pre class='wp-plugin-check-code'><code>{$source_code}</code></pre>"
 					)
 				);
 			}

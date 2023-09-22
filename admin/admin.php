@@ -18,6 +18,19 @@ function render_page() {
 		return;
 	}
 
+	// @todo This should be eventually moved to a separate file.
+	echo <<<HTML
+		<style>
+		.wp-plugin-check-code {
+			white-space:pre-wrap;
+			word-wrap:break-word;
+		}
+		.wp-plugin-check-code code {
+			line-height:1.7em
+		}
+		</style>
+	HTML;
+
 	echo '<div class="wrap">';
 	echo '<h1>' . esc_html__( 'Plugin Check', 'plugin-check' ) . '</h1>';
 	echo '<p>' . esc_html__( 'Select a plugin to run the checks against.', 'plugin-check' ) . '</p>';
