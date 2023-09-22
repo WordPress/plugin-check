@@ -110,31 +110,28 @@ class PHPCS_Checks extends Check_Base {
 				}
 
 				$source_code = esc_html( trim( file( $this->path . '/' . $filename )[ $message['line'] - 1 ] ) );
+				$plugin_data = get_plugins( '/' . $this->slug );
 				$edit_link   = '';
 
-				if ( ! defined( 'DISALLOW_FILE_EDIT' ) || ! DISALLOW_FILE_EDIT ) {
-					$plugin_data = get_plugins( '/' . $this->slug );
-
-					$edit_link = sprintf(
-						'<a href="%1$s" title="%2$s" aria-label="%2$s" target="_blank">%3$s</a>',
-						esc_url(
-							add_query_arg(
-								[
-									'plugin' => rawurlencode( $this->slug . '/' . array_key_first( $plugin_data ) ),
-									'file'   => rawurlencode( $this->slug . '/' . $filename ),
-									'line'   => rawurlencode( $message['line'] ),
-								],
-								admin_url( 'plugin-editor.php' )
-							)
-						),
-						sprintf(
-							/* translators: %1$s is the path to a plugin file. */
-							esc_attr__( 'View %1$s in the plugin file editor.', 'plugin-check' ),
-							$this->slug . '/' . $filename
-						),
-						esc_html__( 'View in code editor', 'plugin-check' )
-					);
-				}
+				$edit_link = sprintf(
+					'<a href="%1$s" title="%2$s" aria-label="%2$s" target="_blank">%3$s</a>',
+					esc_url(
+						add_query_arg(
+							[
+								'plugin' => rawurlencode( $this->slug . '/' . array_key_first( $plugin_data ) ),
+								'file'   => rawurlencode( $this->slug . '/' . $filename ),
+								'line'   => rawurlencode( $message['line'] ),
+							],
+							admin_url( 'plugin-editor.php' )
+						)
+					),
+					sprintf(
+						/* translators: %1$s is the path to a plugin file. */
+						esc_attr__( 'View %1$s in the plugin file editor.', 'plugin-check' ),
+						$this->slug . '/' . $filename
+					),
+					esc_html__( 'View in code editor', 'plugin-check' )
+				);
 
 				$return[] = new $notice_class(
 					$message['source'],
