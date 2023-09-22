@@ -14,7 +14,7 @@ class File_Checks extends Check_Base {
 			return new Error(
 				'compressed_files',
 				sprintf(
-					'Compressed files are not permitted. Found: %s',
+					__( 'Compressed files are not permitted. Found: %s', 'plugin-check' ),
 					implode( ', ', array_map( function( $file ) {
 						return '<code>' . esc_html( basename( $file ) ) . '</code>';
 					}, $files ) )
@@ -28,7 +28,7 @@ class File_Checks extends Check_Base {
 			return new Error(
 				'phar_detected',
 				sprintf(
-					'Phar files are not permitted.. Detected: %s',
+					__( 'Phar files are not permitted.. Detected: %s', 'plugin-check' ),
 					basename( array_shift( $matches ) )
 				)
 			);
@@ -129,7 +129,7 @@ class File_Checks extends Check_Base {
 			return new Warning(
 				'hidden_files',
 				sprintf(
-					'Hidden files and directories are not permitted. Found: %s',
+					__( 'Hidden files and directories are not permitted. Found: %s', 'plugin-check' ),
 					implode( ', ', array_map( function( $file ) {
 						return '<code>' . esc_html( $file ) . '</code>';
 					}, $dotfiles ) )

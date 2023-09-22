@@ -14,7 +14,7 @@ class PHPCS_Checks extends Check_Base {
 		//'WordPress.DB.PreparedSQL.InterpolatedNotPrepared' => Warning::class,
 	];
 
-	function check_against_phpcs() {
+	public function check_against_phpcs() {
 		if ( ! HAS_VENDOR ) {
 			return new Notice(
 				'phpcs_not_tested',
@@ -27,7 +27,7 @@ class PHPCS_Checks extends Check_Base {
 		);
 	}
 
-	function check_against_phpcs_review() {
+	public function check_against_phpcs_review() {
 		if ( ! HAS_VENDOR ) {
 			return new Notice(
 				'phpcs_not_tested',
