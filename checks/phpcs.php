@@ -124,8 +124,8 @@ class PHPCS_Checks extends Check_Base {
 						)
 					),
 					sprintf(
-						/* translators: %1$s is the path to a plugin file. */
-						esc_attr__( 'View %1$s in the plugin file editor.', 'plugin-check' ),
+						/* translators: %s is the path to a plugin file. */
+						esc_attr__( 'View %s in the plugin file editor.', 'plugin-check' ),
 						$this->slug . '/' . $filename
 					),
 					esc_html__( 'View in code editor', 'plugin-check' )
