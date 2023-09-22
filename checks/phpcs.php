@@ -110,19 +110,9 @@ class PHPCS_Checks extends Check_Base {
 				}
 
 				$source_code = esc_html( trim( file( $this->path . '/' . $filename )[ $message['line'] - 1 ] ) );
-				$plugin_data = get_plugins( '/' . $this->slug );
 				$edit_link   = sprintf(
 					'<a href="%1$s" title="%2$s" aria-label="%2$s" target="_blank">%3$s</a>',
-					esc_url(
-						add_query_arg(
-							[
-								'plugin' => rawurlencode( $this->slug . '/' . array_key_first( $plugin_data ) ),
-								'file'   => rawurlencode( $this->slug . '/' . $filename ),
-								'line'   => rawurlencode( $message['line'] ),
-							],
-							admin_url( 'plugin-editor.php' )
-						)
-					),
+					$this->get_file_editor_url( $filename, $message['line'] ),
 					sprintf(
 						/* translators: %s is the path to a plugin file. */
 						esc_attr__( 'View %s in the plugin file editor.', 'plugin-check' ),
@@ -147,5 +137,106 @@ class PHPCS_Checks extends Check_Base {
 		} );
 
 		return $return;
+	}
+
+	/**
+	 * Get the URL for opening the plugin file in an external editor.
+	 *
+	 * @since 0.2.1
+	 *
+	 * @param array $filename Source of PHPCS error.
+	 * @param array $line     Line number of PHPCS error.
+	 *
+	 * @return string|null File editor URL or null if not available.
+	 */
+	private function get_file_editor_url( $filename, $line ) {
+		if ( ! isset( $filename, $line ) ) {
+			return null;
+		}
+
+		$edit_url = null;
+
+		/**
+		 * Filters the template for the URL for linking to an external editor to open a file for editing.
+		 *
+		 * Users of IDEs that support opening files in via web protocols can use this filter to override
+		 * the edit link to result in their editor opening rather than the plugin editor.
+		 *
+		 * The initial filtered value is null, requiring extension plugins to supply the URL template
+		 * string themselves. If no template string is provided, links to the plugin editors will
+		 * be provided if available. For example, for an extension plugin to cause file edit links to
+		 * open in an IDE, the following filters can be used:
+		 *
+		 * # PHPStorm
+		 * add_filter( 'pcp_validation_error_source_file_editor_url_template', function () {
+		 *     return 'phpstorm://open?file={{file}}&line={{line}}';
+		 * } );
+		 *
+		 * # VSCode
+		 * add_filter( 'pcp_validation_error_source_file_editor_url_template', function () {
+		 *     return 'vscode://file/{{file}}:{{line}}';
+		 * } );
+		 *
+		 * For a template to be considered, the string '{{file}}' must be present in the filtered value.
+		 *
+		 * @since 0.2.1
+		 *
+		 * @param string|null $editor_url_template Editor URL template.
+		 */
+		$editor_url_template = apply_filters( 'pcp_validation_error_source_file_editor_url_template', null );
+
+		// Supply the file path to the editor template.
+		if ( null !== $editor_url_template && false !== strpos( $editor_url_template, '{{file}}' ) ) {
+			$file_path = WP_PLUGIN_DIR . '/' . $this->slug;
+			if ( $this->slug !== $filename ) {
+				$file_path .= '/' . $filename;
+			}
+
+			if ( $file_path && file_exists( $file_path ) ) {
+				/**
+				 * Filters the file path to be opened in an external editor for a given PHPCS error source.
+				 *
+				 * This is useful to map the file path from inside of a Docker container or VM to the host machine.
+				 *
+				 * @since 0.2.1
+				 *
+				 * @param string|null $editor_url_template Editor URL template.
+				 * @param array       $source              Source information.
+				 */
+				$file_path = apply_filters( 'pcp_validation_error_source_file_path', $file_path, array( $this->slug, $filename, $line) );
+				if ( $file_path ) {
+					$edit_url = str_replace(
+						[
+							'{{file}}',
+							'{{line}}',
+						],
+						[
+							rawurlencode( $file_path ),
+							rawurlencode( $line ),
+						],
+						$editor_url_template
+					);
+				}
+
+			}
+		}
+
+		// Fall back to using the plugin editor if no external editor is offered.
+		if ( ! $edit_url ) {
+			$plugin_data = get_plugins( '/' . $this->slug );
+
+			return esc_url(
+				add_query_arg(
+					[
+						'plugin' => rawurlencode( $this->slug . '/' . array_first_key( $plugin_data ) ),
+						'file'   => rawurlencode( $this->slug . '/' . $filename ),
+						'line'   => rawurlencode( $line ),
+					],
+					admin_url( 'plugin-editor.php' )
+				)
+			);
+		}
+
+		return $edit_url;
 	}
 }
