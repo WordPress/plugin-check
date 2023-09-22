@@ -12,7 +12,7 @@ class Code_Obfuscation extends Check_Base {
 			return new Error(
 				'obfuscated_code_detected',
 				sprintf(
-					'Code Obfuscation tools are not permitted. Detected: %s',
+					__( 'Code Obfuscation tools are not permitted. Detected: %s', 'plugin-check' ),
 					'Zend Guard'
 				)
 			);
@@ -31,7 +31,7 @@ class Code_Obfuscation extends Check_Base {
 				return new Error(
 					'obfuscated_code_detected',
 					sprintf(
-						'Code Obfuscation tools are not permitted. Detected: %s',
+						__( 'Code Obfuscation tools are not permitted. Detected: %s', 'plugin-check' ),
 						'Source Gardian'
 					)
 				);
@@ -44,7 +44,7 @@ class Code_Obfuscation extends Check_Base {
 			return new Error(
 				'obfuscated_code_detected',
 				sprintf(
-					'Code Obfuscation tools are not permitted. Detected: %s',
+					__( 'Code Obfuscation tools are not permitted. Detected: %s', 'plugin-check' ),
 					'ionCube'
 				)
 			);

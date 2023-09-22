@@ -70,7 +70,7 @@ class Readme extends Check_Base {
 		) {
 			return new Notice(
 				'default_readme_text',
-				'The readme.txt appears to contain default text.'
+				__( 'The readme.txt appears to contain default text.', 'plugin-check' )
 			);
 		}
 	}
@@ -80,7 +80,8 @@ class Readme extends Check_Base {
 			return new Warning(
 				'readme_parser_warnings',
 				sprintf(
-					'The following readme parser warnings were detected: %s',
+					/* translators: %1$s: list of warnings */
+					__( 'The following readme parser warnings were detected: %1$s', 'plugin-check' ),
 					esc_html( implode( ', ',  array_keys( $this->readme->warnings ) ) )
 				)
 			);
@@ -98,7 +99,7 @@ class Readme extends Check_Base {
 		if ( 'trunk' === $stable_tag ) {
 			return new Error(
 				'trunk_stable_tag',
-				"It's recommended not to use 'Stable Tag: trunk'."
+				__( "It's recommended not to use 'Stable Tag: trunk'.", 'plugin-check' )
 			);
 		}
 

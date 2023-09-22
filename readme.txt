@@ -50,6 +50,7 @@ This plugin checker is not perfect, and never will be. It is only a tool to help
 * Fix - Readme changes and typos. Props @aaronjorbin. [#261](https://github.com/10up/plugin-check/pull/261)
 * Fix - Long lines of code with PHPCS check no longer expand over the size of the notice. Props @bordoni, @felixarntz. [#263](https://github.com/10up/plugin-check/pull/263)
 * Fix - Ensure that we have PHP 7.2 compatibility remove trailing comma. Props @bordoni, @leoloso. [#265](https://github.com/10up/plugin-check/issues/265)
+* Fix - Include all strings that were missed in the previous release. Props @bordoni, @pixolin. [#270](https://github.com/10up/plugin-check/issues/270)
 
 = [0.2.0] 2023-09-18 =
 

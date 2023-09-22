@@ -14,11 +14,11 @@ class PHPCS_Checks extends Check_Base {
 		//'WordPress.DB.PreparedSQL.InterpolatedNotPrepared' => Warning::class,
 	];
 
-	function check_against_phpcs() {
+	public function check_against_phpcs() {
 		if ( ! HAS_VENDOR ) {
 			return new Notice(
 				'phpcs_not_tested',
-				'PHP CS rulesets have not been tested, as the vendor directory is missing. Perhaps you need to run <code>`composer install`</code>.'
+				__( 'PHP Code Sniffer rulesets have not been tested, as the vendor directory is missing. Perhaps you need to run <code>`composer install`</code>.', 'plugin-check' )
 			);
 		}
 
@@ -27,11 +27,11 @@ class PHPCS_Checks extends Check_Base {
 		);
 	}
 
-	function check_against_phpcs_review() {
+	public function check_against_phpcs_review() {
 		if ( ! HAS_VENDOR ) {
 			return new Notice(
 				'phpcs_not_tested',
-				'PHP CS rulesets have not been tested, as the vendor directory is missing. Perhaps you need to run <code>`composer install`</code>.'
+				__( 'PHP Code Sniffer rulesets have not been tested, as the vendor directory is missing. Perhaps you need to run <code>`composer install`</code>.', 'plugin-check' )
 			);
 		}
 
@@ -127,7 +127,8 @@ class PHPCS_Checks extends Check_Base {
 				$return[] = new $notice_class(
 					$message['source'],
 					sprintf(
-						'%s Line %d of file %s.<br>%s.<br>%s%s',
+						/* translators: 1: Type of Error 2: Line 3: File 4: Message 5: Code Example 6: Edit Link */
+						__( '%1$s Line %2$d of file %3$s.<br>%4$s.<br>%5$s%6$s', 'plugin-check' ),
 						"<strong>{$message['source']}</strong>",
 						$message['line'],
 						$filename,
