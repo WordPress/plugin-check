@@ -188,7 +188,7 @@ class PHPCS_Checks extends Check_Base {
 		$editor_url_template = apply_filters( 'plugin_check_validation_error_source_file_editor_url_template', null );
 
 		// Supply the file path to the editor template.
-		if ( null !== $editor_url_template && false !== strpos( $editor_url_template, '{{file}}' ) ) {
+		if ( null !== $editor_url_template && str_contains( $editor_url_template, '{{file}}' ) ) {
 			$file_path = WP_PLUGIN_DIR . '/' . $this->slug;
 			if ( $this->slug !== $filename ) {
 				$file_path .= '/' . $filename;
