@@ -3,7 +3,7 @@ Plugin Check
 * Contributors: dd32, davidperez, bordoni, frantorres, eherman24, alexsanford1
 * Requires at least: 6.2
 * Tested up to: 6.3.1
-* Stable tag: 0.2.0
+* Stable tag: 0.2.1
 * License: GPLv2 or later
 * Requires PHP: 7.2
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -42,7 +42,7 @@ This plugin checker is not perfect, and never will be. It is only a tool to help
 
 == Changelog ==
 
-= [0.2.1] 2023-09-?? =
+= [0.2.1] 2023-09-22 =
 
 * Added - 'View in code editor' link beneath each PHPCS error or warning. Props @EvanHerman, @westonruter, @felixarntz, @mukeshpanchal27 [#262](https://github.com/10up/plugin-check/pull/262)
 * Fix - Ensure `readme.txt` has priority over `readme.md` when both are present. Props @bordoni, @afragen [#258](https://github.com/10up/plugin-check/pull/258)

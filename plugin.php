@@ -22,7 +22,7 @@ const PLUGIN_DIR = __DIR__;
  *
  * @var string
  */
-const PLUGIN_CHECK_VERSION = '0.2.0';
+const PLUGIN_CHECK_VERSION = '0.2.1';
 
 include __DIR__ . '/export.php';
 include __DIR__ . '/message.php';
