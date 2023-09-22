@@ -168,12 +168,12 @@ class PHPCS_Checks extends Check_Base {
 		 * open in an IDE, the following filters can be used:
 		 *
 		 * # PhpStorm
-		 * add_filter( 'pcp_validation_error_source_file_editor_url_template', function () {
+		 * add_filter( 'plugin_check_validation_error_source_file_editor_url_template', function () {
 		 *     return 'phpstorm://open?file={{file}}&line={{line}}';
 		 * } );
 		 *
 		 * # VS Code
-		 * add_filter( 'pcp_validation_error_source_file_editor_url_template', function () {
+		 * add_filter( 'plugin_check_validation_error_source_file_editor_url_template', function () {
 		 *     return 'vscode://file/{{file}}:{{line}}';
 		 * } );
 		 *
@@ -183,7 +183,7 @@ class PHPCS_Checks extends Check_Base {
 		 *
 		 * @param string|null $editor_url_template Editor URL template.
 		 */
-		$editor_url_template = apply_filters( 'pcp_validation_error_source_file_editor_url_template', null );
+		$editor_url_template = apply_filters( 'plugin_check_validation_error_source_file_editor_url_template', null );
 
 		// Supply the file path to the editor template.
 		if ( null !== $editor_url_template && false !== strpos( $editor_url_template, '{{file}}' ) ) {
@@ -203,7 +203,7 @@ class PHPCS_Checks extends Check_Base {
 				 * @param string|null $editor_url_template Editor URL template.
 				 * @param array       $source              Source information.
 				 */
-				$file_path = apply_filters( 'pcp_validation_error_source_file_path', $file_path, array( $this->slug, $filename, $line) );
+				$file_path = apply_filters( 'plugin_check_validation_error_source_file_path', $file_path, array( $this->slug, $filename, $line) );
 				if ( $file_path ) {
 					$edit_url = str_replace(
 						[
