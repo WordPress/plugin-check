@@ -1,10 +1,10 @@
 <?php
 /**
  * Plugin Name: Plugin Check
- * Plugin URI: https://github.com/WordPress/plugin-check/
+ * Plugin URI: https://github.com/10up/plugin-check/
  * Description: Runs checks against a plugin to verify the latest WordPress standards and practices.
  * Author: Plugin Review Team
- * Version: 0.2.0
+ * Version: 0.2.1
  * Text Domain: plugin-check
  * License: GPLv2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
