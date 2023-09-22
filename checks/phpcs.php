@@ -110,16 +110,18 @@ class PHPCS_Checks extends Check_Base {
 				}
 
 				$source_code = esc_html( trim( file( $this->path . '/' . $filename )[ $message['line'] - 1 ] ) );
-				$edit_link   = sprintf(
-					'<a href="%1$s" title="%2$s" aria-label="%2$s" target="_blank">%3$s</a>',
-					$this->get_file_editor_url( $filename, $message['line'] ),
-					sprintf(
-						/* translators: %s is the path to a plugin file. */
-						esc_attr__( 'View %s in the plugin file editor.', 'plugin-check' ),
-						$this->slug . '/' . $filename
-					),
-					esc_html__( 'View in code editor', 'plugin-check' )
-				);
+				if ( current_user_can( 'edit_plugins' ) {
+					$edit_link   = sprintf(
+						'<a href="%1$s" title="%2$s" aria-label="%2$s" target="_blank">%3$s</a>',
+						$this->get_file_editor_url( $filename, $message['line'] ),
+						sprintf(
+							/* translators: %s is the path to a plugin file. */
+							esc_attr__( 'View %s in the plugin file editor.', 'plugin-check' ),
+							$this->slug . '/' . $filename
+						),
+						esc_html__( 'View in code editor', 'plugin-check' )
+					);
+				}
 
 				$return[] = new $notice_class(
 					$message['source'],
