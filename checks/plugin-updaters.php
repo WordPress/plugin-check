@@ -23,7 +23,7 @@ class Plugin_Updaters extends Check_Base {
 			return new Error(
 				'plugin_updater_detected',
 				sprintf(
-					'Plugin Updater detected. These are not permitted in WordPress.org hosted plugins. Detected: %s',
+					__( 'Plugin Updater detected. These are not permitted in WordPress.org hosted plugins. Detected: %s', 'plugin-check' ),
 					esc_html( implode( ', ', $matches ) )
 				)
 			);
@@ -43,7 +43,7 @@ class Plugin_Updaters extends Check_Base {
 				return new Error(
 					'plugin_updater_detected',
 					sprintf(
-						'Plugin Updater detected. These are not permitted in WordPress.org hosted plugins. Detected: %s',
+						__( 'Plugin Updater detected. These are not permitted in WordPress.org hosted plugins. Detected: %s', 'plugin-check' ),
 						esc_html( $match )
 					)
 				);
@@ -63,7 +63,7 @@ class Plugin_Updaters extends Check_Base {
 				return new Warning(
 					'update_modification_detected',
 					sprintf(
-						'Detected code which may be altering WordPress update routines. Detected: %s',
+						__( 'Detected code which may be altering WordPress update routines. Detected: %s', 'plugin-check' ),
 						esc_html( $match )
 					)
 				);
