@@ -128,7 +128,7 @@ class PHPCS_Checks extends Check_Base {
 					$message['source'],
 					sprintf(
 						/* translators: 1: Type of Error 2: Line 3: File 4: Message 5: Code Example 6: Edit Link */
-						'%1$s Line %2$d of file %3$s.<br>%4$s.<br>%5$s%6$s',
+						__( '%1$s Line %2$d of file %3$s.<br>%4$s.<br>%5$s%6$s', 'plugin-check' ),
 						"<strong>{$message['source']}</strong>",
 						$message['line'],
 						$filename,
