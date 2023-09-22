@@ -31,7 +31,6 @@ function render_page() {
 		</style>
 	HTML;
 
-
 	echo '<div class="wrap">';
 	echo '<h1>' . esc_html__( 'Plugin Check', 'plugin-check' ) . '</h1>';
 	echo '<p>' . esc_html__( 'Select a plugin to run the checks against.', 'plugin-check' ) . '</p>';
