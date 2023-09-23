@@ -78,7 +78,7 @@ class Readme extends Check_Base {
 
 	function check_for_warnings() {
 		$warnings = $this->readme->warnings ?? [];
-		$warning_keys = array_keys( $this->readme->warnings );
+		$warning_keys = array_keys( $warnings );
 		$ignored_warnings = [
 			'contributor_ignored'
 		];
