@@ -1,6 +1,7 @@
 <?php
 namespace WordPressdotorg\Plugin_Check\Checks;
 use WordPressdotorg\Plugin_Check\{Error, Guideline_Violation, Message, Notice, Warning};
+use WordPressdotorg\Plugin_Directory\Readme\Parser;
 
 class Readme extends Check_Base {
 	/**
@@ -76,13 +77,31 @@ class Readme extends Check_Base {
 	}
 
 	function check_for_warnings() {
-		if ( ! empty( $this->readme->warnings ) ) {
+		$warnings = $this->readme->warnings ?? [];
+		$warning_keys = array_keys( $this->readme->warnings );
+		$ignored_warnings = [
+			'contributor_ignored'
+		];
+
+		/**
+		 * Filter the list of ignored readme parser warnings.
+		 *
+		 * @since 0.2.2
+		 *
+		 * @param array  $ignored_warnings Array of ignored warning keys.
+		 * @param Parser $readme The readme object.
+		 */
+		$ignored_warnings = apply_filters( 'plugin_check_readme_warnings_ignored', $ignored_warnings, $this->readme );
+
+		$warning_keys = array_diff( $warning_keys, $ignored_warnings );
+
+		if ( ! empty( $warning_keys ) ) {
 			return new Warning(
 				'readme_parser_warnings',
 				sprintf(
 					/* translators: %1$s: list of warnings */
 					__( 'The following readme parser warnings were detected: %1$s', 'plugin-check' ),
-					esc_html( implode( ', ',  array_keys( $this->readme->warnings ) ) )
+					esc_html( implode( ', ', $warning_keys ) )
 				)
 			);
 		}
