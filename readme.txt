@@ -3,7 +3,7 @@ Plugin Check
 * Contributors: dd32, davidperez, bordoni, frantorres, eherman24, alexsanford1
 * Requires at least: 6.2
 * Tested up to: 6.3.1
-* Stable tag: 0.2.1
+* Stable tag: 0.2.2
 * License: GPLv2 or later
 * Requires PHP: 7.2
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -41,6 +41,10 @@ Many sites use custom plugins, and that's perfectly okay. But plugins that are i
 This plugin checker is not perfect, and never will be. It is only a tool to help plugin authors, or anybody else who wants to make their plugin more capable. All plugins submitted to WordPress.org are hand-reviewed by a team of experts. The automated plugin checker is meant to be a useful tool only, not an absolute system of measurement.
 
 == Changelog ==
+
+= [0.2.2] 2023-09-TBD =
+
+
 
 = [0.2.1] 2023-09-22 =
 
