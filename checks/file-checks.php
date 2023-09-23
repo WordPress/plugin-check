@@ -28,7 +28,7 @@ class File_Checks extends Check_Base {
 			return new Error(
 				'phar_detected',
 				sprintf(
-					__( 'Phar files are not permitted.. Detected: %s', 'plugin-check' ),
+					__( 'Phar files are not permitted. Detected: %s', 'plugin-check' ),
 					basename( array_shift( $matches ) )
 				)
 			);
