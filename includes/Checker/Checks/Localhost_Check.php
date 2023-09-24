@@ -43,7 +43,8 @@ class Localhost_Check extends Abstract_File_Check {
 	 */
 	protected function check_files( Check_Result $result, array $files ) {
 		$php_files = self::filter_files_by_extension( $files, 'php' );
-		$file      = self::file_preg_match( '#https?://(localhost|127.0.0.1)#', $php_files );
+		$file      = self::file_preg_match( '#(?<!://)(?<!\* )https?://(localhost|127.0.0.1)#', $php_files );
+
 		if ( $file ) {
 			$result->add_message(
 				true,
