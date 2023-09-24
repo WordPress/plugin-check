@@ -43,17 +43,31 @@ class Localhost_Check extends Abstract_File_Check {
 	 */
 	protected function check_files( Check_Result $result, array $files ) {
 		$php_files = self::filter_files_by_extension( $files, 'php' );
-		$file      = self::file_preg_match( '#(?<!://)(?<!\* )https?://(localhost|127.0.0.1)#', $php_files );
 
-		if ( $file ) {
-			$result->add_message(
-				true,
-				__( 'Do not use Localhost/127.0.0.1 in your code.', 'plugin-check' ),
-				array(
-					'code' => 'localhost_code_detected',
-					'file' => $file,
-				)
-			);
+		foreach ( $php_files as $file ) {
+			$code   = file_get_contents( $file );
+			$tokens = token_get_all( $code );
+
+			foreach ( $tokens as $token ) {
+				if ( is_array( $token ) ) {
+					if ( in_array( $token[0], array( T_COMMENT, T_DOC_COMMENT ), true ) ) {
+						continue;
+					}
+
+					if ( preg_match( '#https?://(localhost|127.0.0.1)#', $token[1] ) ) {
+						$result->add_message(
+							true,
+							__( 'Do not use Localhost/127.0.0.1 in your code.', 'plugin-check' ),
+							array(
+								'code' => 'localhost_code_detected',
+								'file' => $file,
+							)
+						);
+						break;
+					}
+				}
+			}
 		}
 	}
+
 }

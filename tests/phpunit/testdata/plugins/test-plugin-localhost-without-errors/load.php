@@ -18,5 +18,3 @@
  /*
   * This file contains https://localhost/test-plugin-localhost-with-errors url.
   */
-
-$file = 'https://localhost/test-plugin-localhost-with-errors';

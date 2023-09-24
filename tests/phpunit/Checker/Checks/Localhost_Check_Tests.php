@@ -29,4 +29,16 @@ class Localhost_Check_Tests extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'code', $errors['load.php'][0][0][0] );
 		$this->assertEquals( 'localhost_code_detected', $errors['load.php'][0][0][0]['code'] );
 	}
+
+	public function test_run_without_errors() {
+		$localhost_check = new Localhost_Check();
+		$check_context   = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-localhost-without-errors/load.php' );
+		$check_result    = new Check_Result( $check_context );
+
+		$localhost_check->run( $check_result );
+
+		$errors = $check_result->get_errors();
+
+		$this->assertEmpty( $errors );
+	}
 }
