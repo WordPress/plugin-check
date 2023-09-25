@@ -71,8 +71,6 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertEquals( 'trunk_stable_tag', $errors['readme.txt'][0][0][0]['code'] );
 
 		// Check for stable tag mismatch file error.
-		$this->assertArrayHasKey( 0, $errors['readme.txt'] );
-		$this->assertArrayHasKey( 0, $errors['readme.txt'][0] );
 		$this->assertArrayHasKey( 'code', $errors['readme.txt'][0][0][1] );
 		$this->assertEquals( 'stable_tag_mismatch', $errors['readme.txt'][0][0][1]['code'] );
 	}
@@ -154,8 +152,6 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertEquals( 'default_readme_text', $warnings['readme.md'][0][0][0]['code'] );
 
 		// Check for invalid license warning.
-		$this->assertArrayHasKey( 0, $warnings['readme.md'] );
-		$this->assertArrayHasKey( 0, $warnings['readme.md'][0] );
 		$this->assertArrayHasKey( 'code', $warnings['readme.md'][0][0][1] );
 		$this->assertEquals( 'invalid_license', $warnings['readme.md'][0][0][1]['code'] );
 
@@ -166,8 +162,6 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertEquals( 'trunk_stable_tag', $errors['readme.md'][0][0][0]['code'] );
 
 		// Check for stable tag mismatch file error.
-		$this->assertArrayHasKey( 0, $errors['readme.md'] );
-		$this->assertArrayHasKey( 0, $errors['readme.md'][0] );
 		$this->assertArrayHasKey( 'code', $errors['readme.md'][0][0][1] );
 		$this->assertEquals( 'stable_tag_mismatch', $errors['readme.md'][0][0][1]['code'] );
 	}
