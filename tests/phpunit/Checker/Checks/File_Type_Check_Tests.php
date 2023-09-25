@@ -79,6 +79,30 @@ class File_Type_Check_Tests extends WP_UnitTestCase {
 		$this->assertSame( 'vcs_present', $problems['.bzr'][0][0][0]['code'] );
 	}
 
+	public function test_run_with_application_file_errors() {
+		// Test plugin with a .bzr directory which is forbidden.
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-file-type-application-errors/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check = new File_Type_Check( File_Type_Check::TYPE_APPLICATION );
+		$check->run( $check_result );
+
+		if ( ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) && 'production' === wp_get_environment_type() ) {
+			$problems      = $check_result->get_errors();
+			$problem_count = $check_result->get_error_count();
+		} else {
+			$problems      = $check_result->get_warnings();
+			$problem_count = $check_result->get_warning_count();
+		}
+
+		$this->assertNotEmpty( $problems );
+		$this->assertArrayHasKey( 'hello-world.sh', $problems );
+		$this->assertSame( 1, $problem_count );
+
+		$this->assertTrue( isset( $problems['hello-world.sh'][0][0][0] ) );
+		$this->assertSame( 'application_detected', $problems['hello-world.sh'][0][0][0]['code'] );
+	}
+
 	public function test_run_without_any_file_type_errors() {
 		// Test plugin without any forbidden file types.
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-i18n-usage-without-errors/load.php' );
