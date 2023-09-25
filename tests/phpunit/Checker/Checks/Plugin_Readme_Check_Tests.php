@@ -58,23 +58,23 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$readme_check->run( $check_result );
 
-		$warnings = $check_result->get_warnings();
+		$errors = $check_result->get_errors();
 
-		$this->assertNotEmpty( $warnings );
-		$this->assertArrayHasKey( 'readme.txt', $warnings );
-		$this->assertEquals( 2, $check_result->get_warning_count() );
+		$this->assertNotEmpty( $errors );
+		$this->assertArrayHasKey( 'readme.txt', $errors );
+		$this->assertEquals( 2, $check_result->get_error_count() );
 
-		// Check for trunk stable tag warning.
-		$this->assertArrayHasKey( 0, $warnings['readme.txt'] );
-		$this->assertArrayHasKey( 0, $warnings['readme.txt'][0] );
-		$this->assertArrayHasKey( 'code', $warnings['readme.txt'][0][0][0] );
-		$this->assertEquals( 'trunk_stable_tag', $warnings['readme.txt'][0][0][0]['code'] );
+		// Check for trunk stable tag error.
+		$this->assertArrayHasKey( 0, $errors['readme.txt'] );
+		$this->assertArrayHasKey( 0, $errors['readme.txt'][0] );
+		$this->assertArrayHasKey( 'code', $errors['readme.txt'][0][0][0] );
+		$this->assertEquals( 'trunk_stable_tag', $errors['readme.txt'][0][0][0]['code'] );
 
-		// Check for stable tag mismatch file warning.
-		$this->assertArrayHasKey( 0, $warnings['readme.txt'] );
-		$this->assertArrayHasKey( 0, $warnings['readme.txt'][0] );
-		$this->assertArrayHasKey( 'code', $warnings['readme.txt'][0][0][1] );
-		$this->assertEquals( 'stable_tag_mismatch', $warnings['readme.txt'][0][0][1]['code'] );
+		// Check for stable tag mismatch file error.
+		$this->assertArrayHasKey( 0, $errors['readme.txt'] );
+		$this->assertArrayHasKey( 0, $errors['readme.txt'][0] );
+		$this->assertArrayHasKey( 'code', $errors['readme.txt'][0][0][1] );
+		$this->assertEquals( 'stable_tag_mismatch', $errors['readme.txt'][0][0][1]['code'] );
 	}
 
 	public function test_run_with_errors_license() {
@@ -136,11 +136,16 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$readme_check->run( $check_result );
 
+		$errors   = $check_result->get_errors();
 		$warnings = $check_result->get_warnings();
+
+		$this->assertNotEmpty( $errors );
+		$this->assertArrayHasKey( 'readme.md', $errors );
+		$this->assertEquals( 2, $check_result->get_error_count() );
 
 		$this->assertNotEmpty( $warnings );
 		$this->assertArrayHasKey( 'readme.md', $warnings );
-		$this->assertEquals( 4, $check_result->get_warning_count() );
+		$this->assertEquals( 2, $check_result->get_warning_count() );
 
 		// Check for default text file warning.
 		$this->assertArrayHasKey( 0, $warnings['readme.md'] );
@@ -154,17 +159,17 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'code', $warnings['readme.md'][0][0][1] );
 		$this->assertEquals( 'invalid_license', $warnings['readme.md'][0][0][1]['code'] );
 
-		// Check for trunk stable tag warning.
-		$this->assertArrayHasKey( 0, $warnings['readme.md'] );
-		$this->assertArrayHasKey( 0, $warnings['readme.md'][0] );
-		$this->assertArrayHasKey( 'code', $warnings['readme.md'][0][0][2] );
-		$this->assertEquals( 'trunk_stable_tag', $warnings['readme.md'][0][0][2]['code'] );
+		// Check for trunk stable tag error.
+		$this->assertArrayHasKey( 0, $errors['readme.md'] );
+		$this->assertArrayHasKey( 0, $errors['readme.md'][0] );
+		$this->assertArrayHasKey( 'code', $errors['readme.md'][0][0][0] );
+		$this->assertEquals( 'trunk_stable_tag', $errors['readme.md'][0][0][0]['code'] );
 
-		// Check for stable tag mismatch file warning.
-		$this->assertArrayHasKey( 0, $warnings['readme.md'] );
-		$this->assertArrayHasKey( 0, $warnings['readme.md'][0] );
-		$this->assertArrayHasKey( 'code', $warnings['readme.md'][0][0][3] );
-		$this->assertEquals( 'stable_tag_mismatch', $warnings['readme.md'][0][0][3]['code'] );
+		// Check for stable tag mismatch file error.
+		$this->assertArrayHasKey( 0, $errors['readme.md'] );
+		$this->assertArrayHasKey( 0, $errors['readme.md'][0] );
+		$this->assertArrayHasKey( 'code', $errors['readme.md'][0][0][1] );
+		$this->assertEquals( 'stable_tag_mismatch', $errors['readme.md'][0][0][1]['code'] );
 	}
 
 	public function test_run_root_readme_file_without_errors() {
