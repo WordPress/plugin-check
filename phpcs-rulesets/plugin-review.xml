@@ -71,12 +71,16 @@
 
 	<!-- Check for code WP does better -->
 	<rule ref="WordPress.WP.AlternativeFunctions">
-		<exclude name="WordPress.WP.AlternativeFunctions.json_encode_json_encode"/>
+		<type>error</type>
+		<exclude name="WordPress.WP.AlternativeFunctions.json_encode"/>
 	</rule>
 
 	<rule ref="Generic.PHP.ForbiddenFunctions">
 		<properties>
 			<property name="forbiddenFunctions" type="array">
+				<element key="move_uploaded_file" value="null"/>
+				<element key="passthru" value="null"/>
+				<element key="proc_open" value="null"/>
 				<element key="create_function" value="null"/>
 				<element key="eval" value="null"/>
 				<element key="str_rot13" value="null"/>

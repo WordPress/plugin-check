@@ -183,7 +183,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 		if ( 'trunk' === $stable_tag ) {
 			$result->add_message(
-				false,
+				true,
 				__( "It's recommended not to use 'Stable Tag: trunk'.", 'plugin-check' ),
 				array(
 					'code' => 'trunk_stable_tag',
@@ -200,7 +200,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 			$stable_tag !== $plugin_data['Version']
 		) {
 			$result->add_message(
-				false,
+				true,
 				__( 'The Stable Tag in your readme file does not match the version in your main plugin file.', 'plugin-check' ),
 				array(
 					'code' => 'stable_tag_mismatch',
