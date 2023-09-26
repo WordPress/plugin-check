@@ -191,19 +191,13 @@ class File_Type_Check extends Abstract_File_Check {
 	 * @param array        $files  List of absolute file paths.
 	 */
 	protected function look_for_application_files( Check_Result $result, array $files ) {
-		$application_files = self::filter_files_by_extensions( $files, array( 'a', 'bin', 'bpk', 'deploy', 'dist', 'distz', 'dmg', 'dms', 'DS_Store', 'dump', 'elc', 'exe', 'iso', 'lha', 'lrf', 'lzh', 'o', 'obj', 'phar', 'pkg', 'sh', 'so' ) );
+		$application_files = self::filter_files_by_extensions(
+			$files,
+			array( 'a', 'bin', 'bpk', 'deploy', 'dist', 'distz', 'dmg', 'dms', 'DS_Store', 'dump', 'elc', 'exe', 'iso', 'lha', 'lrf', 'lzh', 'o', 'obj', 'phar', 'pkg', 'sh', 'so' )
+		);
 		if ( $application_files ) {
-			// Only use an error in production, otherwise a warning.
-			$is_error = ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) && 'production' === wp_get_environment_type();
 			foreach ( $application_files as $file ) {
-				$result->add_message(
-					$is_error,
-					__( 'Application files are not permitted.', 'plugin-check' ),
-					array(
-						'code' => 'application_detected',
-						'file' => str_replace( $result->plugin()->path(), '', $file ),
-					)
-				);
+				$this->add_result_error_for_file( $result, $file, 'application_detected', __( 'Application files are not permitted.', 'plugin-check' ) );
 			}
 		}
 	}
