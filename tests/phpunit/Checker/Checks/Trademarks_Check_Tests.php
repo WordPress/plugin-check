@@ -86,13 +86,13 @@ class Trademarks_Check_Tests extends WP_UnitTestCase {
 				'load.php',
 				'',
 			),
-			'Plugin headers - WooCommerce String for WooCommere' => array(
+			'Plugin headers - WooCommerce String for WooCommerce' => array(
 				Trademarks_Check::CHECK_NAME,
 				'test-trademarks-plugin-header-woocommerce-string-for-woocommerce/load.php',
 				'load.php',
 				'"woocommerce"',
 			),
-			'Plugin headers - WordPress String for WooCommere' => array(
+			'Plugin headers - WordPress String for WooCommerce' => array(
 				Trademarks_Check::CHECK_NAME,
 				'test-trademarks-plugin-header-wordpress-string-for-woocommerce/load.php',
 				'load.php',

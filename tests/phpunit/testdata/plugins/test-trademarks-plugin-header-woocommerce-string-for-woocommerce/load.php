@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: WooCommerce String for WooCommere
+ * Plugin Name: WooCommerce String for WooCommerce
  * Plugin URI: https://github.com/WordPress/plugin-check
  * Description: Test plugin for the Trademarks check.
  * Requires at least: 6.0
