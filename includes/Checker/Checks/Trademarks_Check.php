@@ -164,7 +164,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	const TYPE_README = 1;
 	const TYPE_NAME   = 2;
 	const TYPE_SLUG   = 4;
-	const TYPE_ALL     = 7; // Same as all of the above with bitwise OR.
+	const TYPE_ALL    = 7; // Same as all of the above with bitwise OR.
 
 	/**
 	 * Bitwise flags to control check behavior.
