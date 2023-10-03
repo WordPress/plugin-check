@@ -57,49 +57,49 @@ class Trademarks_Check_Tests extends WP_UnitTestCase {
 	public function data_trademarks_check() {
 		return array(
 			'Plugin readme - Test Plugin with readme'     => array(
-				Trademarks_Check::CHECK_README,
+				Trademarks_Check::TYPE_README,
 				'test-trademarks-plugin-readme-errors/load.php',
 				'readme.txt',
 				'"plugin"',
 			),
 			'Plugin header - Test Trademarks Plugin Header Name Errors' => array(
-				Trademarks_Check::CHECK_NAME,
+				Trademarks_Check::TYPE_NAME,
 				'test-trademarks-plugin-header-name-errors/load.php',
 				'load.php',
 				'"plugin"',
 			),
 			'Plugin slug - test-trademarks-plugin-header-slug-errors' => array(
-				Trademarks_Check::CHECK_SLUG,
+				Trademarks_Check::TYPE_SLUG,
 				'test-trademarks-plugin-header-slug-errors/load.php',
 				'load.php',
 				'"plugin"',
 			),
 			'Plugin headers - WooCommerce Example String' => array(
-				Trademarks_Check::CHECK_NAME,
+				Trademarks_Check::TYPE_NAME,
 				'test-trademarks-plugin-header-woocommerce-string/load.php',
 				'load.php',
 				'"woocommerce"',
 			),
 			'Plugin headers - Example String for WooCommerce' => array(
-				Trademarks_Check::CHECK_NAME,
+				Trademarks_Check::TYPE_NAME,
 				'test-trademarks-plugin-header-example-string-for-woocommerce/load.php',
 				'load.php',
 				'',
 			),
 			'Plugin headers - WooCommerce String for WooCommerce' => array(
-				Trademarks_Check::CHECK_NAME,
+				Trademarks_Check::TYPE_NAME,
 				'test-trademarks-plugin-header-woocommerce-string-for-woocommerce/load.php',
 				'load.php',
 				'"woocommerce"',
 			),
 			'Plugin headers - WordPress String for WooCommerce' => array(
-				Trademarks_Check::CHECK_NAME,
+				Trademarks_Check::TYPE_NAME,
 				'test-trademarks-plugin-header-wordpress-string-for-woocommerce/load.php',
 				'load.php',
 				'"wordpress"',
 			),
 			'Plugin headers portmanteaus'                 => array(
-				Trademarks_Check::CHECK_NAME,
+				Trademarks_Check::TYPE_NAME,
 				'test-trademarks-plugin-header-portmanteaus/load.php',
 				'load.php',
 				'"woo"',

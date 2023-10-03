@@ -161,9 +161,9 @@ class Trademarks_Check extends Abstract_File_Check {
 		'woo',
 	);
 
-	const CHECK_README = 1;
-	const CHECK_NAME   = 2;
-	const CHECK_SLUG   = 4;
+	const TYPE_README = 1;
+	const TYPE_NAME   = 2;
+	const TYPE_SLUG   = 4;
 	const TYPE_ALL     = 7; // Same as all of the above with bitwise OR.
 
 	/**
@@ -209,17 +209,17 @@ class Trademarks_Check extends Abstract_File_Check {
 	protected function check_files( Check_Result $result, array $files ) {
 
 		// Check the trademarks in readme file plugin name.
-		if ( $this->flags & self::CHECK_README ) {
+		if ( $this->flags & self::TYPE_README ) {
 			$this->check_for_readme( $result, $files );
 		}
 
 		// Check the trademarks in plugin name.
-		if ( $this->flags & self::CHECK_NAME ) {
+		if ( $this->flags & self::TYPE_NAME ) {
 			$this->check_for_name( $result );
 		}
 
 		// Check the trademarks in plugin slug.
-		if ( $this->flags & self::CHECK_SLUG ) {
+		if ( $this->flags & self::TYPE_SLUG ) {
 			$this->check_for_slug( $result );
 		}
 	}
