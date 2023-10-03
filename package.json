@@ -3,7 +3,7 @@
   "license": "GPL-2.0-or-later",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/10up/plugin-check.git"
+    "url": "git+https://github.com/WordPress/plugin-check.git"
   },
   "devDependencies": {
     "@wordpress/env": "^5.7.0",
