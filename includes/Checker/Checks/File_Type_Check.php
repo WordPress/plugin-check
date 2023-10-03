@@ -21,11 +21,12 @@ class File_Type_Check extends Abstract_File_Check {
 
 	use Stable_Check;
 
-	const TYPE_COMPRESSED = 1;
-	const TYPE_PHAR       = 2;
-	const TYPE_VCS        = 4;
-	const TYPE_HIDDEN     = 8;
-	const TYPE_ALL        = 15; // Same as all of the above with bitwise OR.
+	const TYPE_COMPRESSED  = 1;
+	const TYPE_PHAR        = 2;
+	const TYPE_VCS         = 4;
+	const TYPE_HIDDEN      = 8;
+	const TYPE_APPLICATION = 16;
+	const TYPE_ALL         = 31; // Same as all of the above with bitwise OR.
 
 	/**
 	 * Bitwise flags to control check behavior.
@@ -82,6 +83,9 @@ class File_Type_Check extends Abstract_File_Check {
 		}
 		if ( $this->flags & self::TYPE_HIDDEN ) {
 			$this->look_for_hidden_files( $result, $files );
+		}
+		if ( $this->flags & self::TYPE_APPLICATION ) {
+			$this->look_for_application_files( $result, $files );
 		}
 	}
 
@@ -174,6 +178,26 @@ class File_Type_Check extends Abstract_File_Check {
 		if ( $hidden_files ) {
 			foreach ( $hidden_files as $file ) {
 				$this->add_result_error_for_file( $result, $file, 'hidden_files', __( 'Hidden files are not permitted.', 'plugin-check' ) );
+			}
+		}
+	}
+
+	/**
+	 * Looks for application files and amends the given result with an error if found.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param Check_Result $result The check result to amend, including the plugin context to check.
+	 * @param array        $files  List of absolute file paths.
+	 */
+	protected function look_for_application_files( Check_Result $result, array $files ) {
+		$application_files = self::filter_files_by_extensions(
+			$files,
+			array( 'a', 'bin', 'bpk', 'deploy', 'dist', 'distz', 'dmg', 'dms', 'DS_Store', 'dump', 'elc', 'exe', 'iso', 'lha', 'lrf', 'lzh', 'o', 'obj', 'phar', 'pkg', 'sh', 'so' )
+		);
+		if ( $application_files ) {
+			foreach ( $application_files as $file ) {
+				$this->add_result_error_for_file( $result, $file, 'application_detected', __( 'Application files are not permitted.', 'plugin-check' ) );
 			}
 		}
 	}
