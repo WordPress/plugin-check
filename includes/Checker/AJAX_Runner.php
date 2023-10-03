@@ -36,6 +36,8 @@ class AJAX_Runner extends Abstract_Check_Runner {
 			return false;
 		}
 
+		// PHPCS ignore reason: Nonce check is already happening before this logic in `Admin_AJAX` class.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( ! isset( $_REQUEST['action'] ) || 'plugin_check_run_checks' !== $_REQUEST['action'] ) {
 			return false;
 		}
@@ -53,12 +55,16 @@ class AJAX_Runner extends Abstract_Check_Runner {
 	 * @throws Exception Thrown if the plugin parameter is empty.
 	 */
 	protected function get_plugin_param() {
+		// PHPCS ignore reason: Nonce check is already happening before this logic in `Admin_AJAX` class.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( ! isset( $_REQUEST['plugin'] ) ) {
 			throw new Exception(
 				__( 'Invalid plugin: Plugin parameter must not be empty.', 'plugin-check' )
 			);
 		}
 
+		// PHPCS ignore reason: Nonce check is already happening before this logic in `Admin_AJAX` class.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		return sanitize_text_field( $_REQUEST['plugin'] );
 	}
 
@@ -77,7 +83,7 @@ class AJAX_Runner extends Abstract_Check_Runner {
 	}
 
 	/**
-	 * Returns the include experimental paramater based on the request.
+	 * Returns the include experimental parameter based on the request.
 	 *
 	 * @since n.e.x.t
 	 *

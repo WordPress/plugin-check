@@ -11,6 +11,7 @@ use Exception;
 use PHP_CodeSniffer\Runner;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Static_Check;
+use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 
 /**
  * Check for running one or more PHP CodeSniffer sniffs.
@@ -29,7 +30,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		'standard'   => true,
 		'extensions' => true,
 		'sniffs'     => true,
-		'exclude'    => true,
+		'exclude'    => true, //phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
 	);
 
 	/**
@@ -82,6 +83,11 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 			'--report=Json',
 			'--report-width=9999',
 		);
+
+		$directories_to_ignore = Plugin_Request_Utility::get_directories_to_ignore();
+		if ( ! empty( $directories_to_ignore ) ) {
+			$defaults[] = '--ignore=*/' . implode( '/*,*/', $directories_to_ignore ) . '/*';
+		}
 
 		// Set the check arguments for PHPCS.
 		$_SERVER['argv'] = $this->parse_argv( $this->get_args(), $defaults );

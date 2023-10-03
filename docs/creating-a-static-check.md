@@ -177,7 +177,7 @@ public function run( Check_Result $result ) {
     'Warning message content.', 
     array(
       'code'   => 'warning_code',
-      'file'   => $pluging_file,
+      'file'   => $plugin_file,
       'line'   => 1,
       'column' => 10,
     )

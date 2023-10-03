@@ -58,9 +58,9 @@ function wp_plugin_check_display_php_version_notice() {
 	echo '<div class="notice notice-error"><p>';
 	printf(
 		/* translators: 1: required version, 2: currently used version */
-		__( 'Plugin Check requires at least PHP version %1$s. Your site is currently running on PHP %2$s.', 'plugin-check' ),
-		WP_PLUGIN_CHECK_MINIMUM_PHP,
-		phpversion()
+		esc_html__( 'Plugin Check requires at least PHP version %1$s. Your site is currently running on PHP %2$s.', 'plugin-check' ),
+		esc_html( WP_PLUGIN_CHECK_MINIMUM_PHP ),
+		esc_html( phpversion() )
 	);
 	echo '</p></div>';
 }

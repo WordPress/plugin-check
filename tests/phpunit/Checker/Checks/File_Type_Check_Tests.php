@@ -34,23 +34,29 @@ class File_Type_Check_Tests extends WP_UnitTestCase {
 
 	public function data_forbidden_file_types() {
 		return array(
-			'compressed' => array(
+			'compressed'  => array(
 				File_Type_Check::TYPE_COMPRESSED,
 				'test-plugin-file-type-compressed-errors/load.php',
 				'compressed.zip',
 				'compressed_files',
 			),
-			'phar'       => array(
+			'phar'        => array(
 				File_Type_Check::TYPE_PHAR,
 				'test-plugin-file-type-phar-errors/load.php',
 				'load.phar',
 				'phar_files',
 			),
-			'hidden'     => array(
+			'hidden'      => array(
 				File_Type_Check::TYPE_HIDDEN,
 				'test-plugin-file-type-vcs-hidden-errors/load.php',
 				'.gitignore',
 				'hidden_files',
+			),
+			'application' => array(
+				File_Type_Check::TYPE_APPLICATION,
+				'test-plugin-file-type-application-errors/load.php',
+				'hello-world.sh',
+				'application_detected',
 			),
 		);
 	}

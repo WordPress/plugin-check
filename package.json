@@ -5,6 +5,10 @@
     "type": "git",
     "url": "git+https://github.com/WordPress/plugin-check.git"
   },
+  "engines": {
+    "node": ">=16.19.1",
+    "npm": ">=8.19.3 <9"
+  },
   "devDependencies": {
     "@wordpress/env": "^5.7.0",
     "@wordpress/scripts": "^24.6.0"

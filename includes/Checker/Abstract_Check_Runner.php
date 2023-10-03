@@ -93,20 +93,11 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	protected $check_categories;
 
 	/**
-	 * Determines if the current request is intended for the plugin checker.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @return bool Returns true if the check is for plugin else false.
-	 */
-	abstract public static function is_plugin_check();
-
-	/**
 	 * Returns the plugin parameter based on the request.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return string The plugin paramater from the request.
+	 * @return string The plugin parameter from the request.
 	 */
 	abstract protected function get_plugin_param();
 
@@ -120,7 +111,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	abstract protected function get_check_slugs_param();
 
 	/**
-	 * Returns the include experimental paramater based on the request.
+	 * Returns the include experimental parameter based on the request.
 	 *
 	 * @since n.e.x.t
 	 *

@@ -90,7 +90,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 	}
 
 	/**
-	 * Returns the include experimental paramater based on the request.
+	 * Returns the include experimental parameter based on the request.
 	 *
 	 * @since n.e.x.t
 	 *

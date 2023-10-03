@@ -134,4 +134,29 @@ class Plugin_Request_Utility {
 
 		static::$runner = null;
 	}
+
+	/**
+	 * Gets the directories to ignore using the filter.
+	 *
+	 * @since n.e.x.t
+	 */
+	public static function get_directories_to_ignore() {
+		// By default, ignore the '.git', 'vendor' and 'node_modules' directories.
+		$default_ignore_directories = array(
+			'.git',
+			'vendor',
+			'node_modules',
+		);
+
+		/**
+		 * Filters the directories to ignore.
+		 *
+		 * @since n.e.x.t
+		 *
+		 * @param array $default_ignore_directories An array of directories to ignore.
+		 */
+		$directories_to_ignore = (array) apply_filters( 'wp_plugin_check_ignore_directories', $default_ignore_directories );
+
+		return $directories_to_ignore;
+	}
 }

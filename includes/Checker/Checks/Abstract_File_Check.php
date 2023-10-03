@@ -13,6 +13,7 @@ use RecursiveIteratorIterator;
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Static_Check;
+use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 
 /**
  * Base class for a check that inspects the plugin's files and contents.
@@ -177,6 +178,7 @@ abstract class Abstract_File_Check implements Static_Check {
 			return self::$file_contents_cache[ $file ];
 		}
 
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		self::$file_contents_cache[ $file ] = file_get_contents( $file );
 
 		return self::$file_contents_cache[ $file ];
@@ -208,7 +210,24 @@ abstract class Abstract_File_Check implements Static_Check {
 					continue;
 				}
 
-				self::$file_list_cache[ $location ][] = $file->getPathname();
+				$file_path = $file->getPathname();
+
+				$directories_to_ignore = Plugin_Request_Utility::get_directories_to_ignore();
+
+				// Flag to check if the file should be included or not.
+				$include_file = true;
+
+				foreach ( $directories_to_ignore as $directory ) {
+					// Check if the current file belongs to the directory you want to ignore.
+					if ( false !== strpos( $file_path, '/' . $directory . '/' ) ) {
+						$include_file = false;
+						break; // Skip the file if it matches any ignored directory.
+					}
+				}
+
+				if ( $include_file ) {
+					self::$file_list_cache[ $location ][] = $file_path;
+				}
 			}
 		} else {
 			self::$file_list_cache[ $location ][] = $location;
