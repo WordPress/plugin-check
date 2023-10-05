@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Test Plugin File Type Compressed Errors
- * Plugin URI: https://github.com/wordpress/plugin-check
+ * Plugin URI: https://github.com/WordPress/plugin-check
  * Description: Plugin Check plugin from the WordPress Performance Team, a collection of tests to help improve plugin performance.
  * Author: WordPress Performance Team
  * Author URI: https://make.wordpress.org/performance/

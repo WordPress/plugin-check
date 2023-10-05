@@ -107,7 +107,7 @@ class My_Custom_Check extends Abstract_Runtime_Check {
 
 Shared preparations are individual classes that consolidate specific preparation logic in a single, centralized location.
 
-The [`Demo_Posts_Creation_Preparation`](https://github.com/10up/plugin-check/blob/trunk/includes/Checker/Preparations/Demo_Posts_Creation_Preparation.php) in the Plugin Checker is an example of a preparation class.
+The [`Demo_Posts_Creation_Preparation`](https://github.com/WordPress/plugin-check/blob/trunk/includes/Checker/Preparations/Demo_Posts_Creation_Preparation.php) in the Plugin Checker is an example of a preparation class.
 
 Preparation classes are beneficial for implementing the same preparation logic across multiple checks, leveraging the concept of shared preparations.
 
@@ -115,7 +115,7 @@ Shared preparations are used to avoid redundant execution of the same preparatio
 
 Before executing checks against a plugin, all shared preparations are gathered and processed to prevent redundant execution of identical shared preparations.
 
-Any preparation class can be used as a shared preparation including [preparations already available in the Plugin Checker](https://github.com/10up/plugin-check/blob/trunk/includes/Checker/Preparations).
+Any preparation class can be used as a shared preparation including [preparations already available in the Plugin Checker](https://github.com/WordPress/plugin-check/blob/trunk/includes/Checker/Preparations).
 
 Check classes can define and utilize shared preparations by implementing the `With_Shared_Preparation` interface.
 
@@ -155,7 +155,7 @@ A check can combine both a check preparation and shared preparations. It's worth
 
 Plugin Checker also includes some preparation classes designed to prepare the overall environment, i.e., before any runtime check. At this point, global preparations cannot be controlled outside of the Plugin Checker.
 
-An example of a global preparation is the [`Force_Single_Plugin_Preparation`](https://github.com/10up/plugin-check/blob/trunk/includes/Checker/Preparations/Force_Single_Plugin_Preparation.php) class, which ensures that only the plugin being checked is active.
+An example of a global preparation is the [`Force_Single_Plugin_Preparation`](https://github.com/WordPress/plugin-check/blob/trunk/includes/Checker/Preparations/Force_Single_Plugin_Preparation.php) class, which ensures that only the plugin being checked is active.
 
 ## Amending the check result object
 
