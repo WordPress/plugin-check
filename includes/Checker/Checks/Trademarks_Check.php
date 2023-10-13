@@ -244,11 +244,14 @@ class Trademarks_Check extends Abstract_File_Check {
 			$readme_list,
 			function ( $file ) use ( $plugin_relative_path ) {
 				$file = str_replace( $plugin_relative_path, '', $file );
-				if ( ! strpos( $file, '/' ) ) {
-					return true;
-				}
+				return ! str_contains( $file, '/' );
 			}
 		);
+
+		// If the readme file does not exist, then skip test.
+		if ( empty( $potential_readme_files ) ) {
+			return;
+		}
 
 		// Find the .txt versions of the readme files.
 		$readme_txt = array_filter(
@@ -258,31 +261,17 @@ class Trademarks_Check extends Abstract_File_Check {
 			}
 		);
 
-		// Find the .md versions of the readme files.
-		$readme_md = array_filter(
-			$potential_readme_files,
-			function ( $file ) {
-				return preg_match( '/^readme\.md$/i', basename( $file ) );
-			}
-		);
-
-		// If there's a .txt version, ignore .md versions.
-		$readme = ( ! empty( $readme_txt ) ) ? $readme_txt : $readme_md;
-
-		// If the readme file does not exist, then skip test.
-		if ( empty( $readme ) ) {
-			return;
-		}
+		$readme = $readme_txt ? $readme_txt : $potential_readme_files;
 
 		$matches = array();
 		// Get the plugin name from readme file.
-		$file = self::file_preg_match( '/===(.*)===/i', $files, $matches );
+		$file = self::file_preg_match( '/===(.*)===/i', $readme, $matches );
 
-		if ( ! $file ) {
+		if ( ! $file || ! isset( $matches[1] ) ) {
 			return;
 		}
 
-		$name = isset( $matches[1] ) ? $matches[1] : '';
+		$name = $matches[1];
 
 		try {
 			$this->validate_name_has_no_trademarks( $name );
@@ -342,11 +331,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	 * @throws Exception Thrown if we found trademarked term in plugin name.
 	 */
 	private function validate_name_has_no_trademarks( $plugin_name ) {
-		if ( empty( $plugin_name ) ) {
-			return;
-		}
-
-		$check = $this->has_trademarked_slug( $plugin_name );
+		$check = $this->has_trademarked_slug( sanitize_title_with_dashes( $plugin_name ) );
 		if ( ! $check ) {
 			return;
 		}
@@ -393,10 +378,6 @@ class Trademarks_Check extends Abstract_File_Check {
 	 * @throws Exception Thrown if we found trademarked term in plugin slug.
 	 */
 	private function validate_slug_has_no_trademarks( $plugin_slug ) {
-		if ( empty( $plugin_slug ) ) {
-			return;
-		}
-
 		$check = $this->has_trademarked_slug( $plugin_slug );
 		if ( ! $check ) {
 			return;
@@ -443,8 +424,10 @@ class Trademarks_Check extends Abstract_File_Check {
 	 * @return string|false The trademark slug if found, false otherwise.
 	 */
 	private function has_trademarked_slug( $slug ) {
-		// We work on slugs for this check.
-		$slug = sanitize_title_with_dashes( $slug );
+		// Bail early if the plugin slug not provided.
+		if ( empty( $slug ) ) {
+			return false;
+		}
 
 		$has_trademarked_slug = false;
 

@@ -17,4 +17,6 @@ parameters:
     # False positive as WordPress ships with a polyfill.
     -
       message: '/^Function str_contains not found.$/'
-      path: includes/Checker/Checks/Abstract_File_Check.php
+      paths:
+        - includes/Checker/Checks/Abstract_File_Check.php
+        - includes/Checker/Checks/Trademarks_Check.php
