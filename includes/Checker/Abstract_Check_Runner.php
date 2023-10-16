@@ -501,6 +501,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 				'enqueued_styles_scope'      => new Checks\Enqueued_Styles_Scope_Check(),
 				'localhost'                  => new Checks\Localhost_Check(),
 				'no_unfiltered_uploads'      => new Checks\No_Unfiltered_Uploads_Check(),
+				'trademarks'                 => new Checks\Trademarks_Check(),
 			)
 		);
 
