@@ -6,8 +6,8 @@ Thank you for your interest in contributing to the Plugin Check plugin!
 
 In general, all code must follow the [WordPress Coding Standards and best practices](https://developer.wordpress.org/coding-standards/). All code in the Plugin Check plugin must follow these requirements:
 
-- **WordPress**: The plugin's minimum WordPress version requirement is 6.0.
-- **PHP**: Always match the latest WordPress version. The minimum required version right now is 5.6.
+- **WordPress**: The plugin's minimum WordPress version requirement is 6.3.
+- **PHP**: Always match the latest WordPress version. The minimum required version right now is 7.0.
 
 ## Guidelines
 

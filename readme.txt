@@ -2,9 +2,9 @@
 === Plugin Check ===
 
 Contributors:      wordpressdotorg
-Requires at least: 6.0
-Tested up to:      6.1
-Requires PHP:      5.6
+Requires at least: 6.3
+Tested up to:      6.3
+Requires PHP:      7.0
 Stable tag:        n.e.x.t
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html

@@ -3,8 +3,8 @@
  * Plugin Name: Plugin Check
  * Plugin URI: https://github.com/WordPress/plugin-check
  * Description: Plugin Check plugin from the WordPress Performance Team, a collection of tests to help improve plugin performance.
- * Requires at least: 6.0
- * Requires PHP: 5.6
+ * Requires at least: 6.3
+ * Requires PHP: 7.0
  * Version: n.e.x.t
  * Author: WordPress Performance Team
  * Author URI: https://make.wordpress.org/performance/
@@ -18,7 +18,7 @@
 use WordPress\Plugin_Check\Plugin_Main;
 
 define( 'WP_PLUGIN_CHECK_VERSION', 'n.e.x.t' );
-define( 'WP_PLUGIN_CHECK_MINIMUM_PHP', '5.6' );
+define( 'WP_PLUGIN_CHECK_MINIMUM_PHP', '7.0' );
 define( 'WP_PLUGIN_CHECK_MAIN_FILE', __FILE__ );
 define( 'WP_PLUGIN_CHECK_PLUGIN_DIR_PATH', plugin_dir_path( WP_PLUGIN_CHECK_MAIN_FILE ) );
 define( 'WP_PLUGIN_CHECK_PLUGIN_DIR_URL', plugin_dir_url( WP_PLUGIN_CHECK_MAIN_FILE ) );
