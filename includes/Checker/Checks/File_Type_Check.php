@@ -137,13 +137,13 @@ class File_Type_Check extends Abstract_File_Check {
 		$vcs_directories = array_filter(
 			array_unique(
 				array_map(
-					function( $file ) {
+					function ( $file ) {
 						return dirname( $file );
 					},
 					$files
 				)
 			),
-			function( $directory ) use ( $directories ) {
+			function ( $directory ) use ( $directories ) {
 				return isset( $directories[ basename( $directory ) ] );
 			}
 		);

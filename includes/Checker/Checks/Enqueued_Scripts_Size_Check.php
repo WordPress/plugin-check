@@ -22,7 +22,8 @@ use WordPress\Plugin_Check\Traits\URL_Aware;
  */
 class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With_Shared_Preparations {
 
-	use URL_Aware, Stable_Check;
+	use URL_Aware;
+	use Stable_Check;
 
 	/**
 	 * Threshold for script size to surface a warning for.
@@ -79,7 +80,7 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 		// Backup the original values for the global state.
 		$this->backup_globals();
 
-		return function() use ( $orig_scripts ) {
+		return function () use ( $orig_scripts ) {
 			if ( is_null( $orig_scripts ) ) {
 				unset( $GLOBALS['wp_scripts'] );
 			} else {
@@ -100,7 +101,7 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	 */
 	public function get_shared_preparations() {
 		$demo_posts = array_map(
-			static function( $post_type ) {
+			static function ( $post_type ) {
 				return array(
 					'post_title'   => "Demo {$post_type} post",
 					'post_content' => 'Test content',

@@ -94,7 +94,7 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 
 		add_filter(
 			'wp_plugin_check_checks',
-			function( $checks ) {
+			function ( $checks ) {
 				return array(
 					'runtime_check' => new Runtime_Check(),
 				);
@@ -138,7 +138,7 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 
 		add_filter(
 			'wp_plugin_check_checks',
-			function( $checks ) {
+			function ( $checks ) {
 				return array(
 					'runtime_check' => new Runtime_Check(),
 				);
@@ -227,7 +227,7 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 
 		add_filter(
 			'wp_plugin_check_checks',
-			function( $checks ) {
+			function ( $checks ) {
 				return array(
 					'i18n_usage_check' => new I18n_Usage_Check(),
 				);
@@ -271,7 +271,7 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 
 		add_filter(
 			'wp_plugin_check_checks',
-			function( $checks ) {
+			function ( $checks ) {
 				return array(
 					'i18n_usage_check' => new I18n_Usage_Check(),
 				);

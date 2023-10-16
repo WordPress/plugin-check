@@ -247,7 +247,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			return $preparation->prepare();
 		}
 
-		return function() {};
+		return function () {};
 	}
 
 	/**
