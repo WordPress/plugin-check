@@ -95,7 +95,7 @@ abstract class Abstract_File_Check implements Static_Check {
 		return array_values(
 			array_filter(
 				$files,
-				static function( $file ) use ( $lookup ) {
+				static function ( $file ) use ( $lookup ) {
 					return isset( $lookup[ pathinfo( $file, PATHINFO_EXTENSION ) ] );
 				}
 			)

@@ -126,7 +126,7 @@ final class Runtime_Environment_Setup {
 		} else {
 			// Get the correct Plugin Check directory when run too early.
 			if ( ! defined( 'WP_PLUGIN_CHECK_PLUGIN_DIR_PATH' ) ) {
-				$object_cache_copy = dirname( dirname( __DIR__ ) ) . '/plugin-check/drop-ins/object-cache.copy.php';
+				$object_cache_copy = dirname( __DIR__, 2 ) . '/plugin-check/drop-ins/object-cache.copy.php';
 			} else {
 				$object_cache_copy = WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'drop-ins/object-cache.copy.php';
 			}

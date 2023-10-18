@@ -62,7 +62,7 @@ class CLI_Runner_Tests extends WP_UnitTestCase {
 
 		add_filter(
 			'wp_plugin_check_checks',
-			function( $checks ) {
+			function ( $checks ) {
 				return array(
 					'runtime-check' => new Runtime_Check(),
 				);
@@ -102,7 +102,7 @@ class CLI_Runner_Tests extends WP_UnitTestCase {
 
 		add_filter(
 			'wp_plugin_check_checks',
-			function( $checks ) {
+			function ( $checks ) {
 				return array(
 					'empty-check' => new Empty_Check(),
 				);
@@ -137,7 +137,7 @@ class CLI_Runner_Tests extends WP_UnitTestCase {
 
 		add_filter(
 			'wp_plugin_check_checks',
-			function( $checks ) {
+			function ( $checks ) {
 				return array(
 					'empty-check' => new WordPress\Plugin_Check\Test_Data\Empty_Check(),
 				);
@@ -164,7 +164,7 @@ class CLI_Runner_Tests extends WP_UnitTestCase {
 
 		add_filter(
 			'wp_plugin_check_checks',
-			function( $checks ) {
+			function ( $checks ) {
 				return array(
 					'error-check' => new Error_Check(),
 				);

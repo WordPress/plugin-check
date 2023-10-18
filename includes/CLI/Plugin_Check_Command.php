@@ -334,7 +334,7 @@ final class Plugin_Check_Command {
 
 		usort(
 			$file_results,
-			static function( $a, $b ) {
+			static function ( $a, $b ) {
 				if ( $a['line'] < $b['line'] ) {
 					return -1;
 				}

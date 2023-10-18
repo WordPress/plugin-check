@@ -95,7 +95,7 @@ class Plugin_Request_Utility {
 			if ( $runner->is_plugin_check() ) {
 				add_action(
 					'muplugins_loaded',
-					function() use ( $runner ) {
+					function () use ( $runner ) {
 						static::$cleanup = $runner->prepare();
 						static::$runner  = $runner;
 					}

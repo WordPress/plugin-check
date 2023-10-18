@@ -41,7 +41,7 @@ class Check_Categories {
 			$categories = array_values(
 				array_filter(
 					$constants,
-					static function( $key ) {
+					static function ( $key ) {
 						return strpos( $key, 'CATEGORY_' ) === 0;
 					},
 					ARRAY_FILTER_USE_KEY
@@ -64,7 +64,7 @@ class Check_Categories {
 	public static function filter_checks_by_categories( array $checks, array $categories ) {
 		return array_filter(
 			$checks,
-			static function( $check ) use ( $categories ) {
+			static function ( $check ) use ( $categories ) {
 				// Return true if at least one of the check categories is among the filter categories.
 				return (bool) array_intersect( $check->get_categories(), $categories );
 			}
