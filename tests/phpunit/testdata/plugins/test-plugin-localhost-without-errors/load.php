@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Test Plugin Localhost Errors
- * Plugin URI: https://github.com/WordPress/plugin-check
+ * Plugin URI: https://github.com/wordpress/plugin-check
  * Description: Test plugin for the Localhost check.
  * Requires at least: 6.0
  * Requires PHP: 5.6
@@ -18,5 +18,3 @@
  /*
   * This file contains https://localhost/test-plugin-localhost-with-errors url.
   */
-
-$file = 'https://localhost/test-plugin-localhost-with-errors';
