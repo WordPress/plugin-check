@@ -61,8 +61,6 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	 *
 	 * @throws Exception Thrown when the check fails with a critical error (unrelated to any errors detected as part of
 	 *                   the check).
-	 *
-	 * @SuppressWarnings(PHPMD.NPathComplexity)
 	 */
 	final public function run( Check_Result $result ) {
 		// Include the PHPCS autoloader.
@@ -127,25 +125,15 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 			}
 
 			foreach ( $file_results['messages'] as $file_message ) {
-				if ( strtoupper( $file_message['type'] ) === 'ERROR' ) {
-					$this->add_result_error_for_file(
-						$result,
-						$file_message['message'],
-						$file_message['source'],
-						$file_name,
-						$file_message['line'],
-						$file_message['column']
-					);
-				} else {
-					$this->add_result_warning_for_file(
-						$result,
-						$file_message['message'],
-						$file_message['source'],
-						$file_name,
-						$file_message['line'],
-						$file_message['column']
-					);
-				}
+				$this->add_result_message_for_file(
+					$result,
+					strtoupper( $file_message['type'] ) === 'ERROR',
+					$file_message['message'],
+					$file_message['source'],
+					$file_name,
+					$file_message['line'],
+					$file_message['column']
+				);
 			}
 		}
 	}
