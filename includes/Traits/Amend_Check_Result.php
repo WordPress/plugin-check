@@ -31,7 +31,7 @@ trait Amend_Check_Result {
 	 */
 	protected function add_result_message_for_file( Check_Result $result, $error, $message, $code, $file, $line = 0, $column = 0 ) {
 		$result->add_message(
-			$error ? true : false,
+			(bool) $error,
 			$message,
 			array(
 				'code'   => $code,

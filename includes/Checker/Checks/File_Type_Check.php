@@ -169,7 +169,7 @@ class File_Type_Check extends Abstract_File_Check {
 					$is_error,
 					__( 'Version control checkouts should not be present.', 'plugin-check' ),
 					'vcs_present',
-					str_replace( $result->plugin()->path(), '', $dir )
+					$dir
 				);
 			}
 		}
