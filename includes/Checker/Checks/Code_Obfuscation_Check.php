@@ -98,7 +98,11 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 		if ( $obfuscated_file ) {
 			$this->add_result_error_for_file(
 				$result,
-				__( 'Code Obfuscation tools are not permitted. Detected: Zend Guard', 'plugin-check' ),
+				sprintf(
+					/* translators: %s: tool name */
+					__( 'Code Obfuscation tools are not permitted. Detected: %s', 'plugin-check' ),
+					__( 'Zend Guard', 'plugin-check' )
+				),
 				'obfuscated_code_detected',
 				$obfuscated_file
 			);
@@ -118,7 +122,11 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 		if ( $obfuscated_file ) {
 			$this->add_result_error_for_file(
 				$result,
-				__( 'Code Obfuscation tools are not permitted. Detected: Source Guardian', 'plugin-check' ),
+				sprintf(
+					/* translators: %s: tool name */
+					__( 'Code Obfuscation tools are not permitted. Detected: %s', 'plugin-check' ),
+					__( 'Source Guardian', 'plugin-check' )
+				),
 				'obfuscated_code_detected',
 				$obfuscated_file
 			);
@@ -138,7 +146,11 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 		if ( $obfuscated_file ) {
 			$this->add_result_error_for_file(
 				$result,
-				__( 'Code Obfuscation tools are not permitted. Detected: ionCube', 'plugin-check' ),
+				sprintf(
+					/* translators: %s: tool name */
+					__( 'Code Obfuscation tools are not permitted. Detected: %s', 'plugin-check' ),
+					__( 'ionCube', 'plugin-check' )
+				),
 				'obfuscated_code_detected',
 				$obfuscated_file
 			);
