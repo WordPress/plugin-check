@@ -17,6 +17,7 @@
 			<td>
 				<?php esc_html_e( 'Message', 'plugin-check' ); ?>
 			</td>
+			<td></td>
 		</tr>
 	</thead>
 	<tbody id="plugin-check__results-body-{{data.index}}"></tbody>

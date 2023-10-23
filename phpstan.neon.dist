@@ -20,3 +20,4 @@ parameters:
       paths:
         - includes/Checker/Checks/Abstract_File_Check.php
         - includes/Traits/Find_Readme.php
+        - includes/Traits/File_Editor_URL.php
