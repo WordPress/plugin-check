@@ -10,6 +10,8 @@ namespace WordPress\Plugin_Check\Checker\Checks;
 use Exception;
 use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Traits\Amend_Check_Result;
+use WordPress\Plugin_Check\Traits\Find_Readme;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 
 /**
@@ -19,6 +21,8 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
  */
 class Trademarks_Check extends Abstract_File_Check {
 
+	use Amend_Check_Result;
+	use Find_Readme;
 	use Stable_Check;
 
 	/**
@@ -236,32 +240,13 @@ class Trademarks_Check extends Abstract_File_Check {
 	private function check_for_name_in_readme( Check_Result $result, array $files ) {
 		$plugin_relative_path = $result->plugin()->path();
 
-		// Find the readme file.
-		$readme_list = self::filter_files_by_regex( $files, '/readme\.(txt|md)$/i' );
-
-		// Filter the readme files located at root.
-		$potential_readme_files = array_filter(
-			$readme_list,
-			function ( $file ) use ( $plugin_relative_path ) {
-				$file = str_replace( $plugin_relative_path, '', $file );
-				return ! str_contains( $file, '/' );
-			}
-		);
+		// Filter the readme files.
+		$readme = $this->filter_files_for_readme( $files, $plugin_relative_path );
 
 		// If the readme file does not exist, then skip test.
-		if ( empty( $potential_readme_files ) ) {
+		if ( empty( $readme ) ) {
 			return;
 		}
-
-		// Find the .txt versions of the readme files.
-		$readme_txt = array_filter(
-			$potential_readme_files,
-			function ( $file ) {
-				return preg_match( '/^readme\.txt$/i', basename( $file ) );
-			}
-		);
-
-		$readme = $readme_txt ? $readme_txt : $potential_readme_files;
 
 		$matches = array();
 		// Get the plugin name from readme file.
@@ -276,7 +261,12 @@ class Trademarks_Check extends Abstract_File_Check {
 		try {
 			$this->validate_name_has_no_trademarks( $name );
 		} catch ( Exception $e ) {
-			$this->add_result_error_for_file( $result, $file, $e->getMessage() );
+			$this->add_result_error_for_file(
+				$result,
+				$e->getMessage(),
+				'trademarked_term',
+				$file
+			);
 		}
 	}
 
@@ -299,7 +289,12 @@ class Trademarks_Check extends Abstract_File_Check {
 			try {
 				$this->validate_name_has_no_trademarks( $plugin_header['Name'] );
 			} catch ( Exception $e ) {
-				$this->add_result_error_for_file( $result, $plugin_main_file, $e->getMessage() );
+				$this->add_result_error_for_file(
+					$result,
+					$e->getMessage(),
+					'trademarked_term',
+					$plugin_main_file
+				);
 			}
 		}
 	}
@@ -317,7 +312,12 @@ class Trademarks_Check extends Abstract_File_Check {
 		try {
 			$this->validate_slug_has_no_trademarks( $plugin_slug );
 		} catch ( Exception $e ) {
-			$this->add_result_error_for_file( $result, WP_PLUGIN_DIR . '/' . $result->plugin()->basename(), $e->getMessage() );
+			$this->add_result_error_for_file(
+				$result,
+				$e->getMessage(),
+				'trademarked_term',
+				WP_PLUGIN_DIR . '/' . $result->plugin()->basename()
+			);
 		}
 	}
 
@@ -502,25 +502,5 @@ class Trademarks_Check extends Abstract_File_Check {
 
 		// If the trademark still doesn't exist in the slug, it's OK.
 		return false === strpos( $short_slug, $trademark );
-	}
-
-	/**
-	 * Amends the given result with an error for the given file, code, and message.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @param Check_Result $result  The check result to amend, including the plugin context to check.
-	 * @param string       $file    Absolute path to the file found.
-	 * @param string       $message Error message.
-	 */
-	private function add_result_error_for_file( Check_Result $result, $file, $message ) {
-		$result->add_message(
-			true,
-			$message,
-			array(
-				'code' => 'trademarked_term',
-				'file' => str_replace( $result->plugin()->path(), '', $file ),
-			)
-		);
 	}
 }

@@ -10,6 +10,7 @@ namespace WordPress\Plugin_Check\Checker\Checks;
 use Exception;
 use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 
 /**
@@ -19,6 +20,7 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
  */
 class Plugin_Updater_Check extends Abstract_File_Check {
 
+	use Amend_Check_Result;
 	use Stable_Check;
 
 	const TYPE_PLUGIN_UPDATE_URI_HEADER = 1;
@@ -111,7 +113,6 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 		if ( ! empty( $plugin_header['UpdateURI'] ) ) {
 			$this->add_result_error_for_file(
 				$result,
-				true,
 				__( 'Plugin Updater detected. Use of the Update URI header is not helpful in plugins hosted on WordPress.org.', 'plugin-check' ),
 				'plugin_updater_detected',
 				$plugin_main_file
@@ -135,7 +136,6 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 			foreach ( $plugin_update_files as $file ) {
 				$this->add_result_error_for_file(
 					$result,
-					true,
 					sprintf(
 						/* translators: %s: The match updater file name. */
 						__( 'Plugin Updater detected. These are not permitted in WordPress.org hosted plugins. Detected: %s', 'plugin-check' ),
@@ -173,7 +173,6 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 			if ( $updater_file ) {
 				$this->add_result_error_for_file(
 					$result,
-					true,
 					sprintf(
 						/* translators: %s: The match updater string. */
 						__( 'Plugin Updater detected. These are not permitted in WordPress.org hosted plugins. Detected: %s', 'plugin-check' ),
@@ -206,9 +205,8 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 			$matches      = array();
 			$updater_file = self::file_preg_match( $regex, $php_files, $matches );
 			if ( $updater_file ) {
-				$this->add_result_error_for_file(
+				$this->add_result_warning_for_file(
 					$result,
-					false,
 					sprintf(
 						/* translators: %s: The match file name. */
 						__( 'Detected code which may be altering WordPress update routines. Detected: %s', 'plugin-check' ),
@@ -219,27 +217,5 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 				);
 			}
 		}
-	}
-
-	/**
-	 * Amends the given result with an error for the given obfuscated file and tool name.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @param Check_Result $result       The check result to amend, including the plugin context to check.
-	 * @param bool         $error        Whether it is an error message.
-	 * @param string       $message      Error message for updater.
-	 * @param string       $code         Violation code according to the message.
-	 * @param string       $updater_file Absolute path to the updater file found.
-	 */
-	private function add_result_error_for_file( Check_Result $result, $error, $message, $code, $updater_file ) {
-		$result->add_message(
-			$error,
-			$message,
-			array(
-				'code' => $code,
-				'file' => str_replace( $result->plugin()->path(), '', $updater_file ),
-			)
-		);
 	}
 }

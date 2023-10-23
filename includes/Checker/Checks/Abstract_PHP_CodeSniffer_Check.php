@@ -11,6 +11,7 @@ use Exception;
 use PHP_CodeSniffer\Runner;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Static_Check;
+use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 
 /**
@@ -19,6 +20,8 @@ use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
  * @since n.e.x.t
  */
 abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
+
+	use Amend_Check_Result;
 
 	/**
 	 * List of allowed PHPCS arguments.
@@ -122,15 +125,14 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 			}
 
 			foreach ( $file_results['messages'] as $file_message ) {
-				$result->add_message(
+				$this->add_result_message_for_file(
+					$result,
 					strtoupper( $file_message['type'] ) === 'ERROR',
 					$file_message['message'],
-					array(
-						'code'   => $file_message['source'],
-						'file'   => $file_name,
-						'line'   => $file_message['line'],
-						'column' => $file_message['column'],
-					)
+					$file_message['source'],
+					$file_name,
+					$file_message['line'],
+					$file_message['column']
 				);
 			}
 		}

@@ -12,6 +12,7 @@ use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Preparations\Demo_Posts_Creation_Preparation;
 use WordPress\Plugin_Check\Checker\With_Shared_Preparations;
+use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 use WordPress\Plugin_Check\Traits\URL_Aware;
 
@@ -22,8 +23,9 @@ use WordPress\Plugin_Check\Traits\URL_Aware;
  */
 class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With_Shared_Preparations {
 
-	use URL_Aware;
+	use Amend_Check_Result;
 	use Stable_Check;
+	use URL_Aware;
 
 	/**
 	 * Threshold for script size to surface a warning for.
@@ -231,18 +233,16 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 
 		if ( $plugin_script_size > $this->threshold_size ) {
 			foreach ( $plugin_scripts as $plugin_script ) {
-				$result->add_message(
-					false,
+				$this->add_result_warning_for_file(
+					$result,
 					sprintf(
 						'This script has a size of %1$s which in combination with the other scripts enqueued on %2$s exceeds the script size threshold of %3$s.',
 						size_format( $plugin_script['size'] ),
 						$url,
 						size_format( $this->threshold_size )
 					),
-					array(
-						'code' => 'EnqueuedScriptsSize.ScriptSizeGreaterThanThreshold',
-						'file' => $plugin_script['path'],
-					)
+					'EnqueuedScriptsSize.ScriptSizeGreaterThanThreshold',
+					$plugin_script['path']
 				);
 			}
 		}
