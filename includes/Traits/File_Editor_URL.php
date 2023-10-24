@@ -83,7 +83,7 @@ trait File_Editor_URL {
 				 * @param string|null $editor_url_template Editor URL template.
 				 * @param array       $source              Source information.
 				 */
-				$file_path = apply_filters( 'plugin_check_validation_error_source_file_path', $file_path, array( $plugin_slug, $filename, $line ) );
+				$file_path = apply_filters( 'wp_plugin_check_validation_error_source_file_path', $file_path, array( $plugin_slug, $filename, $line ) );
 				if ( $file_path ) {
 					$edit_url = str_replace(
 						array(
@@ -101,7 +101,11 @@ trait File_Editor_URL {
 		}
 
 		// Fall back to using the plugin editor if no external editor is offered.
-		if ( ! $edit_url ) {
+		if (
+			! $edit_url
+			&& ! ( defined( 'DISALLOW_FILE_EDIT' ) && true === DISALLOW_FILE_EDIT )
+			&& current_user_can( 'edit_plugins' )
+		) {
 			return add_query_arg(
 				array(
 					'plugin' => rawurlencode( $result->plugin()->basename() ),

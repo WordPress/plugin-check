@@ -14,10 +14,10 @@
 	<td>
 		{{data.message}}
 	</td>
-	<td>
-		<# if ( data.link ) { #>
+	<# if ( data.link ) { #>
+		<td>
 			<a href="{{data.link}}" aria-label="<?php esc_attr_e( 'View file in the plugin file editor.', 'plugin-check' ); ?>" target="_blank"><?php esc_html_e( 'View in code editor', 'plugin-check' ); ?></a>
-		<# } #>
-	</td>
+		</td>
+	<# } #>
 </tr>
 
