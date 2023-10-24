@@ -16,7 +16,7 @@
 	</td>
 	<td>
 		<# if ( data.link ) { #>
-			<a href="{{data.link}}" aria-label="<?php _e( 'View file in the plugin file editor.', 'plugin-check' ); ?>" target="_blank"><?php _e( 'View in code editor', 'plugin-check' ); ?></a>
+			<a href="{{data.link}}" aria-label="<?php esc_attr_e( 'View file in the plugin file editor.', 'plugin-check' ); ?>" target="_blank"><?php esc_html_e( 'View in code editor', 'plugin-check' ); ?></a>
 		<# } #>
 	</td>
 </tr>
