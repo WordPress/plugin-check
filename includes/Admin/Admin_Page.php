@@ -150,15 +150,22 @@ final class Admin_Page {
 	 * Renders the "Plugin Check" page.
 	 *
 	 * @since n.e.x.t
+	 *
+	 * @global array  $available_plugins        The list of available plugins.
+	 * @global string $selected_plugin_basename The selected plugin basename.
+	 * @global array  $categories               An array of categories.
+	 * @global mixed  $user_settings            The user interface setting value.
 	 */
 	public function render_page() {
-		global $available_plugins, $selected_plugin_basename, $categories;
+		global $available_plugins, $selected_plugin_basename, $categories, $user_settings;
 
 		$available_plugins = $this->get_available_plugins();
 
 		$selected_plugin_basename = filter_input( INPUT_GET, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		$categories = Check_Categories::get_categories();
+
+		$user_settings = get_user_setting( 'category_preferences' );
 
 		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'templates/admin-page.php';
 	}

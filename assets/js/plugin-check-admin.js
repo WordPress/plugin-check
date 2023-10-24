@@ -35,6 +35,31 @@
 	canRunChecks();
 	pluginsList.addEventListener( 'change', canRunChecks );
 
+	/**
+	 * Saves the user settings.
+	 *
+	 * @since n.e.x.t
+	 */
+	function saveUserSettings() {
+		const selectedCategories = [];
+
+		// Assuming you have a list of category checkboxes, find the selected ones.
+		categoriesList.forEach( function ( checkbox ) {
+			if ( checkbox.checked ) {
+				selectedCategories.push( checkbox.value );
+			}
+		} );
+
+		// Join the selected category slugs with '__' and save it as a user setting.
+		const settingValue = selectedCategories.join( '__' );
+		window.setUserSetting( 'category_preferences', settingValue );
+	}
+
+	// Attach the saveUserSettings function when a category checkbox is clicked.
+	categoriesList.forEach( function ( checkbox ) {
+		checkbox.addEventListener( 'change', saveUserSettings );
+	} );
+
 	// When the Check it button is clicked.
 	checkItButton.addEventListener( 'click', ( e ) => {
 		e.preventDefault();
