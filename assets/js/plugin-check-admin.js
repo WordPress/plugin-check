@@ -47,7 +47,10 @@
 
 		// Join the selected category slugs with '__' and save it as a user setting.
 		const settingValue = selectedCategories.join( '__' );
-		window.setUserSetting( 'plugin_check_category_preferences', settingValue );
+		window.setUserSetting(
+			'plugin_check_category_preferences',
+			settingValue
+		);
 	}
 
 	// Attach the saveUserSettings function when a category checkbox is clicked.
