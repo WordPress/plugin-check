@@ -101,11 +101,7 @@ trait File_Editor_URL {
 		}
 
 		// Fall back to using the plugin editor if no external editor is offered.
-		if (
-			! $edit_url
-			&& ! ( defined( 'DISALLOW_FILE_EDIT' ) && true === DISALLOW_FILE_EDIT )
-			&& current_user_can( 'edit_plugins' )
-		) {
+		if ( ! $edit_url && current_user_can( 'edit_plugins' ) ) {
 			return add_query_arg(
 				array(
 					'plugin' => rawurlencode( $result->plugin()->basename() ),
