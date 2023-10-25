@@ -165,7 +165,9 @@ final class Admin_Page {
 
 		$categories = Check_Categories::get_categories();
 
-		$user_settings = get_user_setting( 'category_preferences' );
+		// Get user settings for category preferences and set a default value to check all categories by default.
+		$user_settings = get_user_setting( 'plugin_check_category_preferences', 'all_categories' );
+		$user_settings = explode( '__', $user_settings );
 
 		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'templates/admin-page.php';
 	}

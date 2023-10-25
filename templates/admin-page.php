@@ -45,18 +45,7 @@
 							<fieldset>
 								<legend class="screen-reader-text"><?php echo esc_html( $category ); ?></legend>
 								<label for="<?php echo esc_attr( $category ); ?>">
-									<?php
-										$checked = false;
-										if ( $user_settings ) {
-											$selected_categories = explode( '__', $user_settings );
-											if ( in_array( $category, $selected_categories, true ) ) {
-												$checked = true;
-											}
-										} else {
-											$checked = true;
-										}
-									?>
-									<input type="checkbox" id="<?php echo esc_attr( $category ); ?>" name="categories" value="<?php echo esc_attr( $category ); ?>"<?php echo ( $checked ? ' checked="checked"' : '' ); ?> />
+									<input type="checkbox" id="<?php echo esc_attr( $category ); ?>" name="categories" value="<?php echo esc_attr( $category ); ?>" <?php checked( in_array( 'all_categories', $user_settings, true ) || in_array( $category, $user_settings, true ) ); ?> />
 									<?php echo esc_html( ucfirst( str_replace( '_', ' ', $category ) ) ); ?>
 								</label>
 							</fieldset>
