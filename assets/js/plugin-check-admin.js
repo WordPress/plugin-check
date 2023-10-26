@@ -355,18 +355,43 @@
 			Date.now().toString( 36 ) +
 			Math.random().toString( 36 ).substr( 2 );
 
+		// Check if any errors or warnings have links.
+		const hasLinks =
+			hasLinksInResults( errors ) || hasLinksInResults( warnings );
+
 		// Render the file table.
 		resultsContainer.innerHTML += renderTemplate(
 			'plugin-check-results-table',
-			{ file, index }
+			{ file, index, hasLinks }
 		);
 		const resultsTable = document.getElementById(
 			'plugin-check__results-body-' + index
 		);
 
 		// Render results to the table.
-		renderResultRows( 'ERROR', errors, resultsTable );
-		renderResultRows( 'WARNING', warnings, resultsTable );
+		renderResultRows( 'ERROR', errors, resultsTable, hasLinks );
+		renderResultRows( 'WARNING', warnings, resultsTable, hasLinks );
+	}
+
+	/**
+	 * Checks if there are any links in the results object.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param {Object} results The results object.
+	 * @return {boolean} True if there are links, false otherwise.
+	 */
+	function hasLinksInResults( results ) {
+		for ( const line in results ) {
+			for ( const column in results[ line ] ) {
+				for ( let i = 0; i < results[ line ][ column ].length; i++ ) {
+					if ( results[ line ][ column ][ i ].link ) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -374,11 +399,12 @@
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param {string} type    The result type. Either ERROR or WARNING.
-	 * @param {Object} results The results object.
-	 * @param {Object} table   The HTML table to append a result row to.
+	 * @param {string}  type     The result type. Either ERROR or WARNING.
+	 * @param {Object}  results  The results object.
+	 * @param {Object}  table    The HTML table to append a result row to.
+	 * @param {boolean} hasLinks Whether any result has links.
 	 */
-	function renderResultRows( type, results, table ) {
+	function renderResultRows( type, results, table, hasLinks ) {
 		// Loop over each result by the line, column and messages.
 		for ( const line in results ) {
 			for ( const column in results[ line ] ) {
@@ -396,6 +422,7 @@
 							message,
 							code,
 							link,
+							hasLinks,
 						}
 					);
 				}
