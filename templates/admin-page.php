@@ -45,7 +45,7 @@
 							<fieldset>
 								<legend class="screen-reader-text"><?php echo esc_html( $category ); ?></legend>
 								<label for="<?php echo esc_attr( $category ); ?>">
-									<input type="checkbox" id="<?php echo esc_attr( $category ); ?>" name="categories" value="<?php echo esc_attr( $category ); ?>" <?php checked( in_array( 'all_categories', $user_settings, true ) || in_array( $category, $user_settings, true ) ); ?> />
+									<input type="checkbox" id="<?php echo esc_attr( $category ); ?>" name="categories" value="<?php echo esc_attr( $category ); ?>" <?php checked( in_array( $category, $user_settings, true ) ); ?> />
 									<?php echo esc_html( ucfirst( str_replace( '_', ' ', $category ) ) ); ?>
 								</label>
 							</fieldset>
