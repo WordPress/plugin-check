@@ -16,10 +16,12 @@
 	</td>
 	<# if ( data.hasLinks ) { #>
 		<td>
-			<a href="{{data.link}}" target="_blank">
-				<?php esc_html_e( 'View in code editor', 'plugin-check' ); ?>
-				<span class="screen-reader-text"><?php esc_html_e( '(opens in a new tab)', 'plugin-check' ); ?></span>
-			</a>
+			<# if ( data.link ) { #>
+				<a href="{{data.link}}" target="_blank">
+					<?php esc_html_e( 'View in code editor', 'plugin-check' ); ?>
+					<span class="screen-reader-text"><?php esc_html_e( '(opens in a new tab)', 'plugin-check' ); ?></span>
+				</a>
+			<# } #>
 		</td>
 	<# } #>
 </tr>
