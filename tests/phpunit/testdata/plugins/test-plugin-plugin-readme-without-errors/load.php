@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Test Plugin Readme check (no errors)
- * Plugin URI: https://github.com/wordpress/plugin-check
+ * Plugin URI: https://github.com/WordPress/plugin-check
  * Description: Test plugin for the Readme check.
  * Requires at least: 6.0
  * Requires PHP: 5.6

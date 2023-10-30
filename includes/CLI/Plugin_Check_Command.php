@@ -72,6 +72,9 @@ final class Plugin_Check_Command {
 	 *   - json
 	 * ---
 	 *
+	 * [--categories]
+	 * : Limit displayed results to include only specific categories Checks.
+	 *
 	 * [--fields=<fields>]
 	 * : Limit displayed results to a subset of fields provided.
 	 *
@@ -100,14 +103,30 @@ final class Plugin_Check_Command {
 	 * @throws Exception Throws exception.
 	 *
 	 * @SuppressWarnings(PHPMD.NPathComplexity)
+	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
 	 */
 	public function check( $args, $assoc_args ) {
+		/*
+		 * Bail early if the Plugin Checker is not activated.
+		 *
+		 * If the Plugin Checker is not activated, it will throw an error and
+		 * CLI commands won't be usable.
+		 */
+		if ( is_plugin_inactive( $this->plugin_context->basename() ) ) {
+			WP_CLI::error(
+				__( 'Plugin Checker is not active.', 'plugin-check' )
+			);
+		}
+
 		// Get options based on the CLI arguments.
 		$options = $this->get_options( $assoc_args );
 
 		// Create the plugin and checks array from CLI arguments.
 		$plugin = isset( $args[0] ) ? $args[0] : '';
 		$checks = wp_parse_list( $options['checks'] );
+
+		// Create the categories array from CLI arguments.
+		$categories = isset( $options['categories'] ) ? wp_parse_list( $options['categories'] ) : array();
 
 		// Get the CLI Runner.
 		$runner = Plugin_Request_Utility::get_runner();
@@ -129,6 +148,7 @@ final class Plugin_Check_Command {
 			$runner->set_experimental_flag( $options['include-experimental'] );
 			$runner->set_check_slugs( $checks );
 			$runner->set_plugin( $plugin );
+			$runner->set_categories( $categories );
 
 			$checks_to_run = $runner->get_checks_to_run();
 		} catch ( Exception $error ) {
@@ -314,7 +334,7 @@ final class Plugin_Check_Command {
 
 		usort(
 			$file_results,
-			static function( $a, $b ) {
+			static function ( $a, $b ) {
 				if ( $a['line'] < $b['line'] ) {
 					return -1;
 				}

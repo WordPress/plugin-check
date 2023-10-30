@@ -41,7 +41,7 @@ final class Checks {
 		// Run the checks.
 		array_walk(
 			$checks,
-			function( Check $check ) use ( $result ) {
+			function ( Check $check ) use ( $result ) {
 				$this->run_check_with_result( $check, $result );
 			}
 		);

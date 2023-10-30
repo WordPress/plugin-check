@@ -58,7 +58,7 @@ abstract class Runtime_Check_UnitTestCase extends WP_UnitTestCase {
 		}
 
 		// Return the cleanup function.
-		return function() use ( $cleanups ) {
+		return function () use ( $cleanups ) {
 			foreach ( $cleanups as $cleanup ) {
 				$cleanup();
 			}

@@ -7,6 +7,8 @@
 
 namespace WordPress\Plugin_Check\Admin;
 
+use WordPress\Plugin_Check\Checker\Check_Categories;
+
 /**
  * Class is handling admin tools page functionality.
  *
@@ -148,13 +150,19 @@ final class Admin_Page {
 	 * Renders the "Plugin Check" page.
 	 *
 	 * @since n.e.x.t
+	 *
+	 * @SuppressWarnings(PHPMD.UnusedLocalVariable)
 	 */
 	public function render_page() {
-		global $available_plugins, $selected_plugin_basename;
-
 		$available_plugins = $this->get_available_plugins();
 
 		$selected_plugin_basename = filter_input( INPUT_GET, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+
+		$categories = Check_Categories::get_categories();
+
+		// Get user settings for category preferences and set a default value to check all categories by default.
+		$user_enabled_categories = get_user_setting( 'plugin_check_category_preferences', 'all_categories' );
+		$user_enabled_categories = 'all_categories' === $user_enabled_categories ? $categories : explode( '__', $user_enabled_categories );
 
 		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'templates/admin-page.php';
 	}

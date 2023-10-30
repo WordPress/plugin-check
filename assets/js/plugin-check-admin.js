@@ -5,10 +5,19 @@
 	const pluginsList = document.getElementById(
 		'plugin-check__plugins-dropdown'
 	);
+	const categoriesList = document.querySelectorAll(
+		'input[name=categories]'
+	);
 	const templates = {};
 
 	// Return early if the elements cannot be found on the page.
-	if ( ! checkItButton || ! pluginsList || ! resultsContainer || ! spinner ) {
+	if (
+		! checkItButton ||
+		! pluginsList ||
+		! resultsContainer ||
+		! spinner ||
+		! categoriesList.length
+	) {
 		console.error( 'Missing form elements on page' );
 		return;
 	}
@@ -26,6 +35,29 @@
 	canRunChecks();
 	pluginsList.addEventListener( 'change', canRunChecks );
 
+	function saveUserSettings() {
+		const selectedCategories = [];
+
+		// Assuming you have a list of category checkboxes, find the selected ones.
+		categoriesList.forEach( function ( checkbox ) {
+			if ( checkbox.checked ) {
+				selectedCategories.push( checkbox.value );
+			}
+		} );
+
+		// Join the selected category slugs with '__' and save it as a user setting.
+		const settingValue = selectedCategories.join( '__' );
+		window.setUserSetting(
+			'plugin_check_category_preferences',
+			settingValue
+		);
+	}
+
+	// Attach the saveUserSettings function when a category checkbox is clicked.
+	categoriesList.forEach( function ( checkbox ) {
+		checkbox.addEventListener( 'change', saveUserSettings );
+	} );
+
 	// When the Check it button is clicked.
 	checkItButton.addEventListener( 'click', ( e ) => {
 		e.preventDefault();
@@ -34,6 +66,9 @@
 		checkItButton.disabled = true;
 		pluginsList.disabled = true;
 		spinner.classList.add( 'is-active' );
+		for ( let i = 0; i < categoriesList.length; i++ ) {
+			categoriesList[ i ].disabled = true;
+		}
 
 		getChecksToRun()
 			.then( setUpEnvironment )
@@ -70,6 +105,9 @@
 		spinner.classList.remove( 'is-active' );
 		checkItButton.disabled = false;
 		pluginsList.disabled = false;
+		for ( let i = 0; i < categoriesList.length; i++ ) {
+			categoriesList[ i ].disabled = false;
+		}
 	}
 
 	/**
@@ -155,6 +193,15 @@
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append( 'plugin', pluginsList.value );
 		pluginCheckData.append( 'action', pluginCheck.actionGetChecksToRun );
+
+		for ( let i = 0; i < categoriesList.length; i++ ) {
+			if ( categoriesList[ i ].checked ) {
+				pluginCheckData.append(
+					'categories[]',
+					categoriesList[ i ].value
+				);
+			}
+		}
 
 		return fetch( ajaxurl, {
 			method: 'POST',

@@ -5,7 +5,7 @@
  * @package plugin-check
  */
 
-define( 'TESTS_PLUGIN_DIR', dirname( dirname( __DIR__ ) ) );
+define( 'TESTS_PLUGIN_DIR', dirname( __DIR__, 2 ) );
 define( 'UNIT_TESTS_PLUGIN_DIR', TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/' );
 
 if ( file_exists( TESTS_PLUGIN_DIR . '/vendor/autoload.php' ) ) {

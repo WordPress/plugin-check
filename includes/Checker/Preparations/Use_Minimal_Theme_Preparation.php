@@ -80,7 +80,7 @@ class Use_Minimal_Theme_Preparation implements Preparation {
 		}
 
 		// Return the cleanup function.
-		return function() {
+		return function () {
 			global $wp_theme_directories;
 
 			remove_filter( 'template', array( $this, 'get_theme_slug' ) );

@@ -7,7 +7,6 @@
 
 namespace WordPress\Plugin_Check\Checker;
 
-
 /**
  * Result for running checks on a plugin.
  *

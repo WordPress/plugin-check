@@ -9,6 +9,7 @@ namespace WordPress\Plugin_Check\Checker\Checks;
 
 use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 
 /**
@@ -18,6 +19,7 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
  */
 class No_Unfiltered_Uploads_Check extends Abstract_File_Check {
 
+	use Amend_Check_Result;
 	use Stable_Check;
 
 	/**
@@ -45,13 +47,11 @@ class No_Unfiltered_Uploads_Check extends Abstract_File_Check {
 		$php_files = self::filter_files_by_extension( $files, 'php' );
 		$file      = self::file_str_contains( $php_files, 'ALLOW_UNFILTERED_UPLOADS' );
 		if ( $file ) {
-			$result->add_message(
-				true,
+			$this->add_result_error_for_file(
+				$result,
 				__( 'ALLOW_UNFILTERED_UPLOADS is not permitted.', 'plugin-check' ),
-				array(
-					'code' => 'allow_unfiltered_uploads_detected',
-					'file' => $file,
-				)
+				'allow_unfiltered_uploads_detected',
+				$file
 			);
 		}
 	}

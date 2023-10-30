@@ -12,6 +12,7 @@ use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Preparations\Demo_Posts_Creation_Preparation;
 use WordPress\Plugin_Check\Checker\With_Shared_Preparations;
+use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 use WordPress\Plugin_Check\Traits\URL_Aware;
 
@@ -22,7 +23,9 @@ use WordPress\Plugin_Check\Traits\URL_Aware;
  */
 class Enqueued_Styles_Scope_Check extends Abstract_Runtime_Check implements With_Shared_Preparations {
 
-	use URL_Aware, Stable_Check;
+	use Amend_Check_Result;
+	use Stable_Check;
+	use URL_Aware;
 
 	/**
 	 * List of viewable post types.
@@ -76,7 +79,7 @@ class Enqueued_Styles_Scope_Check extends Abstract_Runtime_Check implements With
 		// Backup the original values for the global state.
 		$this->backup_globals();
 
-		return function() use ( $orig_scripts ) {
+		return function () use ( $orig_scripts ) {
 			if ( is_null( $orig_scripts ) ) {
 				unset( $GLOBALS['wp_styles'] );
 			} else {
@@ -97,7 +100,7 @@ class Enqueued_Styles_Scope_Check extends Abstract_Runtime_Check implements With
 	 */
 	public function get_shared_preparations() {
 		$demo_posts = array_map(
-			static function( $post_type ) {
+			static function ( $post_type ) {
 				return array(
 					'post_title'   => "Demo {$post_type} post",
 					'post_content' => 'Test content',
@@ -133,13 +136,11 @@ class Enqueued_Styles_Scope_Check extends Abstract_Runtime_Check implements With
 			$url_count = count( $urls );
 			foreach ( $this->plugin_styles as $plugin_style ) {
 				if ( isset( $plugin_style['count'] ) && ( $url_count === $plugin_style['count'] ) ) {
-					$result->add_message(
-						false,
+					$this->add_result_warning_for_file(
+						$result,
 						__( 'This style is being loaded in all contexts.', 'plugin-check' ),
-						array(
-							'code' => 'EnqueuedStylesScope.StyleLoadedInAllContext',
-							'file' => $plugin_style['path'],
-						)
+						'EnqueuedStylesScope',
+						$plugin_style['path']
 					);
 				}
 			}

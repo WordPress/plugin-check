@@ -34,7 +34,7 @@ class Checks_Tests extends WP_UnitTestCase {
 
 		add_filter(
 			'wp_plugin_check_checks',
-			function( $checks ) use ( $all_checks ) {
+			function ( $checks ) use ( $all_checks ) {
 				return $all_checks;
 			}
 		);
@@ -58,7 +58,7 @@ class Checks_Tests extends WP_UnitTestCase {
 
 		add_filter(
 			'wp_plugin_check_checks',
-			function( $checks ) use ( $all_checks ) {
+			function ( $checks ) use ( $all_checks ) {
 				return $all_checks;
 			}
 		);

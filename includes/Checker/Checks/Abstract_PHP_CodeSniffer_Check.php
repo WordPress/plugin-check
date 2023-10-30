@@ -11,6 +11,8 @@ use Exception;
 use PHP_CodeSniffer\Runner;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Static_Check;
+use WordPress\Plugin_Check\Traits\Amend_Check_Result;
+use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 
 /**
  * Check for running one or more PHP CodeSniffer sniffs.
@@ -18,6 +20,8 @@ use WordPress\Plugin_Check\Checker\Static_Check;
  * @since n.e.x.t
  */
 abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
+
+	use Amend_Check_Result;
 
 	/**
 	 * List of allowed PHPCS arguments.
@@ -29,7 +33,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		'standard'   => true,
 		'extensions' => true,
 		'sniffs'     => true,
-		'exclude'    => true,
+		'exclude'    => true, //phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
 	);
 
 	/**
@@ -83,6 +87,11 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 			'--report-width=9999',
 		);
 
+		$directories_to_ignore = Plugin_Request_Utility::get_directories_to_ignore();
+		if ( ! empty( $directories_to_ignore ) ) {
+			$defaults[] = '--ignore=*/' . implode( '/*,*/', $directories_to_ignore ) . '/*';
+		}
+
 		// Set the check arguments for PHPCS.
 		$_SERVER['argv'] = $this->parse_argv( $this->get_args(), $defaults );
 
@@ -116,15 +125,14 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 			}
 
 			foreach ( $file_results['messages'] as $file_message ) {
-				$result->add_message(
+				$this->add_result_message_for_file(
+					$result,
 					strtoupper( $file_message['type'] ) === 'ERROR',
 					$file_message['message'],
-					array(
-						'code'   => $file_message['source'],
-						'file'   => $file_name,
-						'line'   => $file_message['line'],
-						'column' => $file_message['column'],
-					)
+					$file_message['source'],
+					$file_name,
+					$file_message['line'],
+					$file_message['column']
 				);
 			}
 		}

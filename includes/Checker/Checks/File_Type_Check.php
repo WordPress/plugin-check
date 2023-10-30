@@ -10,6 +10,7 @@ namespace WordPress\Plugin_Check\Checker\Checks;
 use Exception;
 use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 
 /**
@@ -19,13 +20,15 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
  */
 class File_Type_Check extends Abstract_File_Check {
 
+	use Amend_Check_Result;
 	use Stable_Check;
 
-	const TYPE_COMPRESSED = 1;
-	const TYPE_PHAR       = 2;
-	const TYPE_VCS        = 4;
-	const TYPE_HIDDEN     = 8;
-	const TYPE_ALL        = 15; // Same as all of the above with bitwise OR.
+	const TYPE_COMPRESSED  = 1;
+	const TYPE_PHAR        = 2;
+	const TYPE_VCS         = 4;
+	const TYPE_HIDDEN      = 8;
+	const TYPE_APPLICATION = 16;
+	const TYPE_ALL         = 31; // Same as all of the above with bitwise OR.
 
 	/**
 	 * Bitwise flags to control check behavior.
@@ -83,6 +86,9 @@ class File_Type_Check extends Abstract_File_Check {
 		if ( $this->flags & self::TYPE_HIDDEN ) {
 			$this->look_for_hidden_files( $result, $files );
 		}
+		if ( $this->flags & self::TYPE_APPLICATION ) {
+			$this->look_for_application_files( $result, $files );
+		}
 	}
 
 	/**
@@ -97,7 +103,12 @@ class File_Type_Check extends Abstract_File_Check {
 		$compressed_files = self::filter_files_by_extensions( $files, array( 'zip', 'gz', 'tgz', 'rar', 'tar', '7z' ) );
 		if ( $compressed_files ) {
 			foreach ( $compressed_files as $file ) {
-				$this->add_result_error_for_file( $result, $file, 'compressed_files', __( 'Compressed files are not permitted.', 'plugin-check' ) );
+				$this->add_result_error_for_file(
+					$result,
+					__( 'Compressed files are not permitted.', 'plugin-check' ),
+					'compressed_files',
+					$file
+				);
 			}
 		}
 	}
@@ -114,7 +125,12 @@ class File_Type_Check extends Abstract_File_Check {
 		$phar_files = self::filter_files_by_extension( $files, 'phar' );
 		if ( $phar_files ) {
 			foreach ( $phar_files as $file ) {
-				$this->add_result_error_for_file( $result, $file, 'phar_files', __( 'Phar files are not permitted.', 'plugin-check' ) );
+				$this->add_result_error_for_file(
+					$result,
+					__( 'Phar files are not permitted.', 'plugin-check' ),
+					'phar_files',
+					$file
+				);
 			}
 		}
 	}
@@ -133,13 +149,13 @@ class File_Type_Check extends Abstract_File_Check {
 		$vcs_directories = array_filter(
 			array_unique(
 				array_map(
-					function( $file ) {
+					function ( $file ) {
 						return dirname( $file );
 					},
 					$files
 				)
 			),
-			function( $directory ) use ( $directories ) {
+			function ( $directory ) use ( $directories ) {
 				return isset( $directories[ basename( $directory ) ] );
 			}
 		);
@@ -148,13 +164,12 @@ class File_Type_Check extends Abstract_File_Check {
 			// Only use an error in production, otherwise a warning.
 			$is_error = ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) && 'production' === wp_get_environment_type();
 			foreach ( $vcs_directories as $dir ) {
-				$result->add_message(
+				$this->add_result_message_for_file(
+					$result,
 					$is_error,
 					__( 'Version control checkouts should not be present.', 'plugin-check' ),
-					array(
-						'code' => 'vcs_present',
-						'file' => str_replace( $result->plugin()->path(), '', $dir ),
-					)
+					'vcs_present',
+					$dir
 				);
 			}
 		}
@@ -173,29 +188,38 @@ class File_Type_Check extends Abstract_File_Check {
 		$hidden_files = self::filter_files_by_regex( $files, '/^((?!\/vendor\/|\/node_modules\/).)*\/\.\w+(\.\w+)*$/' );
 		if ( $hidden_files ) {
 			foreach ( $hidden_files as $file ) {
-				$this->add_result_error_for_file( $result, $file, 'hidden_files', __( 'Hidden files are not permitted.', 'plugin-check' ) );
+				$this->add_result_error_for_file(
+					$result,
+					__( 'Hidden files are not permitted.', 'plugin-check' ),
+					'hidden_files',
+					$file
+				);
 			}
 		}
 	}
 
 	/**
-	 * Amends the given result with an error for the given file, code, and message.
+	 * Looks for application files and amends the given result with an error if found.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param Check_Result $result  The check result to amend, including the plugin context to check.
-	 * @param string       $file    Absolute path to the file found.
-	 * @param string       $code    Error code.
-	 * @param string       $message Error message.
+	 * @param Check_Result $result The check result to amend, including the plugin context to check.
+	 * @param array        $files  List of absolute file paths.
 	 */
-	private function add_result_error_for_file( Check_Result $result, $file, $code, $message ) {
-		$result->add_message(
-			true,
-			$message,
-			array(
-				'code' => $code,
-				'file' => str_replace( $result->plugin()->path(), '', $file ),
-			)
+	protected function look_for_application_files( Check_Result $result, array $files ) {
+		$application_files = self::filter_files_by_extensions(
+			$files,
+			array( 'a', 'bin', 'bpk', 'deploy', 'dist', 'distz', 'dmg', 'dms', 'DS_Store', 'dump', 'elc', 'exe', 'iso', 'lha', 'lrf', 'lzh', 'o', 'obj', 'phar', 'pkg', 'sh', 'so' )
 		);
+		if ( $application_files ) {
+			foreach ( $application_files as $file ) {
+				$this->add_result_error_for_file(
+					$result,
+					__( 'Application files are not permitted.', 'plugin-check' ),
+					'application_detected',
+					$file
+				);
+			}
+		}
 	}
 }

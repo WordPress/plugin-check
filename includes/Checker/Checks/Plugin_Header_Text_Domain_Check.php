@@ -11,6 +11,7 @@ use Exception;
 use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Static_Check;
+use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 
 /**
@@ -20,6 +21,7 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
  */
 class Plugin_Header_Text_Domain_Check implements Static_Check {
 
+	use Amend_Check_Result;
 	use Stable_Check;
 
 	/**
@@ -60,18 +62,16 @@ class Plugin_Header_Text_Domain_Check implements Static_Check {
 			! empty( $plugin_header['TextDomain'] ) &&
 			$plugin_slug !== $plugin_header['TextDomain']
 		) {
-			$result->add_message(
-				false,
+			$this->add_result_warning_for_file(
+				$result,
 				sprintf(
 					/* translators: 1: plugin header text domain, 2: plugin slug */
 					__( 'The TextDomain header in the plugin file does not match the slug. Found "%1$s", expected "%2$s".', 'plugin-check' ),
 					esc_html( $plugin_header['TextDomain'] ),
 					esc_html( $plugin_slug )
 				),
-				array(
-					'code' => 'textdomain_mismatch',
-					'file' => $plugin_main_file,
-				)
+				'textdomain_mismatch',
+				$plugin_main_file
 			);
 		}
 	}
