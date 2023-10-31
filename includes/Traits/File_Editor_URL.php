@@ -23,13 +23,10 @@ trait File_Editor_URL {
 	 *
 	 * @param Check_Result $result   The check result to amend, including the plugin context to check.
 	 * @param string       $filename Error file name.
-	 * @param int          $line     Line number of error.
+	 * @param int          $line     Optional. Line number of error. Default 0 (no specific line).
 	 * @return string|null File editor URL or null if not available.
 	 */
-	protected function get_file_editor_url( Check_Result $result, $filename, $line ) {
-		if ( ! isset( $filename, $line ) ) {
-			return null;
-		}
+	protected function get_file_editor_url( Check_Result $result, $filename, $line = 0 ) {
 
 		$edit_url = null;
 
@@ -102,12 +99,15 @@ trait File_Editor_URL {
 
 		// Fall back to using the plugin editor if no external editor is offered.
 		if ( ! $edit_url && current_user_can( 'edit_plugins' ) ) {
+			$query_args = array(
+				'plugin' => rawurlencode( $result->plugin()->basename() ),
+				'file'   => rawurlencode( $plugin_slug . '/' . $filename ),
+			);
+			if ( $line ) {
+				$query_args['line'] = $line;
+			}
 			return add_query_arg(
-				array(
-					'plugin' => rawurlencode( $result->plugin()->basename() ),
-					'file'   => rawurlencode( $plugin_slug . '/' . $filename ),
-					'line'   => $line,
-				),
+				$query_args,
 				admin_url( 'plugin-editor.php' )
 			);
 		}
