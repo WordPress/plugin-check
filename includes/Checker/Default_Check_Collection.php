@@ -94,7 +94,7 @@ class Default_Check_Collection implements Check_Collection {
 			$checks[ $slug ] = $check;
 		}
 
-		return new static( $checks );
+		return new self( $checks );
 	}
 
 	/**
