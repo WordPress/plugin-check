@@ -26,14 +26,14 @@ class Default_Check_Repository_Tests extends WP_UnitTestCase {
 		$check = new Static_Check();
 		$this->repository->register_check( 'static_check', $check );
 
-		$this->assertSame( array( 'static_check' => $check ), $this->repository->get_checks() );
+		$this->assertSame( array( 'static_check' => $check ), $this->repository->get_checks()->to_map() );
 	}
 
 	public function test_register_runtime_check() {
 		$check = new Runtime_Check();
 		$this->repository->register_check( 'runtime_check', $check );
 
-		$this->assertSame( array( 'runtime_check' => $check ), $this->repository->get_checks() );
+		$this->assertSame( array( 'runtime_check' => $check ), $this->repository->get_checks()->to_map() );
 	}
 
 	public function test_register_exception_thrown_for_invalid_check() {
@@ -86,7 +86,7 @@ class Default_Check_Repository_Tests extends WP_UnitTestCase {
 			'runtime_check' => $runtime_check,
 		);
 
-		$this->assertSame( $expected, $this->repository->get_checks() );
+		$this->assertSame( $expected, $this->repository->get_checks()->to_map() );
 	}
 
 	public function test_get_checks_returns_static_checks_via_flag() {
@@ -96,7 +96,7 @@ class Default_Check_Repository_Tests extends WP_UnitTestCase {
 		$this->repository->register_check( 'static_check', $static_check );
 		$this->repository->register_check( 'runtime_check', $runtime_check );
 
-		$this->assertSame( array( 'static_check' => $static_check ), $this->repository->get_checks( Check_Repository::TYPE_STATIC ) );
+		$this->assertSame( array( 'static_check' => $static_check ), $this->repository->get_checks( Check_Repository::TYPE_STATIC )->to_map() );
 	}
 
 	public function test_get_checks_returns_runtime_checks_via_flag() {
@@ -106,7 +106,7 @@ class Default_Check_Repository_Tests extends WP_UnitTestCase {
 		$this->repository->register_check( 'static_check', $static_check );
 		$this->repository->register_check( 'runtime_check', $runtime_check );
 
-		$this->assertSame( array( 'runtime_check' => $runtime_check ), $this->repository->get_checks( Check_Repository::TYPE_RUNTIME ) );
+		$this->assertSame( array( 'runtime_check' => $runtime_check ), $this->repository->get_checks( Check_Repository::TYPE_RUNTIME )->to_map() );
 	}
 
 	public function test_get_checks_returns_checks_via_slug() {
@@ -116,14 +116,11 @@ class Default_Check_Repository_Tests extends WP_UnitTestCase {
 		$this->repository->register_check( 'static_check', $static_check );
 		$this->repository->register_check( 'runtime_check', $runtime_check );
 
-		$this->assertSame( array( $static_check ), $this->repository->get_checks( Check_Repository::TYPE_ALL, array( 'static_check' ) ) );
-	}
+		$checks = $this->repository->get_checks( Check_Repository::TYPE_ALL )
+			->include( array( 'static_check' ) )
+			->to_array();
 
-	public function test_get_checks_throws_exception_for_invalid_check_slug() {
-		$this->expectException( 'Exception' );
-		$this->expectExceptionMessage( 'Check with the slug "invalid_check" does not exist.' );
-
-		$this->repository->get_checks( Check_Repository::TYPE_ALL, array( 'invalid_check' ) );
+		$this->assertSame( array( $static_check ), $checks );
 	}
 
 	public function test_get_checks_returns_no_experimental_checks_by_default() {
@@ -142,7 +139,7 @@ class Default_Check_Repository_Tests extends WP_UnitTestCase {
 			'runtime_check' => $runtime_check,
 		);
 
-		$this->assertSame( $expected, $this->repository->get_checks() );
+		$this->assertSame( $expected, $this->repository->get_checks()->to_map() );
 	}
 
 	public function test_get_checks_returns_experimental_checks_with_flag() {
@@ -163,7 +160,7 @@ class Default_Check_Repository_Tests extends WP_UnitTestCase {
 			'experimental_runtime_check' => $experimental_runtime_check,
 		);
 
-		$this->assertSame( $expected, $this->repository->get_checks( Check_Repository::TYPE_ALL | Check_Repository::INCLUDE_EXPERIMENTAL ) );
+		$this->assertSame( $expected, $this->repository->get_checks( Check_Repository::TYPE_ALL | Check_Repository::INCLUDE_EXPERIMENTAL )->to_map() );
 	}
 
 	public function test_get_checks_returns_experimental_static_checks_with_flag() {
@@ -182,7 +179,7 @@ class Default_Check_Repository_Tests extends WP_UnitTestCase {
 			'experimental_static_check' => $experimental_static_check,
 		);
 
-		$this->assertSame( $expected, $this->repository->get_checks( Check_Repository::TYPE_STATIC | Check_Repository::INCLUDE_EXPERIMENTAL ) );
+		$this->assertSame( $expected, $this->repository->get_checks( Check_Repository::TYPE_STATIC | Check_Repository::INCLUDE_EXPERIMENTAL )->to_map() );
 	}
 
 	public function test_get_checks_returns_experimental_runtime_checks_with_flag() {
@@ -201,6 +198,6 @@ class Default_Check_Repository_Tests extends WP_UnitTestCase {
 			'experimental_runtime_check' => $experimental_runtime_check,
 		);
 
-		$this->assertSame( $expected, $this->repository->get_checks( Check_Repository::TYPE_RUNTIME | Check_Repository::INCLUDE_EXPERIMENTAL ) );
+		$this->assertSame( $expected, $this->repository->get_checks( Check_Repository::TYPE_RUNTIME | Check_Repository::INCLUDE_EXPERIMENTAL )->to_map() );
 	}
 }

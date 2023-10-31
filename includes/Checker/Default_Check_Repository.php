@@ -82,13 +82,10 @@ class Default_Check_Repository implements Check_Repository {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param int   $flags       The check type flag.
-	 * @param array $check_slugs An array of check slugs to return.
-	 * @return array An array of check instances.
-	 *
-	 * @throws Exception Thrown when invalid flag is passed, or Check slug does not exist.
+	 * @param int $flags The check type flag.
+	 * @return Check_Collection Check collection providing an indexed array of check instances.
 	 */
-	public function get_checks( $flags = self::TYPE_ALL, array $check_slugs = array() ) {
+	public function get_checks( $flags = self::TYPE_ALL ) {
 		$checks = array();
 
 		if ( $flags & self::TYPE_STATIC ) {
@@ -99,37 +96,19 @@ class Default_Check_Repository implements Check_Repository {
 			$checks += $this->runtime_checks;
 		}
 
-		// Filter out the specific check slugs requested.
-		if ( ! empty( $check_slugs ) ) {
-			$checks = array_map(
-				function ( $slug ) use ( $checks ) {
-					if ( ! isset( $checks[ $slug ] ) ) {
-						throw new Exception(
-							sprintf(
-								/* translators: %s: The Check slug. */
-								__( 'Check with the slug "%s" does not exist.', 'plugin-check' ),
-								$slug
-							)
-						);
-					}
-
-					return $checks[ $slug ];
-				},
-				$check_slugs
-			);
-		}
-
 		// Return all checks, including experimental if requested.
 		if ( $flags & self::INCLUDE_EXPERIMENTAL ) {
-			return $checks;
+			return new Default_Check_Collection( $checks );
 		}
 
 		// Remove experimental checks before returning.
-		return array_filter(
-			$checks,
-			static function ( $check ) {
-				return $check->get_stability() !== Check::STABILITY_EXPERIMENTAL;
-			}
+		return new Default_Check_Collection(
+			array_filter(
+				$checks,
+				static function ( $check ) {
+					return $check->get_stability() !== Check::STABILITY_EXPERIMENTAL;
+				}
+			)
 		);
 	}
 }
