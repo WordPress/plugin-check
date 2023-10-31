@@ -60,7 +60,7 @@ final class Plugin_Check_Command {
 	 * : The plugin to check. Plugin name.
 	 *
 	 * [--checks=<checks>]
-	 * : Only runs checks provided as an argument in comma-separated values, e.g. enqueued-scripts, escaping. Otherwise runs all checks.
+	 * : Only runs checks provided as an argument in comma-separated values, e.g. i18n_usage, late_escaping. Otherwise runs all checks.
 	 *
 	 * [--format=<format>]
 	 * : Format to display the results. Options are table, csv, and json. The default will be a table.
