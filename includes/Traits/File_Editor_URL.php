@@ -63,7 +63,7 @@ trait File_Editor_URL {
 		$editor_url_template = apply_filters( 'wp_plugin_check_validation_error_source_file_editor_url_template', null );
 
 		// Supply the file path to the editor template.
-		if ( null !== $editor_url_template && str_contains( $editor_url_template, '{{file}}' ) ) {
+		if ( is_string( $editor_url_template ) && str_contains( $editor_url_template, '{{file}}' ) ) {
 			$file_path = WP_PLUGIN_DIR . '/' . $plugin_slug;
 			if ( $plugin_slug !== $filename ) {
 				$file_path .= '/' . $filename;
