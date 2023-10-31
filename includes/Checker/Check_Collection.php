@@ -43,6 +43,7 @@ interface Check_Collection extends ArrayAccess, Countable, IteratorAggregate {
 	 *
 	 * @since n.e.x.t
 	 *
+	 * @param array $check_slugs List of slugs to limit to only those. If empty, the same collection is returned.
 	 * @return Check_Collection New check collection, effectively a subset of this one.
 	 */
 	public function include( array $check_slugs ): Check_Collection;

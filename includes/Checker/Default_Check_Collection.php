@@ -8,7 +8,6 @@
 namespace WordPress\Plugin_Check\Checker;
 
 use ArrayIterator;
-use Exception;
 use Traversable;
 
 /**
@@ -75,6 +74,7 @@ class Default_Check_Collection implements Check_Collection {
 	 *
 	 * @since n.e.x.t
 	 *
+	 * @param array $check_slugs List of slugs to limit to only those. If empty, the same collection is returned.
 	 * @return Check_Collection New check collection, effectively a subset of this one.
 	 */
 	public function include( array $check_slugs ): Check_Collection {
