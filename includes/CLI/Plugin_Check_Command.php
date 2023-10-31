@@ -87,10 +87,14 @@ final class Plugin_Check_Command {
 	 * [--include-experimental]
 	 * : Include experimental checks.
 	 *
+	 * [--exclude-directories=<directories>]
+	 * : Additional directories to exclude from checks
+	 * By default, `.git`, `vendor` and `node_modules` directories are excluded.
+	 *
 	 * ## EXAMPLES
 	 *
 	 *   wp plugin check akismet
-	 *   wp plugin check akismet --checks=escaping
+	 *   wp plugin check akismet --checks=late_escaping
 	 *   wp plugin check akismet --format=json
 	 *
 	 * @subcommand check
@@ -127,6 +131,15 @@ final class Plugin_Check_Command {
 
 		// Create the categories array from CLI arguments.
 		$categories = isset( $options['categories'] ) ? wp_parse_list( $options['categories'] ) : array();
+
+		$excluded_directories = isset( $options['exclude-directories'] ) ? wp_parse_list( $options['exclude-directories'] ) : array();
+
+		add_filter(
+			'wp_plugin_check_ignore_directories',
+			static function ( $dirs ) use ( $excluded_directories ) {
+				return array_unique( array_merge( $dirs, $excluded_directories ) );
+			}
+		);
 
 		// Get the CLI Runner.
 		$runner = Plugin_Request_Utility::get_runner();
