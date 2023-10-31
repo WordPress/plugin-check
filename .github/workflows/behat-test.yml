@@ -73,10 +73,11 @@ jobs:
             wordpress: 'latest'
             coverage: true
           - php: '8.0'
-            wordpress: '6.0'
-          - php: '8.0'
-            wordpress: '6.1'
+            wordpress: '6.3'
           - php: '8.2'
+            wordpress: 'trunk'
+            experimental: true
+          - php: '8.3'
             wordpress: 'trunk'
             experimental: true
     env:
