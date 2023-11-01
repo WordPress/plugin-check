@@ -16,6 +16,8 @@ use WordPress\Plugin_Check\Checker\Check_Result;
  */
 trait Amend_Check_Result {
 
+	use File_Editor_URL;
+
 	/**
 	 * Amends the given result with a message for the specified file, including error information.
 	 *
@@ -38,6 +40,7 @@ trait Amend_Check_Result {
 				'file'   => str_replace( $result->plugin()->path(), '', $file ),
 				'line'   => $line,
 				'column' => $column,
+				'link'   => $this->get_file_editor_url( $result, $file, $line ),
 			)
 		);
 	}
