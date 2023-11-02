@@ -102,13 +102,10 @@ class Default_Check_Repository implements Check_Repository {
 		}
 
 		// Remove experimental checks before returning.
-		return new Default_Check_Collection(
-			array_filter(
-				$checks,
-				static function ( $check ) {
-					return $check->get_stability() !== Check::STABILITY_EXPERIMENTAL;
-				}
-			)
+		return ( new Default_Check_Collection( $checks ) )->filter(
+			static function ( $check ) {
+				return $check->get_stability() !== Check::STABILITY_EXPERIMENTAL;
+			}
 		);
 	}
 }

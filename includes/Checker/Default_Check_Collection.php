@@ -68,6 +68,24 @@ class Default_Check_Collection implements Check_Collection {
 	}
 
 	/**
+	 * Returns a new check collection containing the subset of checks based on the given check filter function.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param callable $filter_fn Filter function that accepts a single check object and should return a boolean for
+	 *                            whether to include the check in the new collection.
+	 * @return Check_Collection New check collection, effectively a subset of this one.
+	 */
+	public function filter( callable $filter_fn ): Check_Collection {
+		return new self(
+			array_filter(
+				$this->checks,
+				$filter_fn
+			)
+		);
+	}
+
+	/**
 	 * Returns a new check collection containing the subset of checks based on the given check slugs.
 	 *
 	 * If the given list is empty, the same collection will be returned without any change.
