@@ -123,6 +123,14 @@ class Default_Check_Repository_Tests extends WP_UnitTestCase {
 		$this->assertSame( array( $static_check ), $checks );
 	}
 
+	public function test_get_checks_throws_exception_for_invalid_check_slug() {
+		$this->expectException( 'Exception' );
+		$this->expectExceptionMessage( 'Check with the slug "invalid_check" does not exist.' );
+
+		$this->repository->get_checks( Check_Repository::TYPE_ALL )
+			->require( array( 'invalid_check' ) );
+	}
+
 	public function test_get_checks_returns_no_experimental_checks_by_default() {
 		$static_check               = new Static_Check();
 		$runtime_check              = new Runtime_Check();

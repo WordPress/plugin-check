@@ -8,6 +8,7 @@
 namespace WordPress\Plugin_Check\Checker;
 
 use ArrayIterator;
+use Exception;
 use Traversable;
 
 /**
@@ -113,6 +114,32 @@ class Default_Check_Collection implements Check_Collection {
 		}
 
 		return new self( $checks );
+	}
+
+	/**
+	 * Throws an exception if any of the given check slugs are not present, or returns the same collection otherwise.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param array $check_slugs List of slugs to limit to only those. If empty, the same collection is returned.
+	 * @return Check_Collection The unchanged check collection.
+	 *
+	 * @throws Exception Thrown when any of the given check slugs is not present in the collection.
+	 */
+	public function require( array $check_slugs ): Check_Collection {
+		foreach ( $check_slugs as $slug ) {
+			if ( ! isset( $this->checks[ $slug ] ) ) {
+				throw new Exception(
+					sprintf(
+						/* translators: %s: The Check slug. */
+						__( 'Check with the slug "%s" does not exist.', 'plugin-check' ),
+						$slug
+					)
+				);
+			}
+		}
+
+		return $this;
 	}
 
 	/**
