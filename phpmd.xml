@@ -19,6 +19,12 @@
 		</properties>
 	</rule>
 
+	<rule ref="rulesets/codesize.xml/TooManyPublicMethods">
+		<properties>
+			<property name="ignorepattern" value="(^(getIterator|offsetExists|offsetGet|offsetSet|offsetUnset))i" />
+		</properties>
+	</rule>
+
 	<rule ref="rulesets/cleancode.xml">
 		<exclude name="ElseExpression" />
 		<exclude name="StaticAccess" />
