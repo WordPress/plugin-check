@@ -90,6 +90,7 @@ final class Check_Result {
 	 *     @type string $file   The file in which the message occurred. Default empty string (unknown file).
 	 *     @type int    $line   The line on which the message occurred. Default 0 (unknown line).
 	 *     @type int    $column The column on which the message occurred. Default 0 (unknown column).
+	 *     @type string $link   View in code editor link. Default empty string.
 	 * }
 	 */
 	public function add_message( $error, $message, $args = array() ) {
@@ -98,6 +99,7 @@ final class Check_Result {
 			'file'   => '',
 			'line'   => 0,
 			'column' => 0,
+			'link'   => '',
 		);
 
 		$data = array_merge(

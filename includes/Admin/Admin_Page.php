@@ -51,6 +51,7 @@ final class Admin_Page {
 	public function add_hooks() {
 		add_action( 'admin_menu', array( $this, 'add_and_initialize_page' ) );
 		add_filter( 'plugin_action_links', array( $this, 'filter_plugin_action_links' ), 10, 4 );
+		add_action( 'admin_enqueue_scripts', array( $this, 'add_jump_to_line_code_editor' ) );
 
 		$this->admin_ajax->add_hooks();
 	}
@@ -120,6 +121,41 @@ final class Admin_Page {
 				)
 			),
 			'before'
+		);
+	}
+
+	/**
+	 * Enqueue a script in the WordPress admin on plugin-editor.php.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param string $hook_suffix The current admin page.
+	 */
+	public function add_jump_to_line_code_editor( $hook_suffix ) {
+		if ( 'plugin-editor.php' !== $hook_suffix ) {
+			return;
+		}
+
+		$line = (int) ( $_GET['line'] ?? 0 );
+		if ( ! $line ) {
+			return;
+		}
+
+		wp_add_inline_script(
+			'wp-theme-plugin-editor',
+			sprintf(
+				'
+					(
+						( originalInitCodeEditor ) => {
+							wp.themePluginEditor.initCodeEditor = function() {
+								originalInitCodeEditor.apply( this, arguments );
+								this.instance.codemirror.doc.setCursor( %d - 1 );
+							};
+						}
+					)( wp.themePluginEditor.initCodeEditor );
+				',
+				wp_json_encode( $line )
+			)
 		);
 	}
 
