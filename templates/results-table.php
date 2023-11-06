@@ -17,6 +17,11 @@
 			<td>
 				<?php esc_html_e( 'Message', 'plugin-check' ); ?>
 			</td>
+			<# if ( data.hasLinks ) { #>
+				<td>
+					<?php esc_html_e( 'Edit Link', 'plugin-check' ); ?>
+				</td>
+			<# } #>
 		</tr>
 	</thead>
 	<tbody id="plugin-check__results-body-{{data.index}}"></tbody>
