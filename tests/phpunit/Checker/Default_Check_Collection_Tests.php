@@ -90,4 +90,26 @@ class Default_Check_Collection_Tests extends WP_UnitTestCase {
 
 		$this->collection->require( array( 'static_check', 'invalid_check' ) );
 	}
+
+	public function test_exclude() {
+		$this->assertSame(
+			array( $this->checks['runtime_check'] ),
+			$this->collection->exclude( array( 'static_check' ) )->to_array()
+		);
+	}
+
+	public function test_exclude_with_empty() {
+		$this->assertSame(
+			array_values( $this->checks ),
+			$this->collection->exclude( array() )->to_array()
+		);
+	}
+
+	public function test_exclude_with_invalid() {
+		$this->assertSame(
+			array( $this->checks['runtime_check'] ),
+			$this->collection->exclude( array( 'invalid_check' ) )->to_array()
+		);
+	}
+
 }
