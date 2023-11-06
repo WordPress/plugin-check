@@ -90,13 +90,13 @@ class CLI_Runner extends Abstract_Check_Runner {
 	}
 
 	/**
-	 * Returns an array of Check slugs to ignore based on the request.
+	 * Returns an array of Check slugs to exclude based on the request.
 	 *
 	 * @since n.e.x.t
 	 *
 	 * @return array An array of Check slugs to run.
 	 */
-	protected function get_check_ignore_slugs_param() {
+	protected function get_check_exclude_slugs_param() {
 		$checks = array();
 
 		foreach ( $_SERVER['argv'] as $value ) {

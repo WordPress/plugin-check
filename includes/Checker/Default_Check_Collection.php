@@ -130,7 +130,7 @@ class Default_Check_Collection implements Check_Collection {
 	 * @return Check_Collection New check collection, effectively a subset of this one.
 	 */
 	public function exclude( array $check_slugs ): Check_Collection {
-		// Return unmodified collection if no check slugs to ignore are given.
+		// Return unmodified collection if no check slugs to exclude are given.
 		if ( ! $check_slugs ) {
 			return $this;
 		}
