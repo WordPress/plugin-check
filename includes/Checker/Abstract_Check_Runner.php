@@ -410,7 +410,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 
 		$collection = $this->check_repository->get_checks( $check_flags )
 			->include( $check_slugs ) // Ensures only the checks with the given slugs are included.
-			->exclude( $excluded_checks ); // Exclude provided checks from list
+			->exclude( $excluded_checks ); // Exclude provided checks from list.
 
 		// Filters the checks by specific categories.
 		$categories = $this->get_categories();
