@@ -63,9 +63,8 @@ interface Check_Repository {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param int   $flags       The check type flag.
-	 * @param array $check_slugs An array of check slugs to return.
-	 * @return array An indexed array of check instances.
+	 * @param int $flags The check type flag.
+	 * @return Check_Collection Check collection providing an indexed array of check instances.
 	 */
-	public function get_checks( $flags = self::TYPE_ALL, array $check_slugs = array() );
+	public function get_checks( $flags = self::TYPE_ALL );
 }
