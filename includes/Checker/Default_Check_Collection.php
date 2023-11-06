@@ -73,15 +73,18 @@ class Default_Check_Collection implements Check_Collection {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param callable $filter_fn Filter function that accepts a single check object and should return a boolean for
-	 *                            whether to include the check in the new collection.
+	 * @phpstan-param callable(Check,string): bool $filter_fn
+	 *
+	 * @param callable $filter_fn Filter function that accepts a Check object and a Check slug and
+	 *                            should return a boolean for whether to include the check in the new collection.
 	 * @return Check_Collection New check collection, effectively a subset of this one.
 	 */
 	public function filter( callable $filter_fn ): Check_Collection {
 		return new self(
 			array_filter(
 				$this->checks,
-				$filter_fn
+				$filter_fn,
+				ARRAY_FILTER_USE_BOTH
 			)
 		);
 	}
@@ -114,6 +117,29 @@ class Default_Check_Collection implements Check_Collection {
 		}
 
 		return new self( $checks );
+	}
+
+	/**
+	 * Returns a new check collection excluding the provided checks.
+	 *
+	 * If the given list is empty, the same collection will be returned without any change.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param array $check_slugs List of slugs to exclude. If empty, the same collection is returned.
+	 * @return Check_Collection New check collection, effectively a subset of this one.
+	 */
+	public function exclude( array $check_slugs ): Check_Collection {
+		// Return unmodified collection if no check slugs to ignore are given.
+		if ( ! $check_slugs ) {
+			return $this;
+		}
+
+		return $this->filter(
+			static function ( Check $check, $slug ) use( $check_slugs ) {
+				return ! in_array( $slug, $check_slugs, true );
+			}
+		);
 	}
 
 	/**

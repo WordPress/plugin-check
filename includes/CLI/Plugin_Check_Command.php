@@ -62,6 +62,10 @@ final class Plugin_Check_Command {
 	 * [--checks=<checks>]
 	 * : Only runs checks provided as an argument in comma-separated values, e.g. i18n_usage, late_escaping. Otherwise runs all checks.
 	 *
+	 * [--exclude-checks=<checks>]
+	 * : Exclude checks provided as an argument in comma-separated values, e.g. i18n_usage, late_escaping.
+	 * Applies after evaluating `--checks`.
+	 *
 	 * [--format=<format>]
 	 * : Format to display the results. Options are table, csv, and json. The default will be a table.
 	 * ---

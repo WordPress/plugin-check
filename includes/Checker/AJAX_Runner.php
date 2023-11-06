@@ -83,6 +83,20 @@ class AJAX_Runner extends Abstract_Check_Runner {
 	}
 
 	/**
+	 * Returns an array of Check slugs to ignore based on the request.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array An array of Check slugs to ignore.
+	 */
+	protected function get_check_ignore_slugs_param() {
+		$checks = filter_input( INPUT_POST, 'ignore-checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
+		$checks = is_null( $checks ) ? array() : $checks;
+
+		return $checks;
+	}
+
+	/**
 	 * Returns the include experimental parameter based on the request.
 	 *
 	 * @since n.e.x.t
