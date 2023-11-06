@@ -90,7 +90,7 @@ class AJAX_Runner extends Abstract_Check_Runner {
 	 * @return array An array of Check slugs to exclude.
 	 */
 	protected function get_check_exclude_slugs_param() {
-		$checks = filter_input( INPUT_POST, 'ignore-checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
+		$checks = filter_input( INPUT_POST, 'exclude-checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
 		$checks = is_null( $checks ) ? array() : $checks;
 
 		return $checks;

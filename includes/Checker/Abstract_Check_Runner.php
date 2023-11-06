@@ -179,11 +179,11 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	}
 
 	/**
-	 * Sets the check slugs to be ignored.
+	 * Sets the check slugs to be excluded.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param array $check_slugs An array of check slugs to be ignored.
+	 * @param array $check_slugs An array of check slugs to be excluded.
 	 *
 	 * @throws Exception Thrown if the checks do not match those in the original request.
 	 */
@@ -192,7 +192,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			// Compare the check slugs to see if there was an error.
 			if ( $check_slugs !== $this->get_check_exclude_slugs_param() ) {
 				throw new Exception(
-					__( 'Invalid checks: The checks to ignore do not match the original request.', 'plugin-check' )
+					__( 'Invalid checks: The checks to exclude do not match the original request.', 'plugin-check' )
 				);
 			}
 		}
