@@ -111,5 +111,4 @@ class Default_Check_Collection_Tests extends WP_UnitTestCase {
 			$this->collection->exclude( array( 'invalid_check' ) )->to_array()
 		);
 	}
-
 }
