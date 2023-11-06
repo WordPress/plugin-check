@@ -11,11 +11,18 @@
 
 	<rule ref="rulesets/codesize.xml">
 		<exclude name="CyclomaticComplexity" />
+		<exclude name="TooManyPublicMethods" />
 	</rule>
 
 	<rule ref="rulesets/codesize.xml/CyclomaticComplexity">
 		<properties>
 			<property name="reportLevel" value="20" />
+		</properties>
+	</rule>
+
+	<rule ref="rulesets/codesize.xml/TooManyPublicMethods">
+		<properties>
+			<property name="ignorepattern" value="(^(__construct|getIterator|offsetExists|offsetGet|offsetSet|offsetUnset))i" />
 		</properties>
 	</rule>
 

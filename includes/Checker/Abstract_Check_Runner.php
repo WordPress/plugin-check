@@ -368,7 +368,10 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			$check_flags = $check_flags | Check_Repository::INCLUDE_EXPERIMENTAL;
 		}
 
-		$checks = $this->check_repository->get_checks( $check_flags, $check_slugs );
+		$checks = $this->check_repository->get_checks( $check_flags )
+			->require( $check_slugs ) // Ensures all of the given slugs are valid.
+			->include( $check_slugs ) // Ensures only the checks with the given slugs are included.
+			->to_map();
 
 		// Filters the checks by specific categories.
 		$categories = $this->get_categories();
