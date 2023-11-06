@@ -107,7 +107,7 @@ class Default_Check_Collection_Tests extends WP_UnitTestCase {
 
 	public function test_exclude_with_invalid() {
 		$this->assertSame(
-			array( $this->checks['runtime_check'] ),
+			array( $this->checks['static_check'], $this->checks['runtime_check'] ),
 			$this->collection->exclude( array( 'invalid_check' ) )->to_array()
 		);
 	}
