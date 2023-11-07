@@ -21,7 +21,6 @@ class Plugin_Main {
 	 * Context instance for the plugin.
 	 *
 	 * @since n.e.x.t
-	 *
 	 * @var Plugin_Context
 	 */
 	protected $context;

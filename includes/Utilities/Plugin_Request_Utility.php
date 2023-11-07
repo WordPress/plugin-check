@@ -38,6 +38,8 @@ class Plugin_Request_Utility {
 	/**
 	 * Returns the plugin basename based on the input provided.
 	 *
+	 * @since n.e.x.t
+	 *
 	 * @param string $plugin_slug The plugin slug or basename.
 	 * @return string The plugin basename.
 	 *

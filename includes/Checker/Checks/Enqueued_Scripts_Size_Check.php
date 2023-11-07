@@ -251,6 +251,8 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	/**
 	 * Returns an array of viewable post types.
 	 *
+	 * @since n.e.x.t
+	 *
 	 * @return array Array of viewable post type slugs.
 	 */
 	private function get_viewable_post_types() {
