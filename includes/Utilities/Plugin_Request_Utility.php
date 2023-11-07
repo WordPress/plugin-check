@@ -10,6 +10,7 @@ namespace WordPress\Plugin_Check\Utilities;
 use Exception;
 use WordPress\Plugin_Check\Checker\Abstract_Check_Runner;
 use WordPress\Plugin_Check\Checker\AJAX_Runner;
+use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\CLI_Runner;
 
 /**
@@ -158,5 +159,21 @@ class Plugin_Request_Utility {
 		$directories_to_ignore = (array) apply_filters( 'wp_plugin_check_ignore_directories', $default_ignore_directories );
 
 		return $directories_to_ignore;
+	}
+
+	/**
+	 * Checks if single file plugin.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param Check_Result $result The Check Result to amend.
+	 * @return bool true if the single file plugin, otherwise false.
+	 */
+	public static function is_single_file_plugin( Check_Result $result ) {
+		if ( $result->plugin()->path() === $result->plugin()->location() ) {
+			return false;
+		}
+
+		return true;
 	}
 }

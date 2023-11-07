@@ -12,6 +12,7 @@ use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Traits\Find_Readme;
 use WordPress\Plugin_Check\Traits\Stable_Check;
+use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 
 /**
  * Check the plugins readme file and contents.
@@ -46,6 +47,11 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 * @param array        $files  Array of plugin files.
 	 */
 	protected function check_files( Check_Result $result, array $files ) {
+
+		// Check if single file plugin, then bail early.
+		if ( Plugin_Request_Utility::is_single_file_plugin( $result ) ) {
+			return;
+		}
 
 		$plugin_relative_path = $result->plugin()->path();
 
