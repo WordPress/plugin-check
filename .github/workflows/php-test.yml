@@ -41,7 +41,7 @@ concurrency:
 
 jobs:
   php-test:
-    name: PHP ${{ matrix.php }} - WP ${{ matrix.wordpress }}${{ matrix.experimental && ' (experimental)' || '' }}
+    name: PHP ${{ matrix.php }} - WP ${{ matrix.wordpress }}${{ matrix.experimental && ' (experimental)' || '' }}${{ matrix.coverage && ' (with coverage)' || '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
