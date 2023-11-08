@@ -12,7 +12,10 @@
   },
   "require-dev": {
     "wp-phpunit/wp-phpunit": "^6.1",
-    "yoast/phpunit-polyfills": "^1.0"
+    "yoast/phpunit-polyfills": "^1.0",
+    "wp-cli/extension-command": "^2.1",
+    "wp-cli/wp-cli": "^2.8",
+    "wp-cli/wp-cli-tests": "^v4.2.2"
   },
   "scripts": {
     "lint": [
@@ -31,7 +34,20 @@
     "phpstan": [
       "composer --working-dir=build-cs install",
       "build-cs/vendor/bin/phpstan analyse --memory-limit=2048M"
-    ]
+    ],
+    "behat": "BEHAT_FEATURES_FOLDER=tests/behat/features run-behat-tests",
+    "behat-rerun": "BEHAT_FEATURES_FOLDER=tests/behat/features rerun-behat-tests",
+    "prepare-behat-tests": "install-package-tests"
+  },
+  "scripts-descriptions": {
+    "lint": "Detect coding standards issues",
+    "format": "Detect and automatically fix most coding standards issues",
+    "test": "Run unit tests",
+    "phpmd": "Run PHP mess detector",
+    "phpstan": "Run static analysis",
+    "behat": "Run functional tests",
+    "behat-rerun": "Re-run failed functional tests",
+    "prepare-behat-tests": "Prepare functional tests"
   },
   "config": {
     "allow-plugins": {
@@ -52,7 +68,8 @@
   "autoload-dev": {
     "psr-4": {
       "WordPress\\Plugin_Check\\Test_Data\\": "tests/phpunit/testdata",
-      "WordPress\\Plugin_Check\\Test_Utils\\": "tests/phpunit/utils"
+      "WordPress\\Plugin_Check\\Test_Utils\\": "tests/phpunit/utils",
+      "WordPress\\Plugin_Check\\Behat_Utils\\": "tests/behat/includes"
     }
   }
 }
