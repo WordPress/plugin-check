@@ -87,7 +87,9 @@ class Plugin_Context {
 	}
 
 	/**
-	 * Checks if single file plugin.
+	 * Checks if the plugin is a single file plugin without a dedicated directory.
+	 *
+	 * This is the case when the single file is directly placed within `wp-content/plugins`.
 	 *
 	 * @since n.e.x.t
 	 *
