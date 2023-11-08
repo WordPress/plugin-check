@@ -73,11 +73,6 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
 
-      - name: Install PHP dependencies
-        uses: ramsey/composer-install@83af392bf5f031813d25e6fe4cd626cdba9a2df6
-        with:
-          composer-options: '--prefer-dist --no-progress --no-interaction'
-
       - name: Setup Node.js (.nvmrc)
         uses: actions/setup-node@v3
         with:
