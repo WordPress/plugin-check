@@ -91,16 +91,14 @@ jobs:
           fi
 
       - name: Run tests
-        if: ${{ ! matrix.coverage }}
         run: |
-          npm run test-php
-          npm run test-php-multisite
-
-      - name: Run tests with coverage
-        if: ${{ matrix.coverage }}
-        run: |
-          npm run test-php-coverage
-          npm run test-php-multisite-coverage
+          if [[ ${{ matrix.coverage == true }} == true ]]; then
+            npm run test-php-coverage
+            npm run test-php-multisite-coverage
+          else
+            npm run test-php
+            npm run test-php-multisite
+          fi
 
       - name: Upload code coverage report
         if: ${{ matrix.coverage }}
