@@ -55,9 +55,11 @@ jobs:
         - '7.4'
         - '8.0'
         - '8.1'
-        - '8.2'
         wordpress: [ 'latest' ]
         include:
+          - php: '8.2'
+            wordpress: 'latest'
+            coverage: true
           - php: '8.2'
             wordpress: 'trunk'
             experimental: true
@@ -70,7 +72,8 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
- 
+          coverage: ${{ matrix.coverage == 'true' && 'xdebug' || 'none' }}
+
       - name: Setup Node.js (.nvmrc)
         uses: actions/setup-node@v3
         with:
@@ -83,8 +86,21 @@ jobs:
       - name: Install WordPress
         run: npm run wp-env start
 
-      - name: Running php unit tests
-        run: npm run test-php
+      - name: Run tests
+        if: ${{ matrix.coverage != 'true' }}
+        run: |
+          npm run test-php
+          npm run test-php-multisite
 
-      - name: Running multisite unit tests
-        run: npm run test-php-multisite
+      - name: Run tests with coverage
+        if: ${{ matrix.coverage == 'true' }}
+        run: |
+          npm run test-php-coverage
+          npm run test-php-multisite-coverage
+
+      - name: Upload code coverage report
+        if: ${{ matrix.coverage == 'true' }}
+        uses: codecov/codecov-action@eaaf4bedf32dbdc6b720b63067d99c4d77d6047d
+        with:
+          file: build/logs/*.xml
+          flags: unit

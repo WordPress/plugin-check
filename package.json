@@ -23,6 +23,8 @@
     "format-php": "wp-env run composer run-script format",
     "pretest-php": "wp-env run composer 'install --no-interaction'",
     "test-php": "wp-env run phpunit 'phpunit -c /var/www/html/wp-content/plugins/$(basename $(pwd))/phpunit.xml.dist --verbose'",
-    "test-php-multisite": "wp-env run phpunit 'WP_MULTISITE=1 phpunit -c /var/www/html/wp-content/plugins/$(basename $(pwd))/tests/phpunit/multisite.xml --verbose'"
+    "test-php-coverage": "wp-env run phpunit 'phpunit -c /var/www/html/wp-content/plugins/$(basename $(pwd))/phpunit.xml.dist --verbose  --coverage-clover /var/www/html/wp-content/plugins/$(basename $(pwd))/build/logs/php-coverage.xml'",
+    "test-php-multisite": "wp-env run phpunit 'WP_MULTISITE=1 phpunit -c /var/www/html/wp-content/plugins/$(basename $(pwd))/tests/phpunit/multisite.xml --verbose'",
+    "test-php-multisite-coverage": "wp-env run phpunit 'WP_MULTISITE=1 phpunit -c /var/www/html/wp-content/plugins/$(basename $(pwd))/tests/phpunit/multisite.xml --verbose --coverage-clover /var/www/html/wp-content/plugins/$(basename $(pwd))/build/logs/php-coverage-multisite.xml'"
   }
 }
