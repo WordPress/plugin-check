@@ -85,4 +85,15 @@ class Plugin_Context {
 
 		return $path;
 	}
+
+	/**
+	 * Checks if single file plugin.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return bool true if the single file plugin, otherwise false.
+	 */
+	public function is_single_file_plugin() {
+		return $this->path() !== $this->location();
+	}
 }

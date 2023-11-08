@@ -13,7 +13,6 @@ use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Traits\Find_Readme;
 use WordPress\Plugin_Check\Traits\Stable_Check;
-use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 
 /**
  * Check for trademarks.
@@ -309,7 +308,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	 */
 	private function check_for_slug( Check_Result $result ) {
 		// Check if single file plugin, then bail early.
-		if ( Plugin_Request_Utility::is_single_file_plugin( $result ) ) {
+		if ( $result->plugin()->is_single_file_plugin() ) {
 			return;
 		}
 

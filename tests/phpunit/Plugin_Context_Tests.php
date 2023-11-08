@@ -45,4 +45,11 @@ class Plugin_Context_Tests extends WP_UnitTestCase {
 
 		$this->assertSame( $single_file, $context->location() );
 	}
+
+	public function test_is_single_file_plugin() {
+		$single_file = WP_PLUGIN_DIR . '/single-file-plugin.php';
+		$context     = new Plugin_Context( $single_file );
+
+		$this->assertTrue( $context->is_single_file_plugin() );
+	}
 }
