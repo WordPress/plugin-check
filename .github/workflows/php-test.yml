@@ -85,7 +85,7 @@ jobs:
       - name: Start WordPress
         run: |
           if [[ ${{ matrix.coverage == true }} == true ]]; then
-            npm run wp-env start -- --xdebug
+            npm run wp-env start -- --xdebug=coverage
           else
             npm run wp-env start
           fi
