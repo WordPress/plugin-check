@@ -10,7 +10,7 @@
     "npm": ">=8.19.3 <9"
   },
   "devDependencies": {
-    "@wordpress/env": "^5.7.0",
+    "@wordpress/env": "^8.11.0",
     "@wordpress/scripts": "^24.6.0"
   },
   "scripts": {
@@ -22,10 +22,10 @@
     "lint-php": "wp-env run composer run-script lint",
     "format-php": "wp-env run composer run-script format",
     "pretest-php": "wp-env run composer 'install --no-interaction'",
-    "test-php": "wp-env run phpunit 'phpunit -c /var/www/html/wp-content/plugins/$(basename $(pwd))/phpunit.xml.dist --verbose'",
+    "test-php": "wp-env run tests-cli 'phpunit -c /var/www/html/wp-content/plugins/$(basename $(pwd))/phpunit.xml.dist --verbose'",
     "pretest-php-coverage": "wp-env run composer 'install --no-interaction'",
-    "test-php-coverage": "wp-env run phpunit 'phpunit -c /var/www/html/wp-content/plugins/$(basename $(pwd))/phpunit.xml.dist --verbose --coverage-clover /var/www/html/wp-content/plugins/$(basename $(pwd))/build/logs/php-coverage.xml'",
-    "test-php-multisite": "wp-env run phpunit 'WP_MULTISITE=1 phpunit -c /var/www/html/wp-content/plugins/$(basename $(pwd))/tests/phpunit/multisite.xml --verbose'",
-    "test-php-multisite-coverage": "wp-env run phpunit 'WP_MULTISITE=1 phpunit -c /var/www/html/wp-content/plugins/$(basename $(pwd))/tests/phpunit/multisite.xml --verbose --coverage-clover /var/www/html/wp-content/plugins/$(basename $(pwd))/build/logs/php-coverage-multisite.xml'"
+    "test-php-coverage": "wp-env run tests-cli 'phpunit -c /var/www/html/wp-content/plugins/$(basename $(pwd))/phpunit.xml.dist --verbose --coverage-clover /var/www/html/wp-content/plugins/$(basename $(pwd))/build/logs/php-coverage.xml'",
+    "test-php-multisite": "wp-env run tests-cli 'WP_MULTISITE=1 phpunit -c /var/www/html/wp-content/plugins/$(basename $(pwd))/tests/phpunit/multisite.xml --verbose'",
+    "test-php-multisite-coverage": "wp-env run tests-cli 'WP_MULTISITE=1 phpunit -c /var/www/html/wp-content/plugins/$(basename $(pwd))/tests/phpunit/multisite.xml --verbose --coverage-clover /var/www/html/wp-content/plugins/$(basename $(pwd))/build/logs/php-coverage-multisite.xml'"
   }
 }
