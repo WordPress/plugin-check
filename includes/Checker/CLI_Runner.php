@@ -90,6 +90,26 @@ class CLI_Runner extends Abstract_Check_Runner {
 	}
 
 	/**
+	 * Returns an array of Check slugs to exclude based on the request.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array An array of Check slugs to run.
+	 */
+	protected function get_check_exclude_slugs_param() {
+		$checks = array();
+
+		foreach ( $_SERVER['argv'] as $value ) {
+			if ( false !== strpos( $value, '--exclude-checks=' ) ) {
+				$checks = wp_parse_list( str_replace( '--exclude-checks=', '', $value ) );
+				break;
+			}
+		}
+
+		return $checks;
+	}
+
+	/**
 	 * Returns the include experimental parameter based on the request.
 	 *
 	 * @since n.e.x.t

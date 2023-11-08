@@ -76,6 +76,8 @@ class Force_Single_Plugin_Preparation implements Preparation {
 	/**
 	 * Filter active plugins.
 	 *
+	 * @since n.e.x.t
+	 *
 	 * @param array $active_plugins List of active plugins.
 	 * @return array List of active plugins.
 	 */

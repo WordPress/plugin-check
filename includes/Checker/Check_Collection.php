@@ -42,8 +42,10 @@ interface Check_Collection extends ArrayAccess, Countable, IteratorAggregate {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param callable $filter_fn Filter function that accepts a single check object and should return a boolean for
-	 *                            whether to include the check in the new collection.
+	 * @phpstan-param callable(Check,string): bool $filter_fn
+	 *
+	 * @param callable $filter_fn Filter function that accepts a Check object and a Check slug and
+	 *                            should return a boolean for whether to include the check in the new collection.
 	 * @return Check_Collection New check collection, effectively a subset of this one.
 	 */
 	public function filter( callable $filter_fn ): Check_Collection;
@@ -59,6 +61,18 @@ interface Check_Collection extends ArrayAccess, Countable, IteratorAggregate {
 	 * @return Check_Collection New check collection, effectively a subset of this one.
 	 */
 	public function include( array $check_slugs ): Check_Collection;
+
+	/**
+	 * Returns a new check collection excluding the provided checks.
+	 *
+	 * If the given list is empty, the same collection will be returned without any change.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param array $check_slugs List of slugs to exclude. If empty, the same collection is returned.
+	 * @return Check_Collection New check collection, effectively a subset of this one.
+	 */
+	public function exclude( array $check_slugs ): Check_Collection;
 
 	/**
 	 * Throws an exception if any of the given check slugs are not present, or returns the same collection otherwise.

@@ -37,6 +37,14 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	protected $check_slugs;
 
 	/**
+	 * The check slugs to exclude.
+	 *
+	 * @since n.e.x.t
+	 * @var array
+	 */
+	protected $check_exclude_slugs;
+
+	/**
 	 * The plugin parameter.
 	 *
 	 * @since n.e.x.t
@@ -111,6 +119,15 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	abstract protected function get_check_slugs_param();
 
 	/**
+	 * Returns an array of Check slugs to exclude based on the request.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array An array of Check slugs.
+	 */
+	abstract protected function get_check_exclude_slugs_param();
+
+	/**
 	 * Returns the include experimental parameter based on the request.
 	 *
 	 * @since n.e.x.t
@@ -159,6 +176,28 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		}
 
 		$this->check_slugs = $check_slugs;
+	}
+
+	/**
+	 * Sets the check slugs to be excluded.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param array $check_slugs An array of check slugs to be excluded.
+	 *
+	 * @throws Exception Thrown if the checks do not match those in the original request.
+	 */
+	final public function set_check_exclude_slugs( array $check_slugs ) {
+		if ( $this->initialized_early ) {
+			// Compare the check slugs to see if there was an error.
+			if ( $check_slugs !== $this->get_check_exclude_slugs_param() ) {
+				throw new Exception(
+					__( 'Invalid checks: The checks to exclude do not match the original request.', 'plugin-check' )
+				);
+			}
+		}
+
+		$this->check_exclude_slugs = $check_slugs;
 	}
 
 	/**
@@ -368,18 +407,21 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			$check_flags = $check_flags | Check_Repository::INCLUDE_EXPERIMENTAL;
 		}
 
-		$checks = $this->check_repository->get_checks( $check_flags )
-			->require( $check_slugs ) // Ensures all of the given slugs are valid.
+		$excluded_checks = $this->get_check_exclude_slugs();
+
+		$collection = $this->check_repository->get_checks( $check_flags )
 			->include( $check_slugs ) // Ensures only the checks with the given slugs are included.
-			->to_map();
+			->exclude( $excluded_checks ); // Exclude provided checks from list.
 
 		// Filters the checks by specific categories.
 		$categories = $this->get_categories();
 		if ( $categories ) {
-			$checks = Check_Categories::filter_checks_by_categories( $checks, $categories );
+			$collection = Check_Categories::filter_checks_by_categories( $collection, $categories );
 		}
 
-		return $checks;
+		return $collection
+			->require( $check_slugs ) // Ensures all of the given slugs are valid.
+			->to_map();
 	}
 
 	/**
@@ -414,6 +456,21 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		}
 
 		return $this->get_check_slugs_param();
+	}
+
+	/**
+	 * Returns the check slugs to exclude.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array An array of check slugs to exclude.
+	 */
+	private function get_check_exclude_slugs() {
+		if ( null !== $this->check_exclude_slugs ) {
+			return $this->check_exclude_slugs;
+		}
+
+		return $this->get_check_exclude_slugs_param();
 	}
 
 	/**

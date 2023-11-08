@@ -44,13 +44,12 @@ class Check_Categories_Tests extends WP_UnitTestCase {
 			$this->repository->register_check( $check[0], $check[1] );
 		}
 
-		$checks = $this->repository->get_checks()
-			->to_map();
+		$checks = $this->repository->get_checks();
 
 		$check_categories = new Check_Categories();
 		$filtered_checks  = $check_categories->filter_checks_by_categories( $checks, $categories );
 
-		$this->assertEquals( $expected_filtered_checks, $filtered_checks );
+		$this->assertEquals( $expected_filtered_checks, $filtered_checks->to_map() );
 	}
 
 	public function data_checks_by_categories() {
