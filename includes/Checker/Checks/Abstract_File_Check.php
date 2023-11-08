@@ -10,6 +10,7 @@ namespace WordPress\Plugin_Check\Checker\Checks;
 use Exception;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Static_Check;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
@@ -48,7 +49,7 @@ abstract class Abstract_File_Check implements Static_Check {
 	 *                   the check).
 	 */
 	final public function run( Check_Result $result ) {
-		$files = self::get_files( $result );
+		$files = self::get_files( $result->plugin() );
 		$this->check_files( $result, $files );
 	}
 
@@ -188,11 +189,11 @@ abstract class Abstract_File_Check implements Static_Check {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param Check_Result $result The Check Result to amend.
+	 * @param Check_Context $plugin Context for the plugin to check.
 	 * @return array List of absolute file paths.
 	 */
-	private static function get_files( Check_Result $result ) {
-		$location = $result->plugin()->location();
+	private static function get_files( Check_Context $plugin ) {
+		$location = $plugin->location();
 
 		if ( isset( self::$file_list_cache[ $location ] ) ) {
 			return self::$file_list_cache[ $location ];
@@ -202,9 +203,7 @@ abstract class Abstract_File_Check implements Static_Check {
 
 		// If the location is a plugin folder, get all its files.
 		// Otherwise, it is a single-file plugin.
-		if ( Plugin_Request_Utility::is_single_file_plugin( $result ) ) {
-			self::$file_list_cache[ $location ][] = $location;
-		} else {
+		if ( $plugin->path() === $location ) {
 			$iterator = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $location ) );
 			foreach ( $iterator as $file ) {
 				if ( ! $file->isFile() ) {
@@ -230,6 +229,8 @@ abstract class Abstract_File_Check implements Static_Check {
 					self::$file_list_cache[ $location ][] = $file_path;
 				}
 			}
+		} else {
+			self::$file_list_cache[ $location ][] = $location;
 		}
 
 		return self::$file_list_cache[ $location ];
