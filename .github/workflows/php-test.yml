@@ -72,7 +72,11 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          coverage: ${{ matrix.coverage && 'xdebug' || 'none' }}
+
+      - name: Install PHP dependencies
+        uses: ramsey/composer-install@83af392bf5f031813d25e6fe4cd626cdba9a2df6
+        with:
+          composer-options: '--prefer-dist --no-progress --no-interaction'
 
       - name: Setup Node.js (.nvmrc)
         uses: actions/setup-node@v3
@@ -83,8 +87,13 @@ jobs:
       - name: npm install
         run: npm ci
 
-      - name: Install WordPress
-        run: npm run wp-env start
+      - name: Start WordPress
+        run: |
+          if [[ ${{ matrix.coverage == true ]]; then
+            npm run wp-env start -- --xdebug
+          else
+            npm run wp-env start
+          fi
 
       - name: Run tests
         if: ${{ ! matrix.coverage }}
