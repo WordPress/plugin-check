@@ -203,7 +203,9 @@ abstract class Abstract_File_Check implements Static_Check {
 
 		// If the location is a plugin folder, get all its files.
 		// Otherwise, it is a single-file plugin.
-		if ( $plugin->path() === $location ) {
+		if ( $plugin->is_single_file_plugin() ) {
+			self::$file_list_cache[ $location ][] = $location;
+		} else {
 			$iterator = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $location ) );
 			foreach ( $iterator as $file ) {
 				if ( ! $file->isFile() ) {
@@ -229,8 +231,6 @@ abstract class Abstract_File_Check implements Static_Check {
 					self::$file_list_cache[ $location ][] = $file_path;
 				}
 			}
-		} else {
-			self::$file_list_cache[ $location ][] = $location;
 		}
 
 		return self::$file_list_cache[ $location ];
