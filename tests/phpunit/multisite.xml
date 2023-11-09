@@ -11,16 +11,16 @@
 	</php>
 	<coverage processUncoveredFiles="false">
 		<include>
-			<directory suffix=".php">includes/</directory>
-			<file>plugin-check.php</file>
+			<directory suffix=".php">../../includes/</directory>
+			<file>../../plugin-check.php</file>
 		</include>
 	</coverage>
 	<testsuites>
 		<testsuite name="default">
-			<directory suffix=".php">./tests/phpunit</directory>
-			<exclude>./tests/phpunit/testdata/plugins/*</exclude>
-			<exclude>./tests/phpunit/utils/*</exclude>
-			<exclude>./tests/phpunit/bootstrap.php</exclude>
+			<directory suffix=".php">./</directory>
+			<exclude>./testdata/plugins/*</exclude>
+			<exclude>./utils/*</exclude>
+			<exclude>./bootstrap.php</exclude>
 		</testsuite>
 	</testsuites>
 	<groups>
@@ -30,8 +30,8 @@
 	</groups>
 	<filter>
 		<whitelist processUncoveredFilesFromWhitelist="false">
-			<directory suffix=".php">includes/</directory>
-			<file>plugin-check.php</file>
+			<directory suffix=".php">../../includes/</directory>
+			<file>../../plugin-check.php</file>
 		</whitelist>
 	</filter>
 </phpunit>
