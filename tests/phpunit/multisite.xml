@@ -6,10 +6,18 @@
 	convertNoticesToExceptions="true"
 	convertWarningsToExceptions="true"
 	>
+	<coverage processUncoveredFiles="false">
+		<include>
+			<directory suffix=".php">includes/</directory>
+			<file>plugin-check.php</file>
+		</include>
+	</coverage>
 	<testsuites>
 		<testsuite name="default">
-			<directory suffix=".php">./</directory>
-			<exclude>./testdata/plugins/*</exclude>
+			<directory suffix=".php">./tests/phpunit</directory>
+			<exclude>./tests/phpunit/testdata/*</exclude>
+			<exclude>./tests/phpunit/utils/*</exclude>
+			<exclude>./tests/phpunit/bootstrap.php</exclude>
 		</testsuite>
 	</testsuites>
 	<groups>
@@ -17,4 +25,10 @@
 			<group>ms-excluded</group>
 		</exclude>
 	</groups>
+	<filter>
+		<whitelist processUncoveredFilesFromWhitelist="false">
+			<directory suffix=".php">includes/</directory>
+			<file>plugin-check.php</file>
+		</whitelist>
+	</filter>
 </phpunit>
