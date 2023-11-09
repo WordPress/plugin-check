@@ -11,21 +11,23 @@
   },
   "devDependencies": {
     "@wordpress/env": "^8.11.0",
-    "@wordpress/scripts": "^24.6.0"
+    "@wordpress/scripts": "^24.6.0",
+    "patch-package": "^8.0.0"
   },
   "scripts": {
+    "postinstall": "patch-package",
     "wp-env": "wp-env",
     "lint-js": "wp-scripts lint-js",
     "format-js": "npm run lint-js -- --fix",
-    "prelint-php": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/plugin-check/ composer run 'install --no-interaction'",
-    "phpstan": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/plugin-check/ composer run-script phpstan",
-    "lint-php": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/plugin-check/ composer run-script lint",
-    "format-php": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/plugin-check/ composer run-script format",
-    "pretest-php": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/plugin-check/ composer run 'install --no-interaction'",
-    "test-php": "wp-env run tests-cli 'phpunit -c /var/www/html/wp-content/plugins/$(basename $(pwd))/phpunit.xml.dist --verbose'",
-    "pretest-php-coverage": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/plugin-check/ composer run 'install --no-interaction'",
-    "test-php-coverage": "wp-env run tests-cli 'phpunit -c /var/www/html/wp-content/plugins/$(basename $(pwd))/phpunit.xml.dist --verbose --coverage-clover /var/www/html/wp-content/plugins/$(basename $(pwd))/build/logs/php-coverage.xml'",
-    "test-php-multisite": "wp-env run tests-cli 'WP_MULTISITE=1 phpunit -c /var/www/html/wp-content/plugins/$(basename $(pwd))/tests/phpunit/multisite.xml --verbose'",
-    "test-php-multisite-coverage": "wp-env run tests-cli 'WP_MULTISITE=1 phpunit -c /var/www/html/wp-content/plugins/$(basename $(pwd))/tests/phpunit/multisite.xml --verbose --coverage-clover /var/www/html/wp-content/plugins/$(basename $(pwd))/build/logs/php-coverage-multisite.xml'"
+    "prelint-php": "wp-env run tests-cli --env-cwd=wp-content/plugins/plugin-check/ composer install --no-interaction",
+    "phpstan": "wp-env run tests-cli --env-cwd=wp-content/plugins/plugin-check/ composer run-script phpstan",
+    "lint-php": "wp-env run tests-cli --env-cwd=wp-content/plugins/plugin-check/ composer run-script lint",
+    "format-php": "wp-env run tests-cli --env-cwd=wp-content/plugins/plugin-check/ composer run-script format",
+    "pretest-php": "wp-env run tests-cli --env-cwd=wp-content/plugins/plugin-check/ composer install --no-interaction",
+    "test-php": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/plugin-check/ vendor/bin/phpunit --verbose",
+    "pretest-php-coverage": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/plugin-check/ composer install --no-interaction",
+    "test-php-coverage": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/plugin-check/ vendor/bin/phpunit --verbose --coverage-clover build/logs/php-coverage.xml",
+    "test-php-multisite": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/plugin-check/ WP_MULTISITE=1 vendor/bin/phpunit -c tests/phpunit/multisite.xml --verbose",
+    "test-php-multisite-coverage": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/plugin-check/ WP_MULTISITE=1 vendor/bin/phpunit -c tests/phpunit/multisite.xml --verbose --coverage-clover build/logs/php-coverage-multisite.xml"
   }
 }
