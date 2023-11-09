@@ -98,7 +98,7 @@ jobs:
           elif [[ $PHP_VERSION == "7.2"  ]]; then
             echo "Installing PHPUnit 8.5x"
             composer require --ignore-platform-reqs --no-interaction --no-scripts phpunit/phpunit:^8.5 --with-dependencies
-          else
+          elif [[ $PHP_VERSION != "7.0"  ]]; then
             echo "Installing latest version of PHPUnit"
             composer update --ignore-platform-reqs --no-interaction --no-scripts yoast/phpunit-polyfills --with-dependencies
           fi
