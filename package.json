@@ -23,9 +23,7 @@
     "phpstan": "wp-env run tests-cli --env-cwd=wp-content/plugins/plugin-check/ composer run-script phpstan",
     "lint-php": "wp-env run tests-cli --env-cwd=wp-content/plugins/plugin-check/ composer run-script lint",
     "format-php": "wp-env run tests-cli --env-cwd=wp-content/plugins/plugin-check/ composer run-script format",
-    "pretest-php": "wp-env run tests-cli --env-cwd=wp-content/plugins/plugin-check/ composer install --no-interaction",
     "test-php": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/plugin-check/ vendor/bin/phpunit --verbose",
-    "pretest-php-coverage": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/plugin-check/ composer install --no-interaction",
     "test-php-coverage": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/plugin-check/ vendor/bin/phpunit --verbose --coverage-clover build/logs/php-coverage.xml",
     "test-php-multisite": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/plugin-check/ vendor/bin/phpunit -c tests/phpunit/multisite.xml --verbose",
     "test-php-multisite-coverage": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/plugin-check/ vendor/bin/phpunit -c tests/phpunit/multisite.xml --verbose --coverage-clover build/logs/php-coverage-multisite.xml"
