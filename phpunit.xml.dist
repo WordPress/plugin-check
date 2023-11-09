@@ -6,6 +6,12 @@
 	convertNoticesToExceptions="true"
 	convertWarningsToExceptions="true"
 	>
+	<coverage processUncoveredFiles="false">
+		<include>
+			<directory suffix=".php">includes/</directory>
+			<file>plugin-check.php</file>
+		</include>
+	</coverage>
 	<testsuites>
 		<testsuite name="default">
 			<directory suffix=".php">./tests/phpunit</directory>
