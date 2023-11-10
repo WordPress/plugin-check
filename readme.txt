@@ -1,24 +1,33 @@
-
 === Plugin Check ===
 
 Contributors:      wordpressdotorg
 Requires at least: 6.3
-Tested up to:      6.3
+Tested up to:      6.4
 Requires PHP:      7.0
 Stable tag:        n.e.x.t
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 Tags:              performance, testing, security
 
-Plugin Check plugin from the WordPress Performance Team, a collection of tests to help improve plugin performance.
+Plugin Check is a WordPress.org tool which provides checks to help plugins to meet the directory requirements and follow various best practices.
 
 == Description ==
 
-The Plugin Check is an easy way of testing your plugin and ensure that it's up to the base required standards from the Plugin Review team. With this plugin you will be able to run most of the checks used by the team, and check if your plugin meets the requirements.
+The Plugin Check is an easy way of testing your plugin and ensure that it's up to the required standards for the WordPress.org plugin directory. With this plugin you will be able to run most of the checks used for new submissions, and check if your plugin meets the requirements.
 
-The tests are run through a simple admin menu and all results are displayed at once. This is very handy for plugin developers, or anybody looking to make sure that their plugin supports the [latest WordPress plugin standards and practices](https://make.wordpress.org/plugins/handbook/performing-reviews/review-checklist/).
+Additionally, the tool flags violations or concerns around plugin development best practices, from basic requirements like correct usage of internationalization functions to accessibility, performance, and security best practices.
 
-Keep in mind that this plugin is not yet a replacement for the manual review process, but it will help you speed up the process of getting your plugin approved for the WordPress.org plugin repository, and it will also help you avoid some common mistakes.
+The checks can be run either using the WP Admin user interface or WP-CLI:
+
+* To check a plugin using WP Admin, please navigate to the _Tools > Plugin Check_ menu. You need to be able to manage plugins on your site in order to access that screen.
+* To check a plugin using WP-CLI, please use the `wp plugin check` command. For example, to check the "Hello Dolly" plugin: `wp plugin check hello.php`
+    * Note that by default when using WP-CLI, only static checks can be executed. In order to also include runtime checks, a workaround is currently necessary using the `--require` argument of WP-CLI, to manually load the `cli.php` file within the plugin checker directory before WordPress is loaded. For example: `wp plugin check hello.php --require=./wp-content/plugins/plugin-check/cli.php`
+
+The checks are grouped into several categories, so that you can customize which kinds of checks you would like to run on a plugin.
+
+Keep in mind that this plugin is not a replacement for the manual review process, but it will help you speed up the process of getting your plugin approved for the WordPress.org plugin repository, and it will also help you avoid some common mistakes.
+
+Even if you do not intend to host your plugin in the WordPress.org directory, you are encouraged to use Plugin Check so that your plugin follows the base requirements and best practices for WordPress plugins.
 
 == Installation ==
 
@@ -40,19 +49,23 @@ Keep in mind that this plugin is not yet a replacement for the manual review pro
 
 All development for this plugin is handled via [GitHub](https://github.com/WordPress/plugin-check/) any issues or pull requests should be posted there.
 
-= What if the plugin reports as "error" something that's correct? =
+= What if the plugin reports something that's correct as an "error" or "warning"? =
 
-We strived to write a plugin in a way that minimizes false positives but If you find one, please report it in the GitHub repo.
-
-If you can, please consider submitting a Pull Request to fix it.
+We strive to write a plugin in a way that minimizes false positives but if you find one, please report it in the GitHub repo. For certain false positives, such as those detected by PHPCodeSniffer, you may be able to annotate the code to ignore the specific problem for a specific line.
 
 = Why does it flag something as bad? =
 
-It's not flagging "bad" things, as such. The plugin check is designed to be a non-perfect way to test for compliance with the [Plugin Review guidelines](https://make.wordpress.org/plugins/handbook/performing-reviews/review-checklist/). Not all plugins must adhere to these guidelines. The purpose of the checking tool is to ensure that plugins uploaded to the [central WordPress.org plugin repository](https://wordpress.org/plugins/) meet the latest standards of WordPress plugin and will work on a wide variety of sites.
+It's not flagging "bad" things, as such. The plugin check is designed to be a non-perfect way to test for compliance with the [Plugin Review guidelines](https://make.wordpress.org/plugins/handbook/performing-reviews/review-checklist/), as well as additional plugin development best practices in accessibility, performance, security and other areas. Not all plugins must adhere to these guidelines. The purpose of the checking tool is to ensure that plugins uploaded to the [central WordPress.org plugin repository](https://wordpress.org/plugins/) meet the latest standards of WordPress plugin and will work on a wide variety of sites.
 
 Many sites use custom plugins, and that's perfectly okay. But plugins that are intended for use on many different kinds of sites by the public need to have a certain minimum level of capabilities, in order to ensure proper functioning in many different environments. The Plugin Review guidelines are created with that goal in mind.
 
 This plugin checker is not perfect, and never will be. It is only a tool to help plugin authors, or anybody else who wants to make their plugin more capable. All plugins submitted to WordPress.org are hand-reviewed by a team of experts. The automated plugin checker is meant to be a useful tool only, not an absolute system of measurement.
+
+= Does a plugin need to pass all checks to be approved in the WordPress.org plugin directory? =
+
+To be approved in the WordPress.org plugin directory, a plugin must typically pass all checks in the "Plugin repo" category. Other checks are additional and may not be required to pass.
+
+In any case, passing the checks in this tool likely helps to achieve a smooth plugin review process, but is no guarantee that a plugin will be approved in the WordPress.org plugin directory.
 
 == Changelog ==
 

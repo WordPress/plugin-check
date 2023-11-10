@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Test Plugin late escaping without errors for Plugin Check
  * Plugin URI: https://github.com/WordPress/plugin-check
- * Description: Plugin Check plugin from the WordPress Performance Team, a collection of tests to help improve plugin performance.
+ * Description: Some plugin description.
  * Requires at least: 6.0
  * Requires PHP: 5.6
  * Version: n.e.x.t
