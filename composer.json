@@ -11,16 +11,14 @@
     "automattic/vipwpcs": "^3.0.0"
   },
   "require-dev": {
+    "wp-cli/extension-command": "^2.1",
+    "wp-cli/wp-cli": "^2.8",
+    "wp-cli/wp-cli-tests": "^v4.2.2"
   },
   "scripts": {
-    "behat": [
-      "composer --working-dir=build-cs update --no-interaction",
-      "BEHAT_FEATURES_FOLDER=tests/behat/features build-cs/vendor/bin/run-behat-tests"
-    ],
-    "behat-rerun": [
-      "composer --working-dir=build-cs update --no-interaction",
-      "BEHAT_FEATURES_FOLDER=tests/behat/features build-cs/vendor/bin/rerun-behat-tests"
-    ],
+    "behat": "BEHAT_FEATURES_FOLDER=tests/behat/features run-behat-tests",
+    "behat-rerun": "BEHAT_FEATURES_FOLDER=tests/behat/features rerun-behat-tests",
+    "prepare-behat-tests": "install-package-tests",
     "format": [
       "composer --working-dir=build-cs update --no-interaction",
       "build-cs/vendor/bin/phpcbf --standard=phpcs.xml.dist"
@@ -36,10 +34,6 @@
     "phpstan": [
       "composer --working-dir=build-cs update --no-interaction",
       "build-cs/vendor/bin/phpstan analyse --memory-limit=2048M"
-    ],
-    "prepare-behat-tests": [
-      "composer --working-dir=build-cs update --no-interaction",
-      "build-cs/vendor/bin/install-package-tests"
     ],
     "test": [
       "composer --working-dir=build-cs update --no-interaction",
