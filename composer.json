@@ -39,11 +39,11 @@
     ],
     "prepare-behat-tests": [
       "composer --working-dir=build-cs update --no-interaction",
-      "install-package-tests"
+      "build-cs/vendor/bin/install-package-tests"
     ],
     "test": [
       "composer --working-dir=build-cs update --no-interaction",
-      "phpunit -c phpunit.xml.dist --verbose"
+      "phpunit -c ../phpunit.xml.dist --verbose"
     ]
   },
   "scripts-descriptions": {
