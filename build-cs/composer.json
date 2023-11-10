@@ -3,19 +3,21 @@
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0.0",
     "phpcompatibility/php-compatibility": "^9.3",
     "phpmd/phpmd": "^2.9",
-    "phpstan/phpstan": "^1.10",
     "phpstan/extension-installer": "^1.2",
+    "phpstan/phpstan": "^1.10",
     "slevomat/coding-standard": "^8.9",
     "szepeviktor/phpstan-wordpress": "^1.1",
-    "wp-coding-standards/wpcs": "^3.0.0"
+    "wp-cli/extension-command": "^2.1",
+    "wp-cli/wp-cli": "^2.8",
+    "wp-cli/wp-cli-tests": "^v4.2.2",
+    "wp-coding-standards/wpcs": "^3.0.0",
+    "wp-phpunit/wp-phpunit": "^6.1",
+    "yoast/phpunit-polyfills": "^1.0"
   },
   "config": {
     "allow-plugins": {
       "dealerdirect/phpcodesniffer-composer-installer": true,
       "phpstan/extension-installer": true
-    },
-    "platform": {
-      "php": "8.0"
     }
   }
 }

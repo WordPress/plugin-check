@@ -73,38 +73,6 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
 
-      - name: Install PHP dependencies
-        uses: ramsey/composer-install@v2
-        with:
-          composer-options: '--prefer-dist --no-progress --no-interaction --no-scripts'
-
-      # Installs a different PHPUnit version depending on the PHP version we're testing against.
-      #
-      # | WP  / PHP | PHPUnit |
-      # |-----------|---------|
-      # | *   / 7.0 | 6       |
-      # | *   / 7.1 | 7       |
-      # | *   / 7.2 | 8       |
-      # | *   / 7.3 | 9       |
-      # | *   / 7.4 | 9       |
-      # | *   / 8   | 9       |
-      #
-      # See https://make.wordpress.org/core/handbook/references/phpunit-compatibility-and-wordpress-versions/
-      - name: Update PHPUnit
-        run: |
-          if [[ $PHP_VERSION == "7.1"  ]]; then
-            echo "Installing PHPUnit 7.5x"
-            composer require --ignore-platform-reqs --no-interaction --no-scripts phpunit/phpunit:^7.5 --with-dependencies
-          elif [[ $PHP_VERSION == "7.2"  ]]; then
-            echo "Installing PHPUnit 8.5x"
-            composer require --ignore-platform-reqs --no-interaction --no-scripts phpunit/phpunit:^8.5 --with-dependencies
-          elif [[ $PHP_VERSION != "7.0"  ]]; then
-            echo "Installing latest version of PHPUnit"
-            composer update --ignore-platform-reqs --no-interaction --no-scripts yoast/phpunit-polyfills --with-dependencies
-          fi
-        env:
-          PHP_VERSION: ${{ matrix.php }}
-
       - name: Setup Node.js (.nvmrc)
         uses: actions/setup-node@v3
         with:
