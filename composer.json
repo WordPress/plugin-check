@@ -15,11 +15,11 @@
   "scripts": {
     "behat": [
       "composer --working-dir=build-cs update --no-interaction",
-      "BEHAT_FEATURES_FOLDER=tests/behat/features run-behat-tests"
+      "BEHAT_FEATURES_FOLDER=tests/behat/features build-cs/vendor/bin/run-behat-tests"
     ],
     "behat-rerun": [
       "composer --working-dir=build-cs update --no-interaction",
-      "BEHAT_FEATURES_FOLDER=tests/behat/features rerun-behat-tests"
+      "BEHAT_FEATURES_FOLDER=tests/behat/features build-cs/vendor/bin/rerun-behat-tests"
     ],
     "format": [
       "composer --working-dir=build-cs update --no-interaction",
