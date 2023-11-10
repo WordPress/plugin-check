@@ -19,7 +19,6 @@
 		<testsuite name="default">
 			<directory suffix=".php">./</directory>
 			<exclude>./testdata/plugins/*</exclude>
-			<exclude>./utils/*</exclude>
 			<exclude>./bootstrap.php</exclude>
 		</testsuite>
 	</testsuites>
