@@ -37,7 +37,7 @@
     ],
     "test": [
       "composer --working-dir=build-cs update --no-interaction",
-      "phpunit -c ../phpunit.xml.dist --verbose"
+      "build-cs/vendor/bin/phpunit --verbose"
     ]
   },
   "scripts-descriptions": {
