@@ -1,6 +1,6 @@
 {
   "name": "wordpress/plugin-check",
-  "description": "Plugin Check is a WordPress.org tool which provides checks to help plugins to meet the directory requirements and follow various best practices.",
+  "description": "Plugin Check is a WordPress.org tool which provides checks to help plugins meet the directory requirements and follow various best practices.",
   "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",
   "require": {

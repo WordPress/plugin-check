@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Plugin Check
  * Plugin URI: https://github.com/WordPress/plugin-check
- * Description: Plugin Check is a WordPress.org tool which provides checks to help plugins to meet the directory requirements and follow various best practices.
+ * Description: Plugin Check is a WordPress.org tool which provides checks to help plugins meet the directory requirements and follow various best practices.
  * Requires at least: 6.3
  * Requires PHP: 7.0
  * Version: n.e.x.t

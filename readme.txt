@@ -9,7 +9,7 @@ License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 Tags:              plugin best practices, testing, accessibility, performance, security
 
-Plugin Check is a WordPress.org tool which provides checks to help plugins to meet the directory requirements and follow various best practices.
+Plugin Check is a WordPress.org tool which provides checks to help plugins meet the directory requirements and follow various best practices.
 
 == Description ==
 

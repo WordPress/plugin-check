@@ -1,6 +1,6 @@
 # Plugin Check
 
-Plugin Check is a WordPress.org tool which provides checks to help plugins to meet the directory requirements and follow various best practices.
+Plugin Check is a WordPress.org tool which provides checks to help plugins meet the directory requirements and follow various best practices.
 
 The Plugin Check is an easy way of testing your plugin and ensure that it's up to the required standards for the WordPress.org plugin directory. With this plugin you will be able to run most of the checks used for new submissions, and check if your plugin meets the requirements.
 
