@@ -17,9 +17,7 @@
 	</coverage>
 	<testsuites>
 		<testsuite name="default">
-			<directory suffix=".php">./</directory>
-			<exclude>./testdata/plugins/*</exclude>
-			<exclude>./bootstrap.php</exclude>
+			<directory suffix=".php">./tests</directory>
 		</testsuite>
 	</testsuites>
 	<groups>

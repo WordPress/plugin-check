@@ -68,8 +68,8 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "WordPress\\Plugin_Check\\Test_Data\\": "tests/phpunit/testdata",
-      "WordPress\\Plugin_Check\\Test_Utils\\": "tests/phpunit/utils",
+      "WordPress\\Plugin_Check\\Test_Data\\": "tests/phpunit/includes/testdata",
+      "WordPress\\Plugin_Check\\Test_Utils\\": "tests/phpunit/includes",
       "WordPress\\Plugin_Check\\Behat_Utils\\": "tests/behat/includes"
     }
   }
