@@ -60,10 +60,10 @@
 
 	<!-- Do not apply compatibility rules to allow using the modern PHPUnit functionality -->
 	<rule ref="PHPCompatibility.FunctionDeclarations.NewReturnTypeDeclarations.stringFound">
-		<exclude-pattern>tests/utils/*</exclude-pattern>
+		<exclude-pattern>tests/includes/*</exclude-pattern>
 	</rule>
 	<rule ref="PHPCompatibility.FunctionDeclarations.NewReturnTypeDeclarations.boolFound">
-		<exclude-pattern>tests/utils/*</exclude-pattern>
+		<exclude-pattern>tests/includes/*</exclude-pattern>
 	</rule>
 
 	<!-- Disallows grouped use declarations. -->
