@@ -16,6 +16,10 @@ use WordPress\Plugin_Check\Test_Data\Category_Check_Three;
 use WordPress\Plugin_Check\Test_Data\Category_Check_Two;
 
 class Check_Categories_Tests extends WP_UnitTestCase {
+	/**
+	 * @var Default_Check_Repository
+	 */
+	protected $repository;
 
 	public function set_up() {
 		parent::set_up();
