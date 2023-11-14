@@ -22,9 +22,9 @@
     "phpstan": "wp-env run tests-cli --env-cwd=wp-content/plugins/$(basename $(pwd))/ composer run-script phpstan",
     "lint-php": "wp-env run tests-cli --env-cwd=wp-content/plugins/$(basename $(pwd))/ composer run-script lint",
     "format-php": "wp-env run tests-cli --env-cwd=wp-content/plugins/$(basename $(pwd))/ composer run-script format",
-    "pretest-php": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/$(basename $(pwd)) composer dump --dev; wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/$(basename $(pwd)) composer --working-dir=build-cs update --no-interaction",
+    "pretest-php": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/$(basename $(pwd)) composer dump --dev; wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/$(basename $(pwd)) composer --working-dir=build-cs update --no-interaction --ignore-platform-reqs",
     "test-php": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/$(basename $(pwd)) build-cs/vendor/bin/phpunit -c phpunit.xml.dist --verbose",
-    "pretest-php-coverage": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/$(basename $(pwd)) composer dump --dev; wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/$(basename $(pwd)) composer --working-dir=build-cs update --no-interaction",
+    "pretest-php-coverage": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/$(basename $(pwd)) composer dump --dev; wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/$(basename $(pwd)) composer --working-dir=build-cs update --no-interaction --ignore-platform-reqs",
     "test-php-coverage": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/$(basename $(pwd)) build-cs/vendor/bin/phpunit -c phpunit.xml.dist --verbose --coverage-clover build/logs/php-coverage.xml",
     "test-php-multisite": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/$(basename $(pwd)) build-cs/vendor/bin/phpunit -c tests/phpunit/multisite.xml --verbose",
     "test-php-multisite-coverage": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/$(basename $(pwd)) build-cs/vendor/bin/phpunit -c tests/phpunit/multisite.xml --verbose --coverage-clover build/logs/php-coverage-multisite.xml"
