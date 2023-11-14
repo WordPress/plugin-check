@@ -46,7 +46,7 @@ trait With_Mock_Filesystem {
 		add_filter(
 			'filesystem_method_file',
 			function () {
-				return TESTS_PLUGIN_DIR . '/testdata/Filesystem/WP_Filesystem_FailingMockFilesystem.php';
+				return TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/Filesystem/WP_Filesystem_FailingMockFilesystem.php';
 			}
 		);
 		add_filter(
