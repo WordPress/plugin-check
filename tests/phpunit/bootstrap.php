@@ -8,8 +8,8 @@
 define( 'TESTS_PLUGIN_DIR', dirname( __DIR__, 2 ) );
 define( 'UNIT_TESTS_PLUGIN_DIR', TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/' );
 
-if ( file_exists( TESTS_PLUGIN_DIR . '/build-cs/vendor/autoload.php' ) ) {
-	require_once TESTS_PLUGIN_DIR . '/build-cs/vendor/autoload.php';
+if ( file_exists( TESTS_PLUGIN_DIR . '/build-phpunit/vendor/autoload.php' ) ) {
+	require_once TESTS_PLUGIN_DIR . '/build-phpunit/vendor/autoload.php';
 }
 
 if ( file_exists( TESTS_PLUGIN_DIR . '/vendor/autoload.php' ) ) {
