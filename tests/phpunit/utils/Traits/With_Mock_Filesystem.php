@@ -32,7 +32,7 @@ trait With_Mock_Filesystem {
 		WP_Filesystem();
 
 		// Simulate that the original object-cache.copy.php file exists.
-		$wp_filesystem->put_contents( WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'drop-ins/object-cache.copy.php', file_get_contents( WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'drop-ins/object-cache.copy.php' ) );
+		$wp_filesystem->put_contents( TESTS_PLUGIN_DIR . '/drop-ins/object-cache.copy.php', file_get_contents( TESTS_PLUGIN_DIR . '/drop-ins/object-cache.copy.php' ) );
 	}
 
 	/**
@@ -59,6 +59,6 @@ trait With_Mock_Filesystem {
 		WP_Filesystem();
 
 		// Simulate that the original object-cache.copy.php file exists.
-		$wp_filesystem->put_contents( WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'drop-ins/object-cache.copy.php', file_get_contents( WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'drop-ins/object-cache.copy.php' ) );
+		$wp_filesystem->put_contents( TESTS_PLUGIN_DIR . '/drop-ins/object-cache.copy.php', file_get_contents( TESTS_PLUGIN_DIR . '/drop-ins/object-cache.copy.php' ) );
 	}
 }
