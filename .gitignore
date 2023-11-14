@@ -31,6 +31,8 @@ node_modules/
 vendor/
 build-cs/vendor/
 build-cs/composer.lock
+build-phpunit/vendor/
+build-phpunit/composer.lock
 
 ############
 ## OSes

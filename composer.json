@@ -36,8 +36,8 @@
       "build-cs/vendor/bin/phpstan analyse --memory-limit=2048M"
     ],
     "test": [
-      "composer --working-dir=build-cs update --no-interaction",
-      "build-cs/vendor/bin/phpunit --verbose"
+      "composer --working-dir=build-phpunit update --no-interaction",
+      "build-phpunit/vendor/bin/phpunit --verbose"
     ]
   },
   "scripts-descriptions": {
