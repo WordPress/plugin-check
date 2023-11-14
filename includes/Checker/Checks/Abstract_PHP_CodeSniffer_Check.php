@@ -72,7 +72,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 
 		if ( ! class_exists( '\PHP_CodeSniffer\Runner' ) ) {
 			throw new Exception(
-				__( 'Unable to find Runner class.', 'plugin-check' )
+				__( 'Unable to find PHPCS Runner class.', 'plugin-check' )
 			);
 		}
 
