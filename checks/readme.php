@@ -91,7 +91,7 @@ class Readme extends Check_Base {
 		 * @param array  $ignored_warnings Array of ignored warning keys.
 		 * @param Parser $readme The readme object.
 		 */
-		$ignored_warnings = apply_filters( 'plugin_check_readme_warnings_ignored', $ignored_warnings, $this->readme );
+		$ignored_warnings = (array) apply_filters( 'plugin_check_readme_warnings_ignored', $ignored_warnings, $this->readme );
 
 		$warning_keys = array_diff( $warning_keys, $ignored_warnings );
 
