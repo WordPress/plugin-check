@@ -1,0 +1,19 @@
+diff --git a/node_modules/@wordpress/env/lib/init-config.js b/node_modules/@wordpress/env/lib/init-config.js
+index 318bcae..8628137 100644
+--- a/node_modules/@wordpress/env/lib/init-config.js
++++ b/node_modules/@wordpress/env/lib/init-config.js
+@@ -244,14 +244,6 @@ RUN export COMPOSER_HASH=\`curl -sS https://composer.github.io/installer.sig\` &
+ RUN php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer
+ RUN rm /tmp/composer-setup.php`;
+ 
+-	// Install any Composer packages we might need globally.
+-	// Make sure to do this as the user and ensure the binaries are available in the $PATH.
+-	dockerFileContent += `
+-USER $HOST_UID:$HOST_GID
+-ENV PATH="\${PATH}:/home/$HOST_USERNAME/.composer/vendor/bin"
+-RUN composer global require --dev phpunit/phpunit:"^5.7.21 || ^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0"
+-USER root`;
+-
+ 	return dockerFileContent;
+ }
+ 

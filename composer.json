@@ -11,33 +11,34 @@
     "automattic/vipwpcs": "^3.0.0"
   },
   "require-dev": {
-    "wp-phpunit/wp-phpunit": "^6.1",
-    "yoast/phpunit-polyfills": "^1.0",
     "wp-cli/extension-command": "^2.1",
     "wp-cli/wp-cli": "^2.8",
     "wp-cli/wp-cli-tests": "^v4.2.2"
   },
   "scripts": {
-    "lint": [
-      "composer --working-dir=build-cs install",
-      "build-cs/vendor/bin/phpcs --standard=phpcs.xml.dist"
-    ],
+    "behat": "BEHAT_FEATURES_FOLDER=tests/behat/features run-behat-tests",
+    "behat-rerun": "BEHAT_FEATURES_FOLDER=tests/behat/features rerun-behat-tests",
+    "prepare-behat-tests": "install-package-tests",
     "format": [
-      "composer --working-dir=build-cs install",
+      "composer --working-dir=build-cs update --no-interaction",
       "build-cs/vendor/bin/phpcbf --standard=phpcs.xml.dist"
     ],
-    "test": "phpunit -c phpunit.xml.dist --verbose",
+    "lint": [
+      "composer --working-dir=build-cs update --no-interaction",
+      "build-cs/vendor/bin/phpcs --standard=phpcs.xml.dist"
+    ],
     "phpmd": [
-      "composer --working-dir=build-cs install",
+      "composer --working-dir=build-cs update --no-interaction",
       "build-cs/vendor/bin/phpmd . text phpmd.xml"
     ],
     "phpstan": [
-      "composer --working-dir=build-cs install",
+      "composer --working-dir=build-cs update --no-interaction",
       "build-cs/vendor/bin/phpstan analyse --memory-limit=2048M"
     ],
-    "behat": "BEHAT_FEATURES_FOLDER=tests/behat/features run-behat-tests",
-    "behat-rerun": "BEHAT_FEATURES_FOLDER=tests/behat/features rerun-behat-tests",
-    "prepare-behat-tests": "install-package-tests"
+    "test": [
+      "composer --working-dir=build-phpunit update --no-interaction",
+      "build-phpunit/vendor/bin/phpunit --verbose"
+    ]
   },
   "scripts-descriptions": {
     "lint": "Detect coding standards issues",
@@ -67,7 +68,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "WordPress\\Plugin_Check\\Test_Data\\": "tests/phpunit/testdata",
+      "WordPress\\Plugin_Check\\Test_Data\\": "tests/phpunit/testdata/Checks",
       "WordPress\\Plugin_Check\\Test_Utils\\": "tests/phpunit/utils",
       "WordPress\\Plugin_Check\\Behat_Utils\\": "tests/behat/includes"
     }

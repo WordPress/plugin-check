@@ -41,7 +41,7 @@ concurrency:
 
 jobs:
   php-test:
-    name: PHP ${{ matrix.php }} - WP ${{ matrix.wordpress }}${{ matrix.experimental && ' (experimental)' || '' }}
+    name: PHP ${{ matrix.php }} - WP ${{ matrix.wordpress }}${{ matrix.experimental && ' (experimental)' || '' }}${{ matrix.coverage && ' (with coverage)' || '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -55,9 +55,11 @@ jobs:
         - '7.4'
         - '8.0'
         - '8.1'
-        - '8.2'
         wordpress: [ 'latest' ]
         include:
+          - php: '8.2'
+            wordpress: 'latest'
+            coverage: true
           - php: '8.2'
             wordpress: 'trunk'
             experimental: true
@@ -70,7 +72,7 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
- 
+
       - name: Setup Node.js (.nvmrc)
         uses: actions/setup-node@v3
         with:
@@ -80,11 +82,27 @@ jobs:
       - name: npm install
         run: npm ci
 
-      - name: Install WordPress
-        run: npm run wp-env start
+      - name: Start WordPress
+        run: |
+          if [[ ${{ matrix.coverage == true }} == true ]]; then
+            npm run wp-env start -- --xdebug=coverage
+          else
+            npm run wp-env start
+          fi
 
-      - name: Running php unit tests
-        run: npm run test-php
+      - name: Run tests
+        run: |
+          if [[ ${{ matrix.coverage == true }} == true ]]; then
+            npm run test-php-coverage
+            npm run test-php-multisite-coverage
+          else
+            npm run test-php
+            npm run test-php-multisite
+          fi
 
-      - name: Running multisite unit tests
-        run: npm run test-php-multisite
+      - name: Upload code coverage report
+        if: ${{ matrix.coverage }}
+        uses: codecov/codecov-action@eaaf4bedf32dbdc6b720b63067d99c4d77d6047d
+        with:
+          file: build/logs/*.xml
+          flags: unit
