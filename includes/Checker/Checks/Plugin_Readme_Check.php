@@ -47,6 +47,11 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 */
 	protected function check_files( Check_Result $result, array $files ) {
 
+		// Check if single file plugin, then bail early.
+		if ( $result->plugin()->is_single_file_plugin() ) {
+			return;
+		}
+
 		$plugin_relative_path = $result->plugin()->path();
 
 		// Filter the readme files.

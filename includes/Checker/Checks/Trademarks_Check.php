@@ -307,6 +307,11 @@ class Trademarks_Check extends Abstract_File_Check {
 	 * @param Check_Result $result The Check Result to amend.
 	 */
 	private function check_for_slug( Check_Result $result ) {
+		// Check if single file plugin, then bail early.
+		if ( $result->plugin()->is_single_file_plugin() ) {
+			return;
+		}
+
 		$plugin_slug = basename( $result->plugin()->path() );
 
 		try {

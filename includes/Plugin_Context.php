@@ -85,4 +85,17 @@ class Plugin_Context {
 
 		return $path;
 	}
+
+	/**
+	 * Checks if the plugin is a single file plugin without a dedicated directory.
+	 *
+	 * This is the case when the single file is directly placed within `wp-content/plugins`.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return bool true if the single file plugin, otherwise false.
+	 */
+	public function is_single_file_plugin() {
+		return $this->path() !== $this->location();
+	}
 }

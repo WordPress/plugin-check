@@ -181,4 +181,20 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertEquals( 0, $check_result->get_error_count() );
 		$this->assertEquals( 0, $check_result->get_warning_count() );
 	}
+
+	public function test_single_file_plugin_without_error_for_trademarks() {
+		$readme_check  = new Plugin_Readme_Check();
+		$check_context = new Check_Context( WP_PLUGIN_DIR . '/single-file-plugin.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$readme_check->run( $check_result );
+
+		$errors   = $check_result->get_errors();
+		$warnings = $check_result->get_warnings();
+
+		$this->assertEmpty( $errors );
+		$this->assertEmpty( $warnings );
+		$this->assertSame( 0, $check_result->get_error_count() );
+		$this->assertSame( 0, $check_result->get_warning_count() );
+	}
 }
