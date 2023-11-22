@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5ddf11ee8ead5be7227aff4501ed17e2",
+    "content-hash": "d6efb77e17ac9905f61dc15c9d198fba",
     "packages": [
         {
             "name": "automattic/vipwpcs",
@@ -4078,16 +4078,16 @@
         },
         {
             "name": "wp-cli/wp-cli-tests",
-            "version": "v4.2.2",
+            "version": "v4.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-cli/wp-cli-tests.git",
-                "reference": "560ed5ca2776b6b3b66c79a6e6dc62904ae20b3b"
+                "reference": "0601666a81fcf3efcc6eb27ff35babfd82deb66e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-cli/wp-cli-tests/zipball/560ed5ca2776b6b3b66c79a6e6dc62904ae20b3b",
-                "reference": "560ed5ca2776b6b3b66c79a6e6dc62904ae20b3b",
+                "url": "https://api.github.com/repos/wp-cli/wp-cli-tests/zipball/0601666a81fcf3efcc6eb27ff35babfd82deb66e",
+                "reference": "0601666a81fcf3efcc6eb27ff35babfd82deb66e",
                 "shasum": ""
             },
             "require": {
@@ -4153,7 +4153,7 @@
                 "issues": "https://github.com/wp-cli/wp-cli-tests/issues",
                 "source": "https://github.com/wp-cli/wp-cli-tests"
             },
-            "time": "2023-10-24T07:49:22+00:00"
+            "time": "2023-11-10T12:08:30+00:00"
         },
         {
             "name": "wp-cli/wp-config-transformer",
@@ -4198,54 +4198,6 @@
                 "source": "https://github.com/wp-cli/wp-config-transformer/tree/v1.3.4"
             },
             "time": "2023-08-31T10:11:36+00:00"
-        },
-        {
-            "name": "wp-phpunit/wp-phpunit",
-            "version": "6.3.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/wp-phpunit/wp-phpunit.git",
-                "reference": "4797791a311c41d213027333e4fcc48073f77df0"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/wp-phpunit/wp-phpunit/zipball/4797791a311c41d213027333e4fcc48073f77df0",
-                "reference": "4797791a311c41d213027333e4fcc48073f77df0",
-                "shasum": ""
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "__loaded.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-2.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Evan Mattson",
-                    "email": "me@aaemnnost.tv"
-                },
-                {
-                    "name": "WordPress Community",
-                    "homepage": "https://wordpress.org/about/"
-                }
-            ],
-            "description": "WordPress core PHPUnit library",
-            "homepage": "https://github.com/wp-phpunit",
-            "keywords": [
-                "phpunit",
-                "test",
-                "wordpress"
-            ],
-            "support": {
-                "docs": "https://github.com/wp-phpunit/docs",
-                "issues": "https://github.com/wp-phpunit/issues",
-                "source": "https://github.com/wp-phpunit/wp-phpunit"
-            },
-            "time": "2023-08-09T01:26:57+00:00"
         },
         {
             "name": "yoast/phpunit-polyfills",

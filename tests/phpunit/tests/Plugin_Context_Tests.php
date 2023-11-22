@@ -8,6 +8,16 @@
 use WordPress\Plugin_Check\Plugin_Context;
 
 class Plugin_Context_Tests extends WP_UnitTestCase {
+	/**
+	 * @var string
+	 */
+	protected $plugin_name;
+
+	/**
+	 * @var Plugin_Context
+	 */
+	protected $plugin_context;
+
 	public function set_up() {
 		parent::set_up();
 
