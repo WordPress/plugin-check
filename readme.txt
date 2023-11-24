@@ -42,7 +42,7 @@ This plugin checker is not perfect, and never will be. It is only a tool to help
 
 == Changelog ==
 
-= [0.2.2] 2023-09-TBD =
+= [0.2.2] 2023-11-XX =
 
 * Fix - Remove extra period on the end of the sentence for Phar warning. Props @bordoni, @pixolin. [#275](https://github.com/10up/plugin-check/pull/265)
 
