@@ -3,14 +3,12 @@ namespace WordPressdotorg\Plugin_Check\Checks;
 use const WordPressdotorg\Plugin_Check\{ PLUGIN_DIR, HAS_VENDOR };
 use WordPressdotorg\Plugin_Check\{Error, Guideline_Violation, Message, Notice, Warning};
 use WordPressdotorg\Plugin_Check\PHPCS;
-
-include PLUGIN_DIR . '/inc/class-php-cli.php';
-include PLUGIN_DIR . '/inc/class-phpcs.php';
+use WordPressdotorg\Plugin_Check\PHPCS_Runner;
 
 class PHPCS_Checks extends Check_Base {
 
 	const NOTICE_TYPES = [
-		// This should be an Error, but this is triggered for all variablse with SQL which isn't always a problem.
+		// This should be an Error, but this is triggered for all variables with SQL which isn't always a problem.
 		//'WordPress.DB.PreparedSQL.InterpolatedNotPrepared' => Warning::class,
 	];
 
@@ -27,7 +25,31 @@ class PHPCS_Checks extends Check_Base {
 		);
 	}
 
+	/**
+	 * Attempts to load Codesniffer and return a status if it's safe to use the runner.
+	 *
+	 * @since 0.2.2
+	 *
+	 * @return bool
+	 */
+	protected function load_codesniffer_runner(): bool {
+		if ( class_exists( '\PHP_CodeSniffer\Runner' ) ) {
+			return true;
+		}
+
+		// Include the PHPCS autoloader.
+		$autoloader = PLUGIN_DIR . '/vendor/squizlabs/php_codesniffer/autoload.php';
+
+		if ( file_exists( $autoloader ) ) {
+			include_once $autoloader;
+		}
+
+		return class_exists( '\PHP_CodeSniffer\Runner' );
+	}
+
 	public function check_against_phpcs_review() {
+		return null;
+
 		if ( ! HAS_VENDOR ) {
 			return new Notice(
 				'phpcs_not_tested',
@@ -35,12 +57,15 @@ class PHPCS_Checks extends Check_Base {
 			);
 		}
 
-		return $this->run_phpcs_standard(
+		return $this->run_cli_phpcs_standard(
 			__DIR__ . '/phpcs/plugin-check-needs-review.xml'
 		);
 	}
 
-	protected function run_phpcs_standard( string $standard, array $args = [] ) {
+	protected function run_cli_phpcs_standard( string $standard, array $args = [] ) {
+		include_once PLUGIN_DIR . '/inc/class-php-cli.php';
+		include_once PLUGIN_DIR . '/inc/class-phpcs.php';
+
 		$phpcs = new PHPCS();
 		$phpcs->set_standard( $standard );
 
@@ -72,6 +97,32 @@ class PHPCS_Checks extends Check_Base {
 		}
 
 		return $this->phpcs_result_to_warnings( $report );
+	}
+
+	protected function run_phpcs_standard( string $standard, array $args = [] ) {
+		include_once PLUGIN_DIR . '/inc/class-phpcs-runner.php';
+
+		if ( ! $this->load_codesniffer_runner() ) {
+			return new Notice(
+				'phpcs_runner_not_found',
+				esc_html__( 'PHP Code Sniffer rulesets have not been tested, as the Code Sniffer Runner class is missing.', 'plugin-check' )
+			);
+		}
+
+		$phpcs = new PHPCS_Runner();
+		$phpcs->set_path( $this->path );
+		$phpcs->set_standard( $standard );
+
+		$results = $phpcs->run();
+
+		if ( is_wp_error( $results ) ) {
+			return new Error(
+				$results->get_error_code(),
+				$results->get_error_message()
+			);
+		}
+
+		return $this->phpcs_result_to_warnings( $results );
 	}
 
 	protected function phpcs_result_to_warnings( $result ) {
@@ -109,7 +160,9 @@ class PHPCS_Checks extends Check_Base {
 					$notice_class = self::NOTICE_TYPES[ $message['source'] ];
 				}
 
-				$source_code = esc_html( trim( file( $this->path . '/' . $filename )[ $message['line'] - 1 ] ) );
+				$file_path = dirname( $this->path ) . '/' . $filename;
+
+				$source_code = esc_html( trim( file( $file_path )[ $message['line'] - 1 ] ) );
 
 				if ( current_user_can( 'edit_plugins' ) ) {
 					$edit_link   = sprintf(
@@ -128,7 +181,7 @@ class PHPCS_Checks extends Check_Base {
 					$message['source'],
 					sprintf(
 						/* translators: 1: Type of Error 2: Line 3: File 4: Message 5: Code Example 6: Edit Link */
-						__( '%1$s Line %2$d of file %3$s.<br>%4$s.<br>%5$s%6$s', 'plugin-check' ),
+						__( '%1$s<br><br>Line %2$d of file <code>%3$s</code>.<br>%4$s.<br>%5$s%6$s', 'plugin-check' ),
 						"<strong>{$message['source']}</strong>",
 						$message['line'],
 						$filename,
@@ -153,7 +206,7 @@ class PHPCS_Checks extends Check_Base {
 	 *
 	 * @return string|null File editor URL or null if not available.
 	 */
-	private function get_file_editor_url( $filename, $line ) {
+	protected function get_file_editor_url( $filename, $line ) {
 		if ( ! isset( $filename, $line ) ) {
 			return null;
 		}
@@ -228,12 +281,15 @@ class PHPCS_Checks extends Check_Base {
 		// Fall back to using the plugin editor if no external editor is offered.
 		if ( ! $edit_url ) {
 			$plugin_data = get_plugins( '/' . $this->slug );
+			if ( ! str_starts_with( $filename, $this->slug ) ) {
+				$filename = $this->slug . '/' . $filename;
+			}
 
 			return esc_url(
 				add_query_arg(
 					[
 						'plugin' => rawurlencode( $this->slug . '/' . array_key_first( $plugin_data ) ),
-						'file'   => rawurlencode( $this->slug . '/' . $filename ),
+						'file'   => rawurlencode( $filename ),
 						'line'   => rawurlencode( $line ),
 					],
 					admin_url( 'plugin-editor.php' )
