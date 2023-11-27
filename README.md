@@ -1,8 +1,6 @@
 # Plugin Check
 
-This repository is for the WordPress plugin checker, a tool for plugin developers to analyze their plugin code and flag any violations or concerns around plugin development best practices, from basic requirements like correct usage of internationalization functions to accessibility, performance, and security best practices.
-
-The WordPress plugin checker was [first proposed in summer 2022](https://make.wordpress.org/plugins/2022/07/05/proposal-for-a-wordpress-plugin-checker/) and is now at an early MVP stage.
+Plugin Check is a WordPress.org tool which provides checks to help plugins meet the directory requirements and follow various best practices.
 
 ## Features
 

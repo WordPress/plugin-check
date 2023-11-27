@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Test Plugin File Type VCS Hidden Errors
  * Plugin URI: https://github.com/WordPress/plugin-check
- * Description: Plugin Check plugin from the WordPress Performance Team, a collection of tests to help improve plugin performance.
+ * Description: Some plugin description.
  * Author: WordPress Performance Team
  * Author URI: https://make.wordpress.org/performance/
  * License: GPLv2 or later
