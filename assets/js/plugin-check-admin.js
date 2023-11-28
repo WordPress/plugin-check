@@ -111,7 +111,7 @@
 
 		//Adding Open All/Collapse All button
 		if ( resultsContainer.innerHTML !== '' ) {
-			resultsContainer.innerHTML = '<div><button style="margin-top:1.33em;" class="button button-primary clollaps-all" data-state="open">Clollaps All</button></div>' +resultsContainer.innerHTML;
+			resultsContainer.innerHTML = '<div><button style="margin-top:1.33em;" class="button button-primary clollaps-all" data-state="open">Clollaps All</button></div>' + resultsContainer.innerHTML;
 		}
 	}
 
@@ -474,7 +474,7 @@
 		const template = templates[ templateSlug ];
 		return template( data );
 	}
-	
+
 	//Manage collapse/open tables click event
 	document.addEventListener('click', function(e) {
 		e.preventDefault();
@@ -512,7 +512,7 @@
 			buttons.forEach(function(_button) {
 				_button.innerHTML = isVisible ? 'Open' : 'Collapse';
 				_button.setAttribute( 'data-state', isVisible ? 'closed' : 'open' );
-			});
+			} );
 
 			//Change Collapse All/Open All Button text
 			button.innerHTML = isVisible ? 'Open All' : 'Collapse All';
@@ -520,6 +520,6 @@
 			//Change Collapse All/Open All Button attribute
 			button.setAttribute( 'data-state', isVisible ? 'closed' : 'open' );
 		}
-	  });
+	  } );
 
 } )( PLUGIN_CHECK ); /* global PLUGIN_CHECK */
