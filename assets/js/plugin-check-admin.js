@@ -108,6 +108,11 @@
 		for ( let i = 0; i < categoriesList.length; i++ ) {
 			categoriesList[ i ].disabled = false;
 		}
+
+		//Adding Open All/Collapse All button
+		if( resultsContainer.innerHTML !== '' ){
+			resultsContainer.innerHTML = '<div><button style="margin-top:1.33em;" class="button button-primary clollaps-all" data-state="open">Clollaps All</button></div>' + resultsContainer.innerHTML;
+		}
 	}
 
 	/**
@@ -469,4 +474,52 @@
 		const template = templates[ templateSlug ];
 		return template( data );
 	}
+	
+	//Manage collapse/open tables click event
+	document.addEventListener('click', function(e) {
+		e.preventDefault();
+		let button = e.target;
+		
+		//Manage Collapse/Open All tables separately
+		if( button.classList.contains('collapse-btn') ){
+			var heading = button.closest('.plugin-check__results-heading');
+			var dataIndex = heading.getAttribute('data-index');
+			var tableContainer = document.querySelector('#plugin-check__results-table-'+dataIndex);
+
+			// Toggle the visibility of the table container
+			if (tableContainer.style.display === 'none') {
+				tableContainer.style.display = 'table';
+				button.innerHTML = 'Collapse';
+			} else {
+				tableContainer.style.display = 'none';
+				button.innerHTML = 'Open';
+			}
+		}
+
+		//Manage Collapse/Open All tables together
+		if( button.classList.contains('clollaps-all') ){
+			var tableContainers = document.querySelectorAll('.plugin-check__results-table');
+			var buttons = document.querySelectorAll('.collapse-btn');
+			var state = button.getAttribute('data-state');
+			var isVisible = state && state === 'open';
+
+			//Collapase/Open All tables
+			tableContainers.forEach(function(tableContainer) {
+				tableContainer.style.display = isVisible ? 'none' : 'table';
+			});
+
+			//Change All buttons text
+			buttons.forEach(function(_button) {
+				_button.innerHTML = isVisible ? 'Open' : 'Collapse';
+				_button.setAttribute( 'data-state', isVisible ? 'closed' : 'open' );
+			});
+
+			//Change Collapse All/Open All Button text
+			button.innerHTML = isVisible ? 'Open All' : 'Collapse All';
+
+			//Change Collapse All/Open All Button attribute
+			button.setAttribute( 'data-state', isVisible ? 'closed' : 'open' );
+		}
+	  });
+
 } )( PLUGIN_CHECK ); /* global PLUGIN_CHECK */
