@@ -110,8 +110,8 @@
 		}
 
 		//Adding Open All/Collapse All button
-		if( resultsContainer.innerHTML !== '' ){
-			resultsContainer.innerHTML = '<div><button style="margin-top:1.33em;" class="button button-primary clollaps-all" data-state="open">Clollaps All</button></div>' + resultsContainer.innerHTML;
+		if ( resultsContainer.innerHTML !== '' ) {
+			resultsContainer.innerHTML = '<div><button style="margin-top:1.33em;" class="button button-primary clollaps-all" data-state="open">Clollaps All</button></div>' +resultsContainer.innerHTML;
 		}
 	}
 
@@ -482,9 +482,9 @@
 		
 		//Manage Collapse/Open All tables separately
 		if( button.classList.contains('collapse-btn') ){
-			var heading = button.closest('.plugin-check__results-heading');
-			var dataIndex = heading.getAttribute('data-index');
-			var tableContainer = document.querySelector('#plugin-check__results-table-'+dataIndex);
+			let heading = button.closest('.plugin-check__results-heading'),
+				dataIndex = heading.getAttribute('data-index'),
+				tableContainer = document.querySelector('#plugin-check__results-table-'+dataIndex);
 
 			// Toggle the visibility of the table container
 			if (tableContainer.style.display === 'none') {
@@ -498,10 +498,10 @@
 
 		//Manage Collapse/Open All tables together
 		if( button.classList.contains('clollaps-all') ){
-			var tableContainers = document.querySelectorAll('.plugin-check__results-table');
-			var buttons = document.querySelectorAll('.collapse-btn');
-			var state = button.getAttribute('data-state');
-			var isVisible = state && state === 'open';
+			let tableContainers = document.querySelectorAll('.plugin-check__results-table'),
+				buttons = document.querySelectorAll('.collapse-btn'),
+				state = button.getAttribute('data-state'),
+				isVisible = state && state === 'open';
 
 			//Collapase/Open All tables
 			tableContainers.forEach(function(tableContainer) {
