@@ -479,7 +479,6 @@
 	 * Manage collapse/open tables click event
 	 */
 	document.addEventListener( 'click' , function( e ) {
-		e.preventDefault();
 		const button = e.target;
 		//Manage Collapse/Open All tables separately
 		if( button.classList.contains( 'collapse-btn' ) ){
