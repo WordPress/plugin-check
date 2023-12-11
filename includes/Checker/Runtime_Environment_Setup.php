@@ -27,11 +27,27 @@ final class Runtime_Environment_Setup {
 		// Get the existing active plugins.
 		$active_plugins = get_option( 'active_plugins' );
 
+		// Get the existing permalink structure.
+		$permalink_structure = get_option( 'permalink_structure' );
+
 		// Set the new prefix.
 		$old_prefix = $wpdb->set_prefix( $table_prefix . 'pc_' );
 
 		// Create and populate the test database tables if they do not exist.
 		if ( $wpdb->posts !== $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->posts ) ) ) {
+			/*
+			 * Set the same permalink structure *before* install finishes,
+			 * so that wp_install_maybe_enable_pretty_permalinks() does not flush rewrite rules.
+			 *
+			 * See https://github.com/WordPress/plugin-check/issues/330
+			 */
+			add_action(
+				'populate_options',
+				static function() use( $permalink_structure ) {
+					add_option( 'permalink_structure', $permalink_structure );
+				}
+			);
+
 			wp_install(
 				'Plugin Check',
 				'plugincheck',
