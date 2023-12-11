@@ -43,7 +43,7 @@ final class Runtime_Environment_Setup {
 			 */
 			add_action(
 				'populate_options',
-				static function() use( $permalink_structure ) {
+				static function () use( $permalink_structure ) {
 					add_option( 'permalink_structure', $permalink_structure );
 				}
 			);
