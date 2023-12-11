@@ -549,6 +549,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			array(
 				'i18n_usage'                 => new Checks\I18n_Usage_Check(),
 				'enqueued_scripts_size'      => new Checks\Enqueued_Scripts_Size_Check(),
+				'enqueued_styles_size'       => new Checks\Enqueued_Styles_Size_Check(),
 				'code_obfuscation'           => new Checks\Code_Obfuscation_Check(),
 				'file_type'                  => new Checks\File_Type_Check(),
 				'plugin_header_text_domain'  => new Checks\Plugin_Header_Text_Domain_Check(),
