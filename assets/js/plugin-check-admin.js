@@ -484,7 +484,7 @@
 	 */
 	document.addEventListener( 'click', function ( e ) {
 		const button = e.target;
-		// Manage Collapse/Open All tables separately
+		// Manage Collapse/Open All tables separately.
 		if ( button.classList.contains( 'collapse-btn' ) ) {
 			const dataIndex = button
 				.closest( '.plugin-check__results-heading' )
@@ -493,7 +493,7 @@
 				'#plugin-check__results-table-' + dataIndex
 			);
 
-			// Toggle the visibility of the table container
+			// Toggle the visibility of the table container.
 			if ( tableContainer.style.display === 'none' ) {
 				tableContainer.style.display = 'table';
 				button.innerHTML = PLUGIN_CHECK.collapse;
@@ -503,7 +503,7 @@
 			}
 		}
 
-		// Manage Collapse/Open All tables together
+		// Manage Collapse/Open All tables together.
 		if ( button.classList.contains( 'clollaps-all' ) ) {
 			const tableContainers = document.querySelectorAll(
 				'.plugin-check__results-table'
@@ -512,12 +512,12 @@
 			const state = button.getAttribute( 'data-state' );
 			const isVisible = state && state === 'open';
 
-			// Collapase/Open All tables
+			// Collapase/Open All tables.
 			tableContainers.forEach( function ( tableContainer ) {
 				tableContainer.style.display = isVisible ? 'none' : 'table';
 			} );
 
-			// Change All buttons text
+			// Change All buttons text.
 			buttons.forEach( function ( _button ) {
 				_button.innerHTML = isVisible ? 'Open' : 'Collapse';
 				_button.setAttribute(
@@ -526,12 +526,12 @@
 				);
 			} );
 
-			// Change Collapse All/Open All Button text
+			// Change Collapse All/Open All Button text.
 			button.innerHTML = isVisible
 				? PLUGIN_CHECK.openAll
 				: PLUGIN_CHECK.collapsAll;
 
-			// Change Collapse All/Open All Button attribute
+			// Change Collapse All/Open All Button attribute.
 			button.setAttribute( 'data-state', isVisible ? 'closed' : 'open' );
 		}
 	} );
