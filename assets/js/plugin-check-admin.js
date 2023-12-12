@@ -113,7 +113,7 @@
 		if ( resultsContainer.innerHTML !== '' ) {
 			resultsContainer.innerHTML =
 				'<div><button style="margin-top:1.33em;" class="button button-primary clollaps-all" data-state="open">' +
-				PLUGIN_CHECK.collapsAll +
+				PLUGIN_CHECK.collapseAll +
 				'</button></div>' +
 				resultsContainer.innerHTML;
 		}
@@ -529,7 +529,7 @@
 			// Change Collapse All/Open All Button text.
 			button.innerHTML = isVisible
 				? PLUGIN_CHECK.openAll
-				: PLUGIN_CHECK.collapsAll;
+				: PLUGIN_CHECK.collapseAll;
 
 			// Change Collapse All/Open All Button attribute.
 			button.setAttribute( 'data-state', isVisible ? 'closed' : 'open' );

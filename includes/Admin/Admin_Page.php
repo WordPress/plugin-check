@@ -118,7 +118,7 @@ final class Admin_Page {
 					'actionCleanUpRuntimeEnvironment' => Admin_AJAX::ACTION_CLEAN_UP_ENVIRONMENT,
 					'successMessage'                  => __( 'No errors found.', 'plugin-check' ),
 					'errorMessage'                    => __( 'Errors were found.', 'plugin-check' ),
-					'collapsAll'                      => __( 'Clollaps All', 'plugin-check' ),
+					'collapseAll'                     => __( 'Clollapse All', 'plugin-check' ),
 					'openAll'                      	  => __( 'Open All', 'plugin-check' ),
 					'collapse'                        => __( 'Collapse', 'plugin-check' ),
 					'open'                        	  => __( 'Open', 'plugin-check' ),
