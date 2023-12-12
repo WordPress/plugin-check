@@ -111,7 +111,9 @@
 
 		//Adding Open All/Collapse All button
 		if ( resultsContainer.innerHTML !== '' ) {
-			resultsContainer.innerHTML = '<div><button style="margin-top:1.33em;" class="button button-primary clollaps-all" data-state="open">Clollaps All</button></div>' + resultsContainer.innerHTML;
+			resultsContainer.innerHTML =
+				'<div><button style="margin-top:1.33em;" class="button button-primary clollaps-all" data-state="open">Clollaps All</button></div>' +
+				resultsContainer.innerHTML;
 		}
 	}
 
@@ -474,18 +476,20 @@
 		const template = templates[ templateSlug ];
 		return template( data );
 	}
-	
+
 	/**
 	 * Manage collapse/open tables click event
 	 */
-	document.addEventListener( 'click' , function( e ) {
+	document.addEventListener( 'click', function ( e ) {
 		const button = e.target;
 		//Manage Collapse/Open All tables separately
-		if( button.classList.contains( 'collapse-btn' ) ){
-			const dataIndex = button.closest( '.plugin-check__results-heading' ).getAttribute( 'data-index' );
-			const tableContainer = document.querySelector( 
-					'#plugin-check__results-table-' + dataIndex
-				);
+		if ( button.classList.contains( 'collapse-btn' ) ) {
+			const dataIndex = button
+				.closest( '.plugin-check__results-heading' )
+				.getAttribute( 'data-index' );
+			const tableContainer = document.querySelector(
+				'#plugin-check__results-table-' + dataIndex
+			);
 
 			// Toggle the visibility of the table container
 			if ( tableContainer.style.display === 'none' ) {
@@ -498,8 +502,10 @@
 		}
 
 		//Manage Collapse/Open All tables together
-		if( button.classList.contains( 'clollaps-all' ) ){
-			const tableContainers = document.querySelectorAll( '.plugin-check__results-table' );
+		if ( button.classList.contains( 'clollaps-all' ) ) {
+			const tableContainers = document.querySelectorAll(
+				'.plugin-check__results-table'
+			);
 			const buttons = document.querySelectorAll( '.collapse-btn' );
 			const state = button.getAttribute( 'data-state' );
 			const isVisible = state && state === 'open';
@@ -512,7 +518,8 @@
 			//Change All buttons text
 			buttons.forEach( function ( _button ) {
 				_button.innerHTML = isVisible ? 'Open' : 'Collapse';
-				_button.setAttribute( 'data-state',
+				_button.setAttribute(
+					'data-state',
 					isVisible ? 'closed' : 'open'
 				);
 			} );
@@ -523,6 +530,5 @@
 			//Change Collapse All/Open All Button attribute
 			button.setAttribute( 'data-state', isVisible ? 'closed' : 'open' );
 		}
-	  } );
-
+	} );
 } )( PLUGIN_CHECK ); /* global PLUGIN_CHECK */
