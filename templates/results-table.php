@@ -1,6 +1,6 @@
 <h4 id="plugin-check__results-heading-{{data.index}}" class="plugin-check__results-heading" data-index="{{data.index}}">
 	<?php esc_html_e( 'FILE:', 'plugin-check' ); ?> {{ data.file }} 
-	<button class="collapse-btn" data-state="collapse"><?php esc_html_e( 'Collapse' ); ?></button>
+	<button class="collapse-btn" data-state="collapse"><?php esc_html_e( 'Collapse', 'plugin-check' ); ?></button>
 </h4>
 <table id="plugin-check__results-table-{{data.index}}" class="widefat striped plugin-check__results-table">
 	<thead>
