@@ -112,7 +112,9 @@
 		// Adding Open All/Collapse All button
 		if ( resultsContainer.innerHTML !== '' ) {
 			resultsContainer.innerHTML =
-				'<div><button style="margin-top:1.33em;" class="button button-primary clollaps-all" data-state="open">'+ PLUGIN_CHECK.collapsAll +'</button></div>' +
+				'<div><button style="margin-top:1.33em;" class="button button-primary clollaps-all" data-state="open">' +
+				PLUGIN_CHECK.collapsAll +
+				'</button></div>' +
 				resultsContainer.innerHTML;
 		}
 	}
@@ -525,7 +527,9 @@
 			} );
 
 			// Change Collapse All/Open All Button text
-			button.innerHTML = isVisible ? PLUGIN_CHECK.openAll : PLUGIN_CHECK.collapsAll;
+			button.innerHTML = isVisible
+				? PLUGIN_CHECK.openAll
+				: PLUGIN_CHECK.collapsAll;
 
 			// Change Collapse All/Open All Button attribute
 			button.setAttribute( 'data-state', isVisible ? 'closed' : 'open' );
