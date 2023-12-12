@@ -198,6 +198,7 @@ class Default_Check_Collection implements Check_Collection {
 	 * @param string|int $offset Either a check slug (string) or index (integer).
 	 * @return bool True if a check exists at the given slug or index, false otherwise.
 	 */
+	#[\ReturnTypeWillChange]
 	public function offsetExists( $offset ) {
 		if ( is_string( $offset ) ) {
 			return isset( $this->checks[ $offset ] );
@@ -214,6 +215,7 @@ class Default_Check_Collection implements Check_Collection {
 	 * @param string|int $offset Either a check slug (string) or index (integer).
 	 * @return Check|null Check with the given slug or index, or null if it does not exist.
 	 */
+	#[\ReturnTypeWillChange]
 	public function offsetGet( $offset ) {
 		if ( is_string( $offset ) ) {
 			if ( isset( $this->checks[ $offset ] ) ) {
@@ -239,6 +241,7 @@ class Default_Check_Collection implements Check_Collection {
 	 * @param string|int $offset Either a check slug (string) or index (integer).
 	 * @param mixed      $value  Value to set.
 	 */
+	#[\ReturnTypeWillChange]
 	public function offsetSet( $offset, $value ) {
 		// Not implemented as this is a read-only collection.
 	}
@@ -252,6 +255,7 @@ class Default_Check_Collection implements Check_Collection {
 	 *
 	 * @param string|int $offset Either a check slug (string) or index (integer).
 	 */
+	#[\ReturnTypeWillChange]
 	public function offsetUnset( $offset ) {
 		// Not implemented as this is a read-only collection.
 	}
