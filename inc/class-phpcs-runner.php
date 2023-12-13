@@ -135,7 +135,7 @@ class PHPCS_Runner {
 				esc_html__( 'Cannot find any PHP file to check, make sure your plugin contains PHP files.', 'plugin-check' )
 			);
 		}
-
+		
 		$base_dir = trailingslashit( basename( $this->get_path() ) );
 		$plugin_path = $this->get_path();
 

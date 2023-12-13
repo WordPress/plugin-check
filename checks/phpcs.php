@@ -25,6 +25,20 @@ class PHPCS_Checks extends Check_Base {
 		);
 	}
 
+
+	public function check_against_phpcs_review() {
+		if ( ! HAS_VENDOR ) {
+			return new Notice(
+				'phpcs_not_tested',
+				__( 'PHP Code Sniffer rulesets have not been tested, as the vendor directory is missing. Perhaps you need to run <code>`composer install`</code>.', 'plugin-check' )
+			);
+		}
+
+		return $this->run_phpcs_standard(
+			__DIR__ . '/phpcs/plugin-check-needs-review.xml'
+		);
+	}
+
 	/**
 	 * Attempts to load Codesniffer and return a status if it's safe to use the runner.
 	 *
@@ -45,58 +59,6 @@ class PHPCS_Checks extends Check_Base {
 		}
 
 		return class_exists( '\PHP_CodeSniffer\Runner' );
-	}
-
-	public function check_against_phpcs_review() {
-		return null;
-
-		if ( ! HAS_VENDOR ) {
-			return new Notice(
-				'phpcs_not_tested',
-				__( 'PHP Code Sniffer rulesets have not been tested, as the vendor directory is missing. Perhaps you need to run <code>`composer install`</code>.', 'plugin-check' )
-			);
-		}
-
-		return $this->run_cli_phpcs_standard(
-			__DIR__ . '/phpcs/plugin-check-needs-review.xml'
-		);
-	}
-
-	protected function run_cli_phpcs_standard( string $standard, array $args = [] ) {
-		include_once PLUGIN_DIR . '/inc/class-php-cli.php';
-		include_once PLUGIN_DIR . '/inc/class-phpcs.php';
-
-		$phpcs = new PHPCS();
-		$phpcs->set_standard( $standard );
-
-		$args = wp_parse_args(
-			$args,
-			array(
-				'extensions' => 'php', // Only check php files.
-				's'          => true, // Show the name of the sniff triggering a violation.
-				// --ignore-annotations
-			)
-		);
-
-		$report = $phpcs->run_json_report(
-			$this->path,
-			$args,
-			'array'
-		);
-
-		if ( is_wp_error( $report ) ) {
-			return new Error(
-				$report->get_error_code(),
-				$report->get_error_message()
-			);
-		}
-
-		// If no response, either malformed output or PHP encountered an error.
-		if ( ! $report || empty( $report['files'] ) ) {
-			return false;
-		}
-
-		return $this->phpcs_result_to_warnings( $report );
 	}
 
 	protected function run_phpcs_standard( string $standard, array $args = [] ) {

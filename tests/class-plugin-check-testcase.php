@@ -1,11 +1,12 @@
 <?php
-use function WordPressdotorg\Plugin_Check\{ run_all_checks };
+
+use function WordPressdotorg\Plugin_Check\{run_all_checks};
 
 class PluginCheck_TestCase extends WP_UnitTestCase {
 	public function run_against_string( $string, $args = [] ) {
 		return $this->run_against_virtual_files(
 			[
-				'plugin.php' => $string
+				'plugin.php' => $string,
 			],
 			$args
 		);
@@ -21,12 +22,12 @@ class PluginCheck_TestCase extends WP_UnitTestCase {
 		foreach ( $files as $filename => $string ) {
 			$full_filename = "{$tempname}/{$filename}";
 
-			if ( str_ends_with( $filename, '.php' ) && ! str_starts_with( $string,  '<' . '?php' ) ) {
+			if ( str_ends_with( $filename, '.php' ) && ! str_starts_with( $string, '<' . '?php' ) ) {
 				$string = "<?php {$string}";
 			}
 
 			if ( str_contains( $filename, '/' ) ) {
-				$dir = dirname( $full_filename );
+				$dir    = dirname( $full_filename );
 				$dirs[] = $dir;
 				mkdir( $dir, 0777, true );
 			}
@@ -36,7 +37,7 @@ class PluginCheck_TestCase extends WP_UnitTestCase {
 
 		$dirs[] = $tempname;
 
-		$args[ 'path' ] = $tempname;
+		$args['path'] = $tempname;
 
 		// Do not use the fallback of the path for the slug, as it contains a restricted trademark term.
 		if ( ! isset( $args['slug'] ) ) {
@@ -100,7 +101,7 @@ class PluginCheck_TestCase extends WP_UnitTestCase {
 		if ( $needle ) {
 			$codes = array_filter(
 				$codes,
-				static function( $text ) use( $needle ) {
+				static function ( $text ) use ( $needle ) {
 					return false !== strpos( $text, $needle );
 				}
 			);

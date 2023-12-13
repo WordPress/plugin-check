@@ -1,4 +1,4 @@
-Plugin Check
+Plugin Check (PCP)
 ===============
 * Contributors: dd32, davidperez, bordoni, frantorres, eherman24, alexsanford1
 * Requires at least: 6.2
