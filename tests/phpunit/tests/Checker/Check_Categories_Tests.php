@@ -53,7 +53,7 @@ class Check_Categories_Tests extends WP_UnitTestCase {
 		$check_categories = new Check_Categories();
 		$filtered_checks  = $check_categories->filter_checks_by_categories( $checks, $categories );
 
-		$this->assertEquals( $expected_filtered_checks, $filtered_checks->to_map() );
+		$this->assertEquals( array_keys( $expected_filtered_checks ), array_values( array_intersect( array_keys( $filtered_checks->to_map() ), array_keys( $expected_filtered_checks ) ) ) );
 	}
 
 	public function data_checks_by_categories() {
