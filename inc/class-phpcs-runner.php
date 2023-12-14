@@ -6,7 +6,7 @@ use WP_Error;
 /**
  * Class PHPCS_Runner
  *
- * @since   TBD
+ * @since   0.2.2
  *
  * @package WordPressdotorg\Plugin_Check
  */
@@ -19,7 +19,7 @@ class PHPCS_Runner {
 	 *
 	 * @var array
 	 */
-	protected $allowed_args = [
+	protected array $allowed_args = [
 		'standard' => true,
 		'extensions' => true,
 		'sniffs' => true,
@@ -33,7 +33,7 @@ class PHPCS_Runner {
 	 *
 	 * @var string
 	 */
-	protected $path;
+	protected string $path;
 
 	/**
 	 * Which standard file we will use.
@@ -42,21 +42,54 @@ class PHPCS_Runner {
 	 *
 	 * @var string
 	 */
-	protected $standard;
+	protected string $standard;
 
-	public function set_path( $path ) {
+	/**
+	 * Sets the plugin path which will be used for the runner.
+	 *
+	 * @since 0.2.2
+	 *
+	 * @param string $path The plugin path.
+	 *
+	 * @return void
+	 */
+	public function set_path( string $path ): void {
 		$this->path = $path;
 	}
 
-	public function get_path() {
+	/**
+	 * Gets the path for the plugin.
+	 *
+	 * @since 0.2.2
+	 *
+	 * @return string
+	 */
+	public function get_path(): string {
 		return $this->path;
 	}
 
-	public function set_standard( $standard ) {
+	/**
+	 * Sets the standards file which will be used for the runner.
+	 * Normally this will be a .xml file.
+	 *
+	 * @since 0.2.2
+	 *
+	 * @param string $standard
+	 *
+	 * @return void
+	 */
+	public function set_standard( string $standard ): void {
 		$this->standard = $standard;
 	}
 
-	public function get_standard() {
+	/**
+	 * Gets the standard file for the runner.
+	 *
+	 * @since 0.2.2
+	 *
+	 * @return string
+	 */
+	public function get_standard(): string {
 		return $this->standard;
 	}
 
@@ -74,7 +107,7 @@ class PHPCS_Runner {
 	 * @type string $exclude    A comma separated list of sniff codes to exclude from checks.
 	 *                          }
 	 */
-	protected function get_args() {
+	protected function get_args(): array {
 		return [
 			'extensions' => 'php',
 			'standard' => $this->get_standard(),
@@ -135,11 +168,11 @@ class PHPCS_Runner {
 				esc_html__( 'Cannot find any PHP file to check, make sure your plugin contains PHP files.', 'plugin-check' )
 			);
 		}
-		
-		$base_dir = trailingslashit( basename( $this->get_path() ) );
+
+		$base_dir    = trailingslashit( basename( $this->get_path() ) );
 		$plugin_path = $this->get_path();
 
-		$files_paths = array_map( static function( $file_path ) use ( $base_dir, $plugin_path ) {
+		$files_paths  = array_map( static function ( $file_path ) use ( $base_dir, $plugin_path ) {
 			return str_replace( $plugin_path, $base_dir, $file_path );
 		}, array_keys( $reports['files'] ) );
 		$files_values = array_values( $reports['files'] );
@@ -159,7 +192,7 @@ class PHPCS_Runner {
 	 *
 	 * @return array An indexed array of PHPCS CLI arguments.
 	 */
-	protected function parse_argv( $argv, $defaults ) {
+	protected function parse_argv( $argv, $defaults ): array {
 		// Only accept allowed PHPCS arguments from check arguments array.
 		$check_args = array_intersect_key( $argv, $this->allowed_args );
 
@@ -177,7 +210,7 @@ class PHPCS_Runner {
 	 *
 	 * @since 0.2.2
 	 */
-	protected function reset_php_codesniffer_config() {
+	protected function reset_php_codesniffer_config(): void {
 		if ( class_exists( '\PHP_CodeSniffer\Config' ) ) {
 			/*
 			 * PHPStan ignore reason: PHPStan raised an issue because we can't
