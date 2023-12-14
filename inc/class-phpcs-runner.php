@@ -19,7 +19,7 @@ class PHPCS_Runner {
 	 *
 	 * @var array
 	 */
-	protected array $allowed_args = [
+	protected $allowed_args = [
 		'standard' => true,
 		'extensions' => true,
 		'sniffs' => true,
@@ -33,7 +33,7 @@ class PHPCS_Runner {
 	 *
 	 * @var string
 	 */
-	protected string $path;
+	protected $path;
 
 	/**
 	 * Which standard file we will use.
@@ -42,7 +42,7 @@ class PHPCS_Runner {
 	 *
 	 * @var string
 	 */
-	protected string $standard;
+	protected $standard;
 
 	/**
 	 * Sets the plugin path which will be used for the runner.
