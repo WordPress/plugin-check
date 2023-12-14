@@ -1,14 +1,14 @@
-Plugin Check
+Plugin Check (PCP)
 ===============
 * Contributors: dd32, davidperez, bordoni, frantorres, eherman24, alexsanford1
 * Requires at least: 6.2
-* Tested up to: 6.3.1
+* Tested up to: 6.4.2
 * Stable tag: 0.2.2
 * License: GPLv2 or later
 * Requires PHP: 7.2
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
 * Author URI: https://make.wordpress.org/plugins/
-* Plugin URL: https://github.com/10up/plugin-check/
+* Plugin URL: https://github.com/WordPress/plugin-check/
 
 Plugin Check is a tool from the WordPress.org plugin review team, it provides an initial check of whether your plugin meets our requirements for hosting.
 
@@ -28,7 +28,7 @@ All development for this plugin is handled via [GitHub](https://github.com/10up/
 
 = What if the plugin reports as "error" something that's correct? =
 
-We strived to write a plugin in a way that minimizes false positives but If you find one, please report it in the GitHub repo.
+We strove to write a plugin in a way that minimizes false positives but If you find one, please report it in the GitHub repo.
 
 If you can, please consider submitting a Pull Request to fix it.
 
@@ -42,10 +42,13 @@ This plugin checker is not perfect, and never will be. It is only a tool to help
 
 == Changelog ==
 
-= [0.2.2] 2023-11-XX =
+= [0.2.2] 2023-12-13 =
 
-* Fix - Prevent problems with Readme parser warning related to `contributor_ignored` for when running the check outside of WP.org. Props @bordoni, @dev4press. [#276](https://github.com/10up/plugin-check/pull/276)
-* Fix - Remove extra period on the end of the sentence for Phar warning. Props @bordoni, @pixolin. [#275](https://github.com/10up/plugin-check/pull/275)
+* Enhancement - Include support for Windows Servers.
+* Enhancement - Avoid using PHP CLI directly, which enables plugin developers to use PCP in a variety of new environments.
+* Fix - Remove dependency on `shell_exec` and `exec` functions, which enables plugin developers to use PCP in a variety of new environments.
+* Fix - Prevent problems with Readme parser warning related to `contributor_ignored` for when running the check outside WP.org. Props @dev4press. [#276](https://github.com/10up/plugin-check/pull/276)
+* Fix - Remove extra period on the end of the sentence for Phar warning. Props @pixolin. [#275](https://github.com/10up/plugin-check/pull/275)
 
 = [0.2.1] 2023-09-22 =
 
