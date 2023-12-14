@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name: Plugin Check
- * Plugin URI: https://github.com/10up/plugin-check/
+ * Plugin Name: Plugin Check (PCP)
+ * Plugin URI: https://github.com/WordPress/plugin-check/
  * Description: Runs checks against a plugin to verify the latest WordPress standards and practices.
  * Author: Plugin Review Team
  * Version: 0.2.2
