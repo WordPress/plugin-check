@@ -236,6 +236,8 @@
 	 */
 	async function runChecks( data ) {
 		let isSuccessMessage = true;
+		const allResults = [];
+
 		for ( let i = 0; i < data.checks.length; i++ ) {
 			try {
 				const results = await runCheck( data.plugin, data.checks[ i ] );
@@ -247,13 +249,17 @@
 				) {
 					isSuccessMessage = false;
 				}
-				renderResults( results );
+				allResults.push( results );
 			} catch ( e ) {
 				// Ignore for now.
 			}
 		}
 
 		renderResultsMessage( isSuccessMessage );
+
+		for ( let i = 0; i < allResults.length; i++ ) {
+			renderResults( allResults[ i ] );
+		}
 	}
 
 	/**
