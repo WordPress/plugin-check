@@ -8,7 +8,8 @@
     "composer/installers": "^v1.12.0 || ^2.2",
     "dealerdirect/phpcodesniffer-composer-installer": "^0.4.1 || ^0.5 || ^0.6.2 || ^0.7 || ^1.0",
     "wp-coding-standards/wpcs": "^3.0.0",
-    "automattic/vipwpcs": "^3.0.0"
+    "automattic/vipwpcs": "^3.0.0",
+    "afragen/wordpress-plugin-readme-parser": "dev-master"
   },
   "require-dev": {
     "wp-cli/extension-command": "^2.1",
