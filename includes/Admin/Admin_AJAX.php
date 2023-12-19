@@ -109,6 +109,7 @@ final class Admin_AJAX {
 		}
 
 		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
+		$checks = is_null( $checks ) ? array() : $checks;
 		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		try {
