@@ -348,24 +348,24 @@ class Trademarks_Check extends Abstract_File_Check {
 			// Trademarks that do NOT end in "-", but are within the FOR_USE_EXCEPTIONS array can be used, but only if it ends with 'for x'.
 			$message = sprintf(
 				/* translators: 1: plugin name, 2: found trademarked term */
-				__( 'The plugin name includes a restricted term. Your chosen plugin name - %1$s - contains the restricted term "%2$s" which cannot be used within in your plugin name, unless your plugin name ends with "for %2$s". The term must still not appear anywhere else in your name.', 'plugin-check' ),
-				'<code>' . esc_html( $plugin_name ) . '</code>',
+				__( 'The plugin name includes a restricted term. Your chosen plugin name - "%1$s" - contains the restricted term "%2$s" which cannot be used within in your plugin name, unless your plugin name ends with "for %2$s". The term must still not appear anywhere else in your name.', 'plugin-check' ),
+				esc_html( $plugin_name ),
 				esc_html( trim( $check, '-' ) )
 			);
 		} elseif ( trim( $check, '-' ) === $check ) {
 			// Trademarks that do NOT end in "-" indicate slug cannot contain term at all.
 			$message = sprintf(
 				/* translators: 1: plugin name, 2: found trademarked term */
-				__( 'The plugin name includes a restricted term. Your chosen plugin name - %1$s - contains the restricted term "%2$s" which cannot be used at all in your plugin name.', 'plugin-check' ),
-				'<code>' . esc_html( $plugin_name ) . '</code>',
+				__( 'The plugin name includes a restricted term. Your chosen plugin name - "%1$s" - contains the restricted term "%2$s" which cannot be used at all in your plugin name.', 'plugin-check' ),
+				esc_html( $plugin_name ),
 				esc_html( trim( $check, '-' ) )
 			);
 		} else {
 			// Trademarks ending in "-" indicate slug cannot BEGIN with that term.
 			$message = sprintf(
 				/* translators: 1: plugin name, 2: found trademarked term */
-				__( 'The plugin name includes a restricted term. Your chosen plugin name - %1$s - contains the restricted term "%2$s" and cannot be used to begin your plugin name. We disallow the use of certain terms in ways that are abused, or potentially infringe on and/or are misleading with regards to trademarks. You may use the term "%2$s" elsewhere in your plugin name, such as "... for %2$s".', 'plugin-check' ),
-				'<code>' . esc_html( $plugin_name ) . '</code>',
+				__( 'The plugin name includes a restricted term. Your chosen plugin name - "%1$s" - contains the restricted term "%2$s" and cannot be used to begin your plugin name. We disallow the use of certain terms in ways that are abused, or potentially infringe on and/or are misleading with regards to trademarks. You may use the term "%2$s" elsewhere in your plugin name, such as "... for %2$s".', 'plugin-check' ),
+				esc_html( $plugin_name ),
 				esc_html( trim( $check, '-' ) )
 			);
 		}
@@ -395,24 +395,24 @@ class Trademarks_Check extends Abstract_File_Check {
 			// Trademarks that do NOT end in "-", but are within the FOR_USE_EXCEPTIONS array can be used, but only if it ends with 'for x'.
 			$message = sprintf(
 				/* translators: 1: plugin slug, 2: found trademarked term */
-				__( 'The plugin slug includes a restricted term. Your plugin slug - %1$s - contains the restricted term "%2$s" which cannot be used within in your plugin slug, unless your plugin slug ends with "for %2$s". The term must still not appear anywhere else in your plugin slug.', 'plugin-check' ),
-				'<code>' . esc_html( $plugin_slug ) . '</code>',
+				__( 'The plugin slug includes a restricted term. Your plugin slug - "%1$s" - contains the restricted term "%2$s" which cannot be used within in your plugin slug, unless your plugin slug ends with "for %2$s". The term must still not appear anywhere else in your plugin slug.', 'plugin-check' ),
+				esc_html( $plugin_slug ),
 				esc_html( trim( $check, '-' ) )
 			);
 		} elseif ( trim( $check, '-' ) === $check ) {
 			// Trademarks that do NOT end in "-" indicate slug cannot contain term at all.
 			$message = sprintf(
 				/* translators: 1: plugin slug, 2: found trademarked term */
-				__( 'The plugin slug includes a restricted term. Your plugin slug - %1$s - contains the restricted term "%2$s" which cannot be used at all in your plugin slug.', 'plugin-check' ),
-				'<code>' . esc_html( $plugin_slug ) . '</code>',
+				__( 'The plugin slug includes a restricted term. Your plugin slug - "%1$s" - contains the restricted term "%2$s" which cannot be used at all in your plugin slug.', 'plugin-check' ),
+				esc_html( $plugin_slug ),
 				esc_html( trim( $check, '-' ) )
 			);
 		} else {
 			// Trademarks ending in "-" indicate slug cannot BEGIN with that term.
 			$message = sprintf(
 				/* translators: 1: plugin slug, 2: found trademarked term */
-				__( 'The plugin slug includes a restricted term. Your plugin slug - %1$s - contains the restricted term "%2$s" and cannot be used to begin your plugin slug. We disallow the use of certain terms in ways that are abused, or potentially infringe on and/or are misleading with regards to trademarks. You may use the term "%2$s" elsewhere in your plugin slug, such as "... for %2$s".', 'plugin-check' ),
-				'<code>' . esc_html( $plugin_slug ) . '</code>',
+				__( 'The plugin slug includes a restricted term. Your plugin slug - "%1$s" - contains the restricted term "%2$s" and cannot be used to begin your plugin slug. We disallow the use of certain terms in ways that are abused, or potentially infringe on and/or are misleading with regards to trademarks. You may use the term "%2$s" elsewhere in your plugin slug, such as "... for %2$s".', 'plugin-check' ),
+				esc_html( $plugin_slug ),
 				esc_html( trim( $check, '-' ) )
 			);
 		}
