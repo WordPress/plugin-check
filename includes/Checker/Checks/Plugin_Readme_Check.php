@@ -102,9 +102,9 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		$donate_link       = $parser->donate_link;
 
 		if (
-			in_array( 'tags', $tags, true )
-			|| strpos( $short_description, 'Here is a short description of the plugin.' ) !== false
-			|| strpos( $donate_link, '//example.com/' ) !== false
+			in_array( 'tag1', $tags, true )
+			|| str_contains( $short_description, 'Here is a short description of the plugin.' )
+			|| str_contains( $donate_link, '//example.com/' )
 		) {
 			$this->add_result_warning_for_file(
 				$result,
