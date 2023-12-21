@@ -55,7 +55,7 @@ class Trademarks_Check_Tests extends WP_UnitTestCase {
 				Trademarks_Check::TYPE_README,
 				'test-trademarks-plugin-readme-errors/load.php',
 				'readme.txt',
-				'The plugin name includes a restricted term. Your chosen plugin name - " Test Plugin with readme " - contains the restricted term "plugin" which cannot be used at all in your plugin name.',
+				'The plugin name includes a restricted term. Your chosen plugin name - "Test Plugin with readme" - contains the restricted term "plugin" which cannot be used at all in your plugin name.',
 			),
 			'Plugin header - Test Trademarks Plugin Header Name Errors' => array(
 				Trademarks_Check::TYPE_NAME,

@@ -256,7 +256,7 @@ class Trademarks_Check extends Abstract_File_Check {
 			return;
 		}
 
-		$name = $matches[1];
+		$name = trim( $matches[1] );
 
 		try {
 			$this->validate_name_has_no_trademarks( $name );
