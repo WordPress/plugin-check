@@ -3,7 +3,7 @@ Plugin Check (PCP)
 * Contributors: dd32, davidperez, bordoni, frantorres, eherman24, alexsanford1
 * Requires at least: 6.2
 * Tested up to: 6.4.2
-* Stable tag: 0.2.2
+* Stable tag: 0.2.3
 * License: GPLv2 or later
 * Requires PHP: 7.2
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -41,6 +41,12 @@ Many sites use custom plugins, and that's perfectly okay. But plugins that are i
 This plugin checker is not perfect, and never will be. It is only a tool to help plugin authors, or anybody else who wants to make their plugin more capable. All plugins submitted to WordPress.org are hand-reviewed by a team of experts. The automated plugin checker is meant to be a useful tool only, not an absolute system of measurement.
 
 == Changelog ==
+
+= [0.2.3] 2023-12-21 =
+
+* Tweak - Use version [3.8.0 of the PHP_CodeSniffer](https://github.com/PHPCSStandards/PHP_CodeSniffer/releases/tag/3.8.0) library, moving away from `squizlabs/PHP_CodeSniffer` to use `PHPCSStandards/PHP_CodeSniffer`.
+* Fix - Ensure the plugin works as expected on the WP playground environment to enable reviewers to use PCP. Props @tellyworth.
+* Fix - Undefined array key "argv" when running the plugin check in certain environments. Props @afragen. [#340](https://github.com/WordPress/plugin-check/pull/340)
 
 = [0.2.2] 2023-12-13 =
 
