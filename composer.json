@@ -13,12 +13,14 @@
   "require-dev": {
     "wp-cli/extension-command": "^2.1",
     "wp-cli/wp-cli": "^2.8",
-    "wp-cli/wp-cli-tests": "^v4.2.2"
+    "wp-cli/wp-cli-tests": "^v4.2.2",
+    "wp-cli/scaffold-package-command": "^2.0"
   },
   "scripts": {
     "behat": "BEHAT_FEATURES_FOLDER=tests/behat/features run-behat-tests",
     "behat-rerun": "BEHAT_FEATURES_FOLDER=tests/behat/features rerun-behat-tests",
     "prepare-behat-tests": "install-package-tests",
+    "cli-docs": "./vendor/bin/wp scaffold package-readme --force .",
     "format": [
       "composer --working-dir=build-cs update --no-interaction",
       "build-cs/vendor/bin/phpcbf --standard=phpcs.xml.dist"
@@ -64,8 +66,20 @@
   "autoload": {
     "psr-4": {
       "WordPress\\Plugin_Check\\": "includes/"
-    }
+    },
+    "files": [ "cli.php" ]
   },
+  "extra": {
+		"commands": [
+          "plugin check"
+        ],
+    "readme": {
+      "sections": [
+          "Using"
+      ],
+      "show_powered_by": false
+    }
+	},
   "autoload-dev": {
     "psr-4": {
       "WordPress\\Plugin_Check\\Test_Data\\": "tests/phpunit/testdata/Checks",
