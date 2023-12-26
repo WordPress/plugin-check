@@ -219,6 +219,20 @@ final class Admin_Page {
 	public function filter_plugin_action_links( $actions, $plugin_file, $plugin_data, $context ) {
 
 		$plugin_check_base_name = plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE );
+
+		if ( $plugin_check_base_name === $plugin_file ) {
+			$actions = array_merge(
+				array(
+					'plugin-check' => sprintf(
+						'<a href="%1$s">%2$s</a>',
+						esc_url( admin_url( 'tools.php?page=plugin-check' ) ),
+						esc_html__( 'Plugin Check', 'plugin-check' )
+					),
+				),
+				$actions
+			);
+		}
+
 		if ( in_array( $context, array( 'mustuse', 'dropins' ), true ) || $plugin_check_base_name === $plugin_file ) {
 			return $actions;
 		}
