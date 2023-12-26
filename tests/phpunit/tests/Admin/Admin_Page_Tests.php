@@ -155,12 +155,13 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_filter_plugin_action_links_should_not_add_check_link_for_plugin_checker() {
+	public function test_filter_plugin_action_links_plugin_should_have_self_admin_page_link_only() {
 
 		$base_file = plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE );
 
 		$action_links = $this->admin_page->filter_plugin_action_links( array(), $base_file, array(), 'all' );
-		$this->assertEmpty( $action_links );
+		$this->assertNotEmpty( $action_links );
+		$this->assertEquals( 1, count( $action_links ) );
 
 		/** Administrator check */
 		$admin_user = self::factory()->user->create( array( 'role' => 'administrator' ) );
@@ -171,7 +172,16 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 		wp_set_current_user( $admin_user );
 		$action_links = $this->admin_page->filter_plugin_action_links( array(), $base_file, array(), 'all' );
 
-		$this->assertEmpty( $action_links );
+		$this->assertEquals( 1, count( $action_links ) );
+
+		$this->assertEquals(
+			sprintf(
+				'<a href="%1$s">%2$s</a>',
+				esc_url( admin_url( 'tools.php?page=plugin-check' ) ),
+				esc_html__( 'Plugin Check', 'plugin-check' )
+			),
+			$action_links[0]
+		);
 	}
 
 	/**
