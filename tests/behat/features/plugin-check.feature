@@ -29,3 +29,8 @@ Feature: Test that the WP-CLI command works.
       """
       All output should be run through an escaping function
       """
+    When I try the WP-CLI command `plugin check hello.php --fields=line,column,code,nonexistent_name`
+    Then STDERR should be:
+      """
+      Error: Invalid field: nonexistent_name
+      """

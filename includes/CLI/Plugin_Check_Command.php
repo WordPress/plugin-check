@@ -41,6 +41,20 @@ final class Plugin_Check_Command {
 	);
 
 	/**
+	 * Field names.
+	 *
+	 * @since n.e.x.t
+	 * @var string[]
+	 */
+	protected $allowed_fields = array(
+		'line',
+		'column',
+		'type',
+		'code',
+		'message',
+	);
+
+	/**
 	 * Constructor.
 	 *
 	 * @since n.e.x.t
@@ -128,6 +142,9 @@ final class Plugin_Check_Command {
 
 		// Get options based on the CLI arguments.
 		$options = $this->get_options( $assoc_args );
+
+		// Validate field names.
+		$this->validate_fields( wp_parse_list( $options['fields'] ) );
 
 		// Create the plugin and checks array from CLI arguments.
 		$plugin = isset( $args[0] ) ? $args[0] : '';
@@ -410,5 +427,22 @@ final class Plugin_Check_Command {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Validate field names.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param array $fields An array of field names.
+	 */
+	private function validate_fields( array $fields ) {
+		$invalid_fields = array_diff( $fields, $this->allowed_fields );
+
+		if ( count( $invalid_fields ) > 0 ) {
+			// translators: %s: Field names.
+			$message = ( 1 === count( $invalid_fields ) ) ? __( 'Invalid field: %s', 'plugin-check' ) : __( 'Invalid fields: %s', 'plugin-check' );
+			WP_CLI::error( sprintf( $message, join( ', ', $invalid_fields ) ) );
+		}
 	}
 }
