@@ -1,0 +1,2 @@
+<?php
+$domain = 'sourceguardian.com';
