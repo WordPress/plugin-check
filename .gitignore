@@ -62,3 +62,8 @@ temp/
 ._*
 .Trashes
 .svn
+
+############
+## Local overrides
+############
+.wp-env.override.json
