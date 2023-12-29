@@ -57,8 +57,19 @@ class CLI_Runner extends Abstract_Check_Runner {
 	 * @throws Exception Thrown if the plugin parameter is empty.
 	 */
 	protected function get_plugin_param() {
-		// Get the plugin parameter from the command line arguments.
-		$plugin = isset( $_SERVER['argv'][3] ) ? $_SERVER['argv'][3] : '';
+		// Exclude first three reserved elements.
+		$params = array_slice( $_SERVER['argv'], 3 );
+
+		// Remove associative arguments.
+		$params = array_filter(
+			$params,
+			function ( $val ) {
+				return ! str_starts_with( $val, '--' );
+			}
+		);
+
+		// Use only first element. We dont support checking multiple plugins at once yet!
+		$plugin = count( $params ) > 0 ? reset( $params ) : '';
 
 		if ( empty( $plugin ) ) {
 			throw new Exception(
