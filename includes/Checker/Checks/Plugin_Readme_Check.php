@@ -92,9 +92,9 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param Check_Result $result The Check Result to amend.
+	 * @param Check_Result $result      The Check Result to amend.
 	 * @param string       $readme_file Readme file.
-	 * @param Parser       $parser The Parser object.
+	 * @param Parser       $parser      The Parser object.
 	 */
 	private function check_default_text( Check_Result $result, string $readme_file, Parser $parser ) {
 		$short_description = $parser->short_description;
@@ -120,9 +120,9 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param Check_Result $result The Check Result to amend.
+	 * @param Check_Result $result      The Check Result to amend.
 	 * @param string       $readme_file Readme file.
-	 * @param Parser       $parser The Parser object.
+	 * @param Parser       $parser      The Parser object.
 	 */
 	private function check_license( Check_Result $result, string $readme_file, Parser $parser ) {
 		$license = $parser->license;
@@ -143,9 +143,9 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param Check_Result $result The Check Result to amend.
+	 * @param Check_Result $result      The Check Result to amend.
 	 * @param string       $readme_file Readme file.
-	 * @param Parser       $parser The Parser object.
+	 * @param Parser       $parser      The Parser object.
 	 */
 	private function check_stable_tag( Check_Result $result, string $readme_file, Parser $parser ) {
 		$stable_tag = $parser->stable_tag;
@@ -180,12 +180,12 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param Check_Result $result The Check Result to amend.
+	 * @param Check_Result $result      The Check Result to amend.
 	 * @param string       $readme_file Readme file.
-	 * @param Parser       $parser The Parser object.
+	 * @param Parser       $parser      The Parser object.
 	 */
 	private function check_for_warnings( Check_Result $result, string $readme_file, Parser $parser ) {
-		$warnings = $parser->warnings;
+		$warnings = $parser->warnings ? $parser->warnings : array();
 
 		$warning_keys = array_keys( $warnings );
 
@@ -199,9 +199,9 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		 * @since n.e.x.t
 		 *
 		 * @param array  $ignored_warnings Array of ignored warning keys.
-		 * @param Parser $parser The Parser object.
+		 * @param Parser $parser           The Parser object.
 		 */
-		$ignored_warnings = (array) apply_filters( 'plugin_check_readme_warnings_ignored', $ignored_warnings, $parser );
+		$ignored_warnings = (array) apply_filters( 'wp_plugin_check_readme_warnings_ignored', $ignored_warnings, $parser );
 
 		$warning_keys = array_diff( $warning_keys, $ignored_warnings );
 
@@ -209,8 +209,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 			$this->add_result_warning_for_file(
 				$result,
 				sprintf(
-					/* translators: %1$s: list of warnings */
-					__( 'The following readme parser warnings were detected: %1$s', 'plugin-check' ),
+					/* translators: list of warnings */
+					esc_html__( 'The following readme parser warnings were detected: %s', 'plugin-check' ),
 					esc_html( implode( ', ', $warning_keys ) )
 				),
 				'readme_parser_warnings',

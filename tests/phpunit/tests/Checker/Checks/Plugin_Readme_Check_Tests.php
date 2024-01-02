@@ -217,4 +217,32 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'code', $warnings['readme.txt'][0][0][0] );
 		$this->assertEquals( 'readme_parser_warnings', $warnings['readme.txt'][0][0][0]['code'] );
 	}
+
+	public function test_filter_readme_warnings_ignored() {
+		// Define custom ignore for testing.
+		$custom_ignores = array(
+			'requires_php_header_ignored',
+		);
+
+		// Create a mock filter that will return our custom ignores.
+		$filter_name = 'wp_plugin_check_readme_warnings_ignored';
+		add_filter(
+			$filter_name,
+			static function () use ( $custom_ignores ) {
+				return $custom_ignores;
+			}
+		);
+
+		$result = apply_filters( 'wp_plugin_check_readme_warnings_ignored', array() );
+
+		$this->assertEquals( $custom_ignores, $result );
+
+		// Remove the filter to avoid interfering with other tests.
+		remove_filter(
+			$filter_name,
+			static function () use ( $custom_ignores ) {
+				return $custom_ignores;
+			}
+		);
+	}
 }
