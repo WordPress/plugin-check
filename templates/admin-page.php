@@ -11,7 +11,7 @@
 
 	<h1><?php esc_html_e( 'Plugin Check', 'plugin-check' ); ?></h1>
 
-	<div class="plugin-check-content">
+	<div class="plugin-check-content" style="margin-bottom: 1.33em;">
 
 		<?php if ( ! empty( $available_plugins ) ) { ?>
 
