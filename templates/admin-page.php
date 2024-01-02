@@ -65,8 +65,6 @@
 		<?php } ?>
 	</div>
 
-	<br />
-
 	<div id="plugin-check__results"></div>
 
 </div>
