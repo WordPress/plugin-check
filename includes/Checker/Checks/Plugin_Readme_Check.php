@@ -201,7 +201,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		 * @param array  $ignored_warnings Array of ignored warning keys.
 		 * @param Parser $parser           The Parser object.
 		 */
-		$ignored_warnings = (array) apply_filters( 'wp_plugin_check_readme_warnings_ignored', $ignored_warnings, $parser );
+		$ignored_warnings = (array) apply_filters( 'wp_plugin_check_ignored_readme_warnings', $ignored_warnings, $parser );
 
 		$warning_keys = array_diff( $warning_keys, $ignored_warnings );
 

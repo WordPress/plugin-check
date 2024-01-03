@@ -225,7 +225,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		);
 
 		// Create a mock filter that will return our custom ignores.
-		$filter_name = 'wp_plugin_check_readme_warnings_ignored';
+		$filter_name = 'wp_plugin_check_ignored_readme_warnings';
 		add_filter(
 			$filter_name,
 			static function () use ( $custom_ignores ) {
@@ -233,7 +233,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 			}
 		);
 
-		$result = apply_filters( 'wp_plugin_check_readme_warnings_ignored', array() );
+		$result = apply_filters( 'wp_plugin_check_ignored_readme_warnings', array() );
 
 		$this->assertEquals( $custom_ignores, $result );
 
