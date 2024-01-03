@@ -19,5 +19,6 @@ parameters:
       message: '/^Function str_contains not found.$/'
       paths:
         - includes/Checker/Checks/Abstract_File_Check.php
+        - includes/Checker/Checks/Plugin_Readme_Check.php
         - includes/Traits/Find_Readme.php
         - includes/Traits/File_Editor_URL.php
