@@ -12,6 +12,7 @@ use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Traits\Find_Readme;
 use WordPress\Plugin_Check\Traits\Stable_Check;
+use WordPressdotorg\Plugin_Directory\Readme\Parser;
 
 /**
  * Check the plugins readme file and contents.
@@ -69,14 +70,21 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 			return;
 		}
 
+		$readme_file = reset( $readme );
+
+		$parser = new Parser( $readme_file );
+
 		// Check the readme file for default text.
-		$this->check_default_text( $result, $readme );
+		$this->check_default_text( $result, $readme_file, $parser );
 
 		// Check the readme file for a valid license.
-		$this->check_license( $result, $readme );
+		$this->check_license( $result, $readme_file, $parser );
 
 		// Check the readme file for a valid version.
-		$this->check_stable_tag( $result, $readme );
+		$this->check_stable_tag( $result, $readme_file, $parser );
+
+		// Check the readme file for warnings.
+		$this->check_for_warnings( $result, $readme_file, $parser );
 	}
 
 	/**
@@ -84,27 +92,26 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param Check_Result $result The Check Result to amend.
-	 * @param array        $files  Array of plugin files.
+	 * @param Check_Result $result      The Check Result to amend.
+	 * @param string       $readme_file Readme file.
+	 * @param Parser       $parser      The Parser object.
 	 */
-	private function check_default_text( Check_Result $result, array $files ) {
-		$default_text_patterns = array(
-			'Here is a short description of the plugin.',
-			'Tags: tag1',
-			'Donate link: http://example.com/',
-		);
+	private function check_default_text( Check_Result $result, string $readme_file, Parser $parser ) {
+		$short_description = $parser->short_description;
+		$tags              = $parser->tags;
+		$donate_link       = $parser->donate_link;
 
-		foreach ( $default_text_patterns as $pattern ) {
-			$file = self::file_str_contains( $files, $pattern );
-			if ( $file ) {
-				$this->add_result_warning_for_file(
-					$result,
-					__( 'The readme appears to contain default text.', 'plugin-check' ),
-					'default_readme_text',
-					$file
-				);
-				break;
-			}
+		if (
+			in_array( 'tag1', $tags, true )
+			|| str_contains( $short_description, 'Here is a short description of the plugin.' )
+			|| str_contains( $donate_link, '//example.com/' )
+		) {
+			$this->add_result_warning_for_file(
+				$result,
+				__( 'The readme appears to contain default text.', 'plugin-check' ),
+				'default_readme_text',
+				$readme_file
+			);
 		}
 	}
 
@@ -113,25 +120,20 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param Check_Result $result The Check Result to amend.
-	 * @param array        $files  Array of plugin files.
+	 * @param Check_Result $result      The Check Result to amend.
+	 * @param string       $readme_file Readme file.
+	 * @param Parser       $parser      The Parser object.
 	 */
-	private function check_license( Check_Result $result, array $files ) {
-		$matches = array();
-		// Get the license from the readme file.
-		$file = self::file_preg_match( '/(License:|License URI:)\s*(.+)*/i', $files, $matches );
-
-		if ( empty( $matches ) ) {
-			return;
-		}
+	private function check_license( Check_Result $result, string $readme_file, Parser $parser ) {
+		$license = $parser->license;
 
 		// Test for a valid SPDX license identifier.
-		if ( ! preg_match( '/^([a-z0-9\-\+\.]+)(\sor\s([a-z0-9\-\+\.]+))*$/i', $matches[2] ) ) {
+		if ( ! empty( $license ) && ! preg_match( '/^([a-z0-9\-\+\.]+)(\sor\s([a-z0-9\-\+\.]+))*$/i', $license ) ) {
 			$this->add_result_warning_for_file(
 				$result,
 				__( 'Your plugin has an invalid license declared. Please update your readme with a valid SPDX license identifier.', 'plugin-check' ),
 				'invalid_license',
-				$file
+				$readme_file
 			);
 		}
 	}
@@ -141,25 +143,19 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param Check_Result $result The Check Result to amend.
-	 * @param array        $files  Array of plugin files.
+	 * @param Check_Result $result      The Check Result to amend.
+	 * @param string       $readme_file Readme file.
+	 * @param Parser       $parser      The Parser object.
 	 */
-	private function check_stable_tag( Check_Result $result, array $files ) {
-		$matches = array();
-		// Get the Stable tag from readme file.
-		$file = self::file_preg_match( '/Stable tag:\s*([a-z0-9\.]+)/i', $files, $matches );
-		if ( ! $file ) {
-			return;
-		}
-
-		$stable_tag = isset( $matches[1] ) ? $matches[1] : '';
+	private function check_stable_tag( Check_Result $result, string $readme_file, Parser $parser ) {
+		$stable_tag = $parser->stable_tag;
 
 		if ( 'trunk' === $stable_tag ) {
 			$this->add_result_error_for_file(
 				$result,
 				__( "It's recommended not to use 'Stable Tag: trunk'.", 'plugin-check' ),
 				'trunk_stable_tag',
-				$file
+				$readme_file
 			);
 		}
 
@@ -174,7 +170,51 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				$result,
 				__( 'The Stable Tag in your readme file does not match the version in your main plugin file.', 'plugin-check' ),
 				'stable_tag_mismatch',
-				$file
+				$readme_file
+			);
+		}
+	}
+
+	/**
+	 * Checks the readme file warnings.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param Check_Result $result      The Check Result to amend.
+	 * @param string       $readme_file Readme file.
+	 * @param Parser       $parser      The Parser object.
+	 */
+	private function check_for_warnings( Check_Result $result, string $readme_file, Parser $parser ) {
+		$warnings = $parser->warnings ? $parser->warnings : array();
+
+		$warning_keys = array_keys( $warnings );
+
+		$ignored_warnings = array(
+			'contributor_ignored',
+		);
+
+		/**
+		 * Filter the list of ignored readme parser warnings.
+		 *
+		 * @since n.e.x.t
+		 *
+		 * @param array  $ignored_warnings Array of ignored warning keys.
+		 * @param Parser $parser           The Parser object.
+		 */
+		$ignored_warnings = (array) apply_filters( 'wp_plugin_check_ignored_readme_warnings', $ignored_warnings, $parser );
+
+		$warning_keys = array_diff( $warning_keys, $ignored_warnings );
+
+		if ( ! empty( $warning_keys ) ) {
+			$this->add_result_warning_for_file(
+				$result,
+				sprintf(
+					/* translators: list of warnings */
+					esc_html__( 'The following readme parser warnings were detected: %s', 'plugin-check' ),
+					esc_html( implode( ', ', $warning_keys ) )
+				),
+				'readme_parser_warnings',
+				$readme_file
 			);
 		}
 	}
