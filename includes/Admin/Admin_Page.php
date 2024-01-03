@@ -272,6 +272,26 @@ final class Admin_Page {
 				'type' => 'text/template',
 			)
 		);
+
+		// Print check's page styles.
+		echo '<style>';
+		echo '
+		#plugin-check__results .notice {
+			margin-top: 20px;
+		}
+		#plugin-check__results .notice ~ h4:first-of-type {
+			margin-top: 20px;
+		}
+		#plugin-check__results > h4:first-of-type {
+			margin-top: 80.5px;
+		}
+		@media ( max-width: 782px ) {
+			#plugin-check__results > h4:first-of-type {
+				margin-top: 88.5px;
+			}
+		}
+		';
+		echo '</style>';
 	}
 
 	/**
