@@ -14,3 +14,7 @@
  *
  * @package test-plugin-direct-db-queries-without-errors
  */
+
+global $wpdb;
+
+echo $wpdb->insert_id;

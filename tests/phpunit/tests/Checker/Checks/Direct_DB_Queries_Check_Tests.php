@@ -19,10 +19,13 @@ class Direct_DB_Queries_Check_Tests extends WP_UnitTestCase {
 		$check->run( $check_result );
 
 		$warnings = $check_result->get_warnings();
+		$errors   = $check_result->get_errors();
 
 		$this->assertNotEmpty( $warnings );
 		$this->assertArrayHasKey( 'load.php', $warnings );
 		$this->assertEquals( 6, $check_result->get_warning_count() );
+		$this->assertEmpty( $errors );
+		$this->assertEquals( 0, $check_result->get_error_count() );
 	}
 
 	public function test_run_without_errors() {
@@ -32,9 +35,9 @@ class Direct_DB_Queries_Check_Tests extends WP_UnitTestCase {
 
 		$check->run( $check_result );
 
-		$warnings = $check_result->get_warnings();
-
-		$this->assertEmpty( $warnings );
+		$this->assertEmpty( $check_result->get_warnings() );
+		$this->assertEmpty( $check_result->get_errors() );
 		$this->assertEquals( 0, $check_result->get_warning_count() );
+		$this->assertEquals( 0, $check_result->get_error_count() );
 	}
 }
