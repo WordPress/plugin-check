@@ -30,33 +30,33 @@ Feature: Test that the WP-CLI command works.
       All output should be run through an escaping function
       """
 
-    When I run `wp plugin check hello.php --format=csv`
+    When I run the WP-CLI command `plugin check hello.php --format=csv`
     Then STDOUT should contain:
       """
       line,column,type,code,message
       49,31,ERROR,WordPress.WP.AlternativeFunctions.rand_mt_rand,"mt_rand() is discouraged. Use the far less predictable wp_rand() instead."
       """
 
-    When I run `wp plugin check hello.php --format=csv --fields=line,column,code`
+    When I run the WP-CLI command `plugin check hello.php --format=csv --fields=line,column,code`
     Then STDOUT should contain:
       """
       line,column,code
       49,31,WordPress.WP.AlternativeFunctions.rand_mt_rand
       """
 
-    When I run `wp plugin check hello.php --format=json`
+    When I run the WP-CLI command `plugin check hello.php --format=json`
     Then STDOUT should contain:
       """
       {"line":49,"column":31,"type":"ERROR","code":"WordPress.WP.AlternativeFunctions.rand_mt_rand","message":"mt_rand() is discouraged. Use the far less predictable wp_rand() instead."}
       """
 
-    When I run `wp plugin check hello.php --ignore-errors`
+    When I run the WP-CLI command `plugin check hello.php --ignore-errors`
     Then STDOUT should be empty
 
-    When I run `wp plugin check hello.php --ignore-warnings`
+    When I run the WP-CLI command `plugin check hello.php --ignore-warnings`
     Then STDOUT should not be empty
 
-    When I run `wp plugin check hello.php --checks=plugin_review_phpcs`
+    When I run the WP-CLI command `plugin check hello.php --checks=plugin_review_phpcs`
     Then STDOUT should contain:
       """
       WordPress.WP.AlternativeFunctions.rand_mt_rand
@@ -66,7 +66,7 @@ Feature: Test that the WP-CLI command works.
       WordPress.Security.EscapeOutput.OutputNotEscaped
       """
 
-    When I run `wp plugin check hello.php --exclude-checks=late_escaping`
+    When I run the WP-CLI command `plugin check hello.php --exclude-checks=late_escaping`
     Then STDOUT should not contain:
       """
       WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -75,7 +75,7 @@ Feature: Test that the WP-CLI command works.
       """
       WordPress.WP.AlternativeFunctions.rand_mt_rand
       """
-    When I run `wp plugin check hello.php --categories=security`
+    When I run the WP-CLI command `plugin check hello.php --categories=security`
     Then STDOUT should contain:
       """
       WordPress.Security.EscapeOutput.OutputNotEscaped
