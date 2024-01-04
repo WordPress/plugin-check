@@ -12,7 +12,7 @@ namespace WordPress\Plugin_Check\Checker;
  *
  * @since n.e.x.t
  */
-class Default_Check_Repository extends Empty_Check_Repository implements Check_Repository {
+class Default_Check_Repository extends Empty_Check_Repository {
 
 	/**
 	 * Initializes checks.

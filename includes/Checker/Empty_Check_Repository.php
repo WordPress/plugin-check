@@ -33,14 +33,6 @@ class Empty_Check_Repository implements Check_Repository {
 	protected $static_checks = array();
 
 	/**
-	 * Constructor.
-	 *
-	 * @since n.e.x.t
-	 */
-	public function __construct() {
-	}
-
-	/**
 	 * Registers a check to the repository.
 	 *
 	 * @since n.e.x.t

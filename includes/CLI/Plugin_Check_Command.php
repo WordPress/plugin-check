@@ -19,8 +19,6 @@ use WP_CLI;
 
 /**
  * Plugin check command.
- *
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 final class Plugin_Check_Command {
 
@@ -42,30 +40,6 @@ final class Plugin_Check_Command {
 		'table',
 		'csv',
 		'json',
-	);
-
-	/**
-	 * Default fields.
-	 *
-	 * @since n.e.x.t
-	 * @var array
-	 */
-	protected $default_fields = array(
-		'check'                 => array(
-			'line',
-			'column',
-			'code',
-			'message',
-		),
-		'list-checks'           => array(
-			'slug',
-			'category',
-			'stability',
-		),
-		'list-check-categories' => array(
-			'name',
-			'slug',
-		),
 	);
 
 	/**
@@ -142,20 +116,18 @@ final class Plugin_Check_Command {
 	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
 	 */
 	public function check( $args, $assoc_args ) {
-		/*
-		 * Bail early if the Plugin Checker is not activated.
-		 *
-		 * If the Plugin Checker is not activated, it will throw an error and
-		 * CLI commands won't be usable.
-		 */
-		if ( is_plugin_inactive( $this->plugin_context->basename() ) ) {
-			WP_CLI::error(
-				__( 'Plugin Checker is not active.', 'plugin-check' )
-			);
-		}
-
 		// Get options based on the CLI arguments.
-		$options = $this->get_check_options( $assoc_args );
+		$options = $this->get_options(
+			$assoc_args,
+			array(
+				'checks'               => '',
+				'format'               => 'table',
+				'ignore-warnings'      => false,
+				'ignore-errors'        => false,
+				'include-experimental' => false,
+
+			)
+		);
 
 		// Create the plugin and checks array from CLI arguments.
 		$plugin = isset( $args[0] ) ? $args[0] : '';
@@ -238,8 +210,11 @@ final class Plugin_Check_Command {
 			$warnings = $result->get_warnings();
 		}
 
+		// Default fields.
+		$default_fields = $this->get_check_default_fields( $assoc_args );
+
 		// Get formatter.
-		$formatter = $this->get_formatter( $assoc_args, 'check' );
+		$formatter = $this->get_formatter( $assoc_args, $default_fields );
 
 		// Print the formatted results.
 		// Go over all files with errors first and print them, combined with any warnings in the same file.
@@ -286,9 +261,6 @@ final class Plugin_Check_Command {
 	 * @param array $assoc_args List of the associative arguments.
 	 *
 	 * @throws WP_CLI\ExitException Show error if not valid runner.
-	 *
-	 * @SuppressWarnings(PHPMD.NPathComplexity)
-	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
 	 */
 	public function list_checks( $args, $assoc_args ) {
 		$check_repo = new Default_Check_Repository();
@@ -308,10 +280,17 @@ final class Plugin_Check_Command {
 		}
 
 		// Get options based on the CLI arguments.
-		$options = $this->get_list_checks_options( $assoc_args );
+		$options = $this->get_options( $assoc_args, array( 'format' => 'table' ) );
 
 		// Get formatter.
-		$formatter = $this->get_formatter( $options, 'list-checks' );
+		$formatter = $this->get_formatter(
+			$options,
+			array(
+				'slug',
+				'category',
+				'stability',
+			)
+		);
 
 		// Display results.
 		$formatter->display_items( $all_checks );
@@ -346,19 +325,22 @@ final class Plugin_Check_Command {
 	 *
 	 * @param array $args       List of the positional arguments.
 	 * @param array $assoc_args List of the associative arguments.
-	 *
-	 * @SuppressWarnings(PHPMD.NPathComplexity)
-	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
 	 */
 	public function list_check_categories( $args, $assoc_args ) {
 		// Get options based on the CLI arguments.
-		$options = $this->get_list_check_categories_options( $assoc_args );
+		$options = $this->get_options( $assoc_args, array( 'format' => 'table' ) );
 
 		// Get check categories details.
 		$categories = $this->get_check_categories();
 
 		// Get formatter.
-		$formatter = $this->get_formatter( $options, 'list-check-categories' );
+		$formatter = $this->get_formatter(
+			$options,
+			array(
+				'name',
+				'slug',
+			)
+		);
 
 		// Display results.
 		$formatter->display_items( $categories );
@@ -391,84 +373,17 @@ final class Plugin_Check_Command {
 	}
 
 	/**
-	 * Validates the associative arguments for 'check' command.
+	 * Validates the associative arguments.
 	 *
 	 * @since n.e.x.t
 	 *
 	 * @param array $assoc_args List of the associative arguments.
+	 * @param array $defaults   List of the default arguments.
 	 * @return array List of the associative arguments.
 	 *
 	 * @throws WP_CLI\ExitException Show error if plugin not found.
 	 */
-	private function get_check_options( $assoc_args ) {
-		$defaults = array(
-			'checks'               => '',
-			'format'               => 'table',
-			'ignore-warnings'      => false,
-			'ignore-errors'        => false,
-			'include-experimental' => false,
-		);
-
-		$options = wp_parse_args( $assoc_args, $defaults );
-
-		if ( ! in_array( $options['format'], $this->output_formats, true ) ) {
-			WP_CLI::error(
-				sprintf(
-					// translators: 1. Output formats.
-					__( 'Invalid format argument, valid value will be one of [%1$s]', 'plugin-check' ),
-					implode( ', ', $this->output_formats )
-				)
-			);
-		}
-
-		return $options;
-	}
-
-	/**
-	 * Validates the associative arguments 'list-check-categories' command.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @param array $assoc_args List of the associative arguments.
-	 * @return array List of the associative arguments.
-	 *
-	 * @throws WP_CLI\ExitException Show error if format is invalid.
-	 */
-	private function get_list_check_categories_options( $assoc_args ) {
-		$defaults = array(
-			'format' => 'table',
-		);
-
-		$options = wp_parse_args( $assoc_args, $defaults );
-
-		if ( ! in_array( $options['format'], $this->output_formats, true ) ) {
-			WP_CLI::error(
-				sprintf(
-					// translators: 1. Output formats.
-					__( 'Invalid format argument, valid value will be one of [%1$s]', 'plugin-check' ),
-					implode( ', ', $this->output_formats )
-				)
-			);
-		}
-
-		return $options;
-	}
-
-	/**
-	 * Validates the associative arguments 'list-checks' command.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @param array $assoc_args List of the associative arguments.
-	 * @return array List of the associative arguments.
-	 *
-	 * @throws WP_CLI\ExitException Show error if format is invalid.
-	 */
-	private function get_list_checks_options( $assoc_args ) {
-		$defaults = array(
-			'format' => 'table',
-		);
-
+	private function get_options( $assoc_args, $defaults ) {
 		$options = wp_parse_args( $assoc_args, $defaults );
 
 		if ( ! in_array( $options['format'], $this->output_formats, true ) ) {
@@ -489,35 +404,49 @@ final class Plugin_Check_Command {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param array  $assoc_args Associative arguments.
-	 * @param string $type       Command type.
+	 * @param array $assoc_args     Associative arguments.
+	 * @param array $default_fields Default fields.
 	 * @return WP_CLI\Formatter The formatter instance.
 	 */
-	private function get_formatter( $assoc_args, $type ) {
-		$default_fields = $this->default_fields[ $type ];
-
+	private function get_formatter( $assoc_args, $default_fields ) {
 		if ( isset( $assoc_args['fields'] ) ) {
 			$default_fields = wp_parse_args( $assoc_args['fields'], $default_fields );
-		}
-
-		// This applies only to 'wp plugin check' command.
-		if ( 'check' === $type ) {
-			// If both errors and warnings are included, display the type of each result too.
-			if ( empty( $assoc_args['ignore_errors'] ) && empty( $assoc_args['ignore_warnings'] ) ) {
-				$default_fields = array(
-					'line',
-					'column',
-					'type',
-					'code',
-					'message',
-				);
-			}
 		}
 
 		return new WP_CLI\Formatter(
 			$assoc_args,
 			$default_fields
 		);
+	}
+
+	/**
+	 * Returns check default fields.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param array $assoc_args Associative arguments.
+	 * @return array Default fields.
+	 */
+	private function get_check_default_fields( $assoc_args ) {
+		$default_fields = array(
+			'line',
+			'column',
+			'code',
+			'message',
+		);
+
+		// If both errors and warnings are included, display the type of each result too.
+		if ( empty( $assoc_args['ignore_errors'] ) && empty( $assoc_args['ignore_warnings'] ) ) {
+			$default_fields = array(
+				'line',
+				'column',
+				'type',
+				'code',
+				'message',
+			);
+		}
+
+		return $default_fields;
 	}
 
 	/**
