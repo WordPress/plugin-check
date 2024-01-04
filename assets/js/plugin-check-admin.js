@@ -269,13 +269,11 @@
 			? pluginCheck.successMessage
 			: pluginCheck.errorMessage;
 
-		resultsContainer.innerHTML += renderTemplate(
-			'plugin-check-results-complete',
-			{
+		resultsContainer.innerHTML =
+			renderTemplate( 'plugin-check-results-complete', {
 				type: messageType,
 				message: messageText,
-			}
-		);
+			} ) + resultsContainer.innerHTML;
 	}
 
 	/**
