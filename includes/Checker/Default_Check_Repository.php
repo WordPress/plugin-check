@@ -7,105 +7,59 @@
 
 namespace WordPress\Plugin_Check\Checker;
 
-use Exception;
-
 /**
  * Default Check Repository class.
  *
  * @since n.e.x.t
  */
-class Default_Check_Repository implements Check_Repository {
+class Default_Check_Repository extends Empty_Check_Repository {
 
 	/**
-	 * Array map holding all runtime checks.
+	 * Initializes checks.
 	 *
 	 * @since n.e.x.t
-	 * @var array
 	 */
-	protected $runtime_checks = array();
-
-	/**
-	 * Array map holding all static checks.
-	 *
-	 * @since n.e.x.t
-	 * @var array
-	 */
-	protected $static_checks = array();
-
-	/**
-	 * Registers a check to the repository.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @param string $slug  The checks slug.
-	 * @param Check  $check The Check instance.
-	 *
-	 * @throws Exception Thrown if Check does not use correct interface, or slug already exists.
-	 */
-	public function register_check( $slug, Check $check ) {
-		if ( ! $check instanceof Runtime_Check && ! $check instanceof Static_Check ) {
-			throw new Exception(
-				sprintf(
-					/* translators: %s: The Check slug. */
-					__( 'Check with slug "%s" must be an instance of Runtime_Check or Static_Check.', 'plugin-check' ),
-					$slug
-				)
-			);
-		}
-
-		if ( isset( $this->runtime_checks[ $slug ] ) || isset( $this->static_checks[ $slug ] ) ) {
-			throw new Exception(
-				sprintf(
-					/* translators: %s: The Check slug. */
-					__( 'Check slug "%s" is already in use.', 'plugin-check' ),
-					$slug
-				)
-			);
-		}
-
-		if ( ! $check->get_categories() ) {
-			throw new Exception(
-				sprintf(
-					/* translators: %s: The Check slug. */
-					__( 'Check with slug "%s" has no categories associated with it.', 'plugin-check' ),
-					$slug
-				)
-			);
-		}
-
-		$check_array                   = $check instanceof Runtime_Check ? 'runtime_checks' : 'static_checks';
-		$this->{$check_array}[ $slug ] = $check;
+	public function __construct() {
+		$this->register_default_checks();
 	}
 
 	/**
-	 * Returns an array of checks.
+	 * Registers Checks.
 	 *
 	 * @since n.e.x.t
-	 *
-	 * @param int $flags The check type flag.
-	 * @return Check_Collection Check collection providing an indexed array of check instances.
 	 */
-	public function get_checks( $flags = self::TYPE_ALL ) {
-		$checks = array();
-
-		if ( $flags & self::TYPE_STATIC ) {
-			$checks += $this->static_checks;
-		}
-
-		if ( $flags & self::TYPE_RUNTIME ) {
-			$checks += $this->runtime_checks;
-		}
-
-		// Return all checks, including experimental if requested.
-		if ( $flags & self::INCLUDE_EXPERIMENTAL ) {
-			return new Default_Check_Collection( $checks );
-		}
-
-		// Remove experimental checks before returning.
-		return ( new Default_Check_Collection( $checks ) )->filter(
-			static function ( Check $check ) {
-				return $check->get_stability() !== Check::STABILITY_EXPERIMENTAL;
-			}
+	private function register_default_checks() {
+		/**
+		 * Filters the available plugin check classes.
+		 *
+		 * @since n.e.x.t
+		 *
+		 * @param array $checks An array map of check slugs to Check instances.
+		 */
+		$checks = apply_filters(
+			'wp_plugin_check_checks',
+			array(
+				'i18n_usage'                 => new Checks\I18n_Usage_Check(),
+				'enqueued_scripts_size'      => new Checks\Enqueued_Scripts_Size_Check(),
+				'code_obfuscation'           => new Checks\Code_Obfuscation_Check(),
+				'file_type'                  => new Checks\File_Type_Check(),
+				'plugin_header_text_domain'  => new Checks\Plugin_Header_Text_Domain_Check(),
+				'late_escaping'              => new Checks\Late_Escaping_Check(),
+				'plugin_updater'             => new Checks\Plugin_Updater_Check(),
+				'plugin_review_phpcs'        => new Checks\Plugin_Review_PHPCS_Check(),
+				'direct_db_queries'          => new Checks\Direct_DB_Queries_Check(),
+				'performant_wp_query_params' => new Checks\Performant_WP_Query_Params_Check(),
+				'enqueued_scripts_in_footer' => new Checks\Enqueued_Scripts_In_Footer_Check(),
+				'plugin_readme'              => new Checks\Plugin_Readme_Check(),
+				'enqueued_styles_scope'      => new Checks\Enqueued_Styles_Scope_Check(),
+				'localhost'                  => new Checks\Localhost_Check(),
+				'no_unfiltered_uploads'      => new Checks\No_Unfiltered_Uploads_Check(),
+				'trademarks'                 => new Checks\Trademarks_Check(),
+			)
 		);
+
+		foreach ( $checks as $slug => $check ) {
+			$this->register_check( $slug, $check );
+		}
 	}
 }

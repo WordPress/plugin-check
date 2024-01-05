@@ -8,7 +8,9 @@
 namespace WordPress\Plugin_Check\CLI;
 
 use Exception;
+use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\CLI_Runner;
+use WordPress\Plugin_Check\Checker\Default_Check_Repository;
 use WordPress\Plugin_Check\Checker\Runtime_Check;
 use WordPress\Plugin_Check\Checker\Runtime_Environment_Setup;
 use WordPress\Plugin_Check\Plugin_Context;
@@ -114,20 +116,17 @@ final class Plugin_Check_Command {
 	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
 	 */
 	public function check( $args, $assoc_args ) {
-		/*
-		 * Bail early if the Plugin Checker is not activated.
-		 *
-		 * If the Plugin Checker is not activated, it will throw an error and
-		 * CLI commands won't be usable.
-		 */
-		if ( is_plugin_inactive( $this->plugin_context->basename() ) ) {
-			WP_CLI::error(
-				__( 'Plugin Checker is not active.', 'plugin-check' )
-			);
-		}
-
 		// Get options based on the CLI arguments.
-		$options = $this->get_options( $assoc_args );
+		$options = $this->get_options(
+			$assoc_args,
+			array(
+				'checks'               => '',
+				'format'               => 'table',
+				'ignore-warnings'      => false,
+				'ignore-errors'        => false,
+				'include-experimental' => false,
+			)
+		);
 
 		// Create the plugin and checks array from CLI arguments.
 		$plugin = isset( $args[0] ) ? $args[0] : '';
@@ -210,8 +209,11 @@ final class Plugin_Check_Command {
 			$warnings = $result->get_warnings();
 		}
 
+		// Default fields.
+		$default_fields = $this->get_check_default_fields( $assoc_args );
+
 		// Get formatter.
-		$formatter = $this->get_formatter( $assoc_args );
+		$formatter = $this->get_formatter( $assoc_args, $default_fields );
 
 		// Print the formatted results.
 		// Go over all files with errors first and print them, combined with any warnings in the same file.
@@ -233,24 +235,150 @@ final class Plugin_Check_Command {
 	}
 
 	/**
+	 * Lists the available checks for plugins.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--fields=<fields>]
+	 * : Limit displayed results to a subset of fields provided.
+	 *
+	 * [--format=<format>]
+	 * : Format to display the results. Options are table, csv, and json. The default will be a table.
+	 * ---
+	 * default: table
+	 * options:
+	 *   - table
+	 *   - csv
+	 *   - json
+	 * ---
+	 *
+	 * @subcommand list-checks
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param array $args       List of the positional arguments.
+	 * @param array $assoc_args List of the associative arguments.
+	 *
+	 * @throws WP_CLI\ExitException Show error if invalid format argument.
+	 */
+	public function list_checks( $args, $assoc_args ) {
+		$check_repo = new Default_Check_Repository();
+
+		$all_checks = array();
+
+		foreach ( $check_repo->get_checks() as $key => $check ) {
+			$item = array();
+
+			$item['slug']      = $key;
+			$item['stability'] = strtolower( $check->get_stability() );
+			$item['category']  = join( ', ', $check->get_categories() );
+
+			$all_checks[] = $item;
+		}
+
+		// Get options based on the CLI arguments.
+		$options = $this->get_options( $assoc_args, array( 'format' => 'table' ) );
+
+		// Get formatter.
+		$formatter = $this->get_formatter(
+			$options,
+			array(
+				'slug',
+				'category',
+				'stability',
+			)
+		);
+
+		// Display results.
+		$formatter->display_items( $all_checks );
+	}
+
+	/**
+	 * Lists the available check categories for plugins.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--fields=<fields>]
+	 * : Limit displayed results to a subset of fields provided.
+	 *
+	 * [--format=<format>]
+	 * : Format to display the results. Options are table, csv, and json. The default will be a table.
+	 * ---
+	 * default: table
+	 * options:
+	 *   - table
+	 *   - csv
+	 *   - json
+	 * ---
+	 *
+	 * ## EXAMPLES
+	 *
+	 *   wp plugin list-check-categories
+	 *   wp plugin list-check-categories --format=json
+	 *
+	 * @subcommand list-check-categories
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param array $args       List of the positional arguments.
+	 * @param array $assoc_args List of the associative arguments.
+	 *
+	 * @throws WP_CLI\ExitException Show error if invalid format argument.
+	 */
+	public function list_check_categories( $args, $assoc_args ) {
+		// Get options based on the CLI arguments.
+		$options = $this->get_options( $assoc_args, array( 'format' => 'table' ) );
+
+		// Get check categories details.
+		$categories = $this->get_check_categories();
+
+		// Get formatter.
+		$formatter = $this->get_formatter(
+			$options,
+			array(
+				'name',
+				'slug',
+			)
+		);
+
+		// Display results.
+		$formatter->display_items( $categories );
+	}
+
+	/**
+	 * Returns check categories details.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array List of the check categories.
+	 */
+	private function get_check_categories() {
+		$check_categories = new Check_Categories();
+		$categories_slugs = $check_categories->get_categories();
+
+		return array_map(
+			function ( $slug ) {
+				return array(
+					'slug' => $slug,
+					'name' => ucfirst( str_replace( '_', ' ', $slug ) ),
+				);
+			},
+			$categories_slugs
+		);
+	}
+
+	/**
 	 * Validates the associative arguments.
 	 *
 	 * @since n.e.x.t
 	 *
 	 * @param array $assoc_args List of the associative arguments.
+	 * @param array $defaults   List of the default arguments.
 	 * @return array List of the associative arguments.
 	 *
-	 * @throws WP_CLI\ExitException Show error if plugin not found.
+	 * @throws WP_CLI\ExitException Show error if invalid format argument.
 	 */
-	private function get_options( $assoc_args ) {
-		$defaults = array(
-			'checks'               => '',
-			'format'               => 'table',
-			'ignore-warnings'      => false,
-			'ignore-errors'        => false,
-			'include-experimental' => false,
-		);
-
+	private function get_options( $assoc_args, $defaults ) {
 		$options = wp_parse_args( $assoc_args, $defaults );
 
 		if ( ! in_array( $options['format'], $this->output_formats, true ) ) {
@@ -271,20 +399,36 @@ final class Plugin_Check_Command {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param array $assoc_args Associative arguments.
+	 * @param array $assoc_args     Associative arguments.
+	 * @param array $default_fields Default fields.
 	 * @return WP_CLI\Formatter The formatter instance.
 	 */
-	private function get_formatter( $assoc_args ) {
+	private function get_formatter( $assoc_args, $default_fields ) {
+		if ( isset( $assoc_args['fields'] ) ) {
+			$default_fields = wp_parse_args( $assoc_args['fields'], $default_fields );
+		}
+
+		return new WP_CLI\Formatter(
+			$assoc_args,
+			$default_fields
+		);
+	}
+
+	/**
+	 * Returns check default fields.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param array $assoc_args Associative arguments.
+	 * @return array Default fields.
+	 */
+	private function get_check_default_fields( $assoc_args ) {
 		$default_fields = array(
 			'line',
 			'column',
 			'code',
 			'message',
 		);
-
-		if ( isset( $assoc_args['fields'] ) ) {
-			$default_fields = wp_parse_args( $assoc_args['fields'], $default_fields );
-		}
 
 		// If both errors and warnings are included, display the type of each result too.
 		if ( empty( $assoc_args['ignore_errors'] ) && empty( $assoc_args['ignore_warnings'] ) ) {
@@ -297,10 +441,7 @@ final class Plugin_Check_Command {
 			);
 		}
 
-		return new WP_CLI\Formatter(
-			$assoc_args,
-			$default_fields
-		);
+		return $default_fields;
 	}
 
 	/**
