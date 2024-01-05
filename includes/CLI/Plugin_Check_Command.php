@@ -125,7 +125,6 @@ final class Plugin_Check_Command {
 				'ignore-warnings'      => false,
 				'ignore-errors'        => false,
 				'include-experimental' => false,
-
 			)
 		);
 
@@ -236,7 +235,7 @@ final class Plugin_Check_Command {
 	}
 
 	/**
-	 * Runs plugin list-checks.
+	 * Lists the available checks for plugins.
 	 *
 	 * ## OPTIONS
 	 *
@@ -260,16 +259,14 @@ final class Plugin_Check_Command {
 	 * @param array $args       List of the positional arguments.
 	 * @param array $assoc_args List of the associative arguments.
 	 *
-	 * @throws WP_CLI\ExitException Show error if not valid runner.
+	 * @throws WP_CLI\ExitException Show error if invalid format argument.
 	 */
 	public function list_checks( $args, $assoc_args ) {
 		$check_repo = new Default_Check_Repository();
 
 		$all_checks = array();
 
-		$checks_items = $check_repo->get_checks()->to_map();
-
-		foreach ( $checks_items as $key => $check ) {
+		foreach ( $check_repo->get_checks() as $key => $check ) {
 			$item = array();
 
 			$item['slug']      = $key;
@@ -297,7 +294,7 @@ final class Plugin_Check_Command {
 	}
 
 	/**
-	 * Runs plugin list-check-categories.
+	 * Lists the available check categories for plugins.
 	 *
 	 * ## OPTIONS
 	 *
@@ -325,6 +322,8 @@ final class Plugin_Check_Command {
 	 *
 	 * @param array $args       List of the positional arguments.
 	 * @param array $assoc_args List of the associative arguments.
+	 *
+	 * @throws WP_CLI\ExitException Show error if invalid format argument.
 	 */
 	public function list_check_categories( $args, $assoc_args ) {
 		// Get options based on the CLI arguments.
@@ -354,12 +353,10 @@ final class Plugin_Check_Command {
 	 * @return array List of the check categories.
 	 */
 	private function get_check_categories() {
-		$categories = array();
-
 		$check_categories = new Check_Categories();
 		$categories_slugs = $check_categories->get_categories();
 
-		$categories = array_map(
+		return array_map(
 			function ( $slug ) {
 				return array(
 					'slug' => $slug,
@@ -368,8 +365,6 @@ final class Plugin_Check_Command {
 			},
 			$categories_slugs
 		);
-
-		return $categories;
 	}
 
 	/**
@@ -381,7 +376,7 @@ final class Plugin_Check_Command {
 	 * @param array $defaults   List of the default arguments.
 	 * @return array List of the associative arguments.
 	 *
-	 * @throws WP_CLI\ExitException Show error if plugin not found.
+	 * @throws WP_CLI\ExitException Show error if invalid format argument.
 	 */
 	private function get_options( $assoc_args, $defaults ) {
 		$options = wp_parse_args( $assoc_args, $defaults );
