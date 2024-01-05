@@ -355,12 +355,13 @@ final class Plugin_Check_Command {
 	private function get_check_categories() {
 		$check_categories = new Check_Categories();
 		$categories_slugs = $check_categories->get_categories();
+		$category_labels  = $check_categories->get_category_labels();
 
 		return array_map(
-			function ( $slug ) {
+			function ( $slug ) use ( $category_labels ) {
 				return array(
 					'slug' => $slug,
-					'name' => ucfirst( str_replace( '_', ' ', $slug ) ),
+					'name' => $category_labels[ $slug ],
 				);
 			},
 			$categories_slugs
