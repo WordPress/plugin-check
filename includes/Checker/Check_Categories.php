@@ -47,11 +47,11 @@ class Check_Categories {
 	 */
 	public static function get_category_labels() {
 		return array(
-			self::CATEGORY_GENERAL       => esc_html__( 'General', 'plugin-check' ),
-			self::CATEGORY_PLUGIN_REPO   => esc_html__( 'Plugin Repo', 'plugin-check' ),
-			self::CATEGORY_SECURITY      => esc_html__( 'Security', 'plugin-check' ),
-			self::CATEGORY_PERFORMANCE   => esc_html__( 'Performance', 'plugin-check' ),
-			self::CATEGORY_ACCESSIBILITY => esc_html__( 'Accessibility', 'plugin-check' ),
+			self::CATEGORY_GENERAL       => __( 'General', 'plugin-check' ),
+			self::CATEGORY_PLUGIN_REPO   => __( 'Plugin Repo', 'plugin-check' ),
+			self::CATEGORY_SECURITY      => __( 'Security', 'plugin-check' ),
+			self::CATEGORY_PERFORMANCE   => __( 'Performance', 'plugin-check' ),
+			self::CATEGORY_ACCESSIBILITY => __( 'Accessibility', 'plugin-check' ),
 		);
 	}
 
