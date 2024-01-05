@@ -195,11 +195,10 @@ final class Admin_Page {
 		$selected_plugin_basename = filter_input( INPUT_GET, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		$category_labels = Check_Categories::get_category_labels();
-		$categories      = array_keys( $category_labels );
 
 		// Get user settings for category preferences and set a default value to check all categories by default.
 		$user_enabled_categories = get_user_setting( 'plugin_check_category_preferences', 'all_categories' );
-		$user_enabled_categories = 'all_categories' === $user_enabled_categories ? $categories : explode( '__', $user_enabled_categories );
+		$user_enabled_categories = 'all_categories' === $user_enabled_categories ? array_keys( $category_labels ) : explode( '__', $user_enabled_categories );
 
 		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'templates/admin-page.php';
 	}
