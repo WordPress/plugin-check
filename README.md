@@ -11,7 +11,7 @@ Plugin Check is a WordPress.org tool which provides checks to help plugins meet 
     * Static checks, which analyze the code, either using PHPCodeSniffer sniffs or custom logic e.g. using regular expressions.
     * Runtime checks, which actually execute certain parts of the code, such as running specific WordPress hooks with the plugin active.
 * Allows customizing which checks are run, either via a list of individual check identifiers, or specific check categories.
-* Comes with an ever-growing list of checks for various plugin development requirements and best practices. Please see the [`Abstract_Check_Runner::register_checks()` method](/includes/Checker/Abstract_Check_Runner.php#L358) for a quick overview of currently available checks.
+* Comes with an ever-growing list of checks for various plugin development requirements and best practices. Please see the [`Default_Check_Repository::register_default_checks()` method](/includes/Checker/Default_Check_Repository.php#L31) for a quick overview of currently available checks.
 
 ### For developers
 
