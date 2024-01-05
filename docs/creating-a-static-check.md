@@ -189,7 +189,7 @@ public function run( Check_Result $result ) {
 
 To include the check as part of the Plugin Checker process, it must be added to the Plugin Checker's list of available checks.
 
-- If you're contributing to the Plugin Checker, add the check to the list in the `Abstract_Check_Runner::register_checks()` method.
+- If you're contributing to the Plugin Checker, add the check to the list in the `Default_Check_Repository::register_default_checks()` method.
 - If you're implementing a check in code outside of the Plugin Checker, use the `wp_plugin_check_checks` filter, as seen in the example below.
 
 ```php
