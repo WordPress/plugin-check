@@ -12,5 +12,5 @@ Feature: Test that the WP-CLI plugin list check categories command works.
     When I run the WP-CLI command `plugin list-check-categories --format=csv --fields=slug,name`
     Then STDOUT should contain:
       """
-      plugin_repo,"Plugin repo"
+      plugin_repo,"Plugin Repo"
       """

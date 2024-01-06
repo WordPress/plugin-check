@@ -29,27 +29,30 @@ class Check_Categories {
 	 * @return array An array of available categories.
 	 */
 	public static function get_categories() {
-		static $categories = '';
-		if ( ! $categories ) {
-			$constants = ( new \ReflectionClass( __CLASS__ ) )->getConstants();
+		return array(
+			self::CATEGORY_GENERAL,
+			self::CATEGORY_PLUGIN_REPO,
+			self::CATEGORY_SECURITY,
+			self::CATEGORY_PERFORMANCE,
+			self::CATEGORY_ACCESSIBILITY,
+		);
+	}
 
-			/**
-			 * List of categories.
-			 *
-			 * @var string[] $categories
-			 */
-			$categories = array_values(
-				array_filter(
-					$constants,
-					static function ( $key ) {
-						return strpos( $key, 'CATEGORY_' ) === 0;
-					},
-					ARRAY_FILTER_USE_KEY
-				)
-			);
-		}
-
-		return $categories;
+	/**
+	 * Returns an array of category labels.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array An array of category labels.
+	 */
+	public static function get_category_labels() {
+		return array(
+			self::CATEGORY_GENERAL       => __( 'General', 'plugin-check' ),
+			self::CATEGORY_PLUGIN_REPO   => __( 'Plugin Repo', 'plugin-check' ),
+			self::CATEGORY_SECURITY      => __( 'Security', 'plugin-check' ),
+			self::CATEGORY_PERFORMANCE   => __( 'Performance', 'plugin-check' ),
+			self::CATEGORY_ACCESSIBILITY => __( 'Accessibility', 'plugin-check' ),
+		);
 	}
 
 	/**
