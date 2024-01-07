@@ -53,6 +53,15 @@ interface Check {
 	public function run( Check_Result $result );
 
 	/**
+	 * Gets the check name.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array The name of the check.
+	 */
+	public function get_name();
+
+	/**
 	 * Gets the categories for the check.
 	 *
 	 * Every check must have at least one category.

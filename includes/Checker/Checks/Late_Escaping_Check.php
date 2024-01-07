@@ -20,6 +20,17 @@ class Late_Escaping_Check extends Abstract_PHP_CodeSniffer_Check {
 	use Stable_Check;
 
 	/**
+	 * Gets the check name.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array The name of the check.
+	 */
+	public function get_name() {
+		return 'late_escaping';
+	}
+
+	/**
 	 * Gets the categories for the check.
 	 *
 	 * Every check must have at least one category.
