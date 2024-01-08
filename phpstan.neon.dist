@@ -22,3 +22,6 @@ parameters:
         - includes/Checker/Checks/Plugin_Readme_Check.php
         - includes/Traits/Find_Readme.php
         - includes/Traits/File_Editor_URL.php
+    -
+      message: '/^Function str_starts_with not found.$/'
+      path: includes/Checker/CLI_Runner.php
