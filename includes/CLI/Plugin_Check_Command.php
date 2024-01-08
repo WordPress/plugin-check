@@ -213,7 +213,17 @@ final class Plugin_Check_Command {
 		$default_fields = $this->get_check_default_fields( $assoc_args );
 
 		// Get formatter.
-		$formatter = $this->get_formatter( $assoc_args, $default_fields );
+		$formatter = $this->get_formatter(
+			$assoc_args,
+			$default_fields,
+			array(
+				'line',
+				'column',
+				'type',
+				'code',
+				'message',
+			)
+		);
 
 		// Print the formatted results.
 		// Go over all files with errors first and print them, combined with any warnings in the same file.
@@ -402,11 +412,20 @@ final class Plugin_Check_Command {
 	 *
 	 * @param array $assoc_args     Associative arguments.
 	 * @param array $default_fields Default fields.
+	 * @param array $valid_fields   Valid fields.
 	 * @return WP_CLI\Formatter The formatter instance.
 	 */
-	private function get_formatter( $assoc_args, $default_fields ) {
-		if ( isset( $assoc_args['fields'] ) ) {
-			$default_fields = wp_parse_args( $assoc_args['fields'], $default_fields );
+	private function get_formatter( $assoc_args, $default_fields, $valid_fields = array() ) {
+		if ( isset( $assoc_args['fields'] ) && ! empty( $valid_fields ) ) {
+			$field_names = explode( ',', $assoc_args['fields'] );
+
+			$invalid_fields = array_diff( $field_names, $valid_fields );
+
+			if ( count( $invalid_fields ) > 0 ) {
+				// translators: 1. Invalid field names.
+				$message = ( 1 === count( $invalid_fields ) ) ? __( 'Invalid field: %s', 'plugin-check' ) : __( 'Invalid fields: %s', 'plugin-check' );
+				WP_CLI::error( sprintf( $message, implode( ', ', $invalid_fields ) ) );
+			}
 		}
 
 		return new WP_CLI\Formatter(
