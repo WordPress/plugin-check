@@ -63,7 +63,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 		// Remove associative arguments.
 		$params = array_filter(
 			$params,
-			function ( $val ) {
+			static function ( $val ) {
 				return ! str_starts_with( $val, '--' );
 			}
 		);

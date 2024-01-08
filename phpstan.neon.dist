@@ -24,5 +24,4 @@ parameters:
         - includes/Traits/File_Editor_URL.php
     -
       message: '/^Function str_starts_with not found.$/'
-      paths:
-        - includes/Checker/CLI_Runner.php
+      path: includes/Checker/CLI_Runner.php
