@@ -16,6 +16,7 @@ use WordPress\Plugin_Check\Checker\Check_Result;
  */
 trait Amend_Check_Result {
 
+	use Check_Name;
 	use File_Editor_URL;
 
 	/**
@@ -41,6 +42,7 @@ trait Amend_Check_Result {
 				'line'   => $line,
 				'column' => $column,
 				'link'   => $this->get_file_editor_url( $result, $file, $line ),
+				'check'  => $this->get_name(),
 			)
 		);
 	}
