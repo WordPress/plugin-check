@@ -14,3 +14,23 @@ Feature: Test that the WP-CLI plugin list checks command works.
       """
       plugin_header_text_domain,plugin_repo
       """
+
+    When I run the WP-CLI command `plugin list-checks --stability=stable`
+    Then STDOUT should not be empty
+    And STDOUT should not contain:
+      """
+      experimental
+      """
+
+    When I run the WP-CLI command `plugin list-checks --format=json --stability=experimental`
+    Then STDOUT should be:
+      """
+      []
+      """
+
+    When I run the WP-CLI command `plugin list-checks --format=csv --categories=general`
+    Then STDOUT should be:
+      """
+      slug,category,stability
+      i18n_usage,general,stable
+      """
