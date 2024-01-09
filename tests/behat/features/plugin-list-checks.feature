@@ -34,3 +34,12 @@ Feature: Test that the WP-CLI plugin list checks command works.
       slug,category,stability
       i18n_usage,general,stable
       """
+
+    When I run the WP-CLI command `plugin list-checks --format=csv --categories="general, security"`
+    Then STDOUT should be:
+      """
+      slug,category,stability
+      i18n_usage,general,stable
+      late_escaping,security,stable
+      direct_db_queries,security,stable
+      """

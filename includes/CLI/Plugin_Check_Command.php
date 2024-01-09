@@ -322,7 +322,8 @@ final class Plugin_Check_Command {
 			$all_checks = array_filter(
 				$all_checks,
 				static function ( $item ) use ( $options ) {
-					return array_intersect( explode( ',', $options['categories'] ), $item['category'] );
+					$categories = array_map( 'trim', explode( ',', $options['categories'] ) );
+					return array_intersect( $categories, $item['category'] );
 				}
 			);
 		}
