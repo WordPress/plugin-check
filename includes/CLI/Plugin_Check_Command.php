@@ -252,6 +252,17 @@ final class Plugin_Check_Command {
 	 *   - json
 	 * ---
 	 *
+	 * [--categories]
+	 * : Limit displayed results to include only specific categories.
+	 *
+	 * [--stability=<stability>]
+	 * : Check stability.
+	 * ---
+	 * options:
+	 *   - stable
+	 *   - experimental
+	 * ---
+	 *
 	 * @subcommand list-checks
 	 *
 	 * @since n.e.x.t
@@ -266,18 +277,25 @@ final class Plugin_Check_Command {
 
 		$all_checks = array();
 
-		foreach ( $check_repo->get_checks() as $key => $check ) {
+		foreach ( $check_repo->get_checks( Default_Check_Repository::TYPE_ALL | Default_Check_Repository::INCLUDE_EXPERIMENTAL ) as $key => $check ) {
 			$item = array();
 
 			$item['slug']      = $key;
 			$item['stability'] = strtolower( $check->get_stability() );
-			$item['category']  = join( ', ', $check->get_categories() );
+			$item['category']  = $check->get_categories();
 
 			$all_checks[] = $item;
 		}
 
 		// Get options based on the CLI arguments.
-		$options = $this->get_options( $assoc_args, array( 'format' => 'table' ) );
+		$options = $this->get_options(
+			$assoc_args,
+			array(
+				'format'     => 'table',
+				'categories' => '',
+				'stability'  => '',
+			)
+		);
 
 		// Get formatter.
 		$formatter = $this->get_formatter(
@@ -287,6 +305,34 @@ final class Plugin_Check_Command {
 				'category',
 				'stability',
 			)
+		);
+
+		// Filter by stability.
+		if ( ! empty( $options['stability'] ) ) {
+			$all_checks = array_filter(
+				$all_checks,
+				static function ( $item ) use ( $options ) {
+					return $options['stability'] === $item['stability'];
+				}
+			);
+		}
+
+		// Filter by categories.
+		if ( ! empty( $options['categories'] ) ) {
+			$all_checks = array_filter(
+				$all_checks,
+				static function ( $item ) use ( $options ) {
+					return array_intersect( explode( ',', $options['categories'] ), $item['category'] );
+				}
+			);
+		}
+
+		// Display categories in better way.
+		array_walk(
+			$all_checks,
+			static function ( &$item ) {
+				$item['category'] = join( ', ', $item['category'] );
+			}
 		);
 
 		// Display results.
