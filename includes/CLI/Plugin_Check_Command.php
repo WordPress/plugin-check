@@ -9,6 +9,7 @@ namespace WordPress\Plugin_Check\CLI;
 
 use Exception;
 use WordPress\Plugin_Check\Checker\Check_Categories;
+use WordPress\Plugin_Check\Checker\Check_Repository;
 use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Checker\Default_Check_Repository;
 use WordPress\Plugin_Check\Checker\Runtime_Check;
@@ -255,13 +256,8 @@ final class Plugin_Check_Command {
 	 * [--categories]
 	 * : Limit displayed results to include only specific categories.
 	 *
-	 * [--stability=<stability>]
-	 * : Check stability.
-	 * ---
-	 * options:
-	 *   - stable
-	 *   - experimental
-	 * ---
+	 * [--include-experimental]
+	 * : Include experimental checks.
 	 *
 	 * @subcommand list-checks
 	 *
@@ -275,27 +271,42 @@ final class Plugin_Check_Command {
 	public function list_checks( $args, $assoc_args ) {
 		$check_repo = new Default_Check_Repository();
 
-		$all_checks = array();
-
-		foreach ( $check_repo->get_checks( Default_Check_Repository::TYPE_ALL | Default_Check_Repository::INCLUDE_EXPERIMENTAL ) as $key => $check ) {
-			$item = array();
-
-			$item['slug']      = $key;
-			$item['stability'] = strtolower( $check->get_stability() );
-			$item['category']  = $check->get_categories();
-
-			$all_checks[] = $item;
-		}
-
 		// Get options based on the CLI arguments.
 		$options = $this->get_options(
 			$assoc_args,
 			array(
-				'format'     => 'table',
-				'categories' => '',
-				'stability'  => '',
+				'format'               => 'table',
+				'categories'           => '',
+				'include-experimental' => false,
 			)
 		);
+
+		$check_flags = Check_Repository::TYPE_ALL;
+
+		// Check whether to include experimental checks.
+		if ( $options['include-experimental'] ) {
+			$check_flags = $check_flags | Check_Repository::INCLUDE_EXPERIMENTAL;
+		}
+
+		$collection = $check_repo->get_checks( $check_flags );
+
+		// Filters the checks by specific categories.
+		if ( ! empty( $options['categories'] ) ) {
+			$categories = array_map( 'trim', explode( ',', $options['categories'] ) );
+			$collection = Check_Categories::filter_checks_by_categories( $collection, $categories );
+		}
+
+		$all_checks = array();
+
+		foreach ( $collection as $key => $check ) {
+			$item = array();
+
+			$item['slug']      = $key;
+			$item['stability'] = strtolower( $check->get_stability() );
+			$item['category']  = join( ', ', $check->get_categories() );
+
+			$all_checks[] = $item;
+		}
 
 		// Get formatter.
 		$formatter = $this->get_formatter(
@@ -305,35 +316,6 @@ final class Plugin_Check_Command {
 				'category',
 				'stability',
 			)
-		);
-
-		// Filter by stability.
-		if ( ! empty( $options['stability'] ) ) {
-			$all_checks = array_filter(
-				$all_checks,
-				static function ( $item ) use ( $options ) {
-					return $options['stability'] === $item['stability'];
-				}
-			);
-		}
-
-		// Filter by categories.
-		if ( ! empty( $options['categories'] ) ) {
-			$all_checks = array_filter(
-				$all_checks,
-				static function ( $item ) use ( $options ) {
-					$categories = array_map( 'trim', explode( ',', $options['categories'] ) );
-					return array_intersect( $categories, $item['category'] );
-				}
-			);
-		}
-
-		// Display categories in better way.
-		array_walk(
-			$all_checks,
-			static function ( &$item ) {
-				$item['category'] = join( ', ', $item['category'] );
-			}
 		);
 
 		// Display results.
