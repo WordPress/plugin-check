@@ -413,6 +413,10 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			->include( $check_slugs ) // Ensures only the checks with the given slugs are included.
 			->exclude( $excluded_checks ); // Exclude provided checks from list.
 
+		if ( ! empty( $excluded_checks ) ) {
+			$check_slugs = array_diff( $check_slugs, $excluded_checks );
+		}
+
 		// Filters the checks by specific categories.
 		$categories = $this->get_categories();
 		if ( $categories ) {
