@@ -6,6 +6,8 @@
  */
 
 namespace WordPress\Plugin_Check;
+use WordPress\Plugin_Check\Traits\Find_Readme;
+use WordPressdotorg\Plugin_Directory\Readme\Parser;
 
 /**
  * Class representing the context in which the plugin is running.
@@ -13,6 +15,8 @@ namespace WordPress\Plugin_Check;
  * @since n.e.x.t
  */
 class Plugin_Context {
+
+	use Find_Readme;
 
 	/**
 	 * Absolute path of the plugin main file.
@@ -97,5 +101,35 @@ class Plugin_Context {
 	 */
 	public function is_single_file_plugin() {
 		return $this->path() !== $this->location();
+	}
+
+	/**
+	 * Determine the minimum supported WordPress version of the plugin.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return bool|string The minimum version supported, otherwise false.
+	 */
+	public function minimum_supported_wp() {
+		$headers = get_plugin_data( $this->location() );
+		if ( ! empty( $headers['RequiresWP'] ) ) {
+			return $headers['RequiresWP'];
+		}
+
+		// Look for the readme.
+		if ( ! $this->is_single_file_plugin() ) {
+			$readme_files = glob( $this->path() . '*' );
+			$readme_files = $this->filter_files_for_readme( $readme_files, $this->path() );
+			$readme_file  = reset( $readme_files );
+			if ( $readme_file ) {
+				$parser = new Parser( $readme_file );
+
+				if ( ! empty( $parser->requires ) ) {
+					return $parser->requires;
+				}
+			}
+		}
+
+		return false;
 	}
 }
