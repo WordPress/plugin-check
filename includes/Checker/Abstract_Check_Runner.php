@@ -254,7 +254,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @param array $categories An array of categories for filtering.
 	 *
-	 * @throws Exception Thrown if the getegories does not match the original request parameter.
+	 * @throws Exception Thrown if the categories does not match the original request parameter.
 	 */
 	final public function set_categories( $categories ) {
 		if ( $this->initialized_early ) {

@@ -51,7 +51,7 @@ class Check_Result_Tests extends WP_UnitTestCase {
 		// Tests warnings count incremented correctly.
 		$this->assertEquals( 1, $this->check_result->get_warning_count() );
 
-		// Tests no errors were added or error count incrememeted.
+		// Tests no errors were added or error count incremented.
 		$this->assertEmpty( $this->check_result->get_errors() );
 		$this->assertEquals( 0, $this->check_result->get_error_count() );
 

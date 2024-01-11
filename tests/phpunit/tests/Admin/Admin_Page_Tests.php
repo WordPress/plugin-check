@@ -71,7 +71,7 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 				'Name' => 'Hello Dolly',
 			),
 			'akismet/akismet.php'  => array(
-				'Name' => 'Akistmet',
+				'Name' => 'Akismet',
 			),
 			'Fake-plugin/load.php' => array(
 				'Name' => 'Fake Plugin',
