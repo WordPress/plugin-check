@@ -419,9 +419,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			$collection = Check_Categories::filter_checks_by_categories( $collection, $categories );
 		}
 
-		return $collection
-			->require( $check_slugs ) // Ensures all of the given slugs are valid.
-			->to_map();
+		return $collection->to_map();
 	}
 
 	/**
