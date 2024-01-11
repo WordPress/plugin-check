@@ -92,6 +92,14 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 			$defaults[] = '--ignore=*/' . implode( '/*,*/', $directories_to_ignore ) . '/*';
 		}
 
+		// Set the Minimum WP version supported for the plugin.
+		if ( $result->plugin()->minimum_supported_wp() ) {
+			// Due to the syntax of runtime-set, these must be passed as individual args.
+			$defaults[] = '--runtime-set';
+			$defaults[] = 'minimum_wp_version';
+			$defaults[] = $result->plugin()->minimum_supported_wp();
+		}
+
 		// Set the check arguments for PHPCS.
 		$_SERVER['argv'] = $this->parse_argv( $this->get_args(), $defaults );
 
