@@ -111,7 +111,7 @@ class Plugin_Context {
 	 * @return bool|string The minimum version supported, otherwise false.
 	 */
 	public function minimum_supported_wp() {
-		$headers = get_plugin_data( $this->location() );
+		$headers = get_plugin_data( $this->main_file );
 		if ( ! empty( $headers['RequiresWP'] ) ) {
 			return $headers['RequiresWP'];
 		}
