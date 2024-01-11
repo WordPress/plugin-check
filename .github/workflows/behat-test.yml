@@ -65,18 +65,15 @@ jobs:
         - '7.2'
         - '7.3'
         - '7.4'
+        - '8.0'
         - '8.1'
-        - '8.2'
         wordpress: [ 'latest' ]
         include:
-          - php: '8.0'
+          - php: '8.2'
             wordpress: 'latest'
             coverage: true
-          - php: '8.0'
+          - php: '7.0'
             wordpress: '6.3'
-          - php: '8.2'
-            wordpress: 'trunk'
-            experimental: true
           - php: '8.3'
             wordpress: 'trunk'
             experimental: true
