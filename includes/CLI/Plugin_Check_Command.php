@@ -136,6 +136,9 @@ final class Plugin_Check_Command {
 		// Create the categories array from CLI arguments.
 		$categories = isset( $options['categories'] ) ? wp_parse_list( $options['categories'] ) : array();
 
+		// Validate check categories.
+		$this->validate_check_categories( $categories );
+
 		$excluded_directories = isset( $options['exclude-directories'] ) ? wp_parse_list( $options['exclude-directories'] ) : array();
 
 		add_filter(
@@ -292,6 +295,7 @@ final class Plugin_Check_Command {
 
 		// Filters the checks by specific categories.
 		if ( ! empty( $options['categories'] ) ) {
+			$this->validate_check_categories( wp_parse_list( $options['categories'] ) );
 			$categories = array_map( 'trim', explode( ',', $options['categories'] ) );
 			$collection = Check_Categories::filter_checks_by_categories( $collection, $categories );
 		}
@@ -395,6 +399,35 @@ final class Plugin_Check_Command {
 		}
 
 		return $categories;
+	}
+
+	/**
+	 * Validates check categories.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param array $categories List of check categories.
+	 *
+	 * @throws WP_CLI\ExitException Show error if invalid categories.
+	 */
+	private function validate_check_categories( $categories ) {
+		$all_categories = wp_list_pluck( $this->get_check_categories(), 'slug' );
+
+		$invalid_categories = array_diff( $categories, $all_categories );
+
+		if ( 0 !== count( $invalid_categories ) ) {
+			// translators: %s. Invalid check categories.
+			$message = ( 1 === count( $invalid_categories ) ) ? __( "Invalid check category '%s' found.", 'plugin-check' ) : __( "Invalid check categories '%s' found.", 'plugin-check' );
+
+			$message .= " Try 'wp plugin list-check-categories' to view the available check categories.";
+
+			WP_CLI::error(
+				sprintf(
+					$message,
+					implode( ', ', $invalid_categories )
+				)
+			);
+		}
 	}
 
 	/**
