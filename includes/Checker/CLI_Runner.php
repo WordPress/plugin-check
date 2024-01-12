@@ -68,7 +68,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 			}
 		);
 
-		// Use only first element. We dont support checking multiple plugins at once yet!
+		// Use only first element. We don't support checking multiple plugins at once yet!
 		$plugin = count( $params ) > 0 ? reset( $params ) : '';
 
 		if ( empty( $plugin ) ) {
