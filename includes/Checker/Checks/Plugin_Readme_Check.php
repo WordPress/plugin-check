@@ -86,6 +86,9 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		// Check the readme file for a valid version.
 		$this->check_stable_tag( $result, $readme_file, $parser );
 
+		// Check the readme file for upgrade notice.
+		$this->check_upgrade_notice( $result, $readme_file, $parser );
+
 		// Check the readme file for warnings.
 		$this->check_for_warnings( $result, $readme_file, $parser );
 	}
@@ -309,6 +312,32 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				$result,
 				__( 'The Stable Tag in your readme file does not match the version in your main plugin file.', 'plugin-check' ),
 				'stable_tag_mismatch',
+				$readme_file
+			);
+		}
+	}
+
+	/**
+	 * Checks the readme file upgrade notice.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param Check_Result $result      The Check Result to amend.
+	 * @param string       $readme_file Readme file.
+	 * @param Parser       $parser      The Parser object.
+	 */
+	private function check_upgrade_notice( Check_Result $result, string $readme_file, Parser $parser ) {
+		if ( 0 === count( $parser->upgrade_notice ) ) {
+			return;
+		}
+
+		$notice = reset( $parser->upgrade_notice );
+
+		if ( strlen( $notice ) > 300 ) {
+			$this->add_result_warning_for_file(
+				$result,
+				__( 'The upgrade notice exceeds the limit of 300 characters.', 'plugin-check' ),
+				'upgrade_notice_limit',
 				$readme_file
 			);
 		}
