@@ -254,7 +254,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @param array $categories An array of categories for filtering.
 	 *
-	 * @throws Exception Thrown if the getegories does not match the original request parameter.
+	 * @throws Exception Thrown if the categories does not match the original request parameter.
 	 */
 	final public function set_categories( $categories ) {
 		if ( $this->initialized_early ) {
@@ -410,6 +410,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		$excluded_checks = $this->get_check_exclude_slugs();
 
 		$collection = $this->check_repository->get_checks( $check_flags )
+			->require( $check_slugs ) // Ensures all of the given slugs are valid.
 			->include( $check_slugs ) // Ensures only the checks with the given slugs are included.
 			->exclude( $excluded_checks ); // Exclude provided checks from list.
 
@@ -419,9 +420,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			$collection = Check_Categories::filter_checks_by_categories( $collection, $categories );
 		}
 
-		return $collection
-			->require( $check_slugs ) // Ensures all of the given slugs are valid.
-			->to_map();
+		return $collection->to_map();
 	}
 
 	/**

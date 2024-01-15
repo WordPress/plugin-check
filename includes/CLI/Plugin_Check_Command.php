@@ -9,6 +9,7 @@ namespace WordPress\Plugin_Check\CLI;
 
 use Exception;
 use WordPress\Plugin_Check\Checker\Check_Categories;
+use WordPress\Plugin_Check\Checker\Check_Repository;
 use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Checker\Default_Check_Repository;
 use WordPress\Plugin_Check\Checker\Runtime_Check;
@@ -252,6 +253,12 @@ final class Plugin_Check_Command {
 	 *   - json
 	 * ---
 	 *
+	 * [--categories]
+	 * : Limit displayed results to include only specific categories.
+	 *
+	 * [--include-experimental]
+	 * : Include experimental checks.
+	 *
 	 * @subcommand list-checks
 	 *
 	 * @since n.e.x.t
@@ -264,9 +271,34 @@ final class Plugin_Check_Command {
 	public function list_checks( $args, $assoc_args ) {
 		$check_repo = new Default_Check_Repository();
 
+		// Get options based on the CLI arguments.
+		$options = $this->get_options(
+			$assoc_args,
+			array(
+				'format'               => 'table',
+				'categories'           => '',
+				'include-experimental' => false,
+			)
+		);
+
+		$check_flags = Check_Repository::TYPE_ALL;
+
+		// Check whether to include experimental checks.
+		if ( $options['include-experimental'] ) {
+			$check_flags = $check_flags | Check_Repository::INCLUDE_EXPERIMENTAL;
+		}
+
+		$collection = $check_repo->get_checks( $check_flags );
+
+		// Filters the checks by specific categories.
+		if ( ! empty( $options['categories'] ) ) {
+			$categories = array_map( 'trim', explode( ',', $options['categories'] ) );
+			$collection = Check_Categories::filter_checks_by_categories( $collection, $categories );
+		}
+
 		$all_checks = array();
 
-		foreach ( $check_repo->get_checks() as $key => $check ) {
+		foreach ( $collection as $key => $check ) {
 			$item = array();
 
 			$item['slug']      = $key;
@@ -275,9 +307,6 @@ final class Plugin_Check_Command {
 
 			$all_checks[] = $item;
 		}
-
-		// Get options based on the CLI arguments.
-		$options = $this->get_options( $assoc_args, array( 'format' => 'table' ) );
 
 		// Get formatter.
 		$formatter = $this->get_formatter(

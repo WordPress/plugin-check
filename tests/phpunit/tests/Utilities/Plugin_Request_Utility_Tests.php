@@ -108,7 +108,7 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 
 		do_action( 'muplugins_loaded' );
 
-		// Determine if one of the Universal_Runtume_Preparation was run.
+		// Determine if one of the Universal_Runtime_Preparation was run.
 		$prepared = has_filter( 'option_active_plugins' );
 
 		Plugin_Request_Utility::destroy_runner();
@@ -152,7 +152,7 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 
 		do_action( 'muplugins_loaded' );
 
-		// Determine if one of the Universal_Runtume_Preparation was run.
+		// Determine if one of the Universal_Runtime_Preparation was run.
 		$prepared = has_filter( 'option_active_plugins' );
 
 		Plugin_Request_Utility::destroy_runner();

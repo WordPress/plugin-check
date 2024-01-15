@@ -84,6 +84,15 @@ Feature: Test that the WP-CLI command works.
       """
       WordPress.WP.AlternativeFunctions.rand_mt_rand
       """
+    When I run the WP-CLI command `plugin check hello.php --checks=plugin_review_phpcs,late_escaping --exclude-checks=late_escaping`
+    Then STDOUT should contain:
+      """
+      WordPress.WP.AlternativeFunctions.rand_mt_rand
+      """
+    And STDOUT should not contain:
+      """
+      WordPress.Security.EscapeOutput.OutputNotEscaped
+      """
 
   Scenario: Check Akismet
     Given a WP install with the Plugin Check plugin
