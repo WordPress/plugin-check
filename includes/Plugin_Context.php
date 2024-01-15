@@ -108,7 +108,7 @@ class Plugin_Context {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return bool|string The minimum version supported, otherwise false.
+	 * @return string The minimum version supported, or empty string if unknown.
 	 */
 	public function minimum_supported_wp() {
 		$headers = get_plugin_data( $this->main_file );
@@ -130,6 +130,6 @@ class Plugin_Context {
 			}
 		}
 
-		return false;
+		return '';
 	}
 }
