@@ -461,4 +461,24 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 			}
 		);
 	}
+
+	public function test_run_with_errors_upgrade_notice() {
+		$readme_check  = new Plugin_Readme_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-upgrade-notice/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$readme_check->run( $check_result );
+
+		$warnings = $check_result->get_warnings();
+
+		$this->assertNotEmpty( $warnings );
+		$this->assertArrayHasKey( 'readme.txt', $warnings );
+		$this->assertEquals( 1, $check_result->get_warning_count() );
+
+		// Check for upgrade notice.
+		$this->assertArrayHasKey( 0, $warnings['readme.txt'] );
+		$this->assertArrayHasKey( 0, $warnings['readme.txt'][0] );
+		$this->assertArrayHasKey( 'code', $warnings['readme.txt'][0][0][0] );
+		$this->assertEquals( 'upgrade_notice_limit', $warnings['readme.txt'][0][0][0]['code'] );
+	}
 }
