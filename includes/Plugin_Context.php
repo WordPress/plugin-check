@@ -27,6 +27,14 @@ class Plugin_Context {
 	protected $main_file;
 
 	/**
+	 * The minimum supported WordPress version of the plugin.
+	 *
+	 * @since n.e.x.t
+	 * @var string
+	 */
+	protected $minimum_supported_wp;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since n.e.x.t
@@ -111,13 +119,17 @@ class Plugin_Context {
 	 * @return string The minimum version supported, or empty string if unknown.
 	 */
 	public function minimum_supported_wp() {
-		$headers = get_plugin_data( $this->main_file );
-		if ( ! empty( $headers['RequiresWP'] ) ) {
-			return $headers['RequiresWP'];
+		if ( ! is_null( $this->minimum_supported_wp ) ) {
+			return $this->minimum_supported_wp;
 		}
 
-		// Look for the readme.
-		if ( ! $this->is_single_file_plugin() ) {
+		$this->minimum_supported_wp = '';
+
+		$headers = get_plugin_data( $this->main_file );
+		if ( ! empty( $headers['RequiresWP'] ) ) {
+			$this->minimum_supported_wp = $headers['RequiresWP'];
+		} elseif ( ! $this->is_single_file_plugin() ) {
+			// Look for the readme.
 			$readme_files = glob( $this->path() . '*' );
 			$readme_files = $this->filter_files_for_readme( $readme_files, $this->path() );
 			$readme_file  = reset( $readme_files );
@@ -125,11 +137,11 @@ class Plugin_Context {
 				$parser = new Parser( $readme_file );
 
 				if ( ! empty( $parser->requires ) ) {
-					return $parser->requires;
+					$this->minimum_supported_wp = $parser->requires;
 				}
 			}
 		}
 
-		return '';
+		return $this->minimum_supported_wp;
 	}
 }
