@@ -80,17 +80,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		$orig_cmd_args = $_SERVER['argv'];
 
 		// Create the default arguments for PHPCS.
-		$defaults = array(
-			'',
-			$result->plugin()->location(),
-			'--report=Json',
-			'--report-width=9999',
-		);
-
-		$directories_to_ignore = Plugin_Request_Utility::get_directories_to_ignore();
-		if ( ! empty( $directories_to_ignore ) ) {
-			$defaults[] = '--ignore=*/' . implode( '/*,*/', $directories_to_ignore ) . '/*';
-		}
+		$defaults = $this->get_argv_defaults( $result );
 
 		// Set the check arguments for PHPCS.
 		$_SERVER['argv'] = $this->parse_argv( $this->get_args(), $defaults );
@@ -154,6 +144,38 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		// Format check arguments for PHPCS.
 		foreach ( $check_args as $key => $value ) {
 			$defaults[] = "--{$key}=$value";
+		}
+
+		return $defaults;
+	}
+
+	/**
+	 * Gets the default command arguments.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param Check_Result $result The check result to amend, including the plugin context to check.
+	 * @return array An indexed array of PHPCS CLI arguments.
+	 */
+	private function get_argv_defaults( Check_Result $result ): array {
+		$defaults = array(
+			'',
+			$result->plugin()->location(),
+			'--report=Json',
+			'--report-width=9999',
+		);
+
+		$directories_to_ignore = Plugin_Request_Utility::get_directories_to_ignore();
+		if ( ! empty( $directories_to_ignore ) ) {
+			$defaults[] = '--ignore=*/' . implode( '/*,*/', $directories_to_ignore ) . '/*';
+		}
+
+		// Set the Minimum WP version supported for the plugin.
+		if ( $result->plugin()->minimum_supported_wp() ) {
+			// Due to the syntax of runtime-set, these must be passed as individual args.
+			$defaults[] = '--runtime-set';
+			$defaults[] = 'minimum_wp_version';
+			$defaults[] = $result->plugin()->minimum_supported_wp();
 		}
 
 		return $defaults;

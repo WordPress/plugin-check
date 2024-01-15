@@ -25,7 +25,7 @@ trait Find_Readme {
 	 */
 	protected function filter_files_for_readme( array $files, $plugin_relative_path ) {
 		// Find the readme file.
-		$readme_list = self::filter_files_by_regex( $files, '/readme\.(txt|md)$/i' );
+		$readme_list = preg_grep( '/readme\.(txt|md)$/i', $files );
 
 		// Filter the readme files located at root.
 		$potential_readme_files = array_filter(
