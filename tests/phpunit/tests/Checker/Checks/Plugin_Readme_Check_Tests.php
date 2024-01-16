@@ -95,6 +95,26 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertEquals( 'invalid_license', $warnings['readme.txt'][0][0][0]['code'] );
 	}
 
+	public function test_run_with_errors_no_license() {
+		$readme_check  = new Plugin_Readme_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-no-license/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$readme_check->run( $check_result );
+
+		$errors = $check_result->get_errors();
+
+		$this->assertNotEmpty( $errors );
+		$this->assertArrayHasKey( 'readme.txt', $errors );
+		$this->assertEquals( 1, $check_result->get_error_count() );
+
+		// Check for no license.
+		$this->assertArrayHasKey( 0, $errors['readme.txt'] );
+		$this->assertArrayHasKey( 0, $errors['readme.txt'][0] );
+		$this->assertArrayHasKey( 'code', $errors['readme.txt'][0][0][0] );
+		$this->assertEquals( 'no_license', $errors['readme.txt'][0][0][0]['code'] );
+	}
+
 	public function test_run_without_errors() {
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-without-errors/load.php' );
