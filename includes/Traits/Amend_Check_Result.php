@@ -7,6 +7,7 @@
 
 namespace WordPress\Plugin_Check\Traits;
 
+use ReflectionClass;
 use WordPress\Plugin_Check\Checker\Check_Result;
 
 /**
@@ -16,7 +17,6 @@ use WordPress\Plugin_Check\Checker\Check_Result;
  */
 trait Amend_Check_Result {
 
-	use Check_Name;
 	use File_Editor_URL;
 
 	/**
@@ -42,7 +42,7 @@ trait Amend_Check_Result {
 				'line'   => $line,
 				'column' => $column,
 				'link'   => $this->get_file_editor_url( $result, $file, $line ),
-				'check'  => $this->get_name(),
+				'check'  => $this->get_check_name(),
 			)
 		);
 	}
@@ -77,5 +77,20 @@ trait Amend_Check_Result {
 	 */
 	protected function add_result_warning_for_file( Check_Result $result, $message, $code, $file, $line = 0, $column = 0 ) {
 		$this->add_result_message_for_file( $result, false, $message, $code, $file, $line, $column );
+	}
+
+	/**
+	 * Returns the check name.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return string Check name.
+	 */
+	protected function get_check_name() {
+		$reflection = new ReflectionClass( $this );
+
+		$class_name = strtolower( $reflection->getShortName() );
+
+		return str_replace( '_check', '', $class_name );
 	}
 }
