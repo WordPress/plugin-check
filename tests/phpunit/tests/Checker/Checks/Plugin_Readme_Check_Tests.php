@@ -102,11 +102,15 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$readme_check->run( $check_result );
 
-		$errors = $check_result->get_errors();
+		$errors   = $check_result->get_errors();
+		$warnings = $check_result->get_warnings();
 
 		$this->assertNotEmpty( $errors );
 		$this->assertArrayHasKey( 'readme.txt', $errors );
 		$this->assertEquals( 1, $check_result->get_error_count() );
+
+		$this->assertEmpty( $warnings );
+		$this->assertEquals( 0, $check_result->get_warning_count() );
 
 		// Check for no license.
 		$this->assertArrayHasKey( 0, $errors['readme.txt'] );
