@@ -127,8 +127,19 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	private function check_license( Check_Result $result, string $readme_file, Parser $parser ) {
 		$license = $parser->license;
 
+		if ( empty( $license ) ) {
+			$this->add_result_error_for_file(
+				$result,
+				__( 'Your plugin has no license declared. Please update your readme with a GPLv2 (or later) compatible license.', 'plugin-check' ),
+				'no_license',
+				$readme_file
+			);
+
+			return;
+		}
+
 		// Test for a valid SPDX license identifier.
-		if ( ! empty( $license ) && ! preg_match( '/^([a-z0-9\-\+\.]+)(\sor\s([a-z0-9\-\+\.]+))*$/i', $license ) ) {
+		if ( ! preg_match( '/^([a-z0-9\-\+\.]+)(\sor\s([a-z0-9\-\+\.]+))*$/i', $license ) ) {
 			$this->add_result_warning_for_file(
 				$result,
 				__( 'Your plugin has an invalid license declared. Please update your readme with a valid SPDX license identifier.', 'plugin-check' ),
