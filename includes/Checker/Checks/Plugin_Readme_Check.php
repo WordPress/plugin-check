@@ -327,19 +327,27 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 * @param Parser       $parser      The Parser object.
 	 */
 	private function check_upgrade_notice( Check_Result $result, string $readme_file, Parser $parser ) {
-		if ( 0 === count( $parser->upgrade_notice ) ) {
+		$notices = $parser->upgrade_notice;
+
+		$maximum_characters = 300;
+
+		// Bail if no upgrade notices.
+		if ( 0 === count( $notices ) ) {
 			return;
 		}
 
-		$notice = reset( $parser->upgrade_notice );
+		foreach ( $notices as $version => $notice ) {
+			if ( strlen( $notice ) > $maximum_characters ) {
+				if ( empty( $version ) ) {
+					/* translators: Maximum characters. */
+					$message = sprintf( __( 'The upgrade notice exceeds the limit of %d characters.', 'plugin-check' ), $maximum_characters );
+				} else {
+					/* translators: 1: Version, 2: Maximum characters. */
+					$message = sprintf( __( 'The upgrade notice for \'%1$s\' exceeds the limit of %2$d characters.', 'plugin-check' ), $version, $maximum_characters );
+				}
 
-		if ( strlen( $notice ) > 300 ) {
-			$this->add_result_warning_for_file(
-				$result,
-				__( 'The upgrade notice exceeds the limit of 300 characters.', 'plugin-check' ),
-				'upgrade_notice_limit',
-				$readme_file
-			);
+				$this->add_result_warning_for_file( $result, $message, 'upgrade_notice_limit', $readme_file );
+			}
 		}
 	}
 
