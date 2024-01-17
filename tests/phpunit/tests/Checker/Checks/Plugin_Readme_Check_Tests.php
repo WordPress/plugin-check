@@ -473,12 +473,14 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertNotEmpty( $warnings );
 		$this->assertArrayHasKey( 'readme.txt', $warnings );
-		$this->assertEquals( 1, $check_result->get_warning_count() );
+		$this->assertEquals( 2, $check_result->get_warning_count() );
 
-		// Check for upgrade notice.
+		// Check for upgrade notices.
 		$this->assertArrayHasKey( 0, $warnings['readme.txt'] );
 		$this->assertArrayHasKey( 0, $warnings['readme.txt'][0] );
 		$this->assertArrayHasKey( 'code', $warnings['readme.txt'][0][0][0] );
 		$this->assertEquals( 'upgrade_notice_limit', $warnings['readme.txt'][0][0][0]['code'] );
+		$this->assertArrayHasKey( 'code', $warnings['readme.txt'][0][0][1] );
+		$this->assertEquals( 'upgrade_notice_limit', $warnings['readme.txt'][0][0][1]['code'] );
 	}
 }
