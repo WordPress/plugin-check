@@ -233,13 +233,15 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertNotEmpty( $warnings );
 		$this->assertArrayHasKey( 'readme.txt', $warnings );
-		$this->assertEquals( 1, $check_result->get_warning_count() );
+		$this->assertEquals( 2, $check_result->get_warning_count() );
 
-		// Check for parser warning.
+		// Check for parser warnings.
 		$this->assertArrayHasKey( 0, $warnings['readme.txt'] );
 		$this->assertArrayHasKey( 0, $warnings['readme.txt'][0] );
 		$this->assertArrayHasKey( 'code', $warnings['readme.txt'][0][0][0] );
 		$this->assertEquals( 'readme_parser_warnings', $warnings['readme.txt'][0][0][0]['code'] );
+		$this->assertArrayHasKey( 'code', $warnings['readme.txt'][0][0][1] );
+		$this->assertEquals( 'readme_parser_warnings', $warnings['readme.txt'][0][0][1]['code'] );
 	}
 
 	public function test_filter_readme_warnings_ignored() {
@@ -275,6 +277,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$custom_ignores = array(
 			'requires_php_header_ignored',
 			'contributor_ignored',
+			'tested_header_ignored',
 		);
 
 		// Create a mock filter that will return our custom ignores.
