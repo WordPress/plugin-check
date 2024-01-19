@@ -204,6 +204,13 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 			'contributor_ignored',
 		);
 
+		$messages = array(
+			'contributor_ignored'         => __( "'Contributors' header is invalid. It should be comma separated list of wordpress.org usernames", 'plugin-check' ),
+			'requires_php_header_ignored' => __( "'Requires PHP' header is invalid. It should be in either x.y or x.y.z format.", 'plugin-check' ),
+			'tested_header_ignored'       => __( "'Tested up to' header is invalid. It should be in either x.y or x.y.z format.", 'plugin-check' ),
+			'requires_header_ignored'     => __( "'Requires at least' header is invalid. It should be in either x.y or x.y.z format.", 'plugin-check' ),
+		);
+
 		/**
 		 * Filter the list of ignored readme parser warnings.
 		 *
@@ -217,16 +224,9 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		$warning_keys = array_diff( $warning_keys, $ignored_warnings );
 
 		if ( ! empty( $warning_keys ) ) {
-			$this->add_result_warning_for_file(
-				$result,
-				sprintf(
-					/* translators: list of warnings */
-					esc_html__( 'The following readme parser warnings were detected: %s', 'plugin-check' ),
-					esc_html( implode( ', ', $warning_keys ) )
-				),
-				'readme_parser_warnings',
-				$readme_file
-			);
+			foreach ( $warning_keys as $warning ) {
+				$this->add_result_warning_for_file( $result, $messages[ $warning ], 'readme_parser_warnings', $readme_file );
+			}
 		}
 	}
 }
