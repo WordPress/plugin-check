@@ -77,6 +77,11 @@ options:
 [--include-experimental]
 : Include experimental checks.
 ```
+## EXAMPLES
+```
+wp plugin list-checks
+wp plugin list-checks --format=json
+```
 
 # wp plugin list-check-categories 
 
@@ -102,4 +107,3 @@ options:
 wp plugin list-check-categories
 wp plugin list-check-categories --format=json
 ```
-
