@@ -259,6 +259,11 @@ final class Plugin_Check_Command {
 	 * [--include-experimental]
 	 * : Include experimental checks.
 	 *
+	 * ## EXAMPLES
+	 *
+	 *   wp plugin list-checks
+	 *   wp plugin list-checks --format=json
+	 *
 	 * @subcommand list-checks
 	 *
 	 * @since n.e.x.t
