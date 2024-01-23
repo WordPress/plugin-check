@@ -223,15 +223,15 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				/* translators: 1: plugin header tag; 2: Example version 5.0. 3: Example version 5.1. */
 				__( 'The %1$s field was ignored. This field should only contain a valid WordPress version such as %2$s or %3$s.', 'plugin-check' ),
 				"'Tested up to'",
-				"'" . number_format( $latest_wordpress_version, 1 ) . "'",
-				"'" . number_format( $latest_wordpress_version + 0.1, 1 ) . "'"
+				"'" . number_format( floatval( $latest_wordpress_version ), 1 ) . "'",
+				"'" . number_format( floatval( $latest_wordpress_version ) + 0.1, 1 ) . "'"
 			),
 			'requires_header_ignored'      => sprintf(
 				/* translators: 1: plugin header tag; 2: Example version 5.0. 3: Example version 4.9. */
 				__( 'The %1$s field was ignored. This field should only contain a valid WordPress version such as %2$s or %3$s.', 'plugin-check' ),
 				"'Requires at least'",
-				"'" . number_format( $latest_wordpress_version, 1 ) . "'",
-				"'" . number_format( $latest_wordpress_version - 0.1, 1 ) . "'"
+				"'" . number_format( floatval( $latest_wordpress_version ), 1 ) . "'",
+				"'" . number_format( floatval( $latest_wordpress_version ) - 0.1, 1 ) . "'"
 			),
 			'too_many_tags'                => sprintf(
 				/* translators: %d: maximum tags limit */
