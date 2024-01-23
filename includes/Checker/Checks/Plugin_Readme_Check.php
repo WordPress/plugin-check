@@ -286,13 +286,22 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 * @return string Stable WordPress version.
 	 */
 	private function get_wordpress_stable_version() {
-		$version = get_bloginfo( 'version' );
+		$version = get_transient( 'wp_plugin_check_latest_wp_version' );
 
-		// Strip off any -alpha, -RC, -beta suffixes.
-		list( $version, ) = explode( '-', $version );
+		if ( false === $version ) {
+			$response = wp_remote_get( 'https://api.wordpress.org/core/version-check/1.7/' );
 
-		if ( preg_match( '#^\d.\d#', $version, $matches ) ) {
-			$version = $matches[0];
+			if ( ! is_wp_error( $response ) ) {
+				$body = json_decode( wp_remote_retrieve_body( $response ), true );
+
+				if ( isset( $body['offers'] ) && ! empty( $body['offers'] ) ) {
+					$latest_release = reset( $body['offers'] );
+
+					$version = $latest_release['new_bundled'];
+
+					set_transient( 'wp_plugin_check_latest_wp_version', $version, DAY_IN_SECONDS );
+				}
+			}
 		}
 
 		return $version;
