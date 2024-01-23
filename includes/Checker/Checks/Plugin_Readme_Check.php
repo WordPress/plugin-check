@@ -304,6 +304,18 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 			}
 		}
 
+		// If $version is still false at this point, use current installed WordPress version.
+		if ( false === $version ) {
+			$version = get_bloginfo( 'version' );
+
+			// Strip off any -alpha, -RC, -beta suffixes.
+			list( $version, ) = explode( '-', $version );
+
+			if ( preg_match( '#^\d.\d#', $version, $matches ) ) {
+				$version = $matches[0];
+			}
+		}
+
 		return $version;
 	}
 }
