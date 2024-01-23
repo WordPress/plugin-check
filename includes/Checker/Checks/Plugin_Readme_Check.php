@@ -74,6 +74,9 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 		$parser = new Parser( $readme_file );
 
+		// Check the readme file for plugin name.
+		$this->check_name( $result, $readme_file, $parser );
+
 		// Check the readme file for default text.
 		$this->check_default_text( $result, $readme_file, $parser );
 
@@ -85,6 +88,28 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 		// Check the readme file for warnings.
 		$this->check_for_warnings( $result, $readme_file, $parser );
+	}
+
+	/**
+	 * Checks the readme file for plugin name.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param Check_Result $result      The Check Result to amend.
+	 * @param string       $readme_file Readme file.
+	 * @param Parser       $parser      The Parser object.
+	 */
+	private function check_name( Check_Result $result, string $readme_file, Parser $parser ) {
+		if ( empty( $parser->name ) || isset( $parser->warnings['invalid_plugin_name_header'] ) ) {
+			$message = sprintf(
+				/* translators: 1: 'Plugin Name' section title, 2: 'Plugin Name' */
+				__( 'We cannot find a plugin name in your readme. Plugin names look like: %1$s. Please change %2$s to reflect the actual name of your plugin.', 'plugin-check' ),
+				"'=== Plugin Name ==='",
+				"'Plugin Name'"
+			);
+
+			$this->add_result_error_for_file( $result, $message, 'invalid_plugin_name', $readme_file );
+		}
 	}
 
 	/**
