@@ -207,31 +207,52 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		);
 
 		$messages = array(
-			'contributor_ignored'         => sprintf(
+			'contributor_ignored'          => sprintf(
 				/* translators: %s: plugin header tag */
 				__( 'One or more contributors listed were ignored. The %s field should only contain WordPress.org usernames. Remember that usernames are case-sensitive.', 'plugin-check' ),
 				"'Contributors'"
 			),
-			'requires_php_header_ignored' => sprintf(
+			'requires_php_header_ignored'  => sprintf(
 				/* translators: 1: plugin header tag; 2: Example version 5.2.4. 3: Example version 7.0. */
 				__( 'The %1$s field was ignored. This field should only contain a PHP version such as %2$s or %3$s.', 'plugin-check' ),
 				"'Requires PHP'",
 				"'5.2.4'",
 				"'7.0'"
 			),
-			'tested_header_ignored'       => sprintf(
+			'tested_header_ignored'        => sprintf(
 				/* translators: 1: plugin header tag; 2: Example version 5.0. 3: Example version 5.1. */
 				__( 'The %1$s field was ignored. This field should only contain a valid WordPress version such as %2$s or %3$s.', 'plugin-check' ),
 				"'Tested up to'",
 				"'" . number_format( $latest_wordpress_version, 1 ) . "'",
 				"'" . number_format( $latest_wordpress_version + 0.1, 1 ) . "'"
 			),
-			'requires_header_ignored'     => sprintf(
+			'requires_header_ignored'      => sprintf(
 				/* translators: 1: plugin header tag; 2: Example version 5.0. 3: Example version 4.9. */
 				__( 'The %1$s field was ignored. This field should only contain a valid WordPress version such as %2$s or %3$s.', 'plugin-check' ),
 				"'Requires at least'",
 				"'" . number_format( $latest_wordpress_version, 1 ) . "'",
 				"'" . number_format( $latest_wordpress_version - 0.1, 1 ) . "'"
+			),
+			'too_many_tags'                => sprintf(
+				/* translators: %d: maximum tags limit */
+				__( 'One or more tags were ignored. Please limit your plugin to %d tags.', 'plugin-check' ),
+				5
+			),
+			'ignored_tags'                 => sprintf(
+				/* translators: %s: list of tags not supported */
+				__( 'One or more tags were ignored. The following tags are not permitted: %s', 'plugin-check' ),
+				"'" . implode( "', '", $parser->ignore_tags ) . "'"
+			),
+			'no_short_description_present' => sprintf(
+				/* translators: %s: section title */
+				__( 'The %s section is missing. An excerpt was generated from your main plugin description.', 'plugin-check' ),
+				"'Short Description'"
+			),
+			'trimmed_short_description'    => sprintf(
+				/* translators: 1: section title; 2 maximum limit */
+				__( 'The %1$s section is too long and was truncated. A maximum of %2$d characters is supported.', 'plugin-check' ),
+				"'Short Description'",
+				150
 			),
 		);
 
@@ -259,7 +280,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param string Stable WordPress version.
+	 * @return string Stable WordPress version.
 	 */
 	private function get_wordpress_stable_version() {
 		$version = get_bloginfo( 'version' );
