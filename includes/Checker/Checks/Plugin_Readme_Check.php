@@ -200,15 +200,39 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 		$warning_keys = array_keys( $warnings );
 
+		$latest_wordpress_version = $this->get_wordpress_stable_version();
+
 		$ignored_warnings = array(
 			'contributor_ignored',
 		);
 
 		$messages = array(
-			'contributor_ignored'         => __( "'Contributors' header is invalid. It should be comma separated list of wordpress.org usernames", 'plugin-check' ),
-			'requires_php_header_ignored' => __( "'Requires PHP' header is invalid. It should be in either x.y or x.y.z format.", 'plugin-check' ),
-			'tested_header_ignored'       => __( "'Tested up to' header is invalid. It should be in either x.y or x.y.z format.", 'plugin-check' ),
-			'requires_header_ignored'     => __( "'Requires at least' header is invalid. It should be in either x.y or x.y.z format.", 'plugin-check' ),
+			'contributor_ignored'         => sprintf(
+				/* translators: %s: plugin header tag */
+				__( 'One or more contributors listed were ignored. The %s field should only contain WordPress.org usernames. Remember that usernames are case-sensitive.', 'plugin-check' ),
+				"'Contributors'"
+			),
+			'requires_php_header_ignored' => sprintf(
+				/* translators: 1: plugin header tag; 2: Example version 5.2.4. 3: Example version 7.0. */
+				__( 'The %1$s field was ignored. This field should only contain a PHP version such as %2$s or %3$s.', 'plugin-check' ),
+				"'Requires PHP'",
+				"'5.2.4'",
+				"'7.0'"
+			),
+			'tested_header_ignored'       => sprintf(
+				/* translators: 1: plugin header tag; 2: Example version 5.0. 3: Example version 5.1. */
+				__( 'The %1$s field was ignored. This field should only contain a valid WordPress version such as %2$s or %3$s.', 'plugin-check' ),
+				"'Tested up to'",
+				"'" . number_format( $latest_wordpress_version, 1 ) . "'",
+				"'" . number_format( $latest_wordpress_version + 0.1, 1 ) . "'"
+			),
+			'requires_header_ignored'     => sprintf(
+				/* translators: 1: plugin header tag; 2: Example version 5.0. 3: Example version 4.9. */
+				__( 'The %1$s field was ignored. This field should only contain a valid WordPress version such as %2$s or %3$s.', 'plugin-check' ),
+				"'Requires at least'",
+				"'" . number_format( $latest_wordpress_version, 1 ) . "'",
+				"'" . number_format( $latest_wordpress_version - 0.1, 1 ) . "'"
+			),
 		);
 
 		/**
@@ -228,5 +252,25 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				$this->add_result_warning_for_file( $result, $messages[ $warning ], 'readme_parser_warnings', $readme_file );
 			}
 		}
+	}
+
+	/**
+	 * Returns current major WordPress version.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param string Stable WordPress version.
+	 */
+	private function get_wordpress_stable_version() {
+		$version = get_bloginfo( 'version' );
+
+		// Strip off any -alpha, -RC, -beta suffixes.
+		list( $version, ) = explode( '-', $version );
+
+		if ( preg_match( '#^\d.\d#', $version, $matches ) ) {
+			$version = $matches[0];
+		}
+
+		return $version;
 	}
 }
