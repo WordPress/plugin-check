@@ -199,13 +199,11 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		$warnings = $parser->warnings ? $parser->warnings : array();
 
 		// This should be ERROR rather than WARNING. So ignoring here to handle separately.
-		if ( isset( $warnings['invalid_plugin_name_header'] ) ) {
-			unset( $warnings['invalid_plugin_name_header'] );
-		}
+		unset( $warnings['invalid_plugin_name_header'] );
 
 		$warning_keys = array_keys( $warnings );
 
-		$latest_wordpress_version = $this->get_wordpress_stable_version();
+		$latest_wordpress_version = (float) $this->get_wordpress_stable_version();
 
 		$ignored_warnings = array(
 			'contributor_ignored',
@@ -228,15 +226,15 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				/* translators: 1: plugin header tag; 2: Example version 5.0. 3: Example version 5.1. */
 				__( 'The %1$s field was ignored. This field should only contain a valid WordPress version such as %2$s or %3$s.', 'plugin-check' ),
 				"'Tested up to'",
-				"'" . number_format( floatval( $latest_wordpress_version ), 1 ) . "'",
-				"'" . number_format( floatval( $latest_wordpress_version ) + 0.1, 1 ) . "'"
+				"'" . number_format( $latest_wordpress_version, 1 ) . "'",
+				"'" . number_format( $latest_wordpress_version + 0.1, 1 ) . "'"
 			),
 			'requires_header_ignored'      => sprintf(
 				/* translators: 1: plugin header tag; 2: Example version 5.0. 3: Example version 4.9. */
 				__( 'The %1$s field was ignored. This field should only contain a valid WordPress version such as %2$s or %3$s.', 'plugin-check' ),
 				"'Requires at least'",
-				"'" . number_format( floatval( $latest_wordpress_version ), 1 ) . "'",
-				"'" . number_format( floatval( $latest_wordpress_version ) - 0.1, 1 ) . "'"
+				"'" . number_format( $latest_wordpress_version, 1 ) . "'",
+				"'" . number_format( $latest_wordpress_version - 0.1, 1 ) . "'"
 			),
 			'too_many_tags'                => sprintf(
 				/* translators: %d: maximum tags limit */
@@ -254,8 +252,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				"'Short Description'"
 			),
 			'trimmed_short_description'    => sprintf(
-				/* translators: 1: section title; 2 maximum limit */
-				__( 'The %1$s section is too long and was truncated. A maximum of %2$d characters is supported.', 'plugin-check' ),
+				/* translators: 1: section title; 2: maximum limit */
+				_n( 'The %1$s section is too long and was truncated. A maximum of %2$d character is supported.', 'The %1$s section is too long and was truncated. A maximum of %2$d characters is supported.', 150, 'plugin-check' ),
 				"'Short Description'",
 				150
 			),
