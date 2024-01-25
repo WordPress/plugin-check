@@ -172,6 +172,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				'no_stable_tag',
 				$readme_file
 			);
+
 			return;
 		}
 
@@ -188,7 +189,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $result->plugin()->basename() );
 
 		if (
-			$stable_tag && ! empty( $plugin_data['Version'] ) &&
+			! empty( $plugin_data['Version'] ) &&
 			$stable_tag !== $plugin_data['Version']
 		) {
 			$this->add_result_error_for_file(
