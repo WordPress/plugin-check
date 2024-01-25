@@ -233,15 +233,60 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertNotEmpty( $warnings );
 		$this->assertArrayHasKey( 'readme.txt', $warnings );
-		$this->assertEquals( 2, $check_result->get_warning_count() );
+		$this->assertEquals( 1, $check_result->get_warning_count() );
 
-		// Check for parser warnings.
+		// Check for parser warning.
 		$this->assertArrayHasKey( 0, $warnings['readme.txt'] );
 		$this->assertArrayHasKey( 0, $warnings['readme.txt'][0] );
 		$this->assertArrayHasKey( 'code', $warnings['readme.txt'][0][0][0] );
 		$this->assertEquals( 'readme_parser_warnings', $warnings['readme.txt'][0][0][0]['code'] );
-		$this->assertArrayHasKey( 'code', $warnings['readme.txt'][0][0][1] );
-		$this->assertEquals( 'readme_parser_warnings', $warnings['readme.txt'][0][0][1]['code'] );
+	}
+
+	public function test_run_with_errors_multiple_parser_warnings() {
+		$readme_check  = new Plugin_Readme_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-multiple-parser-warnings/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$readme_check->run( $check_result );
+
+		$errors   = $check_result->get_errors();
+		$warnings = $check_result->get_warnings();
+
+		$this->assertNotEmpty( $warnings );
+		$this->assertArrayHasKey( 'readme.txt', $warnings );
+		$this->assertEquals( 6, $check_result->get_warning_count() );
+		$this->assertEmpty( $errors );
+		$this->assertEquals( 0, $check_result->get_error_count() );
+
+		// Check for parser warnings.
+		$this->assertArrayHasKey( 0, $warnings['readme.txt'] );
+		$this->assertArrayHasKey( 0, $warnings['readme.txt'][0] );
+
+		for ( $i = 0; $i < 6; ++$i ) {
+			$this->assertArrayHasKey( 'code', $warnings['readme.txt'][0][0][ $i ] );
+			$this->assertEquals( 'readme_parser_warnings', $warnings['readme.txt'][0][0][ $i ]['code'] );
+		}
+	}
+
+	public function test_run_with_errors_multiple_parser_warnings_and_empty_ignored_array() {
+		add_filter( 'wp_plugin_check_ignored_readme_warnings', '__return_empty_array' );
+
+		$readme_check  = new Plugin_Readme_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-multiple-parser-warnings/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$readme_check->run( $check_result );
+
+		$errors   = $check_result->get_errors();
+		$warnings = $check_result->get_warnings();
+
+		$this->assertNotEmpty( $warnings );
+		$this->assertArrayHasKey( 'readme.txt', $warnings );
+		$this->assertEquals( 7, $check_result->get_warning_count() );
+		$this->assertEmpty( $errors );
+		$this->assertEquals( 0, $check_result->get_error_count() );
+
+		remove_filter( 'wp_plugin_check_ignored_readme_warnings', '__return_empty_array' );
 	}
 
 	public function test_filter_readme_warnings_ignored() {
@@ -277,7 +322,6 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$custom_ignores = array(
 			'requires_php_header_ignored',
 			'contributor_ignored',
-			'tested_header_ignored',
 		);
 
 		// Create a mock filter that will return our custom ignores.
