@@ -69,6 +69,26 @@ In any case, passing the checks in this tool likely helps to achieve a smooth pl
 
 == Changelog ==
 
+= [1.0.0] 2024-01-29 =
+
+* Feature - Complete overhaul of the plugin, its architecture, and all checks.
+* Feature - Added new [WP-CLI commands](https://github.com/WordPress/plugin-check/blob/trunk/docs/CLI.md) for running checks and listing available options.
+* Enhancement - Added option to only run checks for a specific category.
+
+= [0.2.3] 2023-12-21 =
+
+* Tweak - Use version [3.8.0 of the PHP_CodeSniffer](https://github.com/PHPCSStandards/PHP_CodeSniffer/releases/tag/3.8.0) library, moving away from `squizlabs/PHP_CodeSniffer` to use `PHPCSStandards/PHP_CodeSniffer`.
+* Fix - Ensure the plugin works as expected on the WP playground environment to enable reviewers to use PCP. Props @tellyworth.
+* Fix - Undefined array key "argv" when running the plugin check in certain environments. Props @afragen. [#340](https://github.com/WordPress/plugin-check/pull/340)
+
+= [0.2.2] 2023-12-13 =
+
+* Enhancement - Include support for Windows Servers.
+* Enhancement - Avoid using PHP CLI directly, which enables plugin developers to use PCP in a variety of new environments.
+* Fix - Remove dependency on `shell_exec` and `exec` functions, which enables plugin developers to use PCP in a variety of new environments.
+* Fix - Prevent problems with Readme parser warning related to `contributor_ignored` for when running the check outside WP.org. Props @dev4press. [#276](https://github.com/10up/plugin-check/pull/276)
+* Fix - Remove extra period on the end of the sentence for Phar warning. Props @pixolin. [#275](https://github.com/10up/plugin-check/pull/275)
+
 = [0.2.1] 2023-09-22 =
 
 * Added - 'View in code editor' link beneath each PHPCS error or warning. Props @EvanHerman, @westonruter, @felixarntz, @mukeshpanchal27 [#262](https://github.com/10up/plugin-check/pull/262)
