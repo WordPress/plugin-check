@@ -196,9 +196,9 @@ final class Admin_Page {
 
 		$category_labels = Check_Categories::get_category_labels();
 
-		// Get user settings for category preferences and set a default value to check all categories by default.
-		$user_enabled_categories = get_user_setting( 'plugin_check_category_preferences', 'all_categories' );
-		$user_enabled_categories = 'all_categories' === $user_enabled_categories ? array_keys( $category_labels ) : explode( '__', $user_enabled_categories );
+		// Get user settings for category preferences and set a default value to check plugin_repo by default.
+		$user_enabled_categories = get_user_setting( 'plugin_check_category_preferences', 'plugin_repo' );
+		$user_enabled_categories = explode( '__', $user_enabled_categories );
 
 		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'templates/admin-page.php';
 	}
