@@ -268,6 +268,51 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		}
 	}
 
+	public function test_run_with_errors_parser_warnings_and_http_disabled() {
+		// Get current stable WordPress version.
+		$version = get_bloginfo( 'version' );
+
+		list( $version, ) = explode( '-', $version );
+
+		if ( preg_match( '#^\d.\d#', $version, $matches ) ) {
+			$version = $matches[0];
+		}
+
+		add_filter(
+			'pre_http_request',
+			static function () {
+				return new WP_Error( 'http_request_blocked', __( 'This request is not allowed', 'plugin-check' ) );
+			}
+		);
+
+		$readme_check  = new Plugin_Readme_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-parser-warnings/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$readme_check->run( $check_result );
+
+		$errors   = $check_result->get_errors();
+		$warnings = $check_result->get_warnings();
+
+		$this->assertEmpty( $errors );
+		$this->assertNotEmpty( $warnings );
+		$this->assertEquals( 0, $check_result->get_error_count() );
+		$this->assertEquals( 1, $check_result->get_warning_count() );
+
+		$this->assertArrayHasKey( 0, $warnings['readme.txt'] );
+		$this->assertArrayHasKey( 0, $warnings['readme.txt'][0] );
+		$this->assertArrayHasKey( 'code', $warnings['readme.txt'][0][0][0] );
+		$this->assertEquals( 'readme_parser_warnings', $warnings['readme.txt'][0][0][0]['code'] );
+		$this->assertStringContainsString( 'The "Tested up to" field was ignored. This field should only contain a valid WordPress version such as "' . $version . '"', $warnings['readme.txt'][0][0][0]['message'] );
+
+		remove_filter(
+			'pre_http_request',
+			static function () {
+				return new WP_Error( 'http_request_blocked', __( 'This request is not allowed', 'plugin-check' ) );
+			}
+		);
+	}
+
 	public function test_run_with_errors_multiple_parser_warnings_and_empty_ignored_array() {
 		add_filter( 'wp_plugin_check_ignored_readme_warnings', '__return_empty_array' );
 
@@ -320,7 +365,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 	public function test_filter_wp_plugin_check_ignored_readme_warnings_will_return_no_error() {
 		// Define custom ignore for testing.
 		$custom_ignores = array(
-			'requires_php_header_ignored',
+			'tested_header_ignored',
 			'contributor_ignored',
 		);
 

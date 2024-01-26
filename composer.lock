@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/afragen/wordpress-plugin-readme-parser.git",
-                "reference": "e402e0c48e5421167b6a44edd8194a182ec33aeb"
+                "reference": "2f4fbe89bb7ffaf905eb28b385b7d1def4a83f54"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/afragen/wordpress-plugin-readme-parser/zipball/e402e0c48e5421167b6a44edd8194a182ec33aeb",
-                "reference": "e402e0c48e5421167b6a44edd8194a182ec33aeb",
+                "url": "https://api.github.com/repos/afragen/wordpress-plugin-readme-parser/zipball/2f4fbe89bb7ffaf905eb28b385b7d1def4a83f54",
+                "reference": "2f4fbe89bb7ffaf905eb28b385b7d1def4a83f54",
                 "shasum": ""
             },
             "require": {
@@ -51,7 +51,7 @@
                 "issues": "https://github.com/afragen/wordpress-plugin-readme-parser/issues",
                 "source": "https://github.com/afragen/wordpress-plugin-readme-parser/tree/master"
             },
-            "time": "2024-01-22T16:19:32+00:00"
+            "time": "2024-01-25T16:41:35+00:00"
         },
         {
             "name": "automattic/vipwpcs",
