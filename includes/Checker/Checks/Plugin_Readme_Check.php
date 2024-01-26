@@ -231,6 +231,9 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	private function check_for_warnings( Check_Result $result, string $readme_file, Parser $parser ) {
 		$warnings = $parser->warnings ? $parser->warnings : array();
 
+		// This should be ERROR rather than WARNING. So ignoring here to handle separately.
+		unset( $warnings['invalid_plugin_name_header'] );
+
 		$warning_keys = array_keys( $warnings );
 
 		$ignored_warnings = array(
