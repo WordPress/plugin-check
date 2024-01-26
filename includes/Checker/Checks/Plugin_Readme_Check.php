@@ -166,8 +166,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				$result,
 				sprintf(
 					/* translators: %s: plugin header tag */
-					__( 'The %s field is missing.', 'plugin-check' ),
-					"'Stable Tag'"
+					__( 'The "%s" field is missing.', 'plugin-check' ),
+					'Stable Tag'
 				),
 				'no_stable_tag',
 				$readme_file
