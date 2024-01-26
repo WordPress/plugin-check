@@ -103,17 +103,17 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		if ( isset( $parser->warnings['invalid_plugin_name_header'] ) ) {
 			$message = sprintf(
 				/* translators: 1: 'Plugin Name' section title, 2: 'Plugin Name' */
-				__( 'Plugin names look like: %1$s. Please change %2$s to reflect the actual name of your plugin.', 'plugin-check' ),
-				"'=== Plugin Name ==='",
-				"'Plugin Name'"
+				__( 'Plugin names look like: "%1$s". Please change "%2$s" to reflect the actual name of your plugin.', 'plugin-check' ),
+				'=== Plugin Name ===',
+				'Plugin Name'
 			);
 
 			$this->add_result_error_for_file( $result, $message, 'invalid_plugin_name', $readme_file );
 		} elseif ( empty( $parser->name ) ) {
 			$message = sprintf(
 				/* translators: %s: Example plugin name header */
-				__( 'We cannot find a plugin name in your readme. Please update your readme with a valid plugin name header. Eg: %s', 'plugin-check' ),
-				"'=== Example Name ==='"
+				__( 'We cannot find a plugin name in your readme. Please update your readme with a valid plugin name header. Eg: "%s"', 'plugin-check' ),
+				'=== Example Name ==='
 			);
 
 			$this->add_result_error_for_file( $result, $message, 'empty_plugin_name', $readme_file );
