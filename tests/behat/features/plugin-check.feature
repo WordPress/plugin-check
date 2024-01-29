@@ -34,6 +34,9 @@ Feature: Test that the WP-CLI command works.
     Then STDOUT should contain:
       """
       line,column,type,code,message
+      """
+    And STDOUT should contain:
+      """
       49,31,ERROR,WordPress.WP.AlternativeFunctions.rand_mt_rand,"mt_rand() is discouraged. Use the far less predictable wp_rand() instead."
       """
 
@@ -41,6 +44,9 @@ Feature: Test that the WP-CLI command works.
     Then STDOUT should contain:
       """
       line,column,code
+      """
+    And STDOUT should contain:
+      """
       49,31,WordPress.WP.AlternativeFunctions.rand_mt_rand
       """
 
