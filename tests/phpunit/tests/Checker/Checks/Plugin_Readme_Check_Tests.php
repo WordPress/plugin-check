@@ -242,6 +242,86 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertEquals( 'readme_parser_warnings', $warnings['readme.txt'][0][0][0]['code'] );
 	}
 
+	public function test_run_with_errors_multiple_parser_warnings() {
+		$readme_check  = new Plugin_Readme_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-multiple-parser-warnings/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$readme_check->run( $check_result );
+
+		$errors   = $check_result->get_errors();
+		$warnings = $check_result->get_warnings();
+
+		$this->assertNotEmpty( $warnings );
+		$this->assertArrayHasKey( 'readme.txt', $warnings );
+		$this->assertEquals( 6, $check_result->get_warning_count() );
+		$this->assertEmpty( $errors );
+		$this->assertEquals( 0, $check_result->get_error_count() );
+
+		// Check for parser warnings.
+		$this->assertArrayHasKey( 0, $warnings['readme.txt'] );
+		$this->assertArrayHasKey( 0, $warnings['readme.txt'][0] );
+
+		for ( $i = 0; $i < 6; ++$i ) {
+			$this->assertArrayHasKey( 'code', $warnings['readme.txt'][0][0][ $i ] );
+			$this->assertEquals( 'readme_parser_warnings', $warnings['readme.txt'][0][0][ $i ]['code'] );
+		}
+	}
+
+	public function test_run_with_errors_parser_warnings_with_custom_set_transient_version() {
+		$version = '5.0';
+
+		set_transient( 'wp_plugin_check_latest_wp_version', $version );
+
+		$readme_check  = new Plugin_Readme_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-parser-warnings/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$readme_check->run( $check_result );
+
+		$errors   = $check_result->get_errors();
+		$warnings = $check_result->get_warnings();
+
+		$this->assertEmpty( $errors );
+		$this->assertNotEmpty( $warnings );
+		$this->assertEquals( 0, $check_result->get_error_count() );
+		$this->assertEquals( 1, $check_result->get_warning_count() );
+
+		$this->assertArrayHasKey( 0, $warnings['readme.txt'] );
+		$this->assertArrayHasKey( 0, $warnings['readme.txt'][0] );
+		$this->assertArrayHasKey( 'code', $warnings['readme.txt'][0][0][0] );
+		$this->assertEquals( 'readme_parser_warnings', $warnings['readme.txt'][0][0][0]['code'] );
+		$this->assertStringContainsString( 'The "Tested up to" field was ignored. This field should only contain a valid WordPress version such as "' . $version . '"', $warnings['readme.txt'][0][0][0]['message'] );
+
+		delete_transient( 'wp_plugin_check_latest_wp_version' );
+	}
+
+	public function test_run_with_errors_multiple_parser_warnings_and_empty_ignored_array() {
+		add_filter( 'wp_plugin_check_ignored_readme_warnings', '__return_empty_array' );
+
+		$readme_check  = new Plugin_Readme_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-multiple-parser-warnings/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$readme_check->run( $check_result );
+
+		$errors   = $check_result->get_errors();
+		$warnings = $check_result->get_warnings();
+
+		$this->assertNotEmpty( $warnings );
+		$this->assertArrayHasKey( 'readme.txt', $warnings );
+
+		/*
+		 * Parser warning `contributor_ignored` is ignored by default. When empty array is returned for
+		 * 'wp_plugin_check_ignored_readme_warnings' then that ignored warning is also added in the list of warnings.
+		 */
+		$this->assertEquals( 7, $check_result->get_warning_count() );
+		$this->assertEmpty( $errors );
+		$this->assertEquals( 0, $check_result->get_error_count() );
+
+		remove_filter( 'wp_plugin_check_ignored_readme_warnings', '__return_empty_array' );
+	}
+
 	public function test_filter_readme_warnings_ignored() {
 		// Define custom ignore for testing.
 		$custom_ignores = array(
@@ -273,7 +353,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 	public function test_filter_wp_plugin_check_ignored_readme_warnings_will_return_no_error() {
 		// Define custom ignore for testing.
 		$custom_ignores = array(
-			'requires_php_header_ignored',
+			'tested_header_ignored',
 			'contributor_ignored',
 		);
 
