@@ -236,8 +236,60 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 		$warning_keys = array_keys( $warnings );
 
+		$latest_wordpress_version = (float) $this->get_wordpress_stable_version();
+
 		$ignored_warnings = array(
 			'contributor_ignored',
+		);
+
+		$messages = array(
+			'contributor_ignored'          => sprintf(
+				/* translators: %s: plugin header tag */
+				__( 'One or more contributors listed were ignored. The "%s" field should only contain WordPress.org usernames. Remember that usernames are case-sensitive.', 'plugin-check' ),
+				'Contributors'
+			),
+			'requires_php_header_ignored'  => sprintf(
+				/* translators: 1: plugin header tag; 2: Example version 5.2.4. 3: Example version 7.0. */
+				__( 'The "%1$s" field was ignored. This field should only contain a PHP version such as "%2$s" or "%3$s".', 'plugin-check' ),
+				'Requires PHP',
+				'5.2.4',
+				'7.0'
+			),
+			'tested_header_ignored'        => sprintf(
+				/* translators: 1: plugin header tag; 2: Example version 5.0. 3: Example version 5.1. */
+				__( 'The "%1$s" field was ignored. This field should only contain a valid WordPress version such as "%2$s" or "%3$s".', 'plugin-check' ),
+				'Tested up to',
+				number_format( $latest_wordpress_version, 1 ),
+				number_format( $latest_wordpress_version + 0.1, 1 )
+			),
+			'requires_header_ignored'      => sprintf(
+				/* translators: 1: plugin header tag; 2: Example version 5.0. 3: Example version 4.9. */
+				__( 'The "%1$s" field was ignored. This field should only contain a valid WordPress version such as "%2$s" or "%3$s".', 'plugin-check' ),
+				'Requires at least',
+				number_format( $latest_wordpress_version, 1 ),
+				number_format( $latest_wordpress_version - 0.1, 1 )
+			),
+			'too_many_tags'                => sprintf(
+				/* translators: %d: maximum tags limit */
+				__( 'One or more tags were ignored. Please limit your plugin to %d tags.', 'plugin-check' ),
+				5
+			),
+			'ignored_tags'                 => sprintf(
+				/* translators: %s: list of tags not supported */
+				__( 'One or more tags were ignored. The following tags are not permitted: %s', 'plugin-check' ),
+				'"' . implode( '", "', $parser->ignore_tags ) . '"'
+			),
+			'no_short_description_present' => sprintf(
+				/* translators: %s: section title */
+				__( 'The "%s" section is missing. An excerpt was generated from your main plugin description.', 'plugin-check' ),
+				'Short Description'
+			),
+			'trimmed_short_description'    => sprintf(
+				/* translators: 1: section title; 2: maximum limit */
+				_n( 'The "%1$s" section is too long and was truncated. A maximum of %2$d character is supported.', 'The "%1$s" section is too long and was truncated. A maximum of %2$d characters is supported.', 150, 'plugin-check' ),
+				'Short Description',
+				150
+			),
 		);
 
 		/**
@@ -253,16 +305,50 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		$warning_keys = array_diff( $warning_keys, $ignored_warnings );
 
 		if ( ! empty( $warning_keys ) ) {
-			$this->add_result_warning_for_file(
-				$result,
-				sprintf(
-					/* translators: list of warnings */
-					esc_html__( 'The following readme parser warnings were detected: %s', 'plugin-check' ),
-					esc_html( implode( ', ', $warning_keys ) )
-				),
-				'readme_parser_warnings',
-				$readme_file
-			);
+			foreach ( $warning_keys as $warning ) {
+				$this->add_result_warning_for_file( $result, $messages[ $warning ], 'readme_parser_warnings', $readme_file );
+			}
 		}
+	}
+
+	/**
+	 * Returns current major WordPress version.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return string Stable WordPress version.
+	 */
+	private function get_wordpress_stable_version() {
+		$version = get_transient( 'wp_plugin_check_latest_wp_version' );
+
+		if ( false === $version ) {
+			$response = wp_remote_get( 'https://api.wordpress.org/core/version-check/1.7/' );
+
+			if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
+				$body = json_decode( wp_remote_retrieve_body( $response ), true );
+
+				if ( isset( $body['offers'] ) && ! empty( $body['offers'] ) ) {
+					$latest_release = reset( $body['offers'] );
+
+					$version = $latest_release['new_bundled'];
+
+					set_transient( 'wp_plugin_check_latest_wp_version', $version, DAY_IN_SECONDS );
+				}
+			}
+		}
+
+		// If $version is still false at this point, use current installed WordPress version.
+		if ( false === $version ) {
+			$version = get_bloginfo( 'version' );
+
+			// Strip off any -alpha, -RC, -beta suffixes.
+			list( $version, ) = explode( '-', $version );
+
+			if ( preg_match( '#^\d.\d#', $version, $matches ) ) {
+				$version = $matches[0];
+			}
+		}
+
+		return $version;
 	}
 }
