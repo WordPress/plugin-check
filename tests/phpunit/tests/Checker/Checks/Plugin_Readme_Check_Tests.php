@@ -268,22 +268,10 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		}
 	}
 
-	public function test_run_with_errors_parser_warnings_and_http_disabled() {
-		// Get current stable WordPress version.
-		$version = get_bloginfo( 'version' );
+	public function test_run_with_errors_parser_warnings_with_custom_set_transient_version() {
+		$version = '5.0';
 
-		list( $version, ) = explode( '-', $version );
-
-		if ( preg_match( '#^\d.\d#', $version, $matches ) ) {
-			$version = $matches[0];
-		}
-
-		add_filter(
-			'pre_http_request',
-			static function () {
-				return new WP_Error( 'http_request_blocked', __( 'This request is not allowed', 'plugin-check' ) );
-			}
-		);
+		set_transient( 'wp_plugin_check_latest_wp_version', $version );
 
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-parser-warnings/load.php' );
@@ -305,12 +293,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertEquals( 'readme_parser_warnings', $warnings['readme.txt'][0][0][0]['code'] );
 		$this->assertStringContainsString( 'The "Tested up to" field was ignored. This field should only contain a valid WordPress version such as "' . $version . '"', $warnings['readme.txt'][0][0][0]['message'] );
 
-		remove_filter(
-			'pre_http_request',
-			static function () {
-				return new WP_Error( 'http_request_blocked', __( 'This request is not allowed', 'plugin-check' ) );
-			}
-		);
+		delete_transient( 'wp_plugin_check_latest_wp_version' );
 	}
 
 	public function test_run_with_errors_multiple_parser_warnings_and_empty_ignored_array() {
