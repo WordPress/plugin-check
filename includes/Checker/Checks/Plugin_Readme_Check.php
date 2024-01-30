@@ -103,7 +103,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		if ( isset( $parser->warnings['invalid_plugin_name_header'] ) ) {
 			$message = sprintf(
 				/* translators: 1: 'Plugin Name' section title, 2: 'Plugin Name' */
-				__( 'Plugin names look like: "%1$s". Please change "%2$s" to reflect the actual name of your plugin.', 'plugin-check' ),
+				__( 'Plugin name look like: "%1$s". Please change "%2$s" to reflect the actual name of your plugin.', 'plugin-check' ),
 				'=== Plugin Name ===',
 				'Plugin Name'
 			);
