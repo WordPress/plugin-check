@@ -7,8 +7,10 @@
 
 namespace WordPress\Plugin_Check\Checker\Checks;
 
+use Exception;
 use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Static_Check;
 use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Traits\Find_Readme;
 use WordPress\Plugin_Check\Traits\Stable_Check;
@@ -19,7 +21,7 @@ use WordPressdotorg\Plugin_Directory\Readme\Parser;
  *
  * @since n.e.x.t
  */
-class Plugin_Header_Requires_Check extends Abstract_File_Check {
+class Plugin_Header_Requires_Check implements Static_Check {
 
 	use Amend_Check_Result;
 	use Find_Readme;
@@ -39,21 +41,22 @@ class Plugin_Header_Requires_Check extends Abstract_File_Check {
 	}
 
 	/**
-	 * Check plugin files.
+	 * Amends the given result by running the check on the associated plugin.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param Check_Result $result The Check Result to amend.
-	 * @param array        $files  Array of plugin files.
+	 * @param Check_Result $result The check result to amend, including the plugin context to check.
+	 *
+	 * @throws Exception Thrown when the check fails with a critical error (unrelated to any errors detected as part of
+	 *                   the check).
 	 */
-	protected function check_files( Check_Result $result, array $files ) {
+	public function run( Check_Result $result ) {
 		if ( ! function_exists( 'get_plugin_data' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
 
-		$plugin_main_file     = WP_PLUGIN_DIR . '/' . $result->plugin()->basename();
-		$plugin_header        = get_plugin_data( $plugin_main_file );
-		$plugin_relative_path = $result->plugin()->path();
+		$plugin_main_file = WP_PLUGIN_DIR . '/' . $result->plugin()->basename();
+		$plugin_header    = get_plugin_data( $plugin_main_file );
 
 		$fields = array(
 			'RequiresWP'  => array(
@@ -66,10 +69,13 @@ class Plugin_Header_Requires_Check extends Abstract_File_Check {
 			),
 		);
 
-		$readme = $this->filter_files_for_readme( $files, $plugin_relative_path );
+		// Look for the readme.
+		$plugin_files = glob( $result->plugin()->location() . '*' );
+		$readme_files = $this->filter_files_for_readme( $plugin_files, $result->plugin()->path() );
+		$readme_file  = reset( $readme_files );
 
 		// Check if single file plugin or missing readme file.
-		if ( $result->plugin()->is_single_file_plugin() || empty( $readme ) ) {
+		if ( $result->plugin()->is_single_file_plugin() || empty( $readme_file ) ) {
 			foreach ( $fields as $field_key => $field ) {
 				if ( empty( $plugin_header[ $field_key ] ) ) {
 					$this->add_result_error_for_file(
@@ -85,8 +91,6 @@ class Plugin_Header_Requires_Check extends Abstract_File_Check {
 				}
 			}
 		} else {
-			$readme_file = reset( $readme );
-
 			$parser = new Parser( $readme_file );
 
 			foreach ( $fields as $field_key => $field ) {
