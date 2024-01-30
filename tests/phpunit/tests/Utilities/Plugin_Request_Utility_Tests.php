@@ -217,6 +217,35 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_filter_ignore_files() {
+		// Define custom files to ignore for testing.
+		$custom_ignore_files = array(
+			'file-1.php',
+			'inc/file-2.php',
+		);
+
+		// Create a mock filter that will return our custom files to ignore.
+		$filter_name = 'wp_plugin_check_ignore_files';
+		add_filter(
+			$filter_name,
+			static function () use ( $custom_ignore_files ) {
+				return $custom_ignore_files;
+			}
+		);
+
+		$result = Plugin_Request_Utility::get_files_to_ignore();
+
+		$this->assertEquals( $custom_ignore_files, $result );
+
+		// Remove the filter to avoid interfering with other tests.
+		remove_filter(
+			$filter_name,
+			static function () use ( $custom_ignore_files ) {
+				return $custom_ignore_files;
+			}
+		);
+	}
+
 	public function test_plugin_without_error_for_ignore_directories() {
 
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-ignore-directories/load.php' );
