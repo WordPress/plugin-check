@@ -100,11 +100,17 @@ Feature: Test that the WP-CLI command works.
     When I run the WP-CLI command `plugin check akismet`
     Then STDOUT should contain:
       """
-      FILE: views/config.php
+      FILE: views/notice.php
       """
 
     When I run the WP-CLI command `plugin check akismet --exclude-directories=views`
     Then STDOUT should not contain:
       """
-      FILE: views/config.php
+      FILE: views/notice.php
+      """
+
+    When I run the WP-CLI command `plugin check akismet --exclude-files=class.akismet-cli.php`
+    Then STDOUT should not contain:
+      """
+      FILE: class.akismet-cli.php
       """
