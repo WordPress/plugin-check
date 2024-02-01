@@ -355,21 +355,28 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		$errors = $results->get_errors();
 
 		$this->assertNotEmpty( $errors );
-		$this->assertArrayHasKey( 'inc/file-2.php', $errors );
-		$this->assertArrayHasKey( 'file-1.php', $errors );
-		$this->assertEquals( 2, $results->get_error_count() );
+		$this->assertArrayHasKey( 'bar.php', $errors );
+		$this->assertArrayHasKey( 'foobar.php', $errors );
+		$this->assertArrayHasKey( 'subdirectory/error.php', $errors );
+		$this->assertEquals( 3, $results->get_error_count() );
 
 		// Check for WordPress.WP.I18n.MissingTranslatorsComment error on Line no 7 and column 10.
-		$this->assertArrayHasKey( 7, $errors['file-1.php'] );
-		$this->assertArrayHasKey( 10, $errors['file-1.php'][7] );
-		$this->assertArrayHasKey( 'code', $errors['file-1.php'][7][10][0] );
-		$this->assertEquals( 'WordPress.WP.I18n.MissingTranslatorsComment', $errors['file-1.php'][7][10][0]['code'] );
+		$this->assertArrayHasKey( 7, $errors['bar.php'] );
+		$this->assertArrayHasKey( 10, $errors['bar.php'][7] );
+		$this->assertArrayHasKey( 'code', $errors['bar.php'][7][10][0] );
+		$this->assertEquals( 'WordPress.WP.I18n.MissingTranslatorsComment', $errors['bar.php'][7][10][0]['code'] );
+
+		// Check for WordPress.WP.I18n.NonSingularStringLiteralText error on Line no 7 and column 13.
+		$this->assertArrayHasKey( 7, $errors['foobar.php'] );
+		$this->assertArrayHasKey( 13, $errors['foobar.php'][7] );
+		$this->assertArrayHasKey( 'code', $errors['foobar.php'][7][13][0] );
+		$this->assertEquals( 'WordPress.WP.I18n.NonSingularStringLiteralText', $errors['foobar.php'][7][13][0]['code'] );
 
 		// Check for WordPress.WP.I18n.NonSingularStringLiteralDomain error on Line no 7 and column 29.
-		$this->assertArrayHasKey( 7, $errors['inc/file-2.php'] );
-		$this->assertArrayHasKey( 29, $errors['inc/file-2.php'][7] );
-		$this->assertArrayHasKey( 'code', $errors['inc/file-2.php'][7][29][0] );
-		$this->assertEquals( 'WordPress.WP.I18n.NonSingularStringLiteralDomain', $errors['inc/file-2.php'][7][29][0]['code'] );
+		$this->assertArrayHasKey( 7, $errors['subdirectory/error.php'] );
+		$this->assertArrayHasKey( 29, $errors['subdirectory/error.php'][7] );
+		$this->assertArrayHasKey( 'code', $errors['subdirectory/error.php'][7][29][0] );
+		$this->assertEquals( 'WordPress.WP.I18n.NonSingularStringLiteralDomain', $errors['subdirectory/error.php'][7][29][0]['code'] );
 	}
 
 	public function test_plugin_for_ignore_files_with_custom_filter() {
@@ -389,8 +396,7 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		);
 
 		$custom_ignore_files = array(
-			'file-1.php',
-			'inc/file-2.php',
+			'bar.php',
 		);
 
 		// Create a mock filter that will return our custom files to ignore.
@@ -409,9 +415,9 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		$errors   = $results->get_errors();
 		$warnings = $results->get_warnings();
 
-		$this->assertEmpty( $errors );
+		$this->assertNotEmpty( $errors );
 		$this->assertEmpty( $warnings );
-		$this->assertEquals( 0, $results->get_error_count() );
+		$this->assertEquals( 2, $results->get_error_count() );
 		$this->assertEquals( 0, $results->get_warning_count() );
 
 		// Remove the filter to avoid interfering with other tests.

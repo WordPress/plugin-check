@@ -177,7 +177,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 
 		// Ignore files.
 		if ( ! empty( $files_to_ignore ) ) {
-			$ignore_patterns[] = implode( ',', $files_to_ignore );
+			$ignore_patterns[] = '/' . implode( ',/', $files_to_ignore );
 		}
 
 		if ( ! empty( $ignore_patterns ) ) {
