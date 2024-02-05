@@ -194,6 +194,21 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	private function check_stable_tag( Check_Result $result, string $readme_file, Parser $parser ) {
 		$stable_tag = $parser->stable_tag;
 
+		if ( empty( $stable_tag ) ) {
+			$this->add_result_error_for_file(
+				$result,
+				sprintf(
+					/* translators: %s: plugin header tag */
+					__( 'The "%s" field is missing.', 'plugin-check' ),
+					'Stable Tag'
+				),
+				'no_stable_tag',
+				$readme_file
+			);
+
+			return;
+		}
+
 		if ( 'trunk' === $stable_tag ) {
 			$this->add_result_error_for_file(
 				$result,
@@ -207,7 +222,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $result->plugin()->basename() );
 
 		if (
-			$stable_tag && ! empty( $plugin_data['Version'] ) &&
+			! empty( $plugin_data['Version'] ) &&
 			$stable_tag !== $plugin_data['Version']
 		) {
 			$this->add_result_error_for_file(
