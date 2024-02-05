@@ -101,7 +101,7 @@ trait File_Editor_URL {
 		if ( ! $edit_url && current_user_can( 'edit_plugins' ) ) {
 			$query_args = array(
 				'plugin' => rawurlencode( $result->plugin()->basename() ),
-				'file'   => rawurlencode( $plugin_slug . '/' . $filename ),
+				'file'   => rawurlencode( str_contains( $result->plugin()->basename(), '/' ) ? $plugin_slug . '/' . $filename : $filename ),
 			);
 			if ( $line ) {
 				$query_args['line'] = $line;
