@@ -103,7 +103,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		if ( isset( $parser->warnings['invalid_plugin_name_header'] ) && false === $parser->name ) {
 			$message = sprintf(
 				/* translators: %s: Example plugin name header */
-				__( 'Plugin name header in your readme is invalid. Please update your readme with a valid plugin name header. Eg: "%s"', 'plugin-check' ),
+				__( 'Plugin name header in your readme is missing or invalid. Please update your readme with a valid plugin name header. Eg: "%s"', 'plugin-check' ),
 				'=== Example Name ==='
 			);
 

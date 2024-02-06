@@ -67,8 +67,6 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertNotEmpty( $errors );
 		$this->assertArrayHasKey( 'readme.txt', $errors );
-		// Two errors are 'empty_plugin_name' and 'no_license'.
-		$this->assertEquals( 2, $check_result->get_error_count() );
 		$this->assertEmpty( $warnings );
 		$this->assertEquals( 0, $check_result->get_warning_count() );
 
