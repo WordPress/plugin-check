@@ -17,7 +17,7 @@ use WordPressdotorg\Plugin_Directory\Readme\Parser;
 /**
  * Check the plugins readme file and contents.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 class Plugin_Readme_Check extends Abstract_File_Check {
 
@@ -30,7 +30,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * Every check must have at least one category.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array The categories for the check.
 	 */
@@ -41,7 +41,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	/**
 	 * Check the readme file.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The Check Result to amend.
 	 * @param array        $files  Array of plugin files.
@@ -93,7 +93,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	/**
 	 * Checks the readme file for plugin name.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result      The Check Result to amend.
 	 * @param string       $readme_file Readme file.
@@ -123,7 +123,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	/**
 	 * Checks the readme file for default text.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result      The Check Result to amend.
 	 * @param string       $readme_file Readme file.
@@ -151,7 +151,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	/**
 	 * Checks the readme file for a valid license.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result      The Check Result to amend.
 	 * @param string       $readme_file Readme file.
@@ -185,7 +185,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	/**
 	 * Checks the readme file stable tag.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result      The Check Result to amend.
 	 * @param string       $readme_file Readme file.
@@ -237,7 +237,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	/**
 	 * Checks the readme file warnings.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result      The Check Result to amend.
 	 * @param string       $readme_file Readme file.
@@ -310,7 +310,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		/**
 		 * Filter the list of ignored readme parser warnings.
 		 *
-		 * @since n.e.x.t
+		 * @since 1.0.0
 		 *
 		 * @param array  $ignored_warnings Array of ignored warning keys.
 		 * @param Parser $parser           The Parser object.
@@ -329,7 +329,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	/**
 	 * Returns current major WordPress version.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return string Stable WordPress version.
 	 */

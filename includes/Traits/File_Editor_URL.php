@@ -12,14 +12,14 @@ use WordPress\Plugin_Check\Checker\Check_Result;
 /**
  * Trait for file editor URL.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 trait File_Editor_URL {
 
 	/**
 	 * Gets the URL for opening the plugin file in an external editor.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result   The check result to amend, including the plugin context to check.
 	 * @param string       $filename Error file name.
@@ -56,7 +56,7 @@ trait File_Editor_URL {
 		 *
 		 * For a template to be considered, the string '{{file}}' must be present in the filtered value.
 		 *
-		 * @since n.e.x.t
+		 * @since 1.0.0
 		 *
 		 * @param string|null $editor_url_template Editor URL template. default null.
 		 */
@@ -75,7 +75,7 @@ trait File_Editor_URL {
 				 *
 				 * This is useful to map the file path from inside of a Docker container or VM to the host machine.
 				 *
-				 * @since n.e.x.t
+				 * @since 1.0.0
 				 *
 				 * @param string|null $editor_url_template Editor URL template.
 				 * @param array       $source              Source information.

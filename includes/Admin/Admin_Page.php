@@ -12,14 +12,14 @@ use WordPress\Plugin_Check\Checker\Check_Categories;
 /**
  * Class is handling admin tools page functionality.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 final class Admin_Page {
 
 	/**
 	 * Admin AJAX class instance.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var Admin_AJAX
 	 */
 	protected $admin_ajax;
@@ -27,7 +27,7 @@ final class Admin_Page {
 	/**
 	 * Admin page hook suffix.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var string
 	 */
 	protected $hook_suffix = '';
@@ -35,7 +35,7 @@ final class Admin_Page {
 	/**
 	 * Constructor.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Admin_AJAX $admin_ajax Instance of Admin_AJAX.
 	 */
@@ -46,7 +46,7 @@ final class Admin_Page {
 	/**
 	 * Registers WordPress hooks for the admin page.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	public function add_hooks() {
 		add_action( 'admin_menu', array( $this, 'add_and_initialize_page' ) );
@@ -59,7 +59,7 @@ final class Admin_Page {
 	/**
 	 * Adds the admin page under the tools menu.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	public function add_page() {
 		$this->hook_suffix = add_management_page(
@@ -74,7 +74,7 @@ final class Admin_Page {
 	/**
 	 * Adds and initializes the admin page under the tools menu.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	public function add_and_initialize_page() {
 		$this->add_page();
@@ -84,7 +84,7 @@ final class Admin_Page {
 	/**
 	 * Initializes page hooks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	public function initialize_page() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -94,7 +94,7 @@ final class Admin_Page {
 	/**
 	 * Loads the check's script.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	public function enqueue_scripts() {
 		wp_enqueue_script(
@@ -127,7 +127,7 @@ final class Admin_Page {
 	/**
 	 * Enqueue a script in the WordPress admin on plugin-editor.php.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string $hook_suffix The current admin page.
 	 */
@@ -162,7 +162,7 @@ final class Admin_Page {
 	/**
 	 * Returns the list of plugins.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array List of available plugins.
 	 */
@@ -185,7 +185,7 @@ final class Admin_Page {
 	/**
 	 * Renders the "Plugin Check" page.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @SuppressWarnings(PHPMD.UnusedLocalVariable)
 	 */
@@ -206,7 +206,7 @@ final class Admin_Page {
 	/**
 	 * Adds "check this plugin" link in the plugins list table.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array  $actions     List of actions.
 	 * @param string $plugin_file Plugin main file.
@@ -237,7 +237,7 @@ final class Admin_Page {
 	/**
 	 * Render the results table templates in the footer.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	public function admin_footer() {
 		ob_start();
@@ -293,7 +293,7 @@ final class Admin_Page {
 	/**
 	 * Gets the hook suffix under which the admin page is added.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return string Hook suffix, or empty string if admin page was not added.
 	 */

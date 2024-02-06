@@ -18,7 +18,7 @@ use WordPressdotorg\Plugin_Directory\Readme\Parser;
 /**
  * Check for trademarks.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 class Trademarks_Check extends Abstract_File_Check {
 
@@ -29,7 +29,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	/**
 	 * Lists of trademark terms that are commonly abused on WordPress.org.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @var string[]
 	 */
@@ -148,7 +148,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	/**
 	 * Lists of trademarks that are allowed as 'for-whatever' ONLY.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @var string[]
 	 */
@@ -159,7 +159,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	/**
 	 * Lists of commonly used 'combo' names (to prevent things like 'woopress').
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @var string[]
 	 */
@@ -175,7 +175,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	/**
 	 * Bitwise flags to control check behavior.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var int
 	 */
 	protected $flags = 0;
@@ -183,7 +183,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	/**
 	 * Constructor.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param int $flags Bitwise flags to control check behavior.
 	 */
@@ -196,7 +196,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	 *
 	 * Every check must have at least one category.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array The categories for the check.
 	 */
@@ -207,7 +207,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	/**
 	 * Check for trademarks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The Check Result to amend.
 	 * @param array        $files  Array of plugin files.
@@ -233,7 +233,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	/**
 	 * Checks the trademarks in readme file plugin name.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The Check Result to amend.
 	 * @param array        $files  Array of plugin files.
@@ -268,7 +268,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	/**
 	 * Checks the readme file for default text.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The Check Result to amend.
 	 */
@@ -297,7 +297,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	/**
 	 * Checks the readme file for default text.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The Check Result to amend.
 	 */
@@ -324,7 +324,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	/**
 	 * Determines if we find a trademarked term in plugin name.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string $plugin_name The plugin name.
 	 *
@@ -371,7 +371,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	/**
 	 * Determines if we find a trademarked term in plugin slug.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string $plugin_slug The plugin slug.
 	 *
@@ -418,7 +418,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	/**
 	 * Whether the plugin uses a trademark in the slug.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string $slug The plugin slug.
 	 * @return string|false The trademark slug if found, false otherwise.
@@ -468,7 +468,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	/**
 	 * Validates whether the trademark is valid with a for-use exception.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string $slug      The plugin slug.
 	 * @param string $trademark The trademark term.

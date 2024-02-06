@@ -20,7 +20,7 @@ abstract class Runtime_Check_UnitTestCase extends WP_UnitTestCase {
 	/**
 	 * Gets the Check_Context for the plugin.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string $plugin_file The absolute path to the plugin main file.
 	 * @return Check_Context The check context for the plugin file.
@@ -32,7 +32,7 @@ abstract class Runtime_Check_UnitTestCase extends WP_UnitTestCase {
 	/**
 	 * Prepares the test environment by running all preparations.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check         $check   The check to prepare the environment for.
 	 * @param Check_Context $context The check context to be checked.
@@ -68,7 +68,7 @@ abstract class Runtime_Check_UnitTestCase extends WP_UnitTestCase {
 	/**
 	 * Prepares the test environment and runs the check returning the results.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check         $check   The Check instance to run.
 	 * @param Check_Context $context The check context for the plugin to be checked.

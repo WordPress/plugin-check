@@ -10,7 +10,7 @@ namespace WordPress\Plugin_Check\Checker;
 /**
  * Interface for runtime checks.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 interface Runtime_Check extends Check {
 

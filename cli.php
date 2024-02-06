@@ -5,7 +5,7 @@
  * This is necessary to setup the environment to perform runtime checks.
  *
  * @package plugin-check
- * @since n.e.x.t
+ * @since 1.0.0
  */
 
 use WordPress\Plugin_Check\Checker\CLI_Runner;
@@ -40,7 +40,7 @@ WP_CLI::add_command( 'plugin', $plugin_command );
 /**
  * Adds hook to set up the object-cache.php drop-in file.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 WP_CLI::add_hook(
 	'before_wp_load',
