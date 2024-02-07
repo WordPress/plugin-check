@@ -12,7 +12,7 @@ use WordPress\Plugin_Check\Checker\Check_Result;
 /**
  * Trait for amending check results.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 trait Amend_Check_Result {
 
@@ -21,7 +21,7 @@ trait Amend_Check_Result {
 	/**
 	 * Amends the given result with a message for the specified file, including error information.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result  The check result to amend, including the plugin context to check.
 	 * @param bool         $error   Whether it is an error or notice.
@@ -48,7 +48,7 @@ trait Amend_Check_Result {
 	/**
 	 * Amends the given result with an error message for the specified file.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result  The check result to amend, including the plugin context to check.
 	 * @param string       $message Error message.
@@ -64,7 +64,7 @@ trait Amend_Check_Result {
 	/**
 	 * Amends the given result with a warning message for the specified file.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result  The check result to amend, including the plugin context to check.
 	 * @param string       $message Error message.

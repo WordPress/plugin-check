@@ -12,7 +12,7 @@ use WordPressdotorg\Plugin_Directory\Readme\Parser;
 /**
  * Class representing the context in which the plugin is running.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 class Plugin_Context {
 
@@ -21,7 +21,7 @@ class Plugin_Context {
 	/**
 	 * Absolute path of the plugin main file.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var string
 	 */
 	protected $main_file;
@@ -29,7 +29,7 @@ class Plugin_Context {
 	/**
 	 * The minimum supported WordPress version of the plugin.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var string
 	 */
 	protected $minimum_supported_wp;
@@ -37,7 +37,7 @@ class Plugin_Context {
 	/**
 	 * Constructor.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string $main_file The absolute path to the plugin main file.
 	 */
@@ -48,7 +48,7 @@ class Plugin_Context {
 	/**
 	 * Returns the plugin basename.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return string Plugin basename.
 	 */
@@ -59,7 +59,7 @@ class Plugin_Context {
 	/**
 	 * Returns the absolute path for a relative path to the plugin directory.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string $relative_path Optional. Relative path. Default '/'.
 	 * @return string Absolute path.
@@ -71,7 +71,7 @@ class Plugin_Context {
 	/**
 	 * Returns the full URL for a path relative to the plugin directory.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string $relative_path Optional. Relative path. Default '/'.
 	 * @return string Full URL.
@@ -83,7 +83,7 @@ class Plugin_Context {
 	/**
 	 * Returns the plugin location.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return string The plugin file if single file plugin. Or the plugin folder.
 	 */
@@ -103,7 +103,7 @@ class Plugin_Context {
 	 *
 	 * This is the case when the single file is directly placed within `wp-content/plugins`.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return bool true if the single file plugin, otherwise false.
 	 */
@@ -114,7 +114,7 @@ class Plugin_Context {
 	/**
 	 * Determine the minimum supported WordPress version of the plugin.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return string The minimum version supported, or empty string if unknown.
 	 */

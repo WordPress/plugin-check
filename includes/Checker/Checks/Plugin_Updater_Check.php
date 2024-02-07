@@ -16,7 +16,7 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
 /**
  * Check to detect plugin updater.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 class Plugin_Updater_Check extends Abstract_File_Check {
 
@@ -32,7 +32,7 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 	/**
 	 * Bitwise flags to control check behavior.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var int
 	 */
 	protected $flags = 0;
@@ -40,7 +40,7 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 	/**
 	 * Constructor.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param int $flags Bitwise flags to control check behavior.
 	 */
@@ -53,7 +53,7 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 	 *
 	 * Every check must have at least one category.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array The categories for the check.
 	 */
@@ -64,7 +64,7 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 	/**
 	 * Amends the given result by running the check on the given list of files.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 * @param array        $files  List of absolute file paths.
@@ -99,7 +99,7 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 	/**
 	 * Looks for UpdateURI in plugin header and amends the given result with an error if found.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 */
@@ -123,7 +123,7 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 	/**
 	 * Looks for plugin updater file and amends the given result with an error if found.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result    The check result to amend, including the plugin context to check.
 	 * @param array        $php_files List of absolute PHP file paths.
@@ -151,7 +151,7 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 	/**
 	 * Looks for plugin updater code in plugin files and amends the given result with an error if found.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result    The check result to amend, including the plugin context to check.
 	 * @param array        $php_files List of absolute PHP file paths.
@@ -188,7 +188,7 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 	/**
 	 * Looks for plugin updater routines in plugin files and amends the given result with an error if found.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result    The check result to amend, including the plugin context to check.
 	 * @param array        $php_files List of absolute PHP file paths.

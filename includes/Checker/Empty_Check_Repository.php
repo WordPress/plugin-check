@@ -12,14 +12,14 @@ use Exception;
 /**
  * Empty Check Repository class.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 class Empty_Check_Repository implements Check_Repository {
 
 	/**
 	 * Array map holding all runtime checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var array
 	 */
 	protected $runtime_checks = array();
@@ -27,7 +27,7 @@ class Empty_Check_Repository implements Check_Repository {
 	/**
 	 * Array map holding all static checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var array
 	 */
 	protected $static_checks = array();
@@ -35,7 +35,7 @@ class Empty_Check_Repository implements Check_Repository {
 	/**
 	 * Registers a check to the repository.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string $slug  The checks slug.
 	 * @param Check  $check The Check instance.
@@ -80,7 +80,7 @@ class Empty_Check_Repository implements Check_Repository {
 	/**
 	 * Returns an array of checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param int $flags The check type flag.
 	 * @return Check_Collection Check collection providing an indexed array of check instances.

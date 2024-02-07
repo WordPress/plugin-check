@@ -17,7 +17,7 @@ use WordPressdotorg\Plugin_Directory\Readme\Parser;
 /**
  * Check the plugins readme file and contents.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 class Plugin_Readme_Check extends Abstract_File_Check {
 
@@ -30,7 +30,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * Every check must have at least one category.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array The categories for the check.
 	 */
@@ -41,7 +41,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	/**
 	 * Check the readme file.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The Check Result to amend.
 	 * @param array        $files  Array of plugin files.
@@ -74,6 +74,9 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 		$parser = new Parser( $readme_file );
 
+		// Check the readme file for plugin name.
+		$this->check_name( $result, $readme_file, $parser );
+
 		// Check the readme file for default text.
 		$this->check_default_text( $result, $readme_file, $parser );
 
@@ -88,9 +91,38 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	}
 
 	/**
+	 * Checks the readme file for plugin name.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param Check_Result $result      The Check Result to amend.
+	 * @param string       $readme_file Readme file.
+	 * @param Parser       $parser      The Parser object.
+	 */
+	private function check_name( Check_Result $result, string $readme_file, Parser $parser ) {
+		if ( isset( $parser->warnings['invalid_plugin_name_header'] ) && false === $parser->name ) {
+			$message = sprintf(
+				/* translators: %s: Example plugin name header */
+				__( 'Plugin name header in your readme is missing or invalid. Please update your readme with a valid plugin name header. Eg: "%s"', 'plugin-check' ),
+				'=== Example Name ==='
+			);
+
+			$this->add_result_error_for_file( $result, $message, 'invalid_plugin_name', $readme_file );
+		} elseif ( empty( $parser->name ) ) {
+			$message = sprintf(
+				/* translators: %s: Example plugin name header */
+				__( 'We cannot find a plugin name in your readme. Please update your readme with a valid plugin name header. Eg: "%s"', 'plugin-check' ),
+				'=== Example Name ==='
+			);
+
+			$this->add_result_error_for_file( $result, $message, 'empty_plugin_name', $readme_file );
+		}
+	}
+
+	/**
 	 * Checks the readme file for default text.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result      The Check Result to amend.
 	 * @param string       $readme_file Readme file.
@@ -118,7 +150,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	/**
 	 * Checks the readme file for a valid license.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result      The Check Result to amend.
 	 * @param string       $readme_file Readme file.
@@ -152,7 +184,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	/**
 	 * Checks the readme file stable tag.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result      The Check Result to amend.
 	 * @param string       $readme_file Readme file.
@@ -160,6 +192,21 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 */
 	private function check_stable_tag( Check_Result $result, string $readme_file, Parser $parser ) {
 		$stable_tag = $parser->stable_tag;
+
+		if ( empty( $stable_tag ) ) {
+			$this->add_result_error_for_file(
+				$result,
+				sprintf(
+					/* translators: %s: plugin header tag */
+					__( 'The "%s" field is missing.', 'plugin-check' ),
+					'Stable Tag'
+				),
+				'no_stable_tag',
+				$readme_file
+			);
+
+			return;
+		}
 
 		if ( 'trunk' === $stable_tag ) {
 			$this->add_result_error_for_file(
@@ -174,7 +221,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $result->plugin()->basename() );
 
 		if (
-			$stable_tag && ! empty( $plugin_data['Version'] ) &&
+			! empty( $plugin_data['Version'] ) &&
 			$stable_tag !== $plugin_data['Version']
 		) {
 			$this->add_result_error_for_file(
@@ -189,7 +236,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	/**
 	 * Checks the readme file warnings.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result      The Check Result to amend.
 	 * @param string       $readme_file Readme file.
@@ -262,7 +309,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		/**
 		 * Filter the list of ignored readme parser warnings.
 		 *
-		 * @since n.e.x.t
+		 * @since 1.0.0
 		 *
 		 * @param array  $ignored_warnings Array of ignored warning keys.
 		 * @param Parser $parser           The Parser object.
@@ -281,7 +328,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	/**
 	 * Returns current major WordPress version.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return string Stable WordPress version.
 	 */

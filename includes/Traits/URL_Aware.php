@@ -10,14 +10,14 @@ namespace WordPress\Plugin_Check\Traits;
 /**
  * URL Aware trait.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 trait URL_Aware {
 
 	/**
 	 * List of relevant global query variables to modify.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var array
 	 */
 	private $query_globals = array(
@@ -39,7 +39,7 @@ trait URL_Aware {
 	/**
 	 * List of relevant WP global variables to modify.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var array
 	 */
 	private $wp_globals = array(
@@ -51,7 +51,7 @@ trait URL_Aware {
 	/**
 	 * Array of original values for the global state.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var array
 	 */
 	private $global_values = array(
@@ -64,7 +64,7 @@ trait URL_Aware {
 	/**
 	 * Backups the original values for any global state that may be modified to be restored later.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	protected function backup_globals() {
 		$this->global_values = array(
@@ -88,7 +88,7 @@ trait URL_Aware {
 	/**
 	 * Restores the original values for any global state that may have been modified.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	protected function restore_globals() {
 		$_GET    = $this->global_values['get'];
@@ -110,7 +110,7 @@ trait URL_Aware {
 	/**
 	 * Sets the global state to as if a given URL has been requested.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string $url URL to simulate request for.
 	 *
@@ -190,7 +190,7 @@ trait URL_Aware {
 	/**
 	 * Simulate all the urls like WP and run the cleanup function.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array    $urls     An array of URLs to run.
 	 * @param callable $callback Callback function to run for each URL.

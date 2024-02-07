@@ -10,7 +10,7 @@ namespace WordPress\Plugin_Check\Checker;
 /**
  * Interface for static checks.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 interface Static_Check extends Check {
 

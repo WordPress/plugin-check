@@ -15,7 +15,7 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
 /**
  * Check for detecting "ALLOW_UNFILTERED_UPLOADS" constant in plugin files.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 class No_Unfiltered_Uploads_Check extends Abstract_File_Check {
 
@@ -27,7 +27,7 @@ class No_Unfiltered_Uploads_Check extends Abstract_File_Check {
 	 *
 	 * Every check must have at least one category.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array The categories for the check.
 	 */
@@ -38,7 +38,7 @@ class No_Unfiltered_Uploads_Check extends Abstract_File_Check {
 	/**
 	 * Check the "ALLOW_UNFILTERED_UPLOADS" constant in file.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The Check Result to amend.
 	 * @param array        $files  Array of plugin files.

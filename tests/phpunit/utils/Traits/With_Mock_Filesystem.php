@@ -11,7 +11,7 @@ trait With_Mock_Filesystem {
 	/**
 	 * Sets up a Mock Filesystem.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	protected function set_up_mock_filesystem() {
 		global $wp_filesystem;
@@ -38,7 +38,7 @@ trait With_Mock_Filesystem {
 	/**
 	 * Sets up a failing Mock Filesystem.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	protected function set_up_failing_mock_filesystem() {
 		global $wp_filesystem;
