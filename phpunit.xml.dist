@@ -9,7 +9,7 @@
 	<coverage processUncoveredFiles="false">
 		<include>
 			<directory suffix=".php">includes/</directory>
-			<file>plugin-check.php</file>
+			<file>plugin.php</file>
 		</include>
 	</coverage>
 	<testsuites>
@@ -25,7 +25,7 @@
 	<filter>
 		<whitelist processUncoveredFilesFromWhitelist="false">
 			<directory suffix=".php">includes/</directory>
-			<file>plugin-check.php</file>
+			<file>plugin.php</file>
 		</whitelist>
 	</filter>
 </phpunit>
