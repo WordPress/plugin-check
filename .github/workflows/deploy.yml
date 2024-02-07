@@ -25,8 +25,8 @@ jobs:
         with:
           generate-zip: true
         env:
-          #SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
-          #SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
 
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
