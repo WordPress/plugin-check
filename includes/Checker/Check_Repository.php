@@ -10,14 +10,14 @@ namespace WordPress\Plugin_Check\Checker;
 /**
  * Check Repository interface.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 interface Check_Repository {
 
 	/**
 	 * Bitwise flag for static type checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var int
 	 */
 	const TYPE_STATIC = 1;
@@ -25,7 +25,7 @@ interface Check_Repository {
 	/**
 	 * Bitwise flag for runtime type checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var int
 	 */
 	const TYPE_RUNTIME = 2;
@@ -35,7 +35,7 @@ interface Check_Repository {
 	 *
 	 * This is the same as `TYPE_STATIC | TYPE_RUNTIME`.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var int
 	 */
 	const TYPE_ALL = 3;
@@ -43,7 +43,7 @@ interface Check_Repository {
 	/**
 	 * Bitwise flag for experimental checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var int
 	 */
 	const INCLUDE_EXPERIMENTAL = 4;
@@ -51,7 +51,7 @@ interface Check_Repository {
 	/**
 	 * Registers a check to the repository.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string $slug  The checks slug.
 	 * @param Check  $check The Check instance.
@@ -61,7 +61,7 @@ interface Check_Repository {
 	/**
 	 * Returns an array of checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param int $flags The check type flag.
 	 * @return Check_Collection Check collection providing an indexed array of check instances.

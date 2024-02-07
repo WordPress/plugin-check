@@ -10,7 +10,7 @@ namespace WordPress\Plugin_Check\Checker;
 /**
  * Check Categories class.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 class Check_Categories {
 
@@ -24,7 +24,7 @@ class Check_Categories {
 	/**
 	 * Returns an array of available categories.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array An array of available categories.
 	 */
@@ -41,7 +41,7 @@ class Check_Categories {
 	/**
 	 * Returns an array of category labels.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array An array of category labels.
 	 */
@@ -58,7 +58,7 @@ class Check_Categories {
 	/**
 	 * Returns an array of checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Collection $collection Check collection.
 	 * @param array            $categories An array of categories to filter by.

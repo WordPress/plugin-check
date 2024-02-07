@@ -10,14 +10,14 @@ namespace WordPress\Plugin_Check\Traits;
 /**
  * Trait for find readme.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 trait Find_Readme {
 
 	/**
 	 * Filter the given array of files for readme files (readme.txt or readme.md).
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array  $files                Array of file files to be filtered.
 	 * @param string $plugin_relative_path Plugin relative path.

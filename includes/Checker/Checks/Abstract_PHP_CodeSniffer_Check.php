@@ -17,7 +17,7 @@ use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 /**
  * Check for running one or more PHP CodeSniffer sniffs.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 
@@ -26,7 +26,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	/**
 	 * List of allowed PHPCS arguments.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var array
 	 */
 	protected $allowed_args = array(
@@ -39,7 +39,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	/**
 	 * Returns an associative array of arguments to pass to PHPCS.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array {
 	 *    An associative array of PHPCS CLI arguments. Can include one or more of the following options.
@@ -55,7 +55,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	/**
 	 * Amends the given result by running the check on the associated plugin.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 *
@@ -131,7 +131,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	/**
 	 * Parse the command arguments.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array $argv     An array of arguments to pass.
 	 * @param array $defaults An array of default arguments.
@@ -152,7 +152,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	/**
 	 * Gets the default command arguments.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 * @return array An indexed array of PHPCS CLI arguments.
@@ -185,7 +185,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	 * Resets \PHP_CodeSniffer\Config::$overriddenDefaults to prevent
 	 * incorrect results when running multiple checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	private function reset_php_codesniffer_config() {
 		if ( class_exists( '\PHP_CodeSniffer\Config' ) ) {

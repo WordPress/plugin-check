@@ -26,7 +26,7 @@ final class Plugin_Check_Command {
 	/**
 	 * Plugin context.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var Plugin_Context
 	 */
 	protected $plugin_context;
@@ -34,7 +34,7 @@ final class Plugin_Check_Command {
 	/**
 	 * Output format type.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var string[]
 	 */
 	protected $output_formats = array(
@@ -46,7 +46,7 @@ final class Plugin_Check_Command {
 	/**
 	 * Constructor.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Plugin_Context $plugin_context Plugin context.
 	 */
@@ -106,7 +106,7 @@ final class Plugin_Check_Command {
 	 *
 	 * @subcommand check
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array $args       List of the positional arguments.
 	 * @param array $assoc_args List of the associative arguments.
@@ -266,7 +266,7 @@ final class Plugin_Check_Command {
 	 *
 	 * @subcommand list-checks
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array $args       List of the positional arguments.
 	 * @param array $assoc_args List of the associative arguments.
@@ -352,7 +352,7 @@ final class Plugin_Check_Command {
 	 *
 	 * @subcommand list-check-categories
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array $args       List of the positional arguments.
 	 * @param array $assoc_args List of the associative arguments.
@@ -382,7 +382,7 @@ final class Plugin_Check_Command {
 	/**
 	 * Returns check categories details.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array List of the check categories.
 	 */
@@ -405,7 +405,7 @@ final class Plugin_Check_Command {
 	/**
 	 * Validates the associative arguments.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array $assoc_args List of the associative arguments.
 	 * @param array $defaults   List of the default arguments.
@@ -432,7 +432,7 @@ final class Plugin_Check_Command {
 	/**
 	 * Gets the formatter instance to format check results.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array $assoc_args     Associative arguments.
 	 * @param array $default_fields Default fields.
@@ -452,7 +452,7 @@ final class Plugin_Check_Command {
 	/**
 	 * Returns check default fields.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array $assoc_args Associative arguments.
 	 * @return array Default fields.
@@ -482,7 +482,7 @@ final class Plugin_Check_Command {
 	/**
 	 * Flattens and combines the given associative array of file errors and file warnings into a two-dimensional array.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array $file_errors   Errors from a Check_Result, for a specific file.
 	 * @param array $file_warnings Warnings from a Check_Result, for a specific file.
@@ -550,7 +550,7 @@ final class Plugin_Check_Command {
 	/**
 	 * Displays the results.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param WP_CLI\Formatter $formatter    Formatter class.
 	 * @param string           $file_name    File name.
@@ -573,7 +573,7 @@ final class Plugin_Check_Command {
 	/**
 	 * Checks for a Runtime_Check in a list of checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array $checks An array of Check instances.
 	 * @return bool True if a Runtime_Check exists in the array, false if not.
