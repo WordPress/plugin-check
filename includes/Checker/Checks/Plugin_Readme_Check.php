@@ -145,8 +145,10 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 			),
 		);
 
+		$parser_warnings = $parser->warnings ?? array();
+
 		foreach ( $fields as $field_key => $field ) {
-			if ( empty( $parser->{$field_key} ) && ! in_array( $field['ignore_key'], $ignored_warnings, true ) ) {
+			if ( empty( $parser->{$field_key} ) && ! in_array( $field['ignore_key'], $ignored_warnings, true ) && ! isset( $parser_warnings[ $field['ignore_key'] ] ) ) {
 				$this->add_result_warning_for_file(
 					$result,
 					sprintf(
