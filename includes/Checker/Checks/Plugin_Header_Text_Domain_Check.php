@@ -48,6 +48,10 @@ class Plugin_Header_Text_Domain_Check implements Static_Check {
 	 *                   the check).
 	 */
 	public function run( Check_Result $result ) {
+		// Check if single file plugin, then bail early.
+		if ( $result->plugin()->is_single_file_plugin() ) {
+			return;
+		}
 
 		if ( ! function_exists( 'get_plugin_data' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
