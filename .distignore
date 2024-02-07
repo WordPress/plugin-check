@@ -7,11 +7,12 @@ build-cs
 build-phpunit
 docs
 node_modules
+patches
 test-content
 tests
 
-*.DS_store
-.DS_store
+*.DS_Store
+.DS_Store
 .distignore
 .editorconfig
 .eslintrc.js
