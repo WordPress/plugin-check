@@ -9,10 +9,32 @@ Feature: Test that the WP-CLI command works.
       Plugin with slug foo-bar is not installed.
       """
 
-  Scenario: Check Hello Dolly
+  Scenario: Check custom single file plugin
     Given a WP install with the Plugin Check plugin
+    And a wp-content/plugins/foo-single.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Single
+       * Plugin URI: https://example.com
+       * Description: Custom plugin.
+       * Version: 0.1.0
+       * Author: WordPress Performance Team
+       * Author URI: https://make.wordpress.org/performance/
+       * License: GPL-2.0+
+       * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+       */
 
-    When I run the WP-CLI command `plugin check hello.php`
+      add_action(
+        'init',
+        function () {
+          $number = mt_rand( 10, 100 );
+          echo $number;
+        }
+      );
+      """
+
+    When I run the WP-CLI command `plugin check foo-single.php`
     Then STDOUT should contain:
       """
       mt_rand() is discouraged.
@@ -30,33 +52,33 @@ Feature: Test that the WP-CLI command works.
       All output should be run through an escaping function
       """
 
-    When I run the WP-CLI command `plugin check hello.php --format=csv`
+    When I run the WP-CLI command `plugin check foo-single.php --format=csv`
     Then STDOUT should contain:
       """
       line,column,type,code,message
-      49,31,ERROR,WordPress.WP.AlternativeFunctions.rand_mt_rand,"mt_rand() is discouraged. Use the far less predictable wp_rand() instead."
+      16,15,ERROR,WordPress.WP.AlternativeFunctions.rand_mt_rand,"mt_rand() is discouraged. Use the far less predictable wp_rand() instead."
       """
 
-    When I run the WP-CLI command `plugin check hello.php --format=csv --fields=line,column,code`
+    When I run the WP-CLI command `plugin check foo-single.php --format=csv --fields=line,column,code`
     Then STDOUT should contain:
       """
       line,column,code
-      49,31,WordPress.WP.AlternativeFunctions.rand_mt_rand
+      16,15,WordPress.WP.AlternativeFunctions.rand_mt_rand
       """
 
-    When I run the WP-CLI command `plugin check hello.php --format=json`
+    When I run the WP-CLI command `plugin check foo-single.php --format=json`
     Then STDOUT should contain:
       """
-      {"line":49,"column":31,"type":"ERROR","code":"WordPress.WP.AlternativeFunctions.rand_mt_rand","message":"mt_rand() is discouraged. Use the far less predictable wp_rand() instead."}
+      {"line":16,"column":15,"type":"ERROR","code":"WordPress.WP.AlternativeFunctions.rand_mt_rand","message":"mt_rand() is discouraged. Use the far less predictable wp_rand() instead."}
       """
 
-    When I run the WP-CLI command `plugin check hello.php --ignore-errors`
+    When I run the WP-CLI command `plugin check foo-single.php --ignore-errors`
     Then STDOUT should be empty
 
-    When I run the WP-CLI command `plugin check hello.php --ignore-warnings`
+    When I run the WP-CLI command `plugin check foo-single.php --ignore-warnings`
     Then STDOUT should not be empty
 
-    When I run the WP-CLI command `plugin check hello.php --checks=plugin_review_phpcs`
+    When I run the WP-CLI command `plugin check foo-single.php --checks=plugin_review_phpcs`
     Then STDOUT should contain:
       """
       WordPress.WP.AlternativeFunctions.rand_mt_rand
@@ -66,7 +88,7 @@ Feature: Test that the WP-CLI command works.
       WordPress.Security.EscapeOutput.OutputNotEscaped
       """
 
-    When I run the WP-CLI command `plugin check hello.php --exclude-checks=late_escaping`
+    When I run the WP-CLI command `plugin check foo-single.php --exclude-checks=late_escaping`
     Then STDOUT should not contain:
       """
       WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -75,7 +97,7 @@ Feature: Test that the WP-CLI command works.
       """
       WordPress.WP.AlternativeFunctions.rand_mt_rand
       """
-    When I run the WP-CLI command `plugin check hello.php --categories=security`
+    When I run the WP-CLI command `plugin check foo-single.php --categories=security`
     Then STDOUT should contain:
       """
       WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -84,7 +106,7 @@ Feature: Test that the WP-CLI command works.
       """
       WordPress.WP.AlternativeFunctions.rand_mt_rand
       """
-    When I run the WP-CLI command `plugin check hello.php --checks=plugin_review_phpcs,late_escaping --exclude-checks=late_escaping`
+    When I run the WP-CLI command `plugin check foo-single.php --checks=plugin_review_phpcs,late_escaping --exclude-checks=late_escaping`
     Then STDOUT should contain:
       """
       WordPress.WP.AlternativeFunctions.rand_mt_rand
