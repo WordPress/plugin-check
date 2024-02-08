@@ -165,7 +165,7 @@ class Plugin_Request_Utility {
 	/**
 	 * Gets the files to ignore using the filter.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	public static function get_files_to_ignore() {
 		$default_ignore_files = array();
@@ -173,7 +173,7 @@ class Plugin_Request_Utility {
 		/**
 		 * Filters the files to ignore.
 		 *
-		 * @since n.e.x.t
+		 * @since 1.0.0
 		 *
 		 * @param array $default_ignore_files An array of files to ignore.
 		 */
