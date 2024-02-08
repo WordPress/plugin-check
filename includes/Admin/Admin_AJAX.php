@@ -17,14 +17,14 @@ use WP_Error;
 /**
  * Class to handle the Admin AJAX requests.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 final class Admin_AJAX {
 
 	/**
 	 * Nonce key.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var string
 	 */
 	const NONCE_KEY = 'plugin-check-run-checks';
@@ -32,7 +32,7 @@ final class Admin_AJAX {
 	/**
 	 * Clean up Runtime Environment action name.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var string
 	 */
 	const ACTION_CLEAN_UP_ENVIRONMENT = 'plugin_check_clean_up_environment';
@@ -40,7 +40,7 @@ final class Admin_AJAX {
 	/**
 	 * Set up Runtime Environment action name.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var string
 	 */
 	const ACTION_SET_UP_ENVIRONMENT = 'plugin_check_set_up_environment';
@@ -48,7 +48,7 @@ final class Admin_AJAX {
 	/**
 	 * Get Checks to run action name.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var string
 	 */
 	const ACTION_GET_CHECKS_TO_RUN = 'plugin_check_get_checks_to_run';
@@ -56,7 +56,7 @@ final class Admin_AJAX {
 	/**
 	 * Run Checks action name.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var string
 	 */
 	const ACTION_RUN_CHECKS = 'plugin_check_run_checks';
@@ -64,7 +64,7 @@ final class Admin_AJAX {
 	/**
 	 * Registers WordPress hooks for the Admin AJAX.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	public function add_hooks() {
 		add_action( 'wp_ajax_' . self::ACTION_CLEAN_UP_ENVIRONMENT, array( $this, 'clean_up_environment' ) );
@@ -76,7 +76,7 @@ final class Admin_AJAX {
 	/**
 	 * Creates and returns the nonce.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	public function get_nonce() {
 		return wp_create_nonce( self::NONCE_KEY );
@@ -85,7 +85,7 @@ final class Admin_AJAX {
 	/**
 	 * Handles the AJAX request to setup the runtime environment if needed.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	public function set_up_environment() {
 		// Verify the nonce before continuing.
@@ -144,7 +144,7 @@ final class Admin_AJAX {
 	/**
 	 * Handles the AJAX request to cleanup the runtime environment.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	public function clean_up_environment() {
 		global $wpdb, $table_prefix;
@@ -181,7 +181,7 @@ final class Admin_AJAX {
 	/**
 	 * Handles the AJAX request that returns the checks to run.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	public function get_checks_to_run() {
 		// Verify the nonce before continuing.
@@ -235,7 +235,7 @@ final class Admin_AJAX {
 	/**
 	 * Run checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	public function run_checks() {
 		// Verify the nonce before continuing.
@@ -286,7 +286,7 @@ final class Admin_AJAX {
 	/**
 	 * Verify the request.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string $nonce The request nonce passed.
 	 * @return bool|WP_Error True if the nonce is valid. WP_Error if invalid.
@@ -306,7 +306,7 @@ final class Admin_AJAX {
 	/**
 	 * Check for a Runtime_Check in a list of checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array $checks An array of Check instances.
 	 * @return bool True if a Runtime_Check exists in the array, false if not.

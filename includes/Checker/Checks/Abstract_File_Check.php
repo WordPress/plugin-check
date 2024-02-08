@@ -18,14 +18,14 @@ use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 /**
  * Base class for a check that inspects the plugin's files and contents.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 abstract class Abstract_File_Check implements Static_Check {
 
 	/**
 	 * Internal cache for plugin-specific file lists.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var array
 	 */
 	private static $file_list_cache = array();
@@ -33,7 +33,7 @@ abstract class Abstract_File_Check implements Static_Check {
 	/**
 	 * Internal cache for file contents.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var array
 	 */
 	private static $file_contents_cache = array();
@@ -41,7 +41,7 @@ abstract class Abstract_File_Check implements Static_Check {
 	/**
 	 * Amends the given result by running the check on the associated plugin.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 *
@@ -56,7 +56,7 @@ abstract class Abstract_File_Check implements Static_Check {
 	/**
 	 * Amends the given result by running the check on the given list of files.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 * @param array        $files  List of absolute file paths.
@@ -69,7 +69,7 @@ abstract class Abstract_File_Check implements Static_Check {
 	/**
 	 * Filters a given list of files to only contain those with specific extension.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array  $files     List of absolute file paths.
 	 * @param string $extension File extension to match.
@@ -82,7 +82,7 @@ abstract class Abstract_File_Check implements Static_Check {
 	/**
 	 * Filters a given list of files to only contain those with specific extensions.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array $files      List of absolute file paths.
 	 * @param array $extensions List of file extensions to match.
@@ -105,7 +105,7 @@ abstract class Abstract_File_Check implements Static_Check {
 	/**
 	 * Filters a given list of files to only contain those where the file name matches the given regular expression.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array  $files List of absolute file paths.
 	 * @param string $regex Regular expression for file paths to match.
@@ -121,7 +121,7 @@ abstract class Abstract_File_Check implements Static_Check {
 	 * This is a wrapper around the native `preg_match()` function that will match the first occurrence within the
 	 * list of files.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string $pattern The pattern to search for.
 	 * @param array  $files   List of absolute file paths.
@@ -147,7 +147,7 @@ abstract class Abstract_File_Check implements Static_Check {
 	 * This is a wrapper around the native `str_contains()` function that will find the needle within the list of
 	 * files.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array  $files  List of absolute file paths.
 	 * @param string $needle The substring to search for.
@@ -168,7 +168,7 @@ abstract class Abstract_File_Check implements Static_Check {
 	 *
 	 * This is effectively a caching wrapper around the native `file_get_contents()` function.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string $file The file name.
 	 * @return string The file contents.
@@ -187,7 +187,7 @@ abstract class Abstract_File_Check implements Static_Check {
 	/**
 	 * Gets the list of all files that are part of the given plugin.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Context $plugin Context for the plugin to check.
 	 * @return array List of absolute file paths.

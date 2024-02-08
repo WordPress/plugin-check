@@ -15,14 +15,14 @@ use IteratorAggregate;
 /**
  * Check Collection interface.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 interface Check_Collection extends ArrayAccess, Countable, IteratorAggregate {
 
 	/**
 	 * Returns the raw indexed array representation of this collection.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array The indexed array of check objects.
 	 */
@@ -31,7 +31,7 @@ interface Check_Collection extends ArrayAccess, Countable, IteratorAggregate {
 	/**
 	 * Returns the raw map of check slugs and their check objects as a representation of this collection.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array Map of `$check_slug => $check_obj` pairs.
 	 */
@@ -40,7 +40,7 @@ interface Check_Collection extends ArrayAccess, Countable, IteratorAggregate {
 	/**
 	 * Returns a new check collection containing the subset of checks based on the given check filter function.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @phpstan-param callable(Check,string): bool $filter_fn
 	 *
@@ -55,7 +55,7 @@ interface Check_Collection extends ArrayAccess, Countable, IteratorAggregate {
 	 *
 	 * If the given list is empty, the same collection will be returned without any change.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array $check_slugs List of slugs to limit to only those. If empty, the same collection is returned.
 	 * @return Check_Collection New check collection, effectively a subset of this one.
@@ -67,7 +67,7 @@ interface Check_Collection extends ArrayAccess, Countable, IteratorAggregate {
 	 *
 	 * If the given list is empty, the same collection will be returned without any change.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array $check_slugs List of slugs to exclude. If empty, the same collection is returned.
 	 * @return Check_Collection New check collection, effectively a subset of this one.
@@ -77,7 +77,7 @@ interface Check_Collection extends ArrayAccess, Countable, IteratorAggregate {
 	/**
 	 * Throws an exception if any of the given check slugs are not present, or returns the same collection otherwise.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array $check_slugs List of slugs to limit to only those. If empty, the same collection is returned.
 	 * @return Check_Collection The unchanged check collection.

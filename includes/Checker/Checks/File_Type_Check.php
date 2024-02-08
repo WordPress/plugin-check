@@ -16,7 +16,7 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
 /**
  * Check to detect disallowed file types.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 class File_Type_Check extends Abstract_File_Check {
 
@@ -33,7 +33,7 @@ class File_Type_Check extends Abstract_File_Check {
 	/**
 	 * Bitwise flags to control check behavior.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var int
 	 */
 	protected $flags = 0;
@@ -41,7 +41,7 @@ class File_Type_Check extends Abstract_File_Check {
 	/**
 	 * Constructor.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param int $flags Bitwise flags to control check behavior.
 	 */
@@ -54,7 +54,7 @@ class File_Type_Check extends Abstract_File_Check {
 	 *
 	 * Every check must have at least one category.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array The categories for the check.
 	 */
@@ -65,7 +65,7 @@ class File_Type_Check extends Abstract_File_Check {
 	/**
 	 * Amends the given result by running the check on the given list of files.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 * @param array        $files  List of absolute file paths.
@@ -94,7 +94,7 @@ class File_Type_Check extends Abstract_File_Check {
 	/**
 	 * Looks for compressed files and amends the given result with an error if found.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 * @param array        $files  List of absolute file paths.
@@ -116,7 +116,7 @@ class File_Type_Check extends Abstract_File_Check {
 	/**
 	 * Looks for PHAR files and amends the given result with an error if found.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 * @param array        $files  List of absolute file paths.
@@ -138,7 +138,7 @@ class File_Type_Check extends Abstract_File_Check {
 	/**
 	 * Looks for VCS directories and amends the given result with an error if found.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 * @param array        $files  List of absolute file paths.
@@ -178,7 +178,7 @@ class File_Type_Check extends Abstract_File_Check {
 	/**
 	 * Looks for hidden files and amends the given result with an error if found.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 * @param array        $files  List of absolute file paths.
@@ -201,7 +201,7 @@ class File_Type_Check extends Abstract_File_Check {
 	/**
 	 * Looks for application files and amends the given result with an error if found.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 * @param array        $files  List of absolute file paths.

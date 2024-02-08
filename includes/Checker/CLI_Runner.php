@@ -12,14 +12,14 @@ use Exception;
 /**
  * CLI Runner class.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 class CLI_Runner extends Abstract_Check_Runner {
 
 	/**
 	 * An instance of the Checks class.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var Checks
 	 */
 	protected $checks;
@@ -27,7 +27,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 	/**
 	 * Checks if the current request is a CLI request for the Plugin Checker.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return bool Returns true if is an CLI request for the plugin check else false.
 	 */
@@ -50,7 +50,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 	/**
 	 * Returns the plugin parameter based on the request.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return string The plugin parameter.
 	 *
@@ -83,7 +83,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 	/**
 	 * Returns an array of Check slugs to run based on the request.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array An array of Check slugs to run.
 	 */
@@ -103,7 +103,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 	/**
 	 * Returns an array of Check slugs to exclude based on the request.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array An array of Check slugs to run.
 	 */
@@ -123,7 +123,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 	/**
 	 * Returns the include experimental parameter based on the request.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return bool Returns true to include experimental checks else false.
 	 */
@@ -138,7 +138,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 	/**
 	 * Returns an array of categories for filtering the checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array An array of categories.
 	 */

@@ -15,14 +15,14 @@ use WordPress\Plugin_Check\Checker\CLI_Runner;
 /**
  * Class providing utility methods to return plugin information based on the request.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 class Plugin_Request_Utility {
 
 	/**
 	 * Instance of the current runner based on the request.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var Abstract_Check_Runner|null
 	 */
 	protected static $runner;
@@ -30,7 +30,7 @@ class Plugin_Request_Utility {
 	/**
 	 * The universal runtime preparation cleanups if applied.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var callable|null
 	 */
 	protected static $cleanup;
@@ -38,7 +38,7 @@ class Plugin_Request_Utility {
 	/**
 	 * Returns the plugin basename based on the input provided.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string $plugin_slug The plugin slug or basename.
 	 * @return string The plugin basename.
@@ -85,7 +85,7 @@ class Plugin_Request_Utility {
 	/**
 	 * Initializes the runner classes.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	public static function initialize_runner() {
 		$runners = array(
@@ -111,7 +111,7 @@ class Plugin_Request_Utility {
 	/**
 	 * Get the Runner class for the current request.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return Abstract_Check_Runner|null The Runner class for the request or null.
 	 */
@@ -126,7 +126,7 @@ class Plugin_Request_Utility {
 	/**
 	 * Runs the cleanup functions and destroys the runner.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	public static function destroy_runner() {
 		// Run the cleanup functions.
@@ -140,7 +140,7 @@ class Plugin_Request_Utility {
 	/**
 	 * Gets the directories to ignore using the filter.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	public static function get_directories_to_ignore() {
 		// By default, ignore the '.git', 'vendor' and 'node_modules' directories.
@@ -153,7 +153,7 @@ class Plugin_Request_Utility {
 		/**
 		 * Filters the directories to ignore.
 		 *
-		 * @since n.e.x.t
+		 * @since 1.0.0
 		 *
 		 * @param array $default_ignore_directories An array of directories to ignore.
 		 */

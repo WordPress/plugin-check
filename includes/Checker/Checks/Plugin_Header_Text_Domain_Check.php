@@ -17,7 +17,7 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
 /**
  * Check for plugin header text domain.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 class Plugin_Header_Text_Domain_Check implements Static_Check {
 
@@ -29,7 +29,7 @@ class Plugin_Header_Text_Domain_Check implements Static_Check {
 	 *
 	 * Every check must have at least one category.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array The categories for the check.
 	 */
@@ -40,7 +40,7 @@ class Plugin_Header_Text_Domain_Check implements Static_Check {
 	/**
 	 * Amends the given result by running the check on the associated plugin.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 *
@@ -48,6 +48,10 @@ class Plugin_Header_Text_Domain_Check implements Static_Check {
 	 *                   the check).
 	 */
 	public function run( Check_Result $result ) {
+		// Check if single file plugin, then bail early.
+		if ( $result->plugin()->is_single_file_plugin() ) {
+			return;
+		}
 
 		if ( ! function_exists( 'get_plugin_data' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
