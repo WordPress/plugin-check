@@ -320,7 +320,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	/**
 	 * Checks the readme file upgrade notice.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result      The Check Result to amend.
 	 * @param string       $readme_file Readme file.
@@ -339,11 +339,11 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		foreach ( $notices as $version => $notice ) {
 			if ( strlen( $notice ) > $maximum_characters ) {
 				if ( empty( $version ) ) {
-					/* translators: Maximum characters. */
-					$message = sprintf( __( 'The upgrade notice exceeds the limit of %d characters.', 'plugin-check' ), $maximum_characters );
+					/* translators: %s: maximum limit. */
+					$message = sprintf( _n( 'The upgrade notice exceeds the limit of %d character.', 'The upgrade notice exceeds the limit of %d characters.', $maximum_characters, 'plugin-check' ), $maximum_characters );
 				} else {
-					/* translators: 1: Version, 2: Maximum characters. */
-					$message = sprintf( __( 'The upgrade notice for \'%1$s\' exceeds the limit of %2$d characters.', 'plugin-check' ), $version, $maximum_characters );
+					/* translators: 1: version, 2: maximum limit. */
+					$message = sprintf( _n( 'The upgrade notice for "%1$s" exceeds the limit of %2$d character.', 'The upgrade notice for "%1$s" exceeds the limit of %2$d characters.', $maximum_characters, 'plugin-check' ), $version, $maximum_characters );
 				}
 
 				$this->add_result_warning_for_file( $result, $message, 'upgrade_notice_limit', $readme_file );
