@@ -10,13 +10,13 @@ namespace WordPress\Plugin_Check\Traits;
 /**
  * Trait for stable checks.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 trait Stable_Check {
 	/**
 	 * Returns the checks stability.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return string One of the check stability constant values.
 	 */

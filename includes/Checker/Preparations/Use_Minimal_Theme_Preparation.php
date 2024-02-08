@@ -15,14 +15,14 @@ use WordPress\Plugin_Check\Checker\Preparation;
  *
  * This ensures the plugin is checked as much in isolation as possible.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 class Use_Minimal_Theme_Preparation implements Preparation {
 
 	/**
 	 * Theme slug / directory name.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var string
 	 */
 	protected $theme_slug;
@@ -30,7 +30,7 @@ class Use_Minimal_Theme_Preparation implements Preparation {
 	/**
 	 * Absolute path to themes root directory.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var string
 	 */
 	protected $themes_dir;
@@ -38,7 +38,7 @@ class Use_Minimal_Theme_Preparation implements Preparation {
 	/**
 	 * Sets the theme slug and themes root directory.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string $theme_slug Slug of the theme to enforce.
 	 * @param string $themes_dir Optional. Absolute path to themes root directory, if not the regular wp-content/themes.
@@ -51,7 +51,7 @@ class Use_Minimal_Theme_Preparation implements Preparation {
 	/**
 	 * Runs this preparation step for the environment and returns a cleanup function.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @global array $wp_theme_directories
 	 *
@@ -110,7 +110,7 @@ class Use_Minimal_Theme_Preparation implements Preparation {
 	 *
 	 * Used as a filter callback.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return string The theme slug.
 	 */
@@ -123,7 +123,7 @@ class Use_Minimal_Theme_Preparation implements Preparation {
 	 *
 	 * Used as a filter callback.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return string The theme name.
 	 *
@@ -144,7 +144,7 @@ class Use_Minimal_Theme_Preparation implements Preparation {
 	 *
 	 * Used as a filter callback.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return string The theme root.
 	 */

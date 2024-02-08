@@ -15,14 +15,14 @@ use WordPress\Plugin_Check\Checker\Runtime_Check;
 /**
  * Abstract Runtime Check class.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 abstract class Abstract_Runtime_Check implements Runtime_Check, Preparation {
 
 	/**
 	 * Runs preparation step for the environment and returns a closure as a cleanup function.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return callable Cleanup function to revert the changes made here.
 	 *
@@ -33,7 +33,7 @@ abstract class Abstract_Runtime_Check implements Runtime_Check, Preparation {
 	/**
 	 * Amends the given result by running the check on the associated plugin.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 *

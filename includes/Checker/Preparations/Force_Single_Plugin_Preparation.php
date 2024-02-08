@@ -15,14 +15,14 @@ use WordPress\Plugin_Check\Checker\Preparation;
  *
  * This ensures the plugin is checked as much in isolation as possible.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 class Force_Single_Plugin_Preparation implements Preparation {
 
 	/**
 	 * Plugin slug.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var string
 	 */
 	protected $plugin_basename;
@@ -30,7 +30,7 @@ class Force_Single_Plugin_Preparation implements Preparation {
 	/**
 	 * Sets the plugin slug.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string $plugin_basename Slug of the plugin, E.g. "akismet\akismet.php".
 	 */
@@ -41,7 +41,7 @@ class Force_Single_Plugin_Preparation implements Preparation {
 	/**
 	 * Runs this preparation step for the environment and returns a cleanup function.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return callable Cleanup function to revert any changes made here.
 	 *
@@ -76,7 +76,7 @@ class Force_Single_Plugin_Preparation implements Preparation {
 	/**
 	 * Filter active plugins.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array $active_plugins List of active plugins.
 	 * @return array List of active plugins.

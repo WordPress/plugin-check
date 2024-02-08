@@ -13,14 +13,14 @@ use WordPress\Plugin_Check\Admin\Admin_Page;
 /**
  * Main class for the plugin.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 class Plugin_Main {
 
 	/**
 	 * Context instance for the plugin.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var Plugin_Context
 	 */
 	protected $context;
@@ -28,7 +28,7 @@ class Plugin_Main {
 	/**
 	 * Constructor. Set the plugin main file.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string $main_file Absolute path of the plugin main file.
 	 */
@@ -39,7 +39,7 @@ class Plugin_Main {
 	/**
 	 * Returns the Plugin Context.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return Plugin_Context
 	 */
@@ -50,7 +50,7 @@ class Plugin_Main {
 	/**
 	 * Registers WordPress hooks for the plugin.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	public function add_hooks() {
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {

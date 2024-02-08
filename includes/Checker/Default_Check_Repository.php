@@ -10,14 +10,14 @@ namespace WordPress\Plugin_Check\Checker;
 /**
  * Default Check Repository class.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 class Default_Check_Repository extends Empty_Check_Repository {
 
 	/**
 	 * Initializes checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	public function __construct() {
 		$this->register_default_checks();
@@ -26,13 +26,13 @@ class Default_Check_Repository extends Empty_Check_Repository {
 	/**
 	 * Registers Checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	private function register_default_checks() {
 		/**
 		 * Filters the available plugin check classes.
 		 *
-		 * @since n.e.x.t
+		 * @since 1.0.0
 		 *
 		 * @param array $checks An array map of check slugs to Check instances.
 		 */
