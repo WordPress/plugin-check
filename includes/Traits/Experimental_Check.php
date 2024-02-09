@@ -10,13 +10,13 @@ namespace WordPress\Plugin_Check\Traits;
 /**
  * Trait for experimental checks.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 trait Experimental_Check {
 	/**
 	 * Returns the checks stability.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return string One of the check stability constant values.
 	 */

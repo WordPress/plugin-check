@@ -10,14 +10,14 @@ namespace WordPress\Plugin_Check\Checker;
 /**
  * Result for running checks on a plugin.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 final class Check_Result {
 
 	/**
 	 * Context for the plugin to check.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var Check_Context
 	 */
 	protected $check_context;
@@ -25,7 +25,7 @@ final class Check_Result {
 	/**
 	 * List of errors.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var array
 	 */
 	protected $errors = array();
@@ -33,7 +33,7 @@ final class Check_Result {
 	/**
 	 * List of warnings.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var array
 	 */
 	protected $warnings = array();
@@ -41,7 +41,7 @@ final class Check_Result {
 	/**
 	 * Number of errors.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var int
 	 */
 	protected $error_count = 0;
@@ -49,7 +49,7 @@ final class Check_Result {
 	/**
 	 * Number of warnings.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var int
 	 */
 	protected $warning_count = 0;
@@ -57,7 +57,7 @@ final class Check_Result {
 	/**
 	 * Sets the context for the plugin to check.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Context $check_context Check context instance for the plugin.
 	 */
@@ -68,7 +68,7 @@ final class Check_Result {
 	/**
 	 * Returns the context for the plugin to check.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return Check_Context Plugin context instance.
 	 */
@@ -79,7 +79,7 @@ final class Check_Result {
 	/**
 	 * Adds an error or warning to the respective stack.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param bool   $error   Whether it is an error message.
 	 * @param string $message The message.
@@ -145,7 +145,7 @@ final class Check_Result {
 	/**
 	 * Returns all errors.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array All errors with their data.
 	 */
@@ -156,7 +156,7 @@ final class Check_Result {
 	/**
 	 * Returns all warnings.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array All warnings with their data.
 	 */
@@ -167,7 +167,7 @@ final class Check_Result {
 	/**
 	 * Returns the number of errors.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return int Number of errors found.
 	 */
@@ -178,7 +178,7 @@ final class Check_Result {
 	/**
 	 * Returns the number of warnings.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return int Number of warnings found.
 	 */

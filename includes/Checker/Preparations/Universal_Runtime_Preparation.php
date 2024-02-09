@@ -14,14 +14,14 @@ use WordPress\Plugin_Check\Checker\Preparation;
 /**
  * Class handle all preparations required for when at least one `Runtime_Check` is being run.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 class Universal_Runtime_Preparation implements Preparation {
 
 	/**
 	 * Context for the plugin to check.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var Check_Context
 	 */
 	protected $check_context;
@@ -29,7 +29,7 @@ class Universal_Runtime_Preparation implements Preparation {
 	/**
 	 * Sets the context for the plugin to check.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Context $check_context Check context instance for the plugin.
 	 */
@@ -44,7 +44,7 @@ class Universal_Runtime_Preparation implements Preparation {
 	 * This preparation needs to be called very early in the WordPress lifecycle, before
 	 * plugins are loaded, e.g. from a drop-in like `object-cache.php`.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return callable Cleanup function to revert changes made by theme and plugin preparation classes.
 	 *

@@ -10,14 +10,14 @@ namespace WordPress\Plugin_Check\Checker;
 /**
  * Class to setup the Runtime Environment for Runtime checks.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 final class Runtime_Environment_Setup {
 
 	/**
 	 * Sets up the WordPress environment for runtime checks
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	public function set_up() {
 		global $wpdb, $table_prefix, $wp_filesystem;
@@ -79,7 +79,7 @@ final class Runtime_Environment_Setup {
 	/**
 	 * Cleans up the runtime environment setup.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	public function clean_up() {
 		global $wpdb, $table_prefix, $wp_filesystem;
@@ -120,7 +120,7 @@ final class Runtime_Environment_Setup {
 	/**
 	 * Checks if the WordPress Environment can be set up for runtime checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return bool Returns true if the runtime environment can be set up, false if not.
 	 */
