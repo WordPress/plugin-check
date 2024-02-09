@@ -5,7 +5,7 @@
  * Description: Some plugin description.
  * Requires at least: 6.0
  * Requires PHP: 5.6
- * Version: n.e.x.t
+ * Version: 1.0.0
  * Author: WordPress Performance Team
  * Author URI: https://make.wordpress.org/performance/
  * License: GPLv2 or later

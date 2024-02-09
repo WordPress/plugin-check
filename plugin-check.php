@@ -5,7 +5,7 @@
  * Description: Plugin Check is a WordPress.org tool which provides checks to help plugins meet the directory requirements and follow various best practices.
  * Requires at least: 6.3
  * Requires PHP: 7.0
- * Version: n.e.x.t
+ * Version: 1.0.0
  * Author: WordPress Performance Team
  * Author URI: https://make.wordpress.org/performance/
  * License: GPLv2 or later
@@ -17,7 +17,7 @@
 
 use WordPress\Plugin_Check\Plugin_Main;
 
-define( 'WP_PLUGIN_CHECK_VERSION', 'n.e.x.t' );
+define( 'WP_PLUGIN_CHECK_VERSION', '1.0.0' );
 define( 'WP_PLUGIN_CHECK_MINIMUM_PHP', '7.0' );
 define( 'WP_PLUGIN_CHECK_MAIN_FILE', __FILE__ );
 define( 'WP_PLUGIN_CHECK_PLUGIN_DIR_PATH', plugin_dir_path( WP_PLUGIN_CHECK_MAIN_FILE ) );
@@ -26,7 +26,7 @@ define( 'WP_PLUGIN_CHECK_PLUGIN_DIR_URL', plugin_dir_url( WP_PLUGIN_CHECK_MAIN_F
 /**
  * Checks basic requirements and loads the plugin.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 function wp_plugin_check_load() {
 	// Check for supported PHP version.
@@ -52,7 +52,7 @@ function wp_plugin_check_load() {
 /**
  * Displays admin notice about unmet PHP version requirement.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 function wp_plugin_check_display_php_version_notice() {
 	echo '<div class="notice notice-error"><p>';
@@ -68,7 +68,7 @@ function wp_plugin_check_display_php_version_notice() {
 /**
  * Displays admin notice about missing Composer autoload files.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 function wp_plugin_check_display_composer_autoload_notice() {
 	echo '<div class="notice notice-error"><p>';

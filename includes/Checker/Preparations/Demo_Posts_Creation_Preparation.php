@@ -13,14 +13,14 @@ use WordPress\Plugin_Check\Checker\Preparation;
 /**
  * Class to create demo posts to be used by Checks.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 class Demo_Posts_Creation_Preparation implements Preparation {
 
 	/**
 	 * An array of posts data to create.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var array
 	 */
 	protected $posts;
@@ -28,7 +28,7 @@ class Demo_Posts_Creation_Preparation implements Preparation {
 	/**
 	 * Constructor.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array $posts An array of posts to create in the database.
 	 */
@@ -39,7 +39,7 @@ class Demo_Posts_Creation_Preparation implements Preparation {
 	/**
 	 * Creates the demo posts in the database to be us
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return callable Cleanup function to revert changes made by theme and plugin preparation classes.
 	 *

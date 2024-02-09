@@ -19,7 +19,7 @@
  * be using, and it is implemented in a way that there is no risk for breakage.
  *
  * @package plugin-check
- * @since n.e.x.t
+ * @since 1.0.0
  */
 
 // Set constant to be able to later check for whether this file was loaded.
