@@ -1,4 +1,4 @@
-=== Plugin Check ===
+=== Plugin Check (PCP) ===
 
 Contributors:      wordpressdotorg
 Requires at least: 6.3
