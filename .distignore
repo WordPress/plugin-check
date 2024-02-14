@@ -8,7 +8,6 @@ build-phpunit
 docs
 node_modules
 patches
-test-content
 tests
 
 *.DS_Store
