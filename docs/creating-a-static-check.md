@@ -53,7 +53,7 @@ class My_Custom_Check extends Abstract_PHP_CodeSniffer_Check {
    *
    * Every check must have at least one category.
    *
-   * @since n.e.x.t
+   * @since 1.0.0
    *
    * @return array The categories for the check.
    */
@@ -88,7 +88,7 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
 /**
  * Check for detecting incorrect casing of the term "WordPress" (specifically "Wordpress") using string search in files.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 class My_Custom_Check extends Abstract_File_Check {
 
@@ -99,7 +99,7 @@ class My_Custom_Check extends Abstract_File_Check {
    *
    * Every check must have at least one category.
    *
-   * @since n.e.x.t
+   * @since 1.0.0
    *
    * @return array The categories for the check.
    */
@@ -110,7 +110,7 @@ class My_Custom_Check extends Abstract_File_Check {
   /**
    * Check the "Wordpress" in files.
    *
-   * @since n.e.x.t
+   * @since 1.0.0
    *
    * @param Check_Result $result The Check Result to amend.
    * @param array        $files  Array of plugin files.
@@ -160,7 +160,7 @@ Below is an example demonstrating how to access the plugin context and add messa
 /**
  * Runs the check on the plugin and amends results.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  *
  * @param Check_Result $result The check results to amend and the plugin context.
  */
@@ -189,7 +189,7 @@ public function run( Check_Result $result ) {
 
 To include the check as part of the Plugin Checker process, it must be added to the Plugin Checker's list of available checks.
 
-- If you're contributing to the Plugin Checker, add the check to the list in the `Abstract_Check_Runner::register_checks()` method.
+- If you're contributing to the Plugin Checker, add the check to the list in the `Default_Check_Repository::register_default_checks()` method.
 - If you're implementing a check in code outside of the Plugin Checker, use the `wp_plugin_check_checks` filter, as seen in the example below.
 
 ```php

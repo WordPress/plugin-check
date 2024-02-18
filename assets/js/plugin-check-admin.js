@@ -89,7 +89,7 @@
 	/**
 	 * Reset the results container.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	function resetResults() {
 		// Empty the results container.
@@ -99,7 +99,7 @@
 	/**
 	 * Resets the form controls once checks have completed or failed.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	function resetForm() {
 		spinner.classList.remove( 'is-active' );
@@ -122,7 +122,7 @@
 	/**
 	 * Setup the runtime environment if needed.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param {Object} data Data object with props passed to form data.
 	 */
@@ -162,7 +162,7 @@
 	/**
 	 * Cleanup the runtime environment.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return {Object} The response data.
 	 */
@@ -195,7 +195,7 @@
 	/**
 	 * Get the Checks to run.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	function getChecksToRun() {
 		const pluginCheckData = new FormData();
@@ -239,7 +239,7 @@
 	/**
 	 * Run Checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param {Object} data The response data.
 	 */
@@ -268,7 +268,7 @@
 	/**
 	 * Renders result message.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param {boolean} isSuccessMessage Whether the message is a success message.
 	 */
@@ -278,19 +278,17 @@
 			? pluginCheck.successMessage
 			: pluginCheck.errorMessage;
 
-		resultsContainer.innerHTML += renderTemplate(
-			'plugin-check-results-complete',
-			{
+		resultsContainer.innerHTML =
+			renderTemplate( 'plugin-check-results-complete', {
 				type: messageType,
 				message: messageText,
-			}
-		);
+			} ) + resultsContainer.innerHTML;
 	}
 
 	/**
 	 * Run a single check.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param {string} plugin The plugin to check.
 	 * @param {string} check  The check to run.
@@ -325,7 +323,7 @@
 	/**
 	 * Handles any errors in the data returned from the response.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param {Object} data The response data.
 	 * @return {Object} The response data.
@@ -351,7 +349,7 @@
 	/**
 	 * Renders results for each check on the page.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param {Object} results The results object.
 	 */
@@ -376,7 +374,7 @@
 	/**
 	 * Renders the file results table.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param {string} file     The file name for the results.
 	 * @param {Object} errors   The file errors.
@@ -408,7 +406,7 @@
 	/**
 	 * Checks if there are any links in the results object.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param {Object} results The results object.
 	 * @return {boolean} True if there are links, false otherwise.
@@ -429,7 +427,7 @@
 	/**
 	 * Renders a result row onto the file table.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param {string}  type     The result type. Either ERROR or WARNING.
 	 * @param {Object}  results  The results object.
@@ -465,7 +463,7 @@
 	/**
 	 * Renders the template with data.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param {string} templateSlug The template slug
 	 * @param {Object} data         Template data.

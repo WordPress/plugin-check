@@ -12,14 +12,14 @@ use Exception;
 /**
  * Class to run checks on a plugin.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 final class Checks {
 
 	/**
 	 * Array of all available Checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var array
 	 */
 	protected $checks;
@@ -27,7 +27,7 @@ final class Checks {
 	/**
 	 * Runs checks against the plugin.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Context $context The check context for the plugin to be checked.
 	 * @param array         $checks  An array of Check objects to run.
@@ -52,7 +52,7 @@ final class Checks {
 	/**
 	 * Runs a given check with the given result object to amend.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check        $check  The check to run.
 	 * @param Check_Result $result The result object to amend.

@@ -12,14 +12,14 @@ use Exception;
 /**
  * CLI Runner class.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 class CLI_Runner extends Abstract_Check_Runner {
 
 	/**
 	 * An instance of the Checks class.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var Checks
 	 */
 	protected $checks;
@@ -27,7 +27,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 	/**
 	 * Checks if the current request is a CLI request for the Plugin Checker.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return bool Returns true if is an CLI request for the plugin check else false.
 	 */
@@ -50,15 +50,26 @@ class CLI_Runner extends Abstract_Check_Runner {
 	/**
 	 * Returns the plugin parameter based on the request.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return string The plugin parameter.
 	 *
 	 * @throws Exception Thrown if the plugin parameter is empty.
 	 */
 	protected function get_plugin_param() {
-		// Get the plugin parameter from the command line arguments.
-		$plugin = isset( $_SERVER['argv'][3] ) ? $_SERVER['argv'][3] : '';
+		// Exclude first three reserved elements.
+		$params = array_slice( $_SERVER['argv'], 3 );
+
+		// Remove associative arguments.
+		$params = array_filter(
+			$params,
+			static function ( $val ) {
+				return ! str_starts_with( $val, '--' );
+			}
+		);
+
+		// Use only first element. We don't support checking multiple plugins at once yet!
+		$plugin = count( $params ) > 0 ? reset( $params ) : '';
 
 		if ( empty( $plugin ) ) {
 			throw new Exception(
@@ -72,7 +83,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 	/**
 	 * Returns an array of Check slugs to run based on the request.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array An array of Check slugs to run.
 	 */
@@ -92,7 +103,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 	/**
 	 * Returns an array of Check slugs to exclude based on the request.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array An array of Check slugs to run.
 	 */
@@ -112,7 +123,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 	/**
 	 * Returns the include experimental parameter based on the request.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return bool Returns true to include experimental checks else false.
 	 */
@@ -127,7 +138,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 	/**
 	 * Returns an array of categories for filtering the checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array An array of categories.
 	 */

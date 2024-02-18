@@ -116,7 +116,7 @@ class AJAX_Runner_Tests extends WP_UnitTestCase {
 
 		$this->assertIsCallable( $cleanup );
 
-		// Assert the Universal_Runtume_Preparation was not run.
+		// Assert the Universal_Runtime_Preparation was not run.
 		$this->assertFalse( has_filter( 'option_active_plugins' ) );
 		$this->assertFalse( has_filter( 'default_option_active_plugins' ) );
 		$this->assertFalse( has_filter( 'stylesheet' ) );

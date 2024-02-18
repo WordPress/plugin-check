@@ -12,7 +12,7 @@ use WordPress\Plugin_Check\Plugin_Context;
 /**
  * Class representing the context of a plugin to check.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 final class Check_Context extends Plugin_Context {
 

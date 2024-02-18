@@ -10,14 +10,14 @@ namespace WordPress\Plugin_Check\Traits;
 /**
  * Trait for find readme.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 trait Find_Readme {
 
 	/**
 	 * Filter the given array of files for readme files (readme.txt or readme.md).
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array  $files                Array of file files to be filtered.
 	 * @param string $plugin_relative_path Plugin relative path.
@@ -25,7 +25,7 @@ trait Find_Readme {
 	 */
 	protected function filter_files_for_readme( array $files, $plugin_relative_path ) {
 		// Find the readme file.
-		$readme_list = self::filter_files_by_regex( $files, '/readme\.(txt|md)$/i' );
+		$readme_list = preg_grep( '/readme\.(txt|md)$/i', $files );
 
 		// Filter the readme files located at root.
 		$potential_readme_files = array_filter(

@@ -1,10 +1,10 @@
-=== Plugin Check ===
+=== Plugin Check (PCP) ===
 
 Contributors:      wordpressdotorg
 Requires at least: 6.3
 Tested up to:      6.4
 Requires PHP:      7.0
-Stable tag:        n.e.x.t
+Stable tag:        1.0.1
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 Tags:              plugin best practices, testing, accessibility, performance, security
@@ -69,7 +69,33 @@ In any case, passing the checks in this tool likely helps to achieve a smooth pl
 
 == Changelog ==
 
-= [0.2.1] 2023-09-22 =
+= 1.0.1 =
+
+* Fix - Add missing `test-content` folder needed for runtime checks.
+* Fix - Do not send emails when setting up test environment.
+* Fix - Prevent PHP warning when the `argv` variable isn't set.
+
+= 1.0.0 =
+
+* Feature - Complete overhaul of the plugin, its architecture, and all checks.
+* Feature - Added new [WP-CLI commands](https://github.com/WordPress/plugin-check/blob/trunk/docs/CLI.md) for running checks and listing available options.
+* Enhancement - Added option to only run checks for a specific category.
+
+= 0.2.3 =
+
+* Tweak - Use version [3.8.0 of the PHP_CodeSniffer](https://github.com/PHPCSStandards/PHP_CodeSniffer/releases/tag/3.8.0) library, moving away from `squizlabs/PHP_CodeSniffer` to use `PHPCSStandards/PHP_CodeSniffer`.
+* Fix - Ensure the plugin works as expected on the WP playground environment to enable reviewers to use PCP. Props @tellyworth.
+* Fix - Undefined array key "argv" when running the plugin check in certain environments. Props @afragen. [#340](https://github.com/WordPress/plugin-check/pull/340)
+
+= 0.2.2 =
+
+* Enhancement - Include support for Windows Servers.
+* Enhancement - Avoid using PHP CLI directly, which enables plugin developers to use PCP in a variety of new environments.
+* Fix - Remove dependency on `shell_exec` and `exec` functions, which enables plugin developers to use PCP in a variety of new environments.
+* Fix - Prevent problems with Readme parser warning related to `contributor_ignored` for when running the check outside WP.org. Props @dev4press. [#276](https://github.com/10up/plugin-check/pull/276)
+* Fix - Remove extra period on the end of the sentence for Phar warning. Props @pixolin. [#275](https://github.com/10up/plugin-check/pull/275)
+
+= 0.2.1 =
 
 * Added - 'View in code editor' link beneath each PHPCS error or warning. Props @EvanHerman, @westonruter, @felixarntz, @mukeshpanchal27 [#262](https://github.com/10up/plugin-check/pull/262)
 * Fix - Ensure `readme.txt` has priority over `readme.md` when both are present. Props @bordoni, @afragen [#258](https://github.com/10up/plugin-check/pull/258)
@@ -79,7 +105,7 @@ In any case, passing the checks in this tool likely helps to achieve a smooth pl
 * Fix - Ensure that we have PHP 7.2 compatibility remove trailing comma. Props @bordoni, @leoloso. [#265](https://github.com/10up/plugin-check/issues/265)
 * Fix - Include all strings that were missed in the previous release. Props @bordoni, @pixolin. [#270](https://github.com/10up/plugin-check/issues/270)
 
-= [0.2.0] 2023-09-18 =
+= 0.2.0 =
 
 * Feature - Enable modification of the PHP Binary path used by the plugin with `PLUGIN_CHECK_PHP_BIN` constant.
 * Feature - Include a check for the usage of `ALLOW_UNFILTERED_UPLOADS` on any PHP files - Props EvanHerman at [#45](https://github.com/WordPress/plugin-check/pull/45)

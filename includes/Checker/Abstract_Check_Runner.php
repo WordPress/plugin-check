@@ -14,7 +14,7 @@ use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 /**
  * Abstract Check Runner class.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -23,7 +23,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * True if the class was initialized early in the WordPress load process.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var bool
 	 */
 	protected $initialized_early;
@@ -31,7 +31,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * The check slugs to run.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var array
 	 */
 	protected $check_slugs;
@@ -39,7 +39,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * The check slugs to exclude.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var array
 	 */
 	protected $check_exclude_slugs;
@@ -47,7 +47,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * The plugin parameter.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var string
 	 */
 	protected $plugin;
@@ -55,7 +55,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * An instance of the Checks class.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var Checks
 	 */
 	protected $checks;
@@ -63,7 +63,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * The plugin basename to check.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var string
 	 */
 	protected $plugin_basename;
@@ -71,7 +71,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * An instance of the Check_Repository.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var Check_Repository
 	 */
 	private $check_repository;
@@ -79,7 +79,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * Runtime environment.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var Runtime_Environment_Setup
 	 */
 	protected $runtime_environment;
@@ -87,7 +87,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * Whether to include experimental checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var bool
 	 */
 	protected $include_experimental;
@@ -95,7 +95,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * Checks category for the filter.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var array
 	 */
 	protected $check_categories;
@@ -103,7 +103,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * Returns the plugin parameter based on the request.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return string The plugin parameter from the request.
 	 */
@@ -112,7 +112,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * Returns an array of Check slugs to run based on the request.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array An array of Check slugs.
 	 */
@@ -121,7 +121,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * Returns an array of Check slugs to exclude based on the request.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array An array of Check slugs.
 	 */
@@ -130,7 +130,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * Returns the include experimental parameter based on the request.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return bool Returns true to include experimental checks else false.
 	 */
@@ -139,7 +139,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * Returns an array of categories for filtering the checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array An array of categories.
 	 */
@@ -148,18 +148,18 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * Sets whether the runner class was initialized early.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	final public function __construct() {
-		$this->initialized_early = ! did_action( 'muplugins_loaded' );
-		$this->register_checks();
+		$this->initialized_early   = ! did_action( 'muplugins_loaded' );
+		$this->check_repository    = new Default_Check_Repository();
 		$this->runtime_environment = new Runtime_Environment_Setup();
 	}
 
 	/**
 	 * Sets the check slugs to be run.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array $check_slugs An array of check slugs to be run.
 	 *
@@ -181,7 +181,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * Sets the check slugs to be excluded.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array $check_slugs An array of check slugs to be excluded.
 	 *
@@ -203,7 +203,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * Sets the plugin slug or basename to be checked.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string $plugin The plugin slug or basename to be checked.
 	 *
@@ -225,7 +225,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * Sets whether to include experimental checks in the process.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param bool $include_experimental True to include experimental checks. False to exclude.
 	 *
@@ -250,11 +250,11 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * Sets categories for filtering the checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array $categories An array of categories for filtering.
 	 *
-	 * @throws Exception Thrown if the getegories does not match the original request parameter.
+	 * @throws Exception Thrown if the categories does not match the original request parameter.
 	 */
 	final public function set_categories( $categories ) {
 		if ( $this->initialized_early ) {
@@ -274,7 +274,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * Prepares the environment for running the requested checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return callable Cleanup function to revert any changes made here.
 	 *
@@ -292,7 +292,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * Runs the checks against the plugin.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return Check_Result An object containing all check results.
 	 */
@@ -333,7 +333,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * Determines if any of the checks are a runtime check.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array $checks An array of check instances to run.
 	 * @return bool Returns true if one or more checks is a runtime check.
@@ -351,7 +351,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * Returns all shared preparations used by the checks to run.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array $checks An array of Check instances to run.
 	 * @return array An array of Preparations to run where each item is an array with keys `class` and `args`.
@@ -384,7 +384,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * Returns the Check instances to run.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array An array map of check slugs to Check instances.
 	 *
@@ -410,6 +410,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		$excluded_checks = $this->get_check_exclude_slugs();
 
 		$collection = $this->check_repository->get_checks( $check_flags )
+			->require( $check_slugs ) // Ensures all of the given slugs are valid.
 			->include( $check_slugs ) // Ensures only the checks with the given slugs are included.
 			->exclude( $excluded_checks ); // Exclude provided checks from list.
 
@@ -419,15 +420,13 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			$collection = Check_Categories::filter_checks_by_categories( $collection, $categories );
 		}
 
-		return $collection
-			->require( $check_slugs ) // Ensures all of the given slugs are valid.
-			->to_map();
+		return $collection->to_map();
 	}
 
 	/**
 	 * Creates and returns the Check instance.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return Checks An instance of the Checks class.
 	 *
@@ -446,7 +445,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * Returns the check slugs to run.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array An array of check slugs to run.
 	 */
@@ -461,7 +460,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * Returns the check slugs to exclude.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array An array of check slugs to exclude.
 	 */
@@ -476,7 +475,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * Returns the plugin basename.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return string The plugin basename to check.
 	 */
@@ -492,7 +491,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * Returns the value for the include experimental flag.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return bool True if experimental checks are included. False if not.
 	 */
@@ -507,7 +506,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * Returns an array of categories for filtering the checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array An array of categories.
 	 */
@@ -521,7 +520,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 
 	/** Gets the Check_Context for the plugin.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return Check_Context The check context for the plugin file.
 	 */
@@ -530,51 +529,9 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	}
 
 	/**
-	 * Registers Checks to the Check_Repository.
-	 *
-	 * @since n.e.x.t
-	 */
-	private function register_checks() {
-		$this->check_repository = new Default_Check_Repository();
-
-		/**
-		 * Filters the available plugin check classes.
-		 *
-		 * @since n.e.x.t
-		 *
-		 * @param array $checks An array map of check slugs to Check instances.
-		 */
-		$checks = apply_filters(
-			'wp_plugin_check_checks',
-			array(
-				'i18n_usage'                 => new Checks\I18n_Usage_Check(),
-				'enqueued_scripts_size'      => new Checks\Enqueued_Scripts_Size_Check(),
-				'code_obfuscation'           => new Checks\Code_Obfuscation_Check(),
-				'file_type'                  => new Checks\File_Type_Check(),
-				'plugin_header_text_domain'  => new Checks\Plugin_Header_Text_Domain_Check(),
-				'late_escaping'              => new Checks\Late_Escaping_Check(),
-				'plugin_updater'             => new Checks\Plugin_Updater_Check(),
-				'plugin_review_phpcs'        => new Checks\Plugin_Review_PHPCS_Check(),
-				'direct_db_queries'          => new Checks\Direct_DB_Queries_Check(),
-				'performant_wp_query_params' => new Checks\Performant_WP_Query_Params_Check(),
-				'enqueued_scripts_in_footer' => new Checks\Enqueued_Scripts_In_Footer_Check(),
-				'plugin_readme'              => new Checks\Plugin_Readme_Check(),
-				'enqueued_styles_scope'      => new Checks\Enqueued_Styles_Scope_Check(),
-				'localhost'                  => new Checks\Localhost_Check(),
-				'no_unfiltered_uploads'      => new Checks\No_Unfiltered_Uploads_Check(),
-				'trademarks'                 => new Checks\Trademarks_Check(),
-			)
-		);
-
-		foreach ( $checks as $slug => $check ) {
-			$this->check_repository->register_check( $slug, $check );
-		}
-	}
-
-	/**
 	 * Sets the runtime environment setup.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Runtime_Environment_Setup $runtime_environment_setup Runtime environment instance.
 	 */

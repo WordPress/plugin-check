@@ -13,7 +13,7 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
 /**
  * Check for running WordPress direct DB queries sniffs.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 class Direct_DB_Queries_Check extends Abstract_PHP_CodeSniffer_Check {
 
@@ -24,7 +24,7 @@ class Direct_DB_Queries_Check extends Abstract_PHP_CodeSniffer_Check {
 	 *
 	 * Every check must have at least one category.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array The categories for the check.
 	 */
@@ -35,7 +35,7 @@ class Direct_DB_Queries_Check extends Abstract_PHP_CodeSniffer_Check {
 	/**
 	 * Returns an associative array of arguments to pass to PHPCS.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array An associative array of PHPCS CLI arguments.
 	 */

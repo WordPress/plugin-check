@@ -10,14 +10,14 @@ namespace WordPress\Plugin_Check\Checker;
 /**
  * Class to setup the Runtime Environment for Runtime checks.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 final class Runtime_Environment_Setup {
 
 	/**
 	 * Sets up the WordPress environment for runtime checks
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	public function set_up() {
 		global $wpdb, $table_prefix, $wp_filesystem;
@@ -48,12 +48,17 @@ final class Runtime_Environment_Setup {
 				}
 			);
 
+			// Do not send post-install notification email, see https://github.com/WordPress/plugin-check/issues/424.
+			add_filter( 'pre_wp_mail', '__return_false' );
+
 			wp_install(
 				'Plugin Check',
 				'plugincheck',
 				'demo@plugincheck.test',
 				false
 			);
+
+			remove_filter( 'pre_wp_mail', '__return_false' );
 
 			// Activate the same plugins in the test environment.
 			update_option( 'active_plugins', $active_plugins );
@@ -79,7 +84,7 @@ final class Runtime_Environment_Setup {
 	/**
 	 * Cleans up the runtime environment setup.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	public function clean_up() {
 		global $wpdb, $table_prefix, $wp_filesystem;
@@ -120,7 +125,7 @@ final class Runtime_Environment_Setup {
 	/**
 	 * Checks if the WordPress Environment can be set up for runtime checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return bool Returns true if the runtime environment can be set up, false if not.
 	 */
