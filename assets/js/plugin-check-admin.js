@@ -112,7 +112,7 @@
 		// Adding Open All/Collapse All button
 		if ( resultsContainer.innerHTML !== '' ) {
 			resultsContainer.innerHTML =
-				'<div><button style="margin-top:1.33em;" class="button button-primary clollaps-all" data-state="open">' +
+				'<div><button style="margin-top:1.33em;" class="button button-primary collaps-all" data-state="open">' +
 				PLUGIN_CHECK.collapseAll +
 				'</button></div>' +
 				resultsContainer.innerHTML;
@@ -502,7 +502,7 @@
 		}
 
 		// Manage Collapse/Open All tables together.
-		if ( button.classList.contains( 'clollaps-all' ) ) {
+		if ( button.classList.contains( 'collaps-all' ) ) {
 			const tableContainers = document.querySelectorAll(
 				'.plugin-check__results-table'
 			);
