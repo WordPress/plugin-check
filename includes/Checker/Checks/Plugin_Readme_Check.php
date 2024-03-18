@@ -125,7 +125,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	/**
 	 * Checks the readme file for missing headers.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.2
 	 *
 	 * @param Check_Result $result      The Check Result to amend.
 	 * @param string       $readme_file Readme file.
@@ -145,7 +145,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 			),
 		);
 
-		$parser_warnings = $parser->warnings ?? array();
+		$parser_warnings = is_array( $parser->warnings ) ? $parser->warnings : array();
 
 		foreach ( $fields as $field_key => $field ) {
 			if ( empty( $parser->{$field_key} ) && ! in_array( $field['ignore_key'], $ignored_warnings, true ) && ! isset( $parser_warnings[ $field['ignore_key'] ] ) ) {
@@ -400,7 +400,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	/**
 	 * Returns ignored warnings.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.2
 	 *
 	 * @param Parser $parser The Parser object.
 	 * @return array Ignore warnings.
@@ -413,7 +413,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		/**
 		 * Filter the list of ignored readme parser warnings.
 		 *
-		 * @since n.e.x.t
+		 * @since 1.0.2
 		 *
 		 * @param array  $ignored_warnings Array of ignored warning keys.
 		 * @param Parser $parser           The Parser object.
