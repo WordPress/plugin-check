@@ -8,7 +8,6 @@ build-phpunit
 docs
 node_modules
 patches
-test-content
 tests
 
 *.DS_Store
@@ -23,7 +22,6 @@ tests
 .wp-env.json
 .wp-env.override.json
 behat.yml
-CODE_OF_CONDUCT.md
 codecov.yml
 composer.json
 composer.lock

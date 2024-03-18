@@ -16,7 +16,7 @@
 	<arg name="extensions" value="php"/>
 
 	<file>./cli.php</file>
-	<file>./plugin-check.php</file>
+	<file>./plugin.php</file>
 	<file>./includes</file>
 	<file>./tests/phpunit</file>
 
