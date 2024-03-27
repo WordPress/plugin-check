@@ -40,6 +40,7 @@ class Check_Result_Tests extends WP_UnitTestCase {
 				'file'   => 'test-plugin/test-plugin.php',
 				'line'   => 12,
 				'column' => 40,
+				'check'  => 'custom_check',
 			)
 		);
 
@@ -60,6 +61,7 @@ class Check_Result_Tests extends WP_UnitTestCase {
 			'message' => 'Warning message',
 			'code'    => 'test_warning',
 			'link'    => '',
+			'check'   => 'custom_check',
 		);
 
 		$this->assertEquals( $expected, $warnings['test-plugin.php'][12][40][0] );
@@ -74,6 +76,7 @@ class Check_Result_Tests extends WP_UnitTestCase {
 				'file'   => 'test-plugin/test-plugin.php',
 				'line'   => 22,
 				'column' => 30,
+				'check'  => 'custom_check',
 			)
 		);
 
@@ -94,6 +97,7 @@ class Check_Result_Tests extends WP_UnitTestCase {
 			'message' => 'Error message',
 			'code'    => 'test_error',
 			'link'    => '',
+			'check'   => 'custom_check',
 		);
 
 		$this->assertEquals( $expected, $errors['test-plugin.php'][22][30][0] );
@@ -112,6 +116,7 @@ class Check_Result_Tests extends WP_UnitTestCase {
 				'file'   => 'test-plugin/test-plugin.php',
 				'line'   => 22,
 				'column' => 30,
+				'check'  => 'custom_check',
 			)
 		);
 
@@ -125,6 +130,7 @@ class Check_Result_Tests extends WP_UnitTestCase {
 			'message' => 'Error message',
 			'code'    => 'test_error',
 			'link'    => '',
+			'check'   => 'custom_check',
 		);
 
 		$this->assertEquals( $expected, $errors['test-plugin.php'][22][30][0] );
@@ -143,6 +149,7 @@ class Check_Result_Tests extends WP_UnitTestCase {
 				'file'   => 'test-plugin/test-plugin.php',
 				'line'   => 22,
 				'column' => 30,
+				'check'  => 'custom_check',
 			)
 		);
 
@@ -156,6 +163,7 @@ class Check_Result_Tests extends WP_UnitTestCase {
 			'message' => 'Warning message',
 			'code'    => 'test_warning',
 			'link'    => '',
+			'check'   => 'custom_check',
 		);
 
 		$this->assertEquals( $expected, $warnings['test-plugin.php'][22][30][0] );
