@@ -281,9 +281,13 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @throws Exception Thrown exception when preparation fails.
 	 */
 	final public function prepare() {
-		if ( $this->has_runtime_check( $this->get_checks_to_run() ) ) {
-			$preparation = new Universal_Runtime_Preparation( $this->get_check_context() );
-			return $preparation->prepare();
+		try {
+			if ( $this->has_runtime_check( $this->get_checks_to_run() ) ) {
+				$preparation = new Universal_Runtime_Preparation( $this->get_check_context() );
+				return $preparation->prepare();
+			}
+		} catch ( Exception $error ) {
+			// Ignore for now.
 		}
 
 		return function () {};
