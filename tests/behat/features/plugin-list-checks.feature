@@ -37,3 +37,15 @@ Feature: Test that the WP-CLI plugin list checks command works.
       """
       late_escaping,security,stable
       """
+
+    When I try the WP-CLI command `plugin list-checks --categories=nonexistent_category`
+    Then STDERR should contain:
+      """
+      Invalid check category 'nonexistent_category' found. Try 'wp plugin list-check-categories' to view the available check categories.
+      """
+
+    When I try the WP-CLI command `plugin list-checks --categories="general, nonexistent_category, another_category"`
+    Then STDERR should contain:
+      """
+      Invalid check categories 'nonexistent_category, another_category' found. Try 'wp plugin list-check-categories' to view the available check categories.
+      """

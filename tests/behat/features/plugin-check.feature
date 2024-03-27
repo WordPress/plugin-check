@@ -116,6 +116,12 @@ Feature: Test that the WP-CLI command works.
       WordPress.Security.EscapeOutput.OutputNotEscaped
       """
 
+    When I try the WP-CLI command `plugin check hello.php --categories=nonexistent_category`
+    Then STDERR should contain:
+      """
+      Invalid check category 'nonexistent_category' found. Try 'wp plugin list-check-categories' to view the available check categories.
+      """
+
   Scenario: Exclude directories in plugin check
     Given a WP install with the Plugin Check plugin
     And an empty wp-content/plugins/foo-plugin directory
