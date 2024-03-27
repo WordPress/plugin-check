@@ -42,8 +42,11 @@ options:
 : Include experimental checks.
 
 [--exclude-directories=<directories>]
-: Additional directories to exclude from checks
+: Additional directories to exclude from checks.
 By default, `.git`, `vendor` and `node_modules` directories are excluded.
+
+[--exclude-files=<files>]
+: Additional files to exclude from checks.
 ```
 ## EXAMPLES
 ```
