@@ -27,12 +27,15 @@ trait Find_Readme {
 		// Find the readme file.
 		$readme_list = preg_grep( '/readme\.(txt|md)$/i', $files );
 
+		$plugin_relative_path = rtrim( $plugin_relative_path, '/' );
+
 		// Filter the readme files located at root.
 		$potential_readme_files = array_filter(
 			$readme_list,
 			function ( $file ) use ( $plugin_relative_path ) {
 				$file = str_replace( $plugin_relative_path, '', $file );
-				return ! str_contains( $file, '/' );
+				$file = ltrim( $file, '/\\' );
+				return ! ( str_contains( $file, '/' ) || str_contains( $file, '\\' ) );
 			}
 		);
 
