@@ -228,7 +228,7 @@ abstract class Abstract_File_Check implements Static_Check {
 				}
 
 				if ( $include_file ) {
-					self::$file_list_cache[ $location ][] = $file_path;
+					self::$file_list_cache[ $location ][] = wp_normalize_path( $file_path );
 				}
 			}
 		}
