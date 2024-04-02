@@ -71,7 +71,7 @@ In any case, passing the checks in this tool likely helps to achieve a smooth pl
 
 = 1.0.2 =
 
-* Fix - Correct detection of readme files in Windows
+* Fix - Correct detection of readme files in Windows by normalizing file paths.
 
 = 1.0.1 =
 
