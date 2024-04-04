@@ -69,6 +69,10 @@ In any case, passing the checks in this tool likely helps to achieve a smooth pl
 
 == Changelog ==
 
+= 1.0.2 =
+
+* Fix - Correct detection of readme files in Windows by normalizing file paths.
+
 = 1.0.1 =
 
 * Fix - Add missing `test-content` folder needed for runtime checks.
