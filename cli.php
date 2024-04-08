@@ -29,7 +29,7 @@ if ( ! class_exists( 'WordPress\Plugin_Check\CLI\Plugin_Check_Command' ) ) {
 }
 
 if ( ! isset( $context ) ) {
-	$context = new Plugin_Context( __DIR__ . '/plugin.php' );
+	$context = new Plugin_Context( \WP_CLI\Utils\normalize_path( __DIR__ . '/plugin.php' ) );
 }
 
 // Create the CLI command instance and add to WP CLI.
