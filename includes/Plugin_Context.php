@@ -6,6 +6,7 @@
  */
 
 namespace WordPress\Plugin_Check;
+use Exception;
 use WordPress\Plugin_Check\Traits\Find_Readme;
 use WordPressdotorg\Plugin_Directory\Readme\Parser;
 use function WP_CLI\Utils\normalize_path;
@@ -40,6 +41,8 @@ class Plugin_Context {
 	 *
 	 * @since 1.0.0
 	 *
+	 * @throws Exception Throws exception if not called via regular WP-CLI or WordPress bootstrap order.
+	 *
 	 * @param string $main_file The absolute path to the plugin main file.
 	 */
 	public function __construct( $main_file ) {
@@ -48,7 +51,7 @@ class Plugin_Context {
 		} elseif ( function_exists( '\WP_CLI\Utils\normalize_path' ) ) {
 			$this->main_file = normalize_path( $main_file );
 		} else {
-			$this->main_file = $main_file;
+			throw new Exception( 'Unknown environment, normalize_path function not found' );
 		}
 	}
 
