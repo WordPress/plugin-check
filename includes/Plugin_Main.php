@@ -33,7 +33,7 @@ class Plugin_Main {
 	 * @param string $main_file Absolute path of the plugin main file.
 	 */
 	public function __construct( $main_file ) {
-		$this->context = new Plugin_Context( wp_normalize_path( $main_file ) );
+		$this->context = new Plugin_Context( $main_file );
 	}
 
 	/**

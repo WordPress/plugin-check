@@ -8,6 +8,7 @@
 namespace WordPress\Plugin_Check;
 use WordPress\Plugin_Check\Traits\Find_Readme;
 use WordPressdotorg\Plugin_Directory\Readme\Parser;
+use function WP_CLI\Utils\normalize_path;
 
 /**
  * Class representing the context in which the plugin is running.
@@ -42,7 +43,13 @@ class Plugin_Context {
 	 * @param string $main_file The absolute path to the plugin main file.
 	 */
 	public function __construct( $main_file ) {
-		$this->main_file = $main_file;
+		if ( function_exists( '\WP_CLI\Utils\normalize_path' ) ) {
+			$this->main_file = normalize_path( $main_file );
+		} elseif ( function_exists( 'wp_normalize_path' ) ) {
+			$this->main_file = wp_normalize_path( $main_file );
+		} else {
+			$this->main_file = $main_file;
+		}
 	}
 
 	/**
