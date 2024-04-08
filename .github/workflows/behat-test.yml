@@ -161,3 +161,4 @@ jobs:
           files: ${{ steps.coverage_files.outputs.files }}
           flags: feature
           fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}

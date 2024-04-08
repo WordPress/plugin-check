@@ -109,3 +109,4 @@ jobs:
         with:
           file: build/logs/*.xml
           flags: unit
+          token: ${{ secrets.CODECOV_TOKEN }}
