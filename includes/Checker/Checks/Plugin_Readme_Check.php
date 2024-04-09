@@ -80,9 +80,6 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		// Check the readme file for default text.
 		$this->check_default_text( $result, $readme_file, $parser );
 
-		// Check the readme file for a valid license.
-		$this->check_license( $result, $readme_file, $parser );
-
 		// Check the readme file for a valid version.
 		$this->check_stable_tag( $result, $readme_file, $parser );
 
@@ -142,40 +139,6 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				$result,
 				__( 'The readme appears to contain default text.', 'plugin-check' ),
 				'default_readme_text',
-				$readme_file
-			);
-		}
-	}
-
-	/**
-	 * Checks the readme file for a valid license.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param Check_Result $result      The Check Result to amend.
-	 * @param string       $readme_file Readme file.
-	 * @param Parser       $parser      The Parser object.
-	 */
-	private function check_license( Check_Result $result, string $readme_file, Parser $parser ) {
-		$license = $parser->license;
-
-		if ( empty( $license ) ) {
-			$this->add_result_error_for_file(
-				$result,
-				__( 'Your plugin has no license declared. Please update your readme with a GPLv2 (or later) compatible license.', 'plugin-check' ),
-				'no_license',
-				$readme_file
-			);
-
-			return;
-		}
-
-		// Test for a valid SPDX license identifier.
-		if ( ! preg_match( '/^([a-z0-9\-\+\.]+)(\sor\s([a-z0-9\-\+\.]+))*$/i', $license ) ) {
-			$this->add_result_warning_for_file(
-				$result,
-				__( 'Your plugin has an invalid license declared. Please update your readme with a valid SPDX license identifier.', 'plugin-check' ),
-				'invalid_license',
 				$readme_file
 			);
 		}
