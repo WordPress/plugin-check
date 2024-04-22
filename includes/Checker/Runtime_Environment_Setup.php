@@ -48,12 +48,17 @@ final class Runtime_Environment_Setup {
 				}
 			);
 
+			// Do not send post-install notification email, see https://github.com/WordPress/plugin-check/issues/424.
+			add_filter( 'pre_wp_mail', '__return_false' );
+
 			wp_install(
 				'Plugin Check',
 				'plugincheck',
 				'demo@plugincheck.test',
 				false
 			);
+
+			remove_filter( 'pre_wp_mail', '__return_false' );
 
 			// Activate the same plugins in the test environment.
 			update_option( 'active_plugins', $active_plugins );

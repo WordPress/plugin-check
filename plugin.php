@@ -1,13 +1,12 @@
 <?php
 /**
- * Plugin Name: Plugin Check
+ * Plugin Name: Plugin Check (PCP)
  * Plugin URI: https://github.com/WordPress/plugin-check
  * Description: Plugin Check is a WordPress.org tool which provides checks to help plugins meet the directory requirements and follow various best practices.
  * Requires at least: 6.3
  * Requires PHP: 7.0
- * Version: 1.0.0
- * Author: WordPress Performance Team
- * Author URI: https://make.wordpress.org/performance/
+ * Version: 1.0.1
+ * Author: WordPress Performance Team and Plugin Review Team
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  * Text Domain: plugin-check
@@ -17,7 +16,7 @@
 
 use WordPress\Plugin_Check\Plugin_Main;
 
-define( 'WP_PLUGIN_CHECK_VERSION', '1.0.0' );
+define( 'WP_PLUGIN_CHECK_VERSION', '1.0.1' );
 define( 'WP_PLUGIN_CHECK_MINIMUM_PHP', '7.0' );
 define( 'WP_PLUGIN_CHECK_MAIN_FILE', __FILE__ );
 define( 'WP_PLUGIN_CHECK_PLUGIN_DIR_PATH', plugin_dir_path( WP_PLUGIN_CHECK_MAIN_FILE ) );

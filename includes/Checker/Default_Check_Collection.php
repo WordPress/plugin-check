@@ -136,7 +136,7 @@ class Default_Check_Collection implements Check_Collection {
 		}
 
 		return $this->filter(
-			static function ( Check $check, $slug ) use( $check_slugs ) {
+			static function ( Check $check, $slug ) use ( $check_slugs ) {
 				return ! in_array( $slug, $check_slugs, true );
 			}
 		);

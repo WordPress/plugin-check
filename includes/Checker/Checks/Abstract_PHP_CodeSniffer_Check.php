@@ -77,7 +77,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		}
 
 		// Backup the original command line arguments.
-		$orig_cmd_args = $_SERVER['argv'];
+		$orig_cmd_args = $_SERVER['argv'] ?? '';
 
 		// Create the default arguments for PHPCS.
 		$defaults = $this->get_argv_defaults( $result );

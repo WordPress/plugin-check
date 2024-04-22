@@ -1,10 +1,10 @@
-=== Plugin Check ===
+=== Plugin Check (PCP) ===
 
 Contributors:      wordpressdotorg
 Requires at least: 6.3
 Tested up to:      6.4
 Requires PHP:      7.0
-Stable tag:        1.0.0
+Stable tag:        1.0.1
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 Tags:              plugin best practices, testing, accessibility, performance, security
@@ -68,6 +68,16 @@ To be approved in the WordPress.org plugin directory, a plugin must typically pa
 In any case, passing the checks in this tool likely helps to achieve a smooth plugin review process, but is no guarantee that a plugin will be approved in the WordPress.org plugin directory.
 
 == Changelog ==
+
+= 1.0.2 =
+
+* Fix - Correct detection of readme files in Windows by normalizing file paths.
+
+= 1.0.1 =
+
+* Fix - Add missing `test-content` folder needed for runtime checks.
+* Fix - Do not send emails when setting up test environment.
+* Fix - Prevent PHP warning when the `argv` variable isn't set.
 
 = 1.0.0 =
 
