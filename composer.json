@@ -9,7 +9,7 @@
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0.0",
     "wp-coding-standards/wpcs": "^3.1.0",
     "automattic/vipwpcs": "^3.0.0",
-    "afragen/wordpress-plugin-readme-parser": "dev-master"
+    "afragen/wordpress-plugin-readme-parser": "dev-master#67fba498d0b112acf84386b95e4905c539a33f0b"
   },
   "require-dev": {
     "phpcompatibility/php-compatibility": "^9.3",
