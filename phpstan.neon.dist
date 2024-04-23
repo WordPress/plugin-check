@@ -13,15 +13,3 @@ parameters:
   dynamicConstantNames:
     - WP_PLUGIN_CHECK_PLUGIN_DIR_URL
   treatPhpDocTypesAsCertain: false
-  ignoreErrors:
-    # False positive as WordPress ships with a polyfill.
-    -
-      message: '/^Function str_contains not found.$/'
-      paths:
-        - includes/Checker/Checks/Abstract_File_Check.php
-        - includes/Checker/Checks/Plugin_Readme_Check.php
-        - includes/Traits/Find_Readme.php
-        - includes/Traits/File_Editor_URL.php
-    -
-      message: '/^Function str_starts_with not found.$/'
-      path: includes/Checker/CLI_Runner.php

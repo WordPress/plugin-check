@@ -61,9 +61,6 @@ jobs:
           - php: '8.3'
             wordpress: 'trunk'
             experimental: true
-          - php: '8.4'
-            wordpress: 'trunk'
-            experimental: true
     env:
       WP_ENV_PHP_VERSION: ${{ matrix.php }}
       WP_ENV_CORE: ${{ matrix.wordpress == 'trunk' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', matrix.wordpress ) }}
