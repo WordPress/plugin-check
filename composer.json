@@ -4,14 +4,20 @@
   "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",
   "require": {
-    "php": ">=7",
-    "composer/installers": "^v1.12.0 || ^2.2",
-    "dealerdirect/phpcodesniffer-composer-installer": "^0.4.1 || ^0.5 || ^0.6.2 || ^0.7 || ^1.0",
-    "wp-coding-standards/wpcs": "^3.0.0",
+    "php": ">=7.2.24",
+    "composer/installers": "^2.2",
+    "dealerdirect/phpcodesniffer-composer-installer": "^1.0.0",
+    "wp-coding-standards/wpcs": "^3.1.0",
     "automattic/vipwpcs": "^3.0.0",
     "afragen/wordpress-plugin-readme-parser": "dev-master"
   },
   "require-dev": {
+    "phpcompatibility/php-compatibility": "^9.3",
+    "phpmd/phpmd": "^2.9",
+    "phpstan/extension-installer": "^1.2",
+    "phpstan/phpstan": "^1.10",
+    "slevomat/coding-standard": "^8.9",
+    "szepeviktor/phpstan-wordpress": "^1.1",
     "wp-cli/extension-command": "^2.1",
     "wp-cli/wp-cli": "^2.8",
     "wp-cli/wp-cli-tests": "^v4.2.9"
@@ -20,26 +26,11 @@
     "behat": "BEHAT_FEATURES_FOLDER=tests/behat/features run-behat-tests",
     "behat-rerun": "BEHAT_FEATURES_FOLDER=tests/behat/features rerun-behat-tests",
     "prepare-behat-tests": "install-package-tests",
-    "format": [
-      "composer --working-dir=build-cs update --no-interaction",
-      "build-cs/vendor/bin/phpcbf --standard=phpcs.xml.dist"
-    ],
-    "lint": [
-      "composer --working-dir=build-cs update --no-interaction",
-      "build-cs/vendor/bin/phpcs --standard=phpcs.xml.dist"
-    ],
-    "phpmd": [
-      "composer --working-dir=build-cs update --no-interaction",
-      "build-cs/vendor/bin/phpmd . text phpmd.xml"
-    ],
-    "phpstan": [
-      "composer --working-dir=build-cs update --no-interaction",
-      "build-cs/vendor/bin/phpstan analyse --memory-limit=2048M"
-    ],
-    "test": [
-      "composer --working-dir=build-phpunit update --no-interaction",
-      "build-phpunit/vendor/bin/phpunit --verbose"
-    ]
+    "format": "phpcbf --standard=phpcs.xml.dist",
+    "lint": "phpcs --standard=phpcs.xml.dist",
+    "phpmd": "phpmd . text phpmd.xml",
+    "phpstan": "phpstan analyse --memory-limit=2048M",
+    "test": "phpunit --verbose"
   },
   "scripts-descriptions": {
     "lint": "Detect coding standards issues",
@@ -59,7 +50,7 @@
       "cweagans/composer-patches": false
     },
     "platform": {
-      "php": "7"
+      "php": "7.2.24"
     }
   },
   "autoload": {
