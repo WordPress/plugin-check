@@ -504,4 +504,30 @@ class Trademarks_Check extends Abstract_File_Check {
 		// If the trademark still doesn't exist in the slug, it's OK.
 		return false === strpos( $short_slug, $trademark );
 	}
+
+	/**
+	 * Gets the description for the check.
+	 *
+	 * Every check must have a short description explaining what the check does.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string Description.
+	 */
+	public function get_description(): string {
+		return __( 'Checks the usage of trademarks or other projects in the plugin slug.', 'plugin-check' );
+	}
+
+	/**
+	 * Gets the documentation URL for the check.
+	 *
+	 * Every check must have a URL with further information about the check.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string The documentation URL.
+	 */
+	public function get_documentation_url(): string {
+		return __( 'https://developer.wordpress.org/plugins/wordpress-org/detailed-plugin-guidelines/', 'plugin-check' );
+	}
 }

@@ -50,10 +50,44 @@ class No_Unfiltered_Uploads_Check extends Abstract_File_Check {
 		if ( $file ) {
 			$this->add_result_error_for_file(
 				$result,
-				__( 'ALLOW_UNFILTERED_UPLOADS is not permitted.', 'plugin-check' ),
+				sprintf(
+					/* translators: %s: ALLOW_UNFILTERED_UPLOADS */
+					__( '%s is not permitted.', 'plugin-check' ),
+					'<code>ALLOW_UNFILTERED_UPLOADS</code>'
+				),
 				'allow_unfiltered_uploads_detected',
 				$file
 			);
 		}
+	}
+
+	/**
+	 * Gets the description for the check.
+	 *
+	 * Every check must have a short description explaining what the check does.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string Description.
+	 */
+	public function get_description(): string {
+		return sprintf(
+			/* translators: %s: ALLOW_UNFILTERED_UPLOADS */
+			__( 'Detects disallowed usage of %s.', 'plugin-check' ),
+			'<code>ALLOW_UNFILTERED_UPLOADS</code>'
+		);
+	}
+
+	/**
+	 * Gets the documentation URL for the check.
+	 *
+	 * Every check must have a URL with further information about the check.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string The documentation URL.
+	 */
+	public function get_documentation_url(): string {
+		return __( 'https://make.wordpress.org/plugins/handbook/performing-reviews/review-checklist/', 'plugin-check' );
 	}
 }
