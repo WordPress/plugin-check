@@ -7,7 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
-use WordPress\Plugin_Check\Checker\Checks\Plugin_Readme_Check;
+use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\Plugin_Readme_Check;
 
 class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 

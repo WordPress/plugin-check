@@ -7,7 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
-use WordPress\Plugin_Check\Checker\Checks\Localhost_Check;
+use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\Localhost_Check;
 
 class Localhost_Check_Tests extends WP_UnitTestCase {
 

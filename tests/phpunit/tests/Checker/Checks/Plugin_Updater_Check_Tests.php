@@ -7,7 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
-use WordPress\Plugin_Check\Checker\Checks\Plugin_Updater_Check;
+use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\Plugin_Updater_Check;
 
 class Plugin_Updater_Check_Tests extends WP_UnitTestCase {
 

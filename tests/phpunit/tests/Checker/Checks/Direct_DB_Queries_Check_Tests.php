@@ -7,7 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
-use WordPress\Plugin_Check\Checker\Checks\Direct_DB_Queries_Check;
+use WordPress\Plugin_Check\Checker\Checks\Security\Direct_DB_Queries_Check;
 
 class Direct_DB_Queries_Check_Tests extends WP_UnitTestCase {
 

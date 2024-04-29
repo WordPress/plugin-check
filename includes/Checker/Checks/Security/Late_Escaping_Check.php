@@ -1,21 +1,22 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\I18n_Usage_Check
+ * Class WordPress\Plugin_Check\Checker\Checks\Late_Escaping_Check
  *
  * @package plugin-check
  */
 
-namespace WordPress\Plugin_Check\Checker\Checks;
+namespace WordPress\Plugin_Check\Checker\Checks\Security;
 
 use WordPress\Plugin_Check\Checker\Check_Categories;
+use WordPress\Plugin_Check\Checker\Checks\Abstract_PHP_CodeSniffer_Check;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 
 /**
- * Check for running WordPress internationalization sniffs.
+ * Check for running WordPress escape output sniffs.
  *
  * @since 1.0.0
  */
-class I18n_Usage_Check extends Abstract_PHP_CodeSniffer_Check {
+class Late_Escaping_Check extends Abstract_PHP_CodeSniffer_Check {
 
 	use Stable_Check;
 
@@ -29,7 +30,7 @@ class I18n_Usage_Check extends Abstract_PHP_CodeSniffer_Check {
 	 * @return array The categories for the check.
 	 */
 	public function get_categories() {
-		return array( Check_Categories::CATEGORY_GENERAL );
+		return array( Check_Categories::CATEGORY_SECURITY );
 	}
 
 	/**
@@ -43,7 +44,7 @@ class I18n_Usage_Check extends Abstract_PHP_CodeSniffer_Check {
 		return array(
 			'extensions' => 'php',
 			'standard'   => 'WordPress',
-			'sniffs'     => 'WordPress.WP.I18n',
+			'sniffs'     => 'WordPress.Security.EscapeOutput',
 		);
 	}
 }

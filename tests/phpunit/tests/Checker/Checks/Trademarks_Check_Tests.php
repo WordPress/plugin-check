@@ -7,7 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
-use WordPress\Plugin_Check\Checker\Checks\Trademarks_Check;
+use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\Trademarks_Check;
 
 class Trademarks_Check_Tests extends WP_UnitTestCase {
 

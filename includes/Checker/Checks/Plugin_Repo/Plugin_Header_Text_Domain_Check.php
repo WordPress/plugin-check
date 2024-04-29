@@ -5,7 +5,7 @@
  * @package plugin-check
  */
 
-namespace WordPress\Plugin_Check\Checker\Checks;
+namespace WordPress\Plugin_Check\Checker\Checks\Plugin_Repo;
 
 use Exception;
 use WordPress\Plugin_Check\Checker\Check_Categories;

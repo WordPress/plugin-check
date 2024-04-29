@@ -1,21 +1,22 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\Direct_DB_Queries_Check
+ * Class WordPress\Plugin_Check\Checker\Checks\Enqueued_Scripts_In_Footer_Check
  *
  * @package plugin-check
  */
 
-namespace WordPress\Plugin_Check\Checker\Checks;
+namespace WordPress\Plugin_Check\Checker\Checks\Performance;
 
 use WordPress\Plugin_Check\Checker\Check_Categories;
+use WordPress\Plugin_Check\Checker\Checks\Abstract_PHP_CodeSniffer_Check;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 
 /**
- * Check for running WordPress direct DB queries sniffs.
+ * Check for running WordPress enqueued resource parameters sniffs.
  *
  * @since 1.0.0
  */
-class Direct_DB_Queries_Check extends Abstract_PHP_CodeSniffer_Check {
+class Enqueued_Scripts_In_Footer_Check extends Abstract_PHP_CodeSniffer_Check {
 
 	use Stable_Check;
 
@@ -29,7 +30,7 @@ class Direct_DB_Queries_Check extends Abstract_PHP_CodeSniffer_Check {
 	 * @return array The categories for the check.
 	 */
 	public function get_categories() {
-		return array( Check_Categories::CATEGORY_SECURITY );
+		return array( Check_Categories::CATEGORY_PERFORMANCE );
 	}
 
 	/**
@@ -43,7 +44,7 @@ class Direct_DB_Queries_Check extends Abstract_PHP_CodeSniffer_Check {
 		return array(
 			'extensions' => 'php',
 			'standard'   => 'WordPress',
-			'sniffs'     => 'WordPress.DB.DirectDatabaseQuery',
+			'sniffs'     => 'WordPress.WP.EnqueuedResourceParameters',
 		);
 	}
 }
