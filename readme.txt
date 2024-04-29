@@ -68,9 +68,10 @@ In any case, passing the checks in this tool likely helps to achieve a smooth pl
 
 == Changelog ==
 
-= 1.0.2 =
+= 1.1.0 =
 
 * Fix - Correct detection of readme files in Windows by normalizing file paths.
+* Enhancement - Changed the namespace of included checks. [#460](https://github.com/WordPress/plugin-check/pull/460)
 
 = 1.0.1 =
 
