@@ -198,7 +198,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 			$reflected_phpcs_config = new \ReflectionClass( '\PHP_CodeSniffer\Config' );
 			$overridden_defaults    = $reflected_phpcs_config->getProperty( 'overriddenDefaults' );
 			$overridden_defaults->setAccessible( true );
-			$overridden_defaults->setValue( array() );
+			$overridden_defaults->setValue( $reflected_phpcs_config, array() );
 			$overridden_defaults->setAccessible( false );
 		}
 	}
