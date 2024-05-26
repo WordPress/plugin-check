@@ -55,13 +55,11 @@ class Plugin_Header_Readme_Check extends Abstract_File_Check {
 
 		$readme = $this->filter_files_for_readme( $files, $plugin_relative_path );
 
-		$readme_file   = reset( $readme );
-		$readme_parser = new Parser( $readme_file );
-
+		$readme_file      = reset( $readme );
 		$plugin_main_file = WP_PLUGIN_DIR . '/' . $result->plugin()->basename();
 
 		// Check the readme file and plugin header for a valid license.
-		$this->check_license( $result, $readme_file, $readme_parser, $plugin_main_file );
+		$this->check_license( $result, $readme_file, $plugin_main_file );
 	}
 
 	/**
@@ -71,10 +69,10 @@ class Plugin_Header_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @param Check_Result $result        The Check Result to amend.
 	 * @param string       $readme_file   The readme file.
-	 * @param object       $readme_parser The readme parser object.
 	 * @param string       $plugin_main_file Plugin main file.
 	 */
-	private function check_license( Check_Result $result, string $readme_file, object $readme_parser, string $plugin_main_file ) {
+	private function check_license( Check_Result $result, string $readme_file, string $plugin_main_file ) {
+		$readme_parser = new Parser( $readme_file );
 
 		// Filter the readme files.
 		$license_readme = $readme_parser->license;
