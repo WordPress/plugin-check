@@ -88,7 +88,7 @@ class Plugin_Header_Readme_Check extends Abstract_File_Check {
 		}
 
 		$pattern     = preg_quote( 'License', '/' );
-		$has_license = self::file_preg_match( "/(*ANYCRLF)^.*$pattern\s*:\s*(.*)$/im", array( $plugin_main_file ), $matches );
+		$has_license = self::file_preg_match( "/(*ANYCRLF)^.*$pattern\s*:\s*(.*)$/im", array( $plugin_main_file ), $matches_license );
 		if ( ! $has_license ) {
 			$this->add_result_error_for_file(
 				$result,
@@ -97,7 +97,7 @@ class Plugin_Header_Readme_Check extends Abstract_File_Check {
 				$plugin_main_file
 			);
 		} else {
-			$plugin_license = $this->normaliceLicenses( $matches[1] );
+			$plugin_license = $this->normaliceLicenses( $matches_license[1] );
 		}
 
 		// Checks for a valid license in Plugin Header.
