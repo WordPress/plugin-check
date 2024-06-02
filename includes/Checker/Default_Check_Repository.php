@@ -55,7 +55,6 @@ class Default_Check_Repository extends Empty_Check_Repository {
 				'localhost'                  => new Checks\Localhost_Check(),
 				'no_unfiltered_uploads'      => new Checks\No_Unfiltered_Uploads_Check(),
 				'trademarks'                 => new Checks\Trademarks_Check(),
-				'plugin_header_readme'       => new Checks\Plugin_Header_Readme_Check(),
 			)
 		);
 
