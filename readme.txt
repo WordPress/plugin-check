@@ -70,6 +70,7 @@ In any case, passing the checks in this tool likely helps to achieve a smooth pl
 
 = 1.0.2 =
 
+* Enhancement - Show a warning if a non-existent check if passed to the WP CLI --checks argument. (issue 348)
 * Fix - Correct detection of readme files in Windows by normalizing file paths.
 
 = 1.0.1 =
