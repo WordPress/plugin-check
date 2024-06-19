@@ -163,6 +163,12 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 0, $warnings['readme.txt'][0] );
 		$this->assertArrayHasKey( 'code', $warnings['readme.txt'][0][0][0] );
 		$this->assertEquals( 'invalid_license', $warnings['readme.txt'][0][0][0]['code'] );
+
+		// Check for not same license warning.
+		$this->assertArrayHasKey( 0, $warnings['readme.txt'] );
+		$this->assertArrayHasKey( 0, $warnings['readme.txt'][0] );
+		$this->assertArrayHasKey( 'code', $warnings['readme.txt'][0][0][0] );
+		$this->assertEquals( 'different_license', $warnings['readme.txt'][0][0][0]['code'] );
 	}
 
 	public function test_run_with_errors_no_license() {
