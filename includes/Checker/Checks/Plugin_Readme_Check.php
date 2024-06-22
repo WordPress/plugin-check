@@ -219,8 +219,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	}
 
 	/**
-	 * Normalice the licenses
-	 * Author: Fran Torres
+	 * Normalice licenses to compare them.
 	 *
 	 * @param string $license The license to normalice.
 	 * @return string
