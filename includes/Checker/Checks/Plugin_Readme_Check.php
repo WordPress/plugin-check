@@ -252,19 +252,9 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 		// Versions.
 		$license = str_replace( '-', '', $license );
-		$license = str_replace( ' v2', 'v2', $license );
-		$license = str_replace( ' v3', 'v3', $license );
-
 		$license = str_replace( 'GNU General Public License (GPL)', 'GPL', $license );
 		$license = str_replace( 'GNU General Public License', 'GPL', $license );
-		$license = str_replace( 'v2.0', 'v2', $license );
-		$license = str_replace( 'v3.0', 'v3', $license );
-		$license = str_replace( '2.0', 'v2', $license );
-		$license = str_replace( '3.0', 'v3', $license );
-
-		$license = str_replace( 'GPL2', 'GPLv2', $license );
-		$license = str_replace( 'GPL3', 'GPLv3', $license );
-
+		$license = preg_replace( '/GPL\s*[-|\.]*\s*[v]?([0-9])(\.[0])?/i', 'GPL$1', $license, 1 );
 		$license = str_replace( '.', '', $license );
 
 		return $license;
