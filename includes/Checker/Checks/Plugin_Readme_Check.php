@@ -212,7 +212,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 			$this->add_result_warning_for_file(
 				$result,
 				__( 'Your plugin has a different license declared in the readme file and plugin header. Please update your readme with a valid GPL license identifier.', 'plugin-check' ),
-				'different_license',
+				'license_mismatch',
 				$readme_file
 			);
 		}
