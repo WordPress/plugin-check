@@ -162,16 +162,17 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		$plugin_main_file = WP_PLUGIN_DIR . '/' . $result->plugin()->basename();
 
 		// Filter the readme files.
-		$license_readme = $parser->license;
-		if ( empty( $license_readme ) ) {
+		if ( empty( $license ) ) {
 			$this->add_result_error_for_file(
 				$result,
 				__( 'Your plugin has no license declared. Please update your readme with a GPLv2 (or later) compatible license.', 'plugin-check' ),
 				'no_license',
 				$readme_file
 			);
+
+			return;
 		} else {
-			$license_readme = $this->normaliceLicenses( $license_readme );
+			$license = $this->normalice_licenses( $license );
 		}
 
 		// Test for a valid SPDX license identifier.
@@ -194,7 +195,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				$plugin_main_file
 			);
 		} else {
-			$plugin_license = $this->normaliceLicenses( $matches_license[1] );
+			$plugin_license = $this->normalice_licenses( $matches_license[1] );
 		}
 
 		// Checks for a valid license in Plugin Header.
@@ -208,7 +209,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		}
 
 		// Check different license types.
-		if ( ! empty( $plugin_license ) && ! empty( $license_readme ) && $license_readme !== $plugin_license ) {
+		if ( ! empty( $plugin_license ) && ! empty( $license ) && $license !== $plugin_license ) {
 			$this->add_result_warning_for_file(
 				$result,
 				__( 'Your plugin has a different license declared in the readme file and plugin header. Please update your readme with a valid GPL license identifier.', 'plugin-check' ),
@@ -222,9 +223,11 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 * Normalice licenses to compare them.
 	 *
 	 * @param string $license The license to normalice.
+	 * @since 1.1.0
+	 *
 	 * @return string
 	 */
-	private function normaliceLicenses( $license ) {
+	private function normalice_licenses( $license ) {
 		$license = trim( $license );
 		$license = str_replace( '  ', ' ', $license );
 
