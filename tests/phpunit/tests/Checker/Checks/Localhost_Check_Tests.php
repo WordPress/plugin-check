@@ -25,14 +25,14 @@ class Localhost_Check_Tests extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'another.php', $errors );
 		$this->assertEquals( 2, $check_result->get_error_count() );
 
-		$this->assertArrayHasKey( 0, $errors['load.php'] );
-		$this->assertArrayHasKey( 0, $errors['load.php'][0] );
-		$this->assertArrayHasKey( 'code', $errors['load.php'][0][0][0] );
-		$this->assertEquals( 'localhost_code_detected', $errors['load.php'][0][0][0]['code'] );
+		$this->assertArrayHasKey( 19, $errors['load.php'] );
+		$this->assertArrayHasKey( 24, $errors['load.php'][19] );
+		$this->assertArrayHasKey( 'code', $errors['load.php'][19][24][0] );
+		$this->assertEquals( 'localhost_code_detected', $errors['load.php'][19][24][0]['code'] );
 
-		$this->assertArrayHasKey( 0, $errors['another.php'] );
-		$this->assertArrayHasKey( 0, $errors['another.php'][0] );
-		$this->assertArrayHasKey( 'code', $errors['another.php'][0][0][0] );
-		$this->assertEquals( 'localhost_code_detected', $errors['another.php'][0][0][0]['code'] );
+		$this->assertArrayHasKey( 2, $errors['another.php'] );
+		$this->assertArrayHasKey( 28, $errors['another.php'][2] );
+		$this->assertArrayHasKey( 'code', $errors['another.php'][2][28][0] );
+		$this->assertEquals( 'localhost_code_detected', $errors['another.php'][2][28][0]['code'] );
 	}
 }
