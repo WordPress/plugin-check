@@ -48,8 +48,6 @@ jobs:
       fail-fast: true
       matrix:
         php:
-        - '7.0'
-        - '7.1'
         - '7.2'
         - '7.3'
         - '7.4'
@@ -60,9 +58,6 @@ jobs:
           - php: '8.2'
             wordpress: 'latest'
             coverage: true
-          - php: '8.2'
-            wordpress: 'trunk'
-            experimental: true
           - php: '8.3'
             wordpress: 'trunk'
             experimental: true
