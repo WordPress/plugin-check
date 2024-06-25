@@ -219,7 +219,7 @@ final class Plugin_Check_Command {
 		// Print the formatted results for WPORG.
 		if ( $run_wporg ) {
 			$all_results = array(
-				'pass'     => count( $errors ) === 0,
+				'pass'     => empty( $errors ) ? true : false,
 				'errors'   => $errors,
 				'warnings' => $warnings,
 			);
