@@ -397,13 +397,14 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 		return $version;
 	}
+
 	/**
 	 * Returns ignored warnings.
 	 *
 	 * @since 1.0.2
 	 *
 	 * @param Parser $parser The Parser object.
-	 * @return array Ignore warnings.
+	 * @return array Ignored warnings.
 	 */
 	private function get_ignored_warnings( Parser $parser ) {
 		$ignored_warnings = array(
