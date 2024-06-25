@@ -11,7 +11,7 @@ Follow these instructions to configure and run tests:
 3. You need to have Docker installed and running wp-env environment `npm run wp-env start`.
 4. Run tests with npm command `npm run test-php`.
 
-If it does not fail, your Pull request is ready to be commited to the repository.
+If it does not fail, your Pull request is ready to be committed to the repository.
 
 ## Where to find folder tests
 
