@@ -98,6 +98,9 @@ final class Plugin_Check_Command {
 	 * : Additional directories to exclude from checks
 	 * By default, `.git`, `vendor` and `node_modules` directories are excluded.
 	 *
+	 * [--wporg]
+	 * : Run checks against the WordPress.org plugin repository.
+	 *
 	 * ## EXAMPLES
 	 *
 	 *   wp plugin check akismet
@@ -126,12 +129,15 @@ final class Plugin_Check_Command {
 				'ignore-warnings'      => false,
 				'ignore-errors'        => false,
 				'include-experimental' => false,
+				'wporg'                => false,
 			)
 		);
 
 		// Create the plugin and checks array from CLI arguments.
 		$plugin = isset( $args[0] ) ? $args[0] : '';
 		$checks = wp_parse_list( $options['checks'] );
+
+		$run_wporg = empty( $options['wporg'] ) ? false : true;
 
 		// Create the categories array from CLI arguments.
 		$categories = isset( $options['categories'] ) ? wp_parse_list( $options['categories'] ) : array();
@@ -208,6 +214,18 @@ final class Plugin_Check_Command {
 		$warnings = array();
 		if ( $result && empty( $assoc_args['ignore-warnings'] ) ) {
 			$warnings = $result->get_warnings();
+		}
+
+		// Print the formatted results for WPORG.
+		if ( $run_wporg ) {
+			$all_results = array(
+				'pass'     => count( $errors ) === 0,
+				'errors'   => $errors,
+				'warnings' => $warnings,
+			);
+
+			WP_CLI::line( json_encode( $all_results ) );
+			return;
 		}
 
 		// Default fields.
