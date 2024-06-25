@@ -193,7 +193,7 @@ abstract class Abstract_File_Check implements Static_Check {
 	 * @return array List of absolute file paths.
 	 */
 	private static function get_files( Check_Context $plugin ) {
-		$location = $plugin->location();
+		$location = wp_normalize_path( $plugin->location() );
 
 		if ( isset( self::$file_list_cache[ $location ] ) ) {
 			return self::$file_list_cache[ $location ];
@@ -228,7 +228,7 @@ abstract class Abstract_File_Check implements Static_Check {
 				}
 
 				if ( $include_file ) {
-					self::$file_list_cache[ $location ][] = $file_path;
+					self::$file_list_cache[ $location ][] = wp_normalize_path( $file_path );
 				}
 			}
 		}
