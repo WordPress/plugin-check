@@ -11,16 +11,15 @@ Follow these instructions to configure and run tests:
 3. You need to have Docker installed and running wp-env environment `npm run wp-env start`.
 4. Run tests with npm command `npm run test-php`.
 
-If it does not fail, your Pull request is ready to be committed to the repository.
+The full test suite is run against PRs as a GitHub action ( [example](https://github.com/WordPress/plugin-check/actions/runs/9660204610) ) so tests can be run against all supported environments. Making sure those pass are the important thing. Being able to run them locally is meant to help developers while working on or debugging tests, prior to submitting their code for review.
 
 ## Where to find folder tests
 
 We have this structure for the tests folder:
 
-- tests/behat
-- tests/phpstan
-- tests/phpunit Unit tests for the plugin.
-  - tests/phpunit/tests/Checker/Checks All tests to run inside the plugin.
-  - tests/phpunit/testdata/plugins You will find all data required to run unit tests, organized by folders.
+- `tests/phpunit` Unit tests for the plugin.
+  - `tests/phpunit/tests/` All PHPUnit tests that run as part of the suite.  
+  - `tests/phpunit/testdata/` Example classes or plugins that can be used in tests.  
+  - `tests/phpunit/utils/` Shared helpers that can be used across different test classes.  
 
 Ensure that you create your Check and test unit at same time.
