@@ -22,4 +22,4 @@ We have this structure for the tests folder:
   - `tests/phpunit/testdata/` Example classes or plugins that can be used in tests.  
   - `tests/phpunit/utils/` Shared helpers that can be used across different test classes.  
 
-Ensure that you create your Check and test unit at same time.
+Ensure that you create your check and unit test at same time.
