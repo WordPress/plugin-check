@@ -2,7 +2,7 @@
 
 # Technical Overview
 
-To ensure that all checks are working correctly, the Team has developed Unit test to run the checks whether it pass or fail, to ensure the consistency of the rest of checks and functions. The tests are based on [wp-env](https://make.wordpress.org/core/2020/03/03/wp-env-simple-local-environments-for-wordpress/), so you could run a clean installation to run all tests.
+To ensure that all checks are working correctly, the team is maintaining a set of unit tests. The tests setup is based on [wp-env](https://make.wordpress.org/core/2020/03/03/wp-env-simple-local-environments-for-wordpress/), so you could run a clean installation to run all tests.
 
 Follow these instructions to configure and run tests:
 
