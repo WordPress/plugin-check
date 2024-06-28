@@ -11,7 +11,7 @@ Follow these instructions to configure and run tests:
 3. You need to have Docker installed and running wp-env environment `npm run wp-env start`.
 4. Run tests with npm command `npm run test-php`.
 
-The full test suite is run against PRs as a GitHub action ( [example](https://github.com/WordPress/plugin-check/actions/runs/9660204610) ) so tests can be run against all supported environments. Making sure those pass are the important thing. Being able to run them locally is meant to help developers while working on or debugging tests, prior to submitting their code for review.
+The full test suite is run against PRs as a GitHub action ([example](https://github.com/WordPress/plugin-check/actions/runs/9660204610)) so tests can be run against all supported environments. Passing tests is a requirement for merging PRs. Being able to run them locally is meant to help developers while working on or debugging tests, prior to submitting their code for review.
 
 ## Where to find folder tests
 
