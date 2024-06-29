@@ -13,7 +13,7 @@ Follow these instructions to configure and run tests:
 
 The full test suite is run against PRs as a GitHub action ([example](https://github.com/WordPress/plugin-check/actions/runs/9660204610)) so tests can be run against all supported environments. Passing tests is a requirement for merging PRs. Being able to run them locally is meant to help developers while working on or debugging tests, prior to submitting their code for review.
 
-## Where to find folder tests
+## Tests folder location
 
 We have this structure for the tests folder:
 
