@@ -201,8 +201,11 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 * @param Parser       $parser      The Parser object.
 	 */
 	private function check_license( Check_Result $result, string $readme_file, Parser $parser ) {
-		$license = $parser->license;
+		$license          = $parser->license;
+		$matches_license  = array();
+		$plugin_main_file = WP_PLUGIN_DIR . '/' . $result->plugin()->basename();
 
+		// Filter the readme files.
 		if ( empty( $license ) ) {
 			$this->add_result_error_for_file(
 				$result,
@@ -212,6 +215,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 			);
 
 			return;
+		} else {
+			$license = $this->normalice_licenses( $license );
 		}
 
 		// Test for a valid SPDX license identifier.
@@ -223,6 +228,82 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				$readme_file
 			);
 		}
+
+		$pattern     = preg_quote( 'License', '/' );
+		$has_license = self::file_preg_match( "/(*ANYCRLF)^.*$pattern\s*:\s*(.*)$/im", array( $plugin_main_file ), $matches_license );
+		if ( ! $has_license ) {
+			$this->add_result_error_for_file(
+				$result,
+				__( 'Your plugin has no license declared in Plugin Header. Please update your plugin header with a GPLv2 (or later) compatible license.', 'plugin-check' ),
+				'no_license',
+				$plugin_main_file
+			);
+		} else {
+			$plugin_license = $this->normalice_licenses( $matches_license[1] );
+		}
+
+		// Checks for a valid license in Plugin Header.
+		if ( ! empty( $plugin_license ) && ! preg_match( '/GPL|GNU|MIT|FreeBSD|New BSD|BSD-3-Clause|BSD 3 Clause|OpenLDAP|Expat/im', $plugin_license ) ) {
+			$this->add_result_error_for_file(
+				$result,
+				__( 'Your plugin has an invalid license declared in Plugin Header. Please update your readme with a valid GPL license identifier.', 'plugin-check' ),
+				'invalid_license',
+				$plugin_main_file
+			);
+		}
+
+		// Check different license types.
+		if ( ! empty( $plugin_license ) && ! empty( $license ) && $license !== $plugin_license ) {
+			$this->add_result_warning_for_file(
+				$result,
+				__( 'Your plugin has a different license declared in the readme file and plugin header. Please update your readme with a valid GPL license identifier.', 'plugin-check' ),
+				'license_mismatch',
+				$readme_file
+			);
+		}
+	}
+
+	/**
+	 * Normalice licenses to compare them.
+	 *
+	 * @param string $license The license to normalice.
+	 * @since 1.1.0
+	 *
+	 * @return string
+	 */
+	private function normalice_licenses( $license ) {
+		$license = trim( $license );
+		$license = str_replace( '  ', ' ', $license );
+
+		// Remove some strings at the end.
+		$strings_to_remove = array(
+			'.',
+			'http://www.gnu.org/licenses/old-licenses/gpl-2.0.html',
+			'https://www.gnu.org/licenses/old-licenses/gpl-2.0.html',
+			'https://www.gnu.org/licenses/gpl-3.0.html',
+			' or later',
+			'-or-later',
+			'+',
+		);
+		foreach ( $strings_to_remove as $string_to_remove ) {
+			$position = strrpos( $license, $string_to_remove );
+
+			if ( false !== $position ) {
+				// To remove from the end, the string to remove must be at the end.
+				if ( $position + strlen( $string_to_remove ) === strlen( $license ) ) {
+					$license = trim( substr( $license, 0, $position ) );
+				}
+			}
+		}
+
+		// Versions.
+		$license = str_replace( '-', '', $license );
+		$license = str_replace( 'GNU General Public License (GPL)', 'GPL', $license );
+		$license = str_replace( 'GNU General Public License', 'GPL', $license );
+		$license = preg_replace( '/GPL\s*[-|\.]*\s*[v]?([0-9])(\.[0])?/i', 'GPL$1', $license, 1 );
+		$license = str_replace( '.', '', $license );
+
+		return $license;
 	}
 
 	/**
