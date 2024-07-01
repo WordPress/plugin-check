@@ -148,17 +148,37 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		$parser_warnings = is_array( $parser->warnings ) ? $parser->warnings : array();
 
 		foreach ( $fields as $field_key => $field ) {
-			if ( empty( $parser->{$field_key} ) && ! in_array( $field['ignore_key'], $ignored_warnings, true ) && ! isset( $parser_warnings[ $field['ignore_key'] ] ) ) {
-				$this->add_result_warning_for_file(
-					$result,
-					sprintf(
-						/* translators: %s: plugin header tag */
-						__( 'The "%s" field is missing.', 'plugin-check' ),
-						$field['label']
-					),
-					'missing_readme_header',
-					$readme_file
-				);
+			if ( ! in_array( $field['ignore_key'], $ignored_warnings, true ) && ! isset( $parser_warnings[ $field['ignore_key'] ] ) ) {
+
+				if ( 'tested' === $field_key ) {
+					$latest_wordpress_version = $this->get_wordpress_stable_version();
+					if ( version_compare( $parser->{$field_key}, $latest_wordpress_version, '<' ) ) {
+						$this->add_result_error_for_file(
+							$result,
+							sprintf(
+								/* translators: 1: currently used version, 2: latest stable WordPress version */
+								__( 'Tested up to: %1$s < %2$s', 'plugin-check' ),
+								$parser->{$field_key},
+								$latest_wordpress_version
+							),
+							'outdated_tested_upto_header',
+							$readme_file
+						);
+					}
+				} else {
+					if ( empty( $parser->{$field_key} ) ) {
+						$this->add_result_error_for_file(
+							$result,
+							sprintf(
+								/* translators: %s: plugin header tag */
+								__( 'The "%s" field is missing.', 'plugin-check' ),
+								$field['label']
+							),
+							'missing_readme_header',
+							$readme_file
+						);
+					}
+				}
 			}
 		}
 	}
@@ -457,7 +477,11 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				if ( isset( $body['offers'] ) && ! empty( $body['offers'] ) ) {
 					$latest_release = reset( $body['offers'] );
 
-					$version = $latest_release['new_bundled'];
+					$version = $latest_release['current'];
+
+					if ( preg_match( '#^\d.\d#', $version, $matches ) ) {
+						$version = $matches[0];
+					}
 
 					set_transient( 'wp_plugin_check_latest_wp_version', $version, DAY_IN_SECONDS );
 				}
