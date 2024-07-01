@@ -237,7 +237,7 @@ class Enqueued_Styles_Size_Check extends Abstract_Runtime_Check implements With_
 					$result,
 					sprintf(
 						/* translators: 1: style file size. 2: tested URL. 3: threshold file size. */
-						__( 'This style has a size of %1$s which in combination with the other styles enqueued on %2$s exceeds the style size threshold of %3$s.', 'plugin-check' )
+						__( 'This style has a size of %1$s which in combination with the other styles enqueued on %2$s exceeds the style size threshold of %3$s.', 'plugin-check' ),
 						size_format( $plugin_style['size'] ),
 						$url,
 						size_format( $this->threshold_size )
