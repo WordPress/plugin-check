@@ -477,11 +477,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				if ( isset( $body['offers'] ) && ! empty( $body['offers'] ) ) {
 					$latest_release = reset( $body['offers'] );
 
-					$version = $latest_release['current'];
-
-					if ( preg_match( '#^\d.\d#', $version, $matches ) ) {
-						$version = $matches[0];
-					}
+					$version = $latest_release['new_bundled'];
 
 					set_transient( 'wp_plugin_check_latest_wp_version', $version, DAY_IN_SECONDS );
 				}
