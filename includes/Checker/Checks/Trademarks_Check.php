@@ -13,11 +13,12 @@ use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Traits\Find_Readme;
 use WordPress\Plugin_Check\Traits\Stable_Check;
+use WordPressdotorg\Plugin_Directory\Readme\Parser;
 
 /**
  * Check for trademarks.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 class Trademarks_Check extends Abstract_File_Check {
 
@@ -28,7 +29,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	/**
 	 * Lists of trademark terms that are commonly abused on WordPress.org.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @var string[]
 	 */
@@ -147,7 +148,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	/**
 	 * Lists of trademarks that are allowed as 'for-whatever' ONLY.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @var string[]
 	 */
@@ -158,7 +159,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	/**
 	 * Lists of commonly used 'combo' names (to prevent things like 'woopress').
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @var string[]
 	 */
@@ -174,7 +175,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	/**
 	 * Bitwise flags to control check behavior.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var int
 	 */
 	protected $flags = 0;
@@ -182,7 +183,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	/**
 	 * Constructor.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param int $flags Bitwise flags to control check behavior.
 	 */
@@ -195,7 +196,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	 *
 	 * Every check must have at least one category.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array The categories for the check.
 	 */
@@ -206,7 +207,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	/**
 	 * Check for trademarks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The Check Result to amend.
 	 * @param array        $files  Array of plugin files.
@@ -232,7 +233,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	/**
 	 * Checks the trademarks in readme file plugin name.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The Check Result to amend.
 	 * @param array        $files  Array of plugin files.
@@ -248,24 +249,18 @@ class Trademarks_Check extends Abstract_File_Check {
 			return;
 		}
 
-		$matches = array();
-		// Get the plugin name from readme file.
-		$file = self::file_preg_match( '/===(.*)===/i', $readme, $matches );
+		$readme_file = reset( $readme );
 
-		if ( ! $file || ! isset( $matches[1] ) ) {
-			return;
-		}
-
-		$name = $matches[1];
+		$parser = new Parser( $readme_file );
 
 		try {
-			$this->validate_name_has_no_trademarks( $name );
+			$this->validate_name_has_no_trademarks( $parser->name );
 		} catch ( Exception $e ) {
 			$this->add_result_error_for_file(
 				$result,
 				$e->getMessage(),
 				'trademarked_term',
-				$file
+				$readme_file
 			);
 		}
 	}
@@ -273,7 +268,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	/**
 	 * Checks the readme file for default text.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The Check Result to amend.
 	 */
@@ -302,7 +297,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	/**
 	 * Checks the readme file for default text.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The Check Result to amend.
 	 */
@@ -329,7 +324,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	/**
 	 * Determines if we find a trademarked term in plugin name.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string $plugin_name The plugin name.
 	 *
@@ -348,24 +343,24 @@ class Trademarks_Check extends Abstract_File_Check {
 			// Trademarks that do NOT end in "-", but are within the FOR_USE_EXCEPTIONS array can be used, but only if it ends with 'for x'.
 			$message = sprintf(
 				/* translators: 1: plugin name, 2: found trademarked term */
-				__( 'The plugin name includes a restricted term. Your chosen plugin name - %1$s - contains the restricted term "%2$s" which cannot be used within in your plugin name, unless your plugin name ends with "for %2$s". The term must still not appear anywhere else in your name.', 'plugin-check' ),
-				'<code>' . esc_html( $plugin_name ) . '</code>',
+				__( 'The plugin name includes a restricted term. Your chosen plugin name - "%1$s" - contains the restricted term "%2$s" which cannot be used within in your plugin name, unless your plugin name ends with "for %2$s". The term must still not appear anywhere else in your name.', 'plugin-check' ),
+				esc_html( $plugin_name ),
 				esc_html( trim( $check, '-' ) )
 			);
 		} elseif ( trim( $check, '-' ) === $check ) {
 			// Trademarks that do NOT end in "-" indicate slug cannot contain term at all.
 			$message = sprintf(
 				/* translators: 1: plugin name, 2: found trademarked term */
-				__( 'The plugin name includes a restricted term. Your chosen plugin name - %1$s - contains the restricted term "%2$s" which cannot be used at all in your plugin name.', 'plugin-check' ),
-				'<code>' . esc_html( $plugin_name ) . '</code>',
+				__( 'The plugin name includes a restricted term. Your chosen plugin name - "%1$s" - contains the restricted term "%2$s" which cannot be used at all in your plugin name.', 'plugin-check' ),
+				esc_html( $plugin_name ),
 				esc_html( trim( $check, '-' ) )
 			);
 		} else {
 			// Trademarks ending in "-" indicate slug cannot BEGIN with that term.
 			$message = sprintf(
 				/* translators: 1: plugin name, 2: found trademarked term */
-				__( 'The plugin name includes a restricted term. Your chosen plugin name - %1$s - contains the restricted term "%2$s" and cannot be used to begin your plugin name. We disallow the use of certain terms in ways that are abused, or potentially infringe on and/or are misleading with regards to trademarks. You may use the term "%2$s" elsewhere in your plugin name, such as "... for %2$s".', 'plugin-check' ),
-				'<code>' . esc_html( $plugin_name ) . '</code>',
+				__( 'The plugin name includes a restricted term. Your chosen plugin name - "%1$s" - contains the restricted term "%2$s" and cannot be used to begin your plugin name. We disallow the use of certain terms in ways that are abused, or potentially infringe on and/or are misleading with regards to trademarks. You may use the term "%2$s" elsewhere in your plugin name, such as "... for %2$s".', 'plugin-check' ),
+				esc_html( $plugin_name ),
 				esc_html( trim( $check, '-' ) )
 			);
 		}
@@ -376,7 +371,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	/**
 	 * Determines if we find a trademarked term in plugin slug.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string $plugin_slug The plugin slug.
 	 *
@@ -395,24 +390,24 @@ class Trademarks_Check extends Abstract_File_Check {
 			// Trademarks that do NOT end in "-", but are within the FOR_USE_EXCEPTIONS array can be used, but only if it ends with 'for x'.
 			$message = sprintf(
 				/* translators: 1: plugin slug, 2: found trademarked term */
-				__( 'The plugin slug includes a restricted term. Your plugin slug - %1$s - contains the restricted term "%2$s" which cannot be used within in your plugin slug, unless your plugin slug ends with "for %2$s". The term must still not appear anywhere else in your plugin slug.', 'plugin-check' ),
-				'<code>' . esc_html( $plugin_slug ) . '</code>',
+				__( 'The plugin slug includes a restricted term. Your plugin slug - "%1$s" - contains the restricted term "%2$s" which cannot be used within in your plugin slug, unless your plugin slug ends with "for %2$s". The term must still not appear anywhere else in your plugin slug.', 'plugin-check' ),
+				esc_html( $plugin_slug ),
 				esc_html( trim( $check, '-' ) )
 			);
 		} elseif ( trim( $check, '-' ) === $check ) {
 			// Trademarks that do NOT end in "-" indicate slug cannot contain term at all.
 			$message = sprintf(
 				/* translators: 1: plugin slug, 2: found trademarked term */
-				__( 'The plugin slug includes a restricted term. Your plugin slug - %1$s - contains the restricted term "%2$s" which cannot be used at all in your plugin slug.', 'plugin-check' ),
-				'<code>' . esc_html( $plugin_slug ) . '</code>',
+				__( 'The plugin slug includes a restricted term. Your plugin slug - "%1$s" - contains the restricted term "%2$s" which cannot be used at all in your plugin slug.', 'plugin-check' ),
+				esc_html( $plugin_slug ),
 				esc_html( trim( $check, '-' ) )
 			);
 		} else {
 			// Trademarks ending in "-" indicate slug cannot BEGIN with that term.
 			$message = sprintf(
 				/* translators: 1: plugin slug, 2: found trademarked term */
-				__( 'The plugin slug includes a restricted term. Your plugin slug - %1$s - contains the restricted term "%2$s" and cannot be used to begin your plugin slug. We disallow the use of certain terms in ways that are abused, or potentially infringe on and/or are misleading with regards to trademarks. You may use the term "%2$s" elsewhere in your plugin slug, such as "... for %2$s".', 'plugin-check' ),
-				'<code>' . esc_html( $plugin_slug ) . '</code>',
+				__( 'The plugin slug includes a restricted term. Your plugin slug - "%1$s" - contains the restricted term "%2$s" and cannot be used to begin your plugin slug. We disallow the use of certain terms in ways that are abused, or potentially infringe on and/or are misleading with regards to trademarks. You may use the term "%2$s" elsewhere in your plugin slug, such as "... for %2$s".', 'plugin-check' ),
+				esc_html( $plugin_slug ),
 				esc_html( trim( $check, '-' ) )
 			);
 		}
@@ -423,7 +418,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	/**
 	 * Whether the plugin uses a trademark in the slug.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string $slug The plugin slug.
 	 * @return string|false The trademark slug if found, false otherwise.
@@ -473,7 +468,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	/**
 	 * Validates whether the trademark is valid with a for-use exception.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string $slug      The plugin slug.
 	 * @param string $trademark The trademark term.

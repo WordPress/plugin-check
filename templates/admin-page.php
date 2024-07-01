@@ -23,7 +23,9 @@
 				</h2>
 
 				<select id="plugin-check__plugins-dropdown" name="plugin_check_plugins">
-					<option value=""><?php esc_html_e( 'Select Plugin', 'plugin-check' ); ?></option>
+					<?php if ( 1 !== count( $available_plugins ) ) { ?>
+						<option value=""><?php esc_html_e( 'Select Plugin', 'plugin-check' ); ?></option>
+					<?php } ?>
 					<?php foreach ( $available_plugins as $plugin_basename => $available_plugin ) { ?>
 						<option value="<?php echo esc_attr( $plugin_basename ); ?>"<?php selected( $selected_plugin_basename, $plugin_basename ); ?>>
 							<?php echo esc_html( $available_plugin['Name'] ); ?>
@@ -35,18 +37,18 @@
 				<span id="plugin-check__spinner" class="spinner" style="float: none;"></span>
 				<h4><?php esc_attr_e( 'Categories', 'plugin-check' ); ?></h4>
 				<?php
-				if ( ! empty( $categories ) ) {
+				if ( ! empty( $category_labels ) ) {
 				?>
 				<table>
 				<?php
-				foreach ( $categories as $category ) { ?>
+				foreach ( $category_labels as $category => $label ) { ?>
 					<tr>
 						<td>
 							<fieldset>
 								<legend class="screen-reader-text"><?php echo esc_html( $category ); ?></legend>
 								<label for="<?php echo esc_attr( $category ); ?>">
 									<input type="checkbox" id="<?php echo esc_attr( $category ); ?>" name="categories" value="<?php echo esc_attr( $category ); ?>" <?php checked( in_array( $category, $user_enabled_categories, true ) ); ?> />
-									<?php echo esc_html( ucfirst( str_replace( '_', ' ', $category ) ) ); ?>
+									<?php echo esc_html( $label ); ?>
 								</label>
 							</fieldset>
 						</td>

@@ -1,12 +1,12 @@
 <?php
 /**
- * Tests for the Default_Check_Repository class.
+ * Tests for the Empty_Check_Repository class.
  *
  * @package plugin-check
  */
 
 use WordPress\Plugin_Check\Checker\Check_Repository;
-use WordPress\Plugin_Check\Checker\Default_Check_Repository;
+use WordPress\Plugin_Check\Checker\Empty_Check_Repository;
 use WordPress\Plugin_Check\Test_Data\Check_Without_Category;
 use WordPress\Plugin_Check\Test_Data\Experimental_Runtime_Check;
 use WordPress\Plugin_Check\Test_Data\Experimental_Static_Check;
@@ -14,14 +14,14 @@ use WordPress\Plugin_Check\Test_Data\Invalid_Check;
 use WordPress\Plugin_Check\Test_Data\Runtime_Check;
 use WordPress\Plugin_Check\Test_Data\Static_Check;
 
-class Default_Check_Repository_Tests extends WP_UnitTestCase {
+class Empty_Check_Repository_Tests extends WP_UnitTestCase {
 
 	private $repository;
 
 	public function set_up() {
 		parent::set_up();
 
-		$this->repository = new Default_Check_Repository();
+		$this->repository = new Empty_Check_Repository();
 	}
 
 	public function test_register_static_check() {

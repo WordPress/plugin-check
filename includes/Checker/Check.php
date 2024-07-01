@@ -12,13 +12,13 @@ use Exception;
 /**
  * Interface for a single check.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 interface Check {
 	/**
 	 * Stability value for stable checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var string
 	 */
 	const STABILITY_STABLE = 'STABLE';
@@ -26,7 +26,7 @@ interface Check {
 	/**
 	 * Stability value for experimental checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var string
 	 */
 	const STABILITY_EXPERIMENTAL = 'EXPERIMENTAL';
@@ -34,7 +34,7 @@ interface Check {
 	/**
 	 * Returns the check's stability.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return string One of the check stability constant values.
 	 */
@@ -43,7 +43,7 @@ interface Check {
 	/**
 	 * Amends the given result by running the check on the associated plugin.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 *
@@ -57,7 +57,7 @@ interface Check {
 	 *
 	 * Every check must have at least one category.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array The categories for the check.
 	 */

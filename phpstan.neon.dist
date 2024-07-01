@@ -1,23 +1,15 @@
 parameters:
   level: 5
   paths:
-    - plugin-check.php
+    - plugin.php
     - includes/
   bootstrapFiles:
     - tests/phpstan/bootstrap.php
   scanFiles:
-    - plugin-check.php
+    - plugin.php
     - tests/phpstan/stubs/wp-cli.php
     - tests/phpstan/stubs/exitexception.php
     - tests/phpstan/stubs/formatter.php
   dynamicConstantNames:
     - WP_PLUGIN_CHECK_PLUGIN_DIR_URL
   treatPhpDocTypesAsCertain: false
-  ignoreErrors:
-    # False positive as WordPress ships with a polyfill.
-    -
-      message: '/^Function str_contains not found.$/'
-      paths:
-        - includes/Checker/Checks/Abstract_File_Check.php
-        - includes/Traits/Find_Readme.php
-        - includes/Traits/File_Editor_URL.php

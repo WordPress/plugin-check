@@ -16,7 +16,7 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
 /**
  * Check to detect PHP code obfuscation.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 class Code_Obfuscation_Check extends Abstract_File_Check {
 
@@ -31,7 +31,7 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 	/**
 	 * Bitwise flags to control check behavior.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var int
 	 */
 	protected $flags = 0;
@@ -39,7 +39,7 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 	/**
 	 * Constructor.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param int $flags Bitwise flags to control check behavior.
 	 */
@@ -52,7 +52,7 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 	 *
 	 * Every check must have at least one category.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array The categories for the check.
 	 */
@@ -63,7 +63,7 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 	/**
 	 * Amends the given result by running the check on the given list of files.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 * @param array        $files  List of absolute file paths.
@@ -88,7 +88,7 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 	/**
 	 * Looks for Zend Guard obfuscated files and amends the given result with an error if found.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result    The check result to amend, including the plugin context to check.
 	 * @param array        $php_files List of absolute PHP file paths.
@@ -112,7 +112,7 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 	/**
 	 * Looks for Source Guardian obfuscated files and amends the given result with an error if found.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result    The check result to amend, including the plugin context to check.
 	 * @param array        $php_files List of absolute PHP file paths.
@@ -136,7 +136,7 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 	/**
 	 * Looks for ionCube obfuscated files and amends the given result with an error if found.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result    The check result to amend, including the plugin context to check.
 	 * @param array        $php_files List of absolute PHP file paths.

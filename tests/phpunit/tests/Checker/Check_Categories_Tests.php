@@ -6,7 +6,7 @@
  */
 
 use WordPress\Plugin_Check\Checker\Check_Categories;
-use WordPress\Plugin_Check\Checker\Default_Check_Repository;
+use WordPress\Plugin_Check\Checker\Empty_Check_Repository;
 use WordPress\Plugin_Check\Test_Data\Category_Check_Five;
 use WordPress\Plugin_Check\Test_Data\Category_Check_Four;
 use WordPress\Plugin_Check\Test_Data\Category_Check_One;
@@ -17,13 +17,13 @@ use WordPress\Plugin_Check\Test_Data\Category_Check_Two;
 
 class Check_Categories_Tests extends WP_UnitTestCase {
 	/**
-	 * @var Default_Check_Repository
+	 * @var Empty_Check_Repository
 	 */
 	protected $repository;
 
 	public function set_up() {
 		parent::set_up();
-		$this->repository = new Default_Check_Repository();
+		$this->repository = new Empty_Check_Repository();
 	}
 
 	public function test_get_categories() {
@@ -37,6 +37,16 @@ class Check_Categories_Tests extends WP_UnitTestCase {
 		foreach ( $category_constants as $constant_value ) {
 			$this->assertContains( $constant_value, $categories );
 		}
+	}
+
+	public function test_get_category_labels() {
+		$check_categories = new Check_Categories();
+		$categories       = $check_categories->get_categories();
+		$category_labels  = $check_categories->get_category_labels();
+
+		$this->assertIsArray( $category_labels );
+		$this->assertNotEmpty( $category_labels );
+		$this->assertSame( $categories, array_keys( $category_labels ) );
 	}
 
 	/**

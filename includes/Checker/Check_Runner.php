@@ -12,14 +12,14 @@ use Exception;
 /**
  * Interface for runner classes like AJAX runner or CLI runner.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 interface Check_Runner {
 
 	/**
 	 * Determines if the current request is intended for the plugin checker.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return boolean Returns true if the check is for plugin else false.
 	 */
@@ -28,7 +28,7 @@ interface Check_Runner {
 	/**
 	 * Prepares the environment for running the requested checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return callable Cleanup function to revert any changes made here.
 	 *
@@ -39,7 +39,7 @@ interface Check_Runner {
 	/**
 	 * Runs the requested checks against the plugin context and returns the results.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return Check_Result Object containing all check results.
 	 *

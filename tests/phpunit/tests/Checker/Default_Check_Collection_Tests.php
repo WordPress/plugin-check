@@ -5,7 +5,7 @@
  * @package plugin-check
  */
 
-use WordPress\Plugin_Check\Checker\Default_Check_Repository;
+use WordPress\Plugin_Check\Checker\Empty_Check_Repository;
 use WordPress\Plugin_Check\Checker\Runtime_Check as Runtime_Check_Interface;
 use WordPress\Plugin_Check\Test_Data\Runtime_Check;
 use WordPress\Plugin_Check\Test_Data\Static_Check;
@@ -23,7 +23,7 @@ class Default_Check_Collection_Tests extends WP_UnitTestCase {
 			'runtime_check' => new Runtime_Check(),
 		);
 
-		$repository = new Default_Check_Repository();
+		$repository = new Empty_Check_Repository();
 		foreach ( $this->checks as $slug => $check ) {
 			$repository->register_check( $slug, $check );
 		}

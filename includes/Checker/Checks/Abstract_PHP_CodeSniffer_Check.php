@@ -17,7 +17,7 @@ use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 /**
  * Check for running one or more PHP CodeSniffer sniffs.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 
@@ -26,7 +26,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	/**
 	 * List of allowed PHPCS arguments.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var array
 	 */
 	protected $allowed_args = array(
@@ -39,7 +39,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	/**
 	 * Returns an associative array of arguments to pass to PHPCS.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array {
 	 *    An associative array of PHPCS CLI arguments. Can include one or more of the following options.
@@ -55,7 +55,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	/**
 	 * Amends the given result by running the check on the associated plugin.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 *
@@ -77,20 +77,10 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		}
 
 		// Backup the original command line arguments.
-		$orig_cmd_args = $_SERVER['argv'];
+		$orig_cmd_args = $_SERVER['argv'] ?? '';
 
 		// Create the default arguments for PHPCS.
-		$defaults = array(
-			'',
-			$result->plugin()->location(),
-			'--report=Json',
-			'--report-width=9999',
-		);
-
-		$directories_to_ignore = Plugin_Request_Utility::get_directories_to_ignore();
-		if ( ! empty( $directories_to_ignore ) ) {
-			$defaults[] = '--ignore=*/' . implode( '/*,*/', $directories_to_ignore ) . '/*';
-		}
+		$defaults = $this->get_argv_defaults( $result );
 
 		// Set the check arguments for PHPCS.
 		$_SERVER['argv'] = $this->parse_argv( $this->get_args(), $defaults );
@@ -141,7 +131,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	/**
 	 * Parse the command arguments.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array $argv     An array of arguments to pass.
 	 * @param array $defaults An array of default arguments.
@@ -160,10 +150,42 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	}
 
 	/**
+	 * Gets the default command arguments.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param Check_Result $result The check result to amend, including the plugin context to check.
+	 * @return array An indexed array of PHPCS CLI arguments.
+	 */
+	private function get_argv_defaults( Check_Result $result ): array {
+		$defaults = array(
+			'',
+			$result->plugin()->location(),
+			'--report=Json',
+			'--report-width=9999',
+		);
+
+		$directories_to_ignore = Plugin_Request_Utility::get_directories_to_ignore();
+		if ( ! empty( $directories_to_ignore ) ) {
+			$defaults[] = '--ignore=*/' . implode( '/*,*/', $directories_to_ignore ) . '/*';
+		}
+
+		// Set the Minimum WP version supported for the plugin.
+		if ( $result->plugin()->minimum_supported_wp() ) {
+			// Due to the syntax of runtime-set, these must be passed as individual args.
+			$defaults[] = '--runtime-set';
+			$defaults[] = 'minimum_wp_version';
+			$defaults[] = $result->plugin()->minimum_supported_wp();
+		}
+
+		return $defaults;
+	}
+
+	/**
 	 * Resets \PHP_CodeSniffer\Config::$overriddenDefaults to prevent
 	 * incorrect results when running multiple checks.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 */
 	private function reset_php_codesniffer_config() {
 		if ( class_exists( '\PHP_CodeSniffer\Config' ) ) {
@@ -176,7 +198,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 			$reflected_phpcs_config = new \ReflectionClass( '\PHP_CodeSniffer\Config' );
 			$overridden_defaults    = $reflected_phpcs_config->getProperty( 'overriddenDefaults' );
 			$overridden_defaults->setAccessible( true );
-			$overridden_defaults->setValue( array() );
+			$overridden_defaults->setValue( $reflected_phpcs_config, array() );
 			$overridden_defaults->setAccessible( false );
 		}
 	}

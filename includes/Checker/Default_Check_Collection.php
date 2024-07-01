@@ -14,14 +14,14 @@ use Traversable;
 /**
  * Default Check Collection class.
  *
- * @since n.e.x.t
+ * @since 1.0.0
  */
 class Default_Check_Collection implements Check_Collection {
 
 	/**
 	 * Map of `$check_slug => $check_obj` pairs.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var array
 	 */
 	private $checks;
@@ -29,7 +29,7 @@ class Default_Check_Collection implements Check_Collection {
 	/**
 	 * List of check slugs, in the same order as `$checks` - effectively the keys of that array.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 * @var array
 	 */
 	private $slugs;
@@ -37,7 +37,7 @@ class Default_Check_Collection implements Check_Collection {
 	/**
 	 * Constructor.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array $checks Map of `$check_slug => $check_obj` pairs for the collection.
 	 */
@@ -49,7 +49,7 @@ class Default_Check_Collection implements Check_Collection {
 	/**
 	 * Returns the raw indexed array representation of this collection.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array The indexed array of check objects.
 	 */
@@ -60,7 +60,7 @@ class Default_Check_Collection implements Check_Collection {
 	/**
 	 * Returns the raw map of check slugs and their check objects as a representation of this collection.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return array Map of `$check_slug => $check_obj` pairs.
 	 */
@@ -71,7 +71,7 @@ class Default_Check_Collection implements Check_Collection {
 	/**
 	 * Returns a new check collection containing the subset of checks based on the given check filter function.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @phpstan-param callable(Check,string): bool $filter_fn
 	 *
@@ -94,7 +94,7 @@ class Default_Check_Collection implements Check_Collection {
 	 *
 	 * If the given list is empty, the same collection will be returned without any change.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array $check_slugs List of slugs to limit to only those. If empty, the same collection is returned.
 	 * @return Check_Collection New check collection, effectively a subset of this one.
@@ -124,7 +124,7 @@ class Default_Check_Collection implements Check_Collection {
 	 *
 	 * If the given list is empty, the same collection will be returned without any change.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array $check_slugs List of slugs to exclude. If empty, the same collection is returned.
 	 * @return Check_Collection New check collection, effectively a subset of this one.
@@ -136,7 +136,7 @@ class Default_Check_Collection implements Check_Collection {
 		}
 
 		return $this->filter(
-			static function ( Check $check, $slug ) use( $check_slugs ) {
+			static function ( Check $check, $slug ) use ( $check_slugs ) {
 				return ! in_array( $slug, $check_slugs, true );
 			}
 		);
@@ -145,7 +145,7 @@ class Default_Check_Collection implements Check_Collection {
 	/**
 	 * Throws an exception if any of the given check slugs are not present, or returns the same collection otherwise.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param array $check_slugs List of slugs to limit to only those. If empty, the same collection is returned.
 	 * @return Check_Collection The unchanged check collection.
@@ -171,7 +171,7 @@ class Default_Check_Collection implements Check_Collection {
 	/**
 	 * Counts the checks in the collection.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return int Number of checks in the collection.
 	 */
@@ -182,7 +182,7 @@ class Default_Check_Collection implements Check_Collection {
 	/**
 	 * Returns an iterator for the checks in the collection.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @return Traversable Checks iterator.
 	 */
@@ -193,11 +193,12 @@ class Default_Check_Collection implements Check_Collection {
 	/**
 	 * Checks whether a check exists with the given slug or index.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string|int $offset Either a check slug (string) or index (integer).
 	 * @return bool True if a check exists at the given slug or index, false otherwise.
 	 */
+	#[\ReturnTypeWillChange]
 	public function offsetExists( $offset ) {
 		if ( is_string( $offset ) ) {
 			return isset( $this->checks[ $offset ] );
@@ -209,11 +210,12 @@ class Default_Check_Collection implements Check_Collection {
 	/**
 	 * Retrieves the check with the given slug or index.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string|int $offset Either a check slug (string) or index (integer).
 	 * @return Check|null Check with the given slug or index, or null if it does not exist.
 	 */
+	#[\ReturnTypeWillChange]
 	public function offsetGet( $offset ) {
 		if ( is_string( $offset ) ) {
 			if ( isset( $this->checks[ $offset ] ) ) {
@@ -234,11 +236,12 @@ class Default_Check_Collection implements Check_Collection {
 	 *
 	 * This method does nothing as the collection is read-only.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string|int $offset Either a check slug (string) or index (integer).
 	 * @param mixed      $value  Value to set.
 	 */
+	#[\ReturnTypeWillChange]
 	public function offsetSet( $offset, $value ) {
 		// Not implemented as this is a read-only collection.
 	}
@@ -248,10 +251,11 @@ class Default_Check_Collection implements Check_Collection {
 	 *
 	 * This method does nothing as the collection is read-only.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.0.0
 	 *
 	 * @param string|int $offset Either a check slug (string) or index (integer).
 	 */
+	#[\ReturnTypeWillChange]
 	public function offsetUnset( $offset ) {
 		// Not implemented as this is a read-only collection.
 	}

@@ -13,7 +13,7 @@ if ( ! class_exists( 'SebastianBergmann\CodeCoverage\Filter' ) ) {
 
 $filter = new Filter();
 $filter->includeDirectory( "{$root_folder}/includes" );
-$filter->includeFiles( array( "{$root_folder}/plugin-check.php" ) );
+$filter->includeFiles( array( "{$root_folder}/plugin.php" ) );
 
 $coverage = new CodeCoverage(
 	( new Selector() )->forLineCoverage( $filter ),
