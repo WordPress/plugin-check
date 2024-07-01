@@ -150,7 +150,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		foreach ( $fields as $field_key => $field ) {
 			if ( ! in_array( $field['ignore_key'], $ignored_warnings, true ) && ! isset( $parser_warnings[ $field['ignore_key'] ] ) ) {
 
-				if ( 'tested' === $field_key ) {
+				if ( ! empty( $parser->{$field_key} ) && 'tested' === $field_key ) {
 					$latest_wordpress_version = $this->get_wordpress_stable_version();
 					if ( version_compare( $parser->{$field_key}, $latest_wordpress_version, '<' ) ) {
 						$this->add_result_error_for_file(
@@ -477,7 +477,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				if ( isset( $body['offers'] ) && ! empty( $body['offers'] ) ) {
 					$latest_release = reset( $body['offers'] );
 
-					$version = $latest_release['new_bundled'];
+					$version = $latest_release['current'];
 
 					set_transient( 'wp_plugin_check_latest_wp_version', $version, DAY_IN_SECONDS );
 				}
@@ -490,10 +490,10 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 			// Strip off any -alpha, -RC, -beta suffixes.
 			list( $version, ) = explode( '-', $version );
+		}
 
-			if ( preg_match( '#^\d.\d#', $version, $matches ) ) {
-				$version = $matches[0];
-			}
+		if ( preg_match( '#^\d.\d#', $version, $matches ) ) {
+			$version = $matches[0];
 		}
 
 		return $version;
