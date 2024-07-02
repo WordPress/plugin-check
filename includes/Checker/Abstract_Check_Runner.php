@@ -525,7 +525,9 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @return Check_Context The check context for the plugin file.
 	 */
 	private function get_check_context() {
-		return new Check_Context( WP_PLUGIN_DIR . '/' . $this->get_plugin_basename() );
+		$plugin_basename = $this->get_plugin_basename();
+		$plugin_path     = is_dir( $plugin_basename ) ? $plugin_basename : WP_PLUGIN_DIR . '/' . $plugin_basename;
+		return new Check_Context( $plugin_path );
 	}
 
 	/**
