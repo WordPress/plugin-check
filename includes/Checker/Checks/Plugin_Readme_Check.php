@@ -18,6 +18,8 @@ use WordPressdotorg\Plugin_Directory\Readme\Parser;
  * Check the plugins readme file and contents.
  *
  * @since 1.0.0
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class Plugin_Readme_Check extends Abstract_File_Check {
 
