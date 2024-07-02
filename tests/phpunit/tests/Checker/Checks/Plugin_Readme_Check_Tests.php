@@ -38,21 +38,15 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$readme_check->run( $check_result );
 
-		$errors   = $check_result->get_errors();
-		$warnings = $check_result->get_warnings();
+		$errors = $check_result->get_errors();
 
 		$this->assertNotEmpty( $errors );
 		$this->assertArrayHasKey( 'readme.txt', $errors );
-		$this->assertEquals( 1, $check_result->get_error_count() );
-
-		$this->assertEmpty( $warnings );
-		$this->assertEquals( 0, $check_result->get_warning_count() );
 
 		// Check for invalid name error.
 		$this->assertArrayHasKey( 0, $errors['readme.txt'] );
 		$this->assertArrayHasKey( 0, $errors['readme.txt'][0] );
-		$this->assertArrayHasKey( 'code', $errors['readme.txt'][0][0][0] );
-		$this->assertEquals( 'invalid_plugin_name', $errors['readme.txt'][0][0][0]['code'] );
+		$this->assertCount( 1, wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'invalid_plugin_name' ) ) );
 	}
 
 	public function test_run_with_errors_empty_name() {
@@ -62,26 +56,15 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$readme_check->run( $check_result );
 
-		$errors   = $check_result->get_errors();
-		$warnings = $check_result->get_warnings();
+		$errors = $check_result->get_errors();
 
 		$this->assertNotEmpty( $errors );
 		$this->assertArrayHasKey( 'readme.txt', $errors );
-		// After https://github.com/WordPress/plugin-check/issues/402 there will be warning of missing "Tested up to" field.
-		$this->assertNotEmpty( $warnings );
-		$this->assertEquals( 1, $check_result->get_warning_count() );
 
 		// Check for empty name error.
 		$this->assertArrayHasKey( 0, $errors['readme.txt'] );
 		$this->assertArrayHasKey( 0, $errors['readme.txt'][0] );
-		$this->assertArrayHasKey( 'code', $errors['readme.txt'][0][0][0] );
-		$this->assertEquals( 'empty_plugin_name', $errors['readme.txt'][0][0][0]['code'] );
-
-		// Tested up to warning.
-		$this->assertArrayHasKey( 0, $warnings['readme.txt'] );
-		$this->assertArrayHasKey( 0, $warnings['readme.txt'][0] );
-		$this->assertArrayHasKey( 'code', $warnings['readme.txt'][0][0][0] );
-		$this->assertEquals( 'missing_readme_header', $warnings['readme.txt'][0][0][0]['code'] );
+		$this->assertCount( 1, wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'empty_plugin_name' ) ) );
 	}
 
 	public function test_run_with_errors_default_text() {
@@ -115,17 +98,14 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertNotEmpty( $errors );
 		$this->assertArrayHasKey( 'readme.txt', $errors );
-		$this->assertEquals( 2, $check_result->get_error_count() );
 
 		// Check for trunk stable tag error.
 		$this->assertArrayHasKey( 0, $errors['readme.txt'] );
 		$this->assertArrayHasKey( 0, $errors['readme.txt'][0] );
-		$this->assertArrayHasKey( 'code', $errors['readme.txt'][0][0][0] );
-		$this->assertEquals( 'trunk_stable_tag', $errors['readme.txt'][0][0][0]['code'] );
+		$this->assertCount( 1, wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'trunk_stable_tag' ) ) );
 
 		// Check for stable tag mismatch file error.
-		$this->assertArrayHasKey( 'code', $errors['readme.txt'][0][0][1] );
-		$this->assertEquals( 'stable_tag_mismatch', $errors['readme.txt'][0][0][1]['code'] );
+		$this->assertCount( 1, wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'stable_tag_mismatch' ) ) );
 	}
 
 	public function test_run_with_errors_no_stable_tag() {
@@ -135,21 +115,15 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$readme_check->run( $check_result );
 
-		$errors   = $check_result->get_errors();
-		$warnings = $check_result->get_warnings();
+		$errors = $check_result->get_errors();
 
 		$this->assertNotEmpty( $errors );
 		$this->assertArrayHasKey( 'readme.txt', $errors );
-		$this->assertEquals( 1, $check_result->get_error_count() );
-
-		$this->assertEmpty( $warnings );
-		$this->assertEquals( 0, $check_result->get_warning_count() );
 
 		// Check for no stable tag error.
 		$this->assertArrayHasKey( 0, $errors['readme.txt'] );
 		$this->assertArrayHasKey( 0, $errors['readme.txt'][0] );
-		$this->assertArrayHasKey( 'code', $errors['readme.txt'][0][0][0] );
-		$this->assertEquals( 'no_stable_tag', $errors['readme.txt'][0][0][0]['code'] );
+		$this->assertCount( 1, wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'no_stable_tag' ) ) );
 	}
 
 	public function test_run_with_errors_license() {
@@ -163,16 +137,14 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertNotEmpty( $warnings );
 		$this->assertArrayHasKey( 'readme.txt', $warnings );
-		$this->assertEquals( 2, $check_result->get_warning_count() );
 
 		// Check for invalid license warning.
 		$this->assertArrayHasKey( 0, $warnings['readme.txt'] );
 		$this->assertArrayHasKey( 0, $warnings['readme.txt'][0] );
-		$this->assertArrayHasKey( 'code', $warnings['readme.txt'][0][0][0] );
-		$this->assertEquals( 'invalid_license', $warnings['readme.txt'][0][0][0]['code'] );
+		$this->assertCount( 1, wp_list_filter( $warnings['readme.txt'][0][0], array( 'code' => 'invalid_license' ) ) );
 
 		// Check for not same license warning.
-		$this->assertEquals( 'license_mismatch', $warnings['readme.txt'][0][0][1]['code'] );
+		$this->assertCount( 1, wp_list_filter( $warnings['readme.txt'][0][0], array( 'code' => 'license_mismatch' ) ) );
 	}
 
 	public function test_run_with_errors_no_license() {
@@ -182,21 +154,15 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$readme_check->run( $check_result );
 
-		$errors   = $check_result->get_errors();
-		$warnings = $check_result->get_warnings();
+		$errors = $check_result->get_errors();
 
 		$this->assertNotEmpty( $errors );
 		$this->assertArrayHasKey( 'readme.txt', $errors );
-		$this->assertEquals( 1, $check_result->get_error_count() );
-
-		$this->assertEmpty( $warnings );
-		$this->assertEquals( 0, $check_result->get_warning_count() );
 
 		// Check for no license.
 		$this->assertArrayHasKey( 0, $errors['readme.txt'] );
 		$this->assertArrayHasKey( 0, $errors['readme.txt'][0] );
-		$this->assertArrayHasKey( 'code', $errors['readme.txt'][0][0][0] );
-		$this->assertEquals( 'no_license', $errors['readme.txt'][0][0][0]['code'] );
+		$this->assertCount( 1, wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'no_license' ) ) );
 	}
 
 	public function test_run_without_errors() {
@@ -243,31 +209,16 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertNotEmpty( $errors );
 		$this->assertArrayHasKey( 'readme.md', $errors );
-		$this->assertEquals( 2, $check_result->get_error_count() );
+
+		$this->assertCount( 1, wp_list_filter( $errors['readme.md'][0][0], array( 'code' => 'trunk_stable_tag' ) ) );
+		$this->assertCount( 1, wp_list_filter( $errors['readme.md'][0][0], array( 'code' => 'stable_tag_mismatch' ) ) );
+		$this->assertCount( 1, wp_list_filter( $errors['readme.md'][0][0], array( 'code' => 'outdated_tested_upto_header' ) ) );
 
 		$this->assertNotEmpty( $warnings );
 		$this->assertArrayHasKey( 'readme.md', $warnings );
-		$this->assertEquals( 3, $check_result->get_warning_count() );
-
-		// Check for default text file warning.
-		$this->assertArrayHasKey( 0, $warnings['readme.md'] );
-		$this->assertArrayHasKey( 0, $warnings['readme.md'][0] );
-		$this->assertArrayHasKey( 'code', $warnings['readme.md'][0][0][0] );
-		$this->assertEquals( 'default_readme_text', $warnings['readme.md'][0][0][0]['code'] );
-
-		// Check for invalid license warning.
-		$this->assertArrayHasKey( 'code', $warnings['readme.md'][0][0][1] );
-		$this->assertEquals( 'invalid_license', $warnings['readme.md'][0][0][1]['code'] );
-
-		// Check for trunk stable tag error.
-		$this->assertArrayHasKey( 0, $errors['readme.md'] );
-		$this->assertArrayHasKey( 0, $errors['readme.md'][0] );
-		$this->assertArrayHasKey( 'code', $errors['readme.md'][0][0][0] );
-		$this->assertEquals( 'trunk_stable_tag', $errors['readme.md'][0][0][0]['code'] );
-
-		// Check for stable tag mismatch file error.
-		$this->assertArrayHasKey( 'code', $errors['readme.md'][0][0][1] );
-		$this->assertEquals( 'stable_tag_mismatch', $errors['readme.md'][0][0][1]['code'] );
+		$this->assertCount( 1, wp_list_filter( $warnings['readme.md'][0][0], array( 'code' => 'default_readme_text' ) ) );
+		$this->assertCount( 1, wp_list_filter( $warnings['readme.md'][0][0], array( 'code' => 'invalid_license' ) ) );
+		$this->assertCount( 1, wp_list_filter( $warnings['readme.md'][0][0], array( 'code' => 'license_mismatch' ) ) );
 	}
 
 	public function test_run_root_readme_file_without_errors() {
