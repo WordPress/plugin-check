@@ -18,6 +18,8 @@ use WordPressdotorg\Plugin_Directory\Readme\Parser;
  * Check the plugins readme file and contents.
  *
  * @since 1.0.0
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class Plugin_Readme_Check extends Abstract_File_Check {
 
@@ -77,6 +79,9 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		// Check the readme file for plugin name.
 		$this->check_name( $result, $readme_file, $parser );
 
+		// Check the readme file for missing headers.
+		$this->check_headers( $result, $readme_file, $parser );
+
 		// Check the readme file for default text.
 		$this->check_default_text( $result, $readme_file, $parser );
 
@@ -119,6 +124,67 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 			);
 
 			$this->add_result_error_for_file( $result, $message, 'empty_plugin_name', $readme_file );
+		}
+	}
+
+	/**
+	 * Checks the readme file for missing headers.
+	 *
+	 * @since 1.0.2
+	 *
+	 * @param Check_Result $result      The Check Result to amend.
+	 * @param string       $readme_file Readme file.
+	 * @param Parser       $parser      The Parser object.
+	 */
+	private function check_headers( Check_Result $result, string $readme_file, Parser $parser ) {
+		$ignored_warnings = $this->get_ignored_warnings( $parser );
+
+		$fields = array(
+			'tested'       => array(
+				'label'      => __( 'Tested up to', 'plugin-check' ),
+				'ignore_key' => 'tested_header_ignored',
+			),
+			'contributors' => array(
+				'label'      => __( 'Contributors', 'plugin-check' ),
+				'ignore_key' => 'contributor_ignored',
+			),
+		);
+
+		$parser_warnings = is_array( $parser->warnings ) ? $parser->warnings : array();
+
+		foreach ( $fields as $field_key => $field ) {
+			if ( ! in_array( $field['ignore_key'], $ignored_warnings, true ) && ! isset( $parser_warnings[ $field['ignore_key'] ] ) ) {
+
+				if ( ! empty( $parser->{$field_key} ) && 'tested' === $field_key ) {
+					$latest_wordpress_version = $this->get_wordpress_stable_version();
+					if ( version_compare( $parser->{$field_key}, $latest_wordpress_version, '<' ) ) {
+						$this->add_result_error_for_file(
+							$result,
+							sprintf(
+								/* translators: 1: currently used version, 2: latest stable WordPress version */
+								__( 'Tested up to: %1$s < %2$s', 'plugin-check' ),
+								$parser->{$field_key},
+								$latest_wordpress_version
+							),
+							'outdated_tested_upto_header',
+							$readme_file
+						);
+					}
+				} else {
+					if ( empty( $parser->{$field_key} ) ) {
+						$this->add_result_error_for_file(
+							$result,
+							sprintf(
+								/* translators: %s: plugin header tag */
+								__( 'The "%s" field is missing.', 'plugin-check' ),
+								$field['label']
+							),
+							'missing_readme_header',
+							$readme_file
+						);
+					}
+				}
+			}
 		}
 	}
 
@@ -370,10 +436,6 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 		$latest_wordpress_version = (float) $this->get_wordpress_stable_version();
 
-		$ignored_warnings = array(
-			'contributor_ignored',
-		);
-
 		$messages = array(
 			'contributor_ignored'          => sprintf(
 				/* translators: %s: plugin header tag */
@@ -424,15 +486,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 			),
 		);
 
-		/**
-		 * Filter the list of ignored readme parser warnings.
-		 *
-		 * @since 1.0.0
-		 *
-		 * @param array  $ignored_warnings Array of ignored warning keys.
-		 * @param Parser $parser           The Parser object.
-		 */
-		$ignored_warnings = (array) apply_filters( 'wp_plugin_check_ignored_readme_warnings', $ignored_warnings, $parser );
+		$ignored_warnings = $this->get_ignored_warnings( $parser );
 
 		$warning_keys = array_diff( $warning_keys, $ignored_warnings );
 
@@ -462,7 +516,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				if ( isset( $body['offers'] ) && ! empty( $body['offers'] ) ) {
 					$latest_release = reset( $body['offers'] );
 
-					$version = $latest_release['new_bundled'];
+					$version = $latest_release['current'];
 
 					set_transient( 'wp_plugin_check_latest_wp_version', $version, DAY_IN_SECONDS );
 				}
@@ -475,12 +529,38 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 			// Strip off any -alpha, -RC, -beta suffixes.
 			list( $version, ) = explode( '-', $version );
+		}
 
-			if ( preg_match( '#^\d.\d#', $version, $matches ) ) {
-				$version = $matches[0];
-			}
+		if ( preg_match( '#^\d.\d#', $version, $matches ) ) {
+			$version = $matches[0];
 		}
 
 		return $version;
+	}
+
+	/**
+	 * Returns ignored warnings.
+	 *
+	 * @since 1.0.2
+	 *
+	 * @param Parser $parser The Parser object.
+	 * @return array Ignored warnings.
+	 */
+	private function get_ignored_warnings( Parser $parser ) {
+		$ignored_warnings = array(
+			'contributor_ignored',
+		);
+
+		/**
+		 * Filter the list of ignored readme parser warnings.
+		 *
+		 * @since 1.0.2
+		 *
+		 * @param array  $ignored_warnings Array of ignored warning keys.
+		 * @param Parser $parser           The Parser object.
+		 */
+		$ignored_warnings = (array) apply_filters( 'wp_plugin_check_ignored_readme_warnings', $ignored_warnings, $parser );
+
+		return $ignored_warnings;
 	}
 }
