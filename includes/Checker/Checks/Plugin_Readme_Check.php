@@ -91,6 +91,9 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		// Check the readme file for a valid version.
 		$this->check_stable_tag( $result, $readme_file, $parser );
 
+		// Check the readme file for upgrade notice.
+		$this->check_upgrade_notice( $result, $readme_file, $parser );
+
 		// Check the readme file for warnings.
 		$this->check_for_warnings( $result, $readme_file, $parser );
 	}
@@ -377,6 +380,40 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				'stable_tag_mismatch',
 				$readme_file
 			);
+		}
+	}
+
+	/**
+	 * Checks the readme file upgrade notice.
+	 *
+	 * @since 1.0.2
+	 *
+	 * @param Check_Result $result      The Check Result to amend.
+	 * @param string       $readme_file Readme file.
+	 * @param Parser       $parser      The Parser object.
+	 */
+	private function check_upgrade_notice( Check_Result $result, string $readme_file, Parser $parser ) {
+		$notices = $parser->upgrade_notice;
+
+		$maximum_characters = 300;
+
+		// Bail if no upgrade notices.
+		if ( 0 === count( $notices ) ) {
+			return;
+		}
+
+		foreach ( $notices as $version => $notice ) {
+			if ( strlen( $notice ) > $maximum_characters ) {
+				if ( empty( $version ) ) {
+					/* translators: %d: maximum limit. */
+					$message = sprintf( _n( 'The upgrade notice exceeds the limit of %d character.', 'The upgrade notice exceeds the limit of %d characters.', $maximum_characters, 'plugin-check' ), $maximum_characters );
+				} else {
+					/* translators: 1: version, 2: maximum limit. */
+					$message = sprintf( _n( 'The upgrade notice for "%1$s" exceeds the limit of %2$d character.', 'The upgrade notice for "%1$s" exceeds the limit of %2$d characters.', $maximum_characters, 'plugin-check' ), $version, $maximum_characters );
+				}
+
+				$this->add_result_warning_for_file( $result, $message, 'upgrade_notice_limit', $readme_file );
+			}
 		}
 	}
 
