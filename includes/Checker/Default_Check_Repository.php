@@ -51,6 +51,7 @@ class Default_Check_Repository extends Empty_Check_Repository {
 				'direct_db_queries'          => new Checks\Direct_DB_Queries_Check(),
 				'performant_wp_query_params' => new Checks\Performant_WP_Query_Params_Check(),
 				'enqueued_scripts_in_footer' => new Checks\Enqueued_Scripts_In_Footer_Check(),
+				'enqueued_resources'         => new Checks\Enqueued_Resources_Check(),
 				'plugin_readme'              => new Checks\Plugin_Readme_Check(),
 				'enqueued_styles_scope'      => new Checks\Enqueued_Styles_Scope_Check(),
 				'localhost'                  => new Checks\Localhost_Check(),
