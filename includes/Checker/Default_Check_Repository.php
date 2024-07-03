@@ -41,6 +41,7 @@ class Default_Check_Repository extends Empty_Check_Repository {
 			array(
 				'i18n_usage'                 => new Checks\General\I18n_Usage_Check(),
 				'enqueued_scripts_size'      => new Checks\Performance\Enqueued_Scripts_Size_Check(),
+				'enqueued_styles_size'       => new Checks\Performance\Enqueued_Styles_Size_Check(),
 				'code_obfuscation'           => new Checks\Plugin_Repo\Code_Obfuscation_Check(),
 				'file_type'                  => new Checks\Plugin_Repo\File_Type_Check(),
 				'plugin_header_text_domain'  => new Checks\Plugin_Repo\Plugin_Header_Text_Domain_Check(),
@@ -52,6 +53,7 @@ class Default_Check_Repository extends Empty_Check_Repository {
 				'enqueued_scripts_in_footer' => new Checks\Performance\Enqueued_Scripts_In_Footer_Check(),
 				'plugin_readme'              => new Checks\Plugin_Repo\Plugin_Readme_Check(),
 				'enqueued_styles_scope'      => new Checks\Performance\Enqueued_Styles_Scope_Check(),
+				'enqueued_scripts_scope'     => new Checks\Performance\Enqueued_Scripts_Scope_Check(),
 				'localhost'                  => new Checks\Plugin_Repo\Localhost_Check(),
 				'no_unfiltered_uploads'      => new Checks\Plugin_Repo\No_Unfiltered_Uploads_Check(),
 				'trademarks'                 => new Checks\Plugin_Repo\Trademarks_Check(),
