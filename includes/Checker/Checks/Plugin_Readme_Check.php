@@ -339,7 +339,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		foreach ( $notices as $version => $notice ) {
 			if ( strlen( $notice ) > $maximum_characters ) {
 				if ( empty( $version ) ) {
-					/* translators: %s: maximum limit. */
+					/* translators: %d: maximum limit. */
 					$message = sprintf( _n( 'The upgrade notice exceeds the limit of %d character.', 'The upgrade notice exceeds the limit of %d characters.', $maximum_characters, 'plugin-check' ), $maximum_characters );
 				} else {
 					/* translators: 1: version, 2: maximum limit. */
