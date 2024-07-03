@@ -48,8 +48,6 @@ jobs:
       fail-fast: true
       matrix:
         php:
-        - '7.0'
-        - '7.1'
         - '7.2'
         - '7.3'
         - '7.4'
@@ -60,9 +58,6 @@ jobs:
           - php: '8.2'
             wordpress: 'latest'
             coverage: true
-          - php: '8.2'
-            wordpress: 'trunk'
-            experimental: true
           - php: '8.3'
             wordpress: 'trunk'
             experimental: true
@@ -70,14 +65,14 @@ jobs:
       WP_ENV_PHP_VERSION: ${{ matrix.php }}
       WP_ENV_CORE: ${{ matrix.wordpress == 'trunk' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', matrix.wordpress ) }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
 
       - name: Setup Node.js (.nvmrc)
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
           cache: npm

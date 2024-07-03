@@ -1,6 +1,6 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\Enqueued_Scripts_Size_Check
+ * Class WordPress\Plugin_Check\Checker\Checks\Enqueued_Styles_Size_Check
  *
  * @package plugin-check
  */
@@ -17,20 +17,20 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
 use WordPress\Plugin_Check\Traits\URL_Aware;
 
 /**
- * Check for enqueued script sizes.
+ * Check for enqueued style sizes.
  *
- * @since 1.0.0
+ * @since 1.0.2
  */
-class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With_Shared_Preparations {
+class Enqueued_Styles_Size_Check extends Abstract_Runtime_Check implements With_Shared_Preparations {
 
 	use Amend_Check_Result;
 	use Stable_Check;
 	use URL_Aware;
 
 	/**
-	 * Threshold for script size to surface a warning for.
+	 * Threshold for style size to surface a warning for.
 	 *
-	 * @since 1.0.0
+	 * @since 1.0.2
 	 * @var int
 	 */
 	private $threshold_size;
@@ -38,17 +38,17 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	/**
 	 * List of viewable post types.
 	 *
-	 * @since 1.0.0
+	 * @since 1.0.2
 	 * @var array
 	 */
 	private $viewable_post_types;
 
 	/**
-	 * Set the threshold size for script sizes to surface warnings.
+	 * Set the threshold size for style sizes to surface warnings.
 	 *
-	 * @since 1.0.0
+	 * @since 1.0.2
 	 *
-	 * @param int $threshold_size The threshold in bytes for script size to surface warnings.
+	 * @param int $threshold_size The threshold in bytes for style size to surface warnings.
 	 */
 	public function __construct( $threshold_size = 300000 ) {
 		$this->threshold_size = $threshold_size;
@@ -59,7 +59,7 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	 *
 	 * Every check must have at least one category.
 	 *
-	 * @since 1.0.0
+	 * @since 1.0.2
 	 *
 	 * @return array The categories for the check.
 	 */
@@ -70,23 +70,23 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	/**
 	 * Runs this preparation step for the environment and returns a cleanup function.
 	 *
-	 * @since 1.0.0
+	 * @since 1.0.2
 	 *
 	 * @return callable Cleanup function to revert any changes made here.
 	 *
 	 * @throws Exception Thrown when preparation fails.
 	 */
 	public function prepare() {
-		$orig_scripts = isset( $GLOBALS['wp_scripts'] ) ? $GLOBALS['wp_scripts'] : null;
+		$orig_styles = isset( $GLOBALS['wp_styles'] ) ? $GLOBALS['wp_styles'] : null;
 
 		// Backup the original values for the global state.
 		$this->backup_globals();
 
-		return function () use ( $orig_scripts ) {
-			if ( is_null( $orig_scripts ) ) {
-				unset( $GLOBALS['wp_scripts'] );
+		return function () use ( $orig_styles ) {
+			if ( is_null( $orig_styles ) ) {
+				unset( $GLOBALS['wp_styles'] );
 			} else {
-				$GLOBALS['wp_scripts'] = $orig_scripts;
+				$GLOBALS['wp_styles'] = $orig_styles;
 			}
 
 			$this->restore_globals();
@@ -96,7 +96,7 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	/**
 	 * Returns an array of shared preparations for the check.
 	 *
-	 * @since 1.0.0
+	 * @since 1.0.2
 	 *
 	 * @return array Returns a map of $class_name => $constructor_args pairs. If the class does not
 	 *               need any constructor arguments, it would just be an empty array.
@@ -122,7 +122,7 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	/**
 	 * Runs the check on the plugin and amends results.
 	 *
-	 * @since 1.0.0
+	 * @since 1.0.2
 	 *
 	 * @param Check_Result $result The check results to amend and the plugin context.
 	 */
@@ -138,7 +138,7 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	/**
 	 * Gets the list of URLs to run this check for.
 	 *
-	 * @since 1.0.0
+	 * @since 1.0.2
 	 *
 	 * @return array List of URL strings (either full URLs or paths).
 	 *
@@ -175,7 +175,7 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	/**
 	 * Amends the given result by running the check for the given URL.
 	 *
-	 * @since 1.0.0
+	 * @since 1.0.2
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 * @param string       $url    URL to run the check for.
@@ -186,64 +186,64 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	 * @SuppressWarnings(PHPMD.NPathComplexity)
 	 */
 	protected function check_url( Check_Result $result, $url ) {
-		// Reset the WP_Scripts instance.
-		unset( $GLOBALS['wp_scripts'] );
+		// Reset the WP_Styles instance.
+		unset( $GLOBALS['wp_styles'] );
 
-		// Run the 'wp_enqueue_script' action, wrapped in an output buffer in case of any callbacks printing scripts
+		// Run enqueue functions wrapped in an output buffer in case of any callbacks printing styles
 		// directly. This is discouraged, but some plugins or themes are still doing it.
 		ob_start();
 		wp_enqueue_scripts();
-		wp_scripts()->do_head_items();
-		wp_scripts()->do_footer_items();
+		wp_styles()->do_items();
+		wp_styles()->do_footer_items();
 		ob_get_clean();
 
-		$plugin_scripts     = array();
-		$plugin_script_size = 0;
+		$plugin_styles     = array();
+		$plugin_style_size = 0;
 
-		foreach ( wp_scripts()->done as $handle ) {
-			$script = wp_scripts()->registered[ $handle ];
+		foreach ( wp_styles()->done as $handle ) {
+			$style = wp_styles()->registered[ $handle ];
 
-			if ( ! $script->src || strpos( $script->src, $result->plugin()->url() ) !== 0 ) {
+			if ( ! $style->src || strpos( $style->src, $result->plugin()->url() ) !== 0 ) {
 				continue;
 			}
 
-			// Get size of script src.
-			$script_path = str_replace( $result->plugin()->url(), $result->plugin()->path(), $script->src );
-			$script_size = function_exists( 'wp_filesize' ) ? wp_filesize( $script_path ) : filesize( $script_path );
+			// Get size of style src.
+			$style_path = str_replace( $result->plugin()->url(), $result->plugin()->path(), $style->src );
+			$style_size = function_exists( 'wp_filesize' ) ? wp_filesize( $style_path ) : filesize( $style_path );
 
-			// Get size of additional inline scripts.
-			if ( ! empty( $script->extra['after'] ) ) {
-				foreach ( $script->extra['after'] as $extra ) {
-					$script_size += ( is_string( $extra ) ) ? mb_strlen( $extra, '8bit' ) : 0;
+			// Get size of additional inline styles.
+			if ( ! empty( $style->extra['after'] ) ) {
+				foreach ( $style->extra['after'] as $extra ) {
+					$style_size += ( is_string( $extra ) ) ? mb_strlen( $extra, '8bit' ) : 0;
 				}
 			}
 
-			if ( ! empty( $script->extra['before'] ) ) {
-				foreach ( $script->extra['before'] as $extra ) {
-					$script_size += ( is_string( $extra ) ) ? mb_strlen( $extra, '8bit' ) : 0;
+			if ( ! empty( $style->extra['before'] ) ) {
+				foreach ( $style->extra['before'] as $extra ) {
+					$style_size += ( is_string( $extra ) ) ? mb_strlen( $extra, '8bit' ) : 0;
 				}
 			}
 
-			$plugin_scripts[]    = array(
-				'path' => $script_path,
-				'size' => $script_size,
+			$plugin_styles[]    = array(
+				'path' => $style_path,
+				'size' => $style_size,
 			);
-			$plugin_script_size += $script_size;
+			$plugin_style_size += $style_size;
 		}
 
-		if ( $plugin_script_size > $this->threshold_size ) {
-			foreach ( $plugin_scripts as $plugin_script ) {
+		if ( $plugin_style_size > $this->threshold_size ) {
+			foreach ( $plugin_styles as $plugin_style ) {
 				$this->add_result_warning_for_file(
 					$result,
 					sprintf(
 						/* translators: 1: style file size. 2: tested URL. 3: threshold file size. */
-						__( 'This script has a size of %1$s which in combination with the other scripts enqueued on %2$s exceeds the script size threshold of %3$s.', 'plugin-check' ),
-						size_format( $plugin_script['size'] ),
+						__( 'This style has a size of %1$s which in combination with the other styles enqueued on %2$s exceeds the style size threshold of %3$s.', 'plugin-check' ),
+						size_format( $plugin_style['size'] ),
 						$url,
 						size_format( $this->threshold_size )
 					),
-					'EnqueuedScriptsSize.ScriptSizeGreaterThanThreshold',
-					$plugin_script['path']
+					'EnqueuedStylesSize.StyleSizeGreaterThanThreshold',
+					$plugin_style['path']
 				);
 			}
 		}
@@ -252,7 +252,7 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	/**
 	 * Returns an array of viewable post types.
 	 *
-	 * @since 1.0.0
+	 * @since 1.0.2
 	 *
 	 * @return array Array of viewable post type slugs.
 	 */
