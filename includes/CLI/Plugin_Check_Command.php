@@ -41,6 +41,7 @@ final class Plugin_Check_Command {
 		'table',
 		'csv',
 		'json',
+		'wporg',
 	);
 
 	/**
@@ -77,6 +78,7 @@ final class Plugin_Check_Command {
 	 *   - table
 	 *   - csv
 	 *   - json
+	 *   - wporg
 	 * ---
 	 *
 	 * [--categories]
@@ -97,9 +99,6 @@ final class Plugin_Check_Command {
 	 * [--exclude-directories=<directories>]
 	 * : Additional directories to exclude from checks
 	 * By default, `.git`, `vendor` and `node_modules` directories are excluded.
-	 *
-	 * [--wporg]
-	 * : Run checks against the WordPress.org plugin repository.
 	 *
 	 * ## EXAMPLES
 	 *
@@ -129,7 +128,6 @@ final class Plugin_Check_Command {
 				'ignore-warnings'      => false,
 				'ignore-errors'        => false,
 				'include-experimental' => false,
-				'wporg'                => false,
 			)
 		);
 
@@ -137,7 +135,7 @@ final class Plugin_Check_Command {
 		$plugin = isset( $args[0] ) ? $args[0] : '';
 		$checks = wp_parse_list( $options['checks'] );
 
-		$run_wporg = empty( $options['wporg'] ) ? false : true;
+		$run_wporg = isset( $options['format'] ) && 'wporg' === $options['format'] ? true : false;
 
 		// Create the categories array from CLI arguments.
 		$categories = isset( $options['categories'] ) ? wp_parse_list( $options['categories'] ) : array();
