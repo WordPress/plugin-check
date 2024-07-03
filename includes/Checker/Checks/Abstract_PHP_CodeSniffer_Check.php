@@ -165,9 +165,23 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 			'--report-width=9999',
 		);
 
+		$ignore_patterns = array();
+
 		$directories_to_ignore = Plugin_Request_Utility::get_directories_to_ignore();
+		$files_to_ignore       = Plugin_Request_Utility::get_files_to_ignore();
+
+		// Ignore directories.
 		if ( ! empty( $directories_to_ignore ) ) {
-			$defaults[] = '--ignore=*/' . implode( '/*,*/', $directories_to_ignore ) . '/*';
+			$ignore_patterns[] = '*/' . implode( '/*,*/', $directories_to_ignore ) . '/*';
+		}
+
+		// Ignore files.
+		if ( ! empty( $files_to_ignore ) ) {
+			$ignore_patterns[] = '/' . implode( ',/', $files_to_ignore );
+		}
+
+		if ( ! empty( $ignore_patterns ) ) {
+			$defaults[] = '--ignore=' . implode( ',', $ignore_patterns );
 		}
 
 		// Set the Minimum WP version supported for the plugin.
