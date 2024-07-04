@@ -70,6 +70,26 @@ class Plugin_Context {
 	}
 
 	/**
+	 * Returns the plugin main file.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return string Plugin main file.
+	 */
+	public function main_file() {
+		if ( false === strpos( $this->main_file, '.php' ) ) {
+			$files = glob( $this->main_file . '/*.php' );
+			foreach ( $files as $file ) {
+				$plugin_data = get_plugin_data( $file );
+				if ( ! empty( $plugin_data['Name'] ) ) {
+					return $file;
+				}
+			}
+		}
+		return $this->main_file;
+	}
+
+	/**
 	 * Returns the absolute path for a relative path to the plugin directory.
 	 *
 	 * @since 1.0.0

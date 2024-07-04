@@ -225,7 +225,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	private function check_license( Check_Result $result, string $readme_file, Parser $parser ) {
 		$license          = $parser->license;
 		$matches_license  = array();
-		$plugin_main_file = WP_PLUGIN_DIR . '/' . $result->plugin()->basename();
+		$plugin_main_file = $result->plugin()->main_file();
 
 		// Filter the readme files.
 		if ( empty( $license ) ) {
