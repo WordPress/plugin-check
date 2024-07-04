@@ -135,8 +135,6 @@ final class Plugin_Check_Command {
 		$plugin = isset( $args[0] ) ? $args[0] : '';
 		$checks = wp_parse_list( $options['checks'] );
 
-		$run_wporg = isset( $options['format'] ) && 'wporg' === $options['format'] ? true : false;
-
 		// Create the categories array from CLI arguments.
 		$categories = isset( $options['categories'] ) ? wp_parse_list( $options['categories'] ) : array();
 
