@@ -214,15 +214,15 @@ final class Plugin_Check_Command {
 			$warnings = $result->get_warnings();
 		}
 
-		// Print the formatted results for WPORG.
-		if ( $run_wporg ) {
-			$all_results = array(
+		// Print the json formatted results for WPORG.
+		if ( isset( $options['format'] ) && 'wporg' === $options['format'] ) {
+			$wporg_results = array(
 				'pass'     => empty( $errors ) ? true : false,
 				'errors'   => $errors,
 				'warnings' => $warnings,
 			);
 
-			WP_CLI::line( json_encode( $all_results ) );
+			WP_CLI::line( json_encode( $wporg_results ) );
 			return;
 		}
 
