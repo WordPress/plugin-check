@@ -365,7 +365,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		}
 
 		// Check the readme file Stable tag against the plugin's main file version.
-		$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $result->plugin()->basename() );
+		$plugin_data = get_plugin_data( $result->plugin()->main_file() );
 
 		if (
 			! empty( $plugin_data['Version'] ) &&

@@ -316,7 +316,7 @@ class Trademarks_Check extends Abstract_File_Check {
 				$result,
 				$e->getMessage(),
 				'trademarked_term',
-				WP_PLUGIN_DIR . '/' . $result->plugin()->basename()
+				$result->plugin()->main_file()
 			);
 		}
 	}
