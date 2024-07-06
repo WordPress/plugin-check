@@ -56,6 +56,17 @@ class Plugin_Context {
 				__( 'Unknown environment, normalize_path function not found', 'plugin-check' )
 			);
 		}
+
+		if ( false === strpos( $this->main_file, '.php' ) ) {
+			$files = glob( $this->main_file . '/*.php' );
+			foreach ( $files as $file ) {
+				$plugin_data = get_plugin_data( $file );
+				if ( ! empty( $plugin_data['Name'] ) ) {
+					$this->main_file = $file;
+					break;
+				}
+			}
+		}
 	}
 
 	/**
@@ -77,15 +88,6 @@ class Plugin_Context {
 	 * @return string Plugin main file.
 	 */
 	public function main_file() {
-		if ( false === strpos( $this->main_file, '.php' ) ) {
-			$files = glob( $this->main_file . '/*.php' );
-			foreach ( $files as $file ) {
-				$plugin_data = get_plugin_data( $file );
-				if ( ! empty( $plugin_data['Name'] ) ) {
-					return $file;
-				}
-			}
-		}
 		return $this->main_file;
 	}
 
