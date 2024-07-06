@@ -186,3 +186,35 @@ Feature: Test that the WP-CLI command works.
       """
       mt_rand() is discouraged.
       """
+
+  Scenario: Check a plugin from external location
+    Given a WP install with the Plugin Check plugin
+    And an empty external-folder/foo-plugin directory
+    And a external-folder/foo-plugin/foo-plugin.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Plugin
+       * Plugin URI:  https://example.com
+       * Description:
+       * Version:     0.1.0
+       * Author:
+       * Author URI:
+       * License:     GPL-2.0+
+       * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+       * Text Domain: foo-plugin
+       * Domain Path: /languages
+       */
+
+      """
+
+    When I run the WP-CLI command `plugin check {RUN_DIR}/external-folder/foo-plugin`
+    Then STDERR should be empty
+    And STDOUT should contain:
+      """
+      trademarked_term
+      """
+    And STDOUT should contain:
+      """
+      no_plugin_readme
+      """
