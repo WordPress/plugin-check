@@ -165,4 +165,24 @@ class Plugin_Request_Utility {
 
 		return $directories_to_ignore;
 	}
+
+	/**
+	 * Gets the files to ignore using the filter.
+	 *
+	 * @since 1.0.2
+	 */
+	public static function get_files_to_ignore() {
+		$default_ignore_files = array();
+
+		/**
+		 * Filters the files to ignore.
+		 *
+		 * @since 1.0.2
+		 *
+		 * @param array $default_ignore_files An array of files to ignore.
+		 */
+		$files_to_ignore = (array) apply_filters( 'wp_plugin_check_ignore_files', $default_ignore_files );
+
+		return $files_to_ignore;
+	}
 }
