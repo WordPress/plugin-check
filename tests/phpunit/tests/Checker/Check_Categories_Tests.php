@@ -49,6 +49,39 @@ class Check_Categories_Tests extends WP_UnitTestCase {
 		$this->assertSame( $categories, array_keys( $category_labels ) );
 	}
 
+	public function test_filter_check_categories() {
+		$check_categories = new Check_Categories();
+
+		$custom_categories = array(
+			'first_category'  => 'First Category',
+			'second_category' => 'Second Category',
+		);
+
+		$filter_name = 'wp_plugin_check_categories';
+
+		// Create a mock filter that will return our custom categories.
+		add_filter(
+			$filter_name,
+			static function () use ( $custom_categories ) {
+				return $custom_categories;
+			}
+		);
+
+		$categories      = $check_categories->get_categories();
+		$category_labels = $check_categories->get_category_labels();
+
+		$this->assertSame( array_keys( $custom_categories ), $categories );
+		$this->assertSame( $custom_categories, $category_labels );
+
+		// Remove the filter to avoid interfering with other tests.
+		remove_filter(
+			$filter_name,
+			static function () use ( $custom_categories ) {
+				return $custom_categories;
+			}
+		);
+	}
+
 	/**
 	 * @dataProvider data_checks_by_categories
 	 */
