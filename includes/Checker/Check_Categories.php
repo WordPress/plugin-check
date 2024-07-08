@@ -64,7 +64,7 @@ class Check_Categories {
 		 *
 		 * @since 1.0.2
 		 *
-		 * @param array $default_categories An array of check categories.
+		 * @param array<string, string> $default_categories Associative array of category slugs to labels.
 		 */
 		$check_categories = (array) apply_filters( 'wp_plugin_check_categories', $default_categories );
 
