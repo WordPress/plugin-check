@@ -40,7 +40,7 @@ class Check_Categories {
 	 * @return array An array of category labels.
 	 */
 	public static function get_category_labels() {
-		return self::get_categories();
+		return array_values( self::get_categories() );
 	}
 
 	/**
