@@ -10,7 +10,7 @@
     "npm": ">=10.2.3"
   },
   "devDependencies": {
-    "@wordpress/env": "^10.1.0",
+    "@wordpress/env": "^10.2.0",
     "@wordpress/scripts": "^26.19.0",
     "patch-package": "^8.0.0"
   },
