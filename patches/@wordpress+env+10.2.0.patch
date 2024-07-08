@@ -1,3 +1,15 @@
+diff --git a/node_modules/@wordpress/env/lib/build-docker-compose-config.js b/node_modules/@wordpress/env/lib/build-docker-compose-config.js
+index d7a813e..a394537 100644
+--- a/node_modules/@wordpress/env/lib/build-docker-compose-config.js
++++ b/node_modules/@wordpress/env/lib/build-docker-compose-config.js
+@@ -175,7 +175,6 @@ module.exports = function buildDockerComposeConfig( config ) {
+ 	}}:3306`;
+ 
+ 	return {
+-		version: '3.7',
+ 		services: {
+ 			mysql: {
+ 				image: 'mariadb:lts',
 diff --git a/node_modules/@wordpress/env/lib/init-config.js b/node_modules/@wordpress/env/lib/init-config.js
 index 318bcae..8628137 100644
 --- a/node_modules/@wordpress/env/lib/init-config.js
