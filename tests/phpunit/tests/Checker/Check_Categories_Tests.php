@@ -41,12 +41,12 @@ class Check_Categories_Tests extends WP_UnitTestCase {
 
 	public function test_get_category_labels() {
 		$check_categories = new Check_Categories();
-		$category_slugs   = $check_categories->get_category_slugs();
+		$categories       = $check_categories->get_categories();
 		$category_labels  = $check_categories->get_category_labels();
 
 		$this->assertIsArray( $category_labels );
 		$this->assertNotEmpty( $category_labels );
-		$this->assertSame( $category_slugs, array_keys( $category_labels ) );
+		$this->assertSame( $category_labels, array_values( $categories ) );
 	}
 
 	public function test_filter_check_categories() {
@@ -67,11 +67,9 @@ class Check_Categories_Tests extends WP_UnitTestCase {
 			}
 		);
 
-		$category_slugs  = $check_categories->get_category_slugs();
-		$category_labels = $check_categories->get_category_labels();
+		$categories = $check_categories->get_categories();
 
-		$this->assertSame( array_keys( $custom_categories ), $category_slugs );
-		$this->assertSame( $custom_categories, $category_labels );
+		$this->assertSame( $custom_categories, $categories );
 
 		// Remove the filter to avoid interfering with other tests.
 		remove_filter(
