@@ -30,7 +30,7 @@
     "lint": "phpcs --standard=phpcs.xml.dist",
     "phpmd": "phpmd . text phpmd.xml",
     "phpstan": "phpstan analyse --memory-limit=2048M",
-    "test": "phpunit --verbose"
+    "test": "phpunit"
   },
   "scripts-descriptions": {
     "lint": "Detect coding standards issues",
