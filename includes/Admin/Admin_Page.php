@@ -194,7 +194,7 @@ final class Admin_Page {
 
 		$selected_plugin_basename = filter_input( INPUT_GET, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
-		$category_labels = Check_Categories::get_category_labels();
+		$category_labels = Check_Categories::get_categories();
 
 		// Get user settings for category preferences and set a default value to check plugin_repo by default.
 		$user_enabled_categories = get_user_setting( 'plugin_check_category_preferences', 'plugin_repo' );
