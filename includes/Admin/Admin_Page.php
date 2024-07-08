@@ -310,7 +310,7 @@ final class Admin_Page {
 	 *
 	 * @return string Categories separated by double underscores.
 	 */
-	public static function get_default_check_categories_to_be_selected() {
+	public function get_default_check_categories_to_be_selected() {
 		$default_check_categories = array(
 			'plugin_repo',
 		);
