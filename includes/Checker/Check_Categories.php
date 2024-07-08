@@ -29,13 +29,7 @@ class Check_Categories {
 	 * @return array An array of available categories.
 	 */
 	public static function get_categories() {
-		return array(
-			self::CATEGORY_GENERAL,
-			self::CATEGORY_PLUGIN_REPO,
-			self::CATEGORY_SECURITY,
-			self::CATEGORY_PERFORMANCE,
-			self::CATEGORY_ACCESSIBILITY,
-		);
+		return array_keys( self::get_check_categories() );
 	}
 
 	/**
@@ -46,13 +40,35 @@ class Check_Categories {
 	 * @return array An array of category labels.
 	 */
 	public static function get_category_labels() {
-		return array(
+		return self::get_check_categories();
+	}
+
+	/**
+	 * Returns an array of check categories.
+	 *
+	 * @since 1.0.2
+	 *
+	 * @return array An array of check categories.
+	 */
+	public static function get_check_categories() {
+		$default_categories = array(
 			self::CATEGORY_GENERAL       => __( 'General', 'plugin-check' ),
 			self::CATEGORY_PLUGIN_REPO   => __( 'Plugin Repo', 'plugin-check' ),
 			self::CATEGORY_SECURITY      => __( 'Security', 'plugin-check' ),
 			self::CATEGORY_PERFORMANCE   => __( 'Performance', 'plugin-check' ),
 			self::CATEGORY_ACCESSIBILITY => __( 'Accessibility', 'plugin-check' ),
 		);
+
+		/**
+		 * Filters the check categories.
+		 *
+		 * @since 1.0.2
+		 *
+		 * @param array $default_categories An array of check categories.
+		 */
+		$check_categories = (array) apply_filters( 'wp_plugin_check_categories', $default_categories );
+
+		return $check_categories;
 	}
 
 	/**
