@@ -46,10 +46,6 @@ class Plugin_Request_Utility {
 	 * @throws Exception Thrown if an invalid basename or plugin slug is provided.
 	 */
 	public static function get_plugin_basename_from_input( $plugin_slug ) {
-		if ( is_dir( $plugin_slug ) ) {
-			return $plugin_slug;
-		}
-
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 
 		if ( empty( $plugin_slug ) ) {
