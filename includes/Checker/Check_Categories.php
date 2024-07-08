@@ -28,8 +28,8 @@ class Check_Categories {
 	 *
 	 * @return array An array of available categories.
 	 */
-	public static function get_categories() {
-		return array_keys( self::get_check_categories() );
+	public static function get_category_slugs() {
+		return array_keys( self::get_categories() );
 	}
 
 	/**
@@ -40,7 +40,7 @@ class Check_Categories {
 	 * @return array An array of category labels.
 	 */
 	public static function get_category_labels() {
-		return self::get_check_categories();
+		return self::get_categories();
 	}
 
 	/**
@@ -50,7 +50,7 @@ class Check_Categories {
 	 *
 	 * @return array An array of check categories.
 	 */
-	public static function get_check_categories() {
+	public static function get_categories() {
 		$default_categories = array(
 			self::CATEGORY_GENERAL       => __( 'General', 'plugin-check' ),
 			self::CATEGORY_PLUGIN_REPO   => __( 'Plugin Repo', 'plugin-check' ),

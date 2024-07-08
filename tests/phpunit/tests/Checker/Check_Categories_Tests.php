@@ -28,25 +28,25 @@ class Check_Categories_Tests extends WP_UnitTestCase {
 
 	public function test_get_categories() {
 		$check_categories = new Check_Categories();
-		$categories       = $check_categories->get_categories();
+		$category_slugs   = $check_categories->get_category_slugs();
 
 		$reflection_class   = new ReflectionClass( Check_Categories::class );
 		$category_constants = $reflection_class->getConstants();
 
 		// Assert that all the CATEGORY_* constants are included in the returned categories array.
 		foreach ( $category_constants as $constant_value ) {
-			$this->assertContains( $constant_value, $categories );
+			$this->assertContains( $constant_value, $category_slugs );
 		}
 	}
 
 	public function test_get_category_labels() {
 		$check_categories = new Check_Categories();
-		$categories       = $check_categories->get_categories();
+		$category_slugs   = $check_categories->get_category_slugs();
 		$category_labels  = $check_categories->get_category_labels();
 
 		$this->assertIsArray( $category_labels );
 		$this->assertNotEmpty( $category_labels );
-		$this->assertSame( $categories, array_keys( $category_labels ) );
+		$this->assertSame( $category_slugs, array_keys( $category_labels ) );
 	}
 
 	public function test_filter_check_categories() {
@@ -67,10 +67,10 @@ class Check_Categories_Tests extends WP_UnitTestCase {
 			}
 		);
 
-		$categories      = $check_categories->get_categories();
+		$category_slugs  = $check_categories->get_category_slugs();
 		$category_labels = $check_categories->get_category_labels();
 
-		$this->assertSame( array_keys( $custom_categories ), $categories );
+		$this->assertSame( array_keys( $custom_categories ), $category_slugs );
 		$this->assertSame( $custom_categories, $category_labels );
 
 		// Remove the filter to avoid interfering with other tests.
