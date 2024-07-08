@@ -292,7 +292,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 * Normalice licenses to compare them.
 	 *
 	 * @param string $license The license to normalice.
-	 * @since 1.1.0
+	 * @since 1.0.2
 	 *
 	 * @return string
 	 */
