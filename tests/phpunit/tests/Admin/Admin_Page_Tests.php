@@ -190,9 +190,16 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 			}
 		);
 
-		$result = $this->admin_page->get_default_check_categories_to_be_selected();
+		// Render the admin page.
+		ob_start();
+		$this->admin_page->render_page();
+		$output = ob_get_contents();
+		ob_end_clean();
 
-		$this->assertSame( 'general__plugin_repo', $result );
+		foreach ( $custom_categories as $category ) {
+			$this->assertStringContainsString( '<input type="checkbox" id="' . $category . '" name="categories" value="' . $category . '"  checked=\'checked\' />', $output );
+
+		}
 
 		// Remove the filter to avoid interfering with other tests.
 		remove_filter(
