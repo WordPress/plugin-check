@@ -174,6 +174,35 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 		$this->assertEmpty( $action_links );
 	}
 
+	public function test_filter_default_check_categories() {
+		$custom_categories = array(
+			'general',
+			'plugin_repo',
+		);
+
+		$filter_name = 'wp_plugin_check_default_categories';
+
+		// Create a mock filter that will return our custom categories.
+		add_filter(
+			$filter_name,
+			static function () use ( $custom_categories ) {
+				return $custom_categories;
+			}
+		);
+
+		$result = $this->admin_page->get_default_check_categories_to_be_selected();
+
+		$this->assertSame( 'general__plugin_repo', $result );
+
+		// Remove the filter to avoid interfering with other tests.
+		remove_filter(
+			$filter_name,
+			static function () use ( $custom_categories ) {
+				return $custom_categories;
+			}
+		);
+	}
+
 	/**
 	 * @dataProvider data_status_mustuse_and_dropins
 	 */

@@ -13,6 +13,8 @@ use WordPress\Plugin_Check\Checker\Check_Categories;
  * Class is handling admin tools page functionality.
  *
  * @since 1.0.0
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 final class Admin_Page {
 
@@ -306,9 +308,9 @@ final class Admin_Page {
 	 *
 	 * @since 1.0.2
 	 *
-	 * @return string Categories separated by double underscore.
+	 * @return string Categories separated by double underscores.
 	 */
-	protected static function get_default_check_categories_to_be_selected() {
+	public static function get_default_check_categories_to_be_selected() {
 		$default_check_categories = array(
 			'plugin_repo',
 		);
