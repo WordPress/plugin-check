@@ -40,7 +40,7 @@ class Plugin_Request_Utility {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string $plugin_slug The plugin slug, basename or arbitrary path.
+	 * @param string $plugin_slug The plugin slug or basename.
 	 * @return string The plugin basename.
 	 *
 	 * @throws Exception Thrown if an invalid basename or plugin slug is provided.
