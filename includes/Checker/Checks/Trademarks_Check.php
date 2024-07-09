@@ -256,7 +256,7 @@ class Trademarks_Check extends Abstract_File_Check {
 		try {
 			$this->validate_name_has_no_trademarks( $parser->name );
 		} catch ( Exception $e ) {
-			$this->add_result_error_for_file(
+			$this->add_result_warning_for_file(
 				$result,
 				$e->getMessage(),
 				'trademarked_term',
@@ -284,7 +284,7 @@ class Trademarks_Check extends Abstract_File_Check {
 			try {
 				$this->validate_name_has_no_trademarks( $plugin_header['Name'] );
 			} catch ( Exception $e ) {
-				$this->add_result_error_for_file(
+				$this->add_result_warning_for_file(
 					$result,
 					$e->getMessage(),
 					'trademarked_term',
@@ -312,7 +312,7 @@ class Trademarks_Check extends Abstract_File_Check {
 		try {
 			$this->validate_slug_has_no_trademarks( $plugin_slug );
 		} catch ( Exception $e ) {
-			$this->add_result_error_for_file(
+			$this->add_result_warning_for_file(
 				$result,
 				$e->getMessage(),
 				'trademarked_term',

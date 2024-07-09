@@ -400,11 +400,11 @@ final class Plugin_Check_Command {
 	 */
 	private function get_check_categories() {
 		$check_categories = new Check_Categories();
-		$category_labels  = $check_categories->get_category_labels();
+		$all_categories   = $check_categories->get_categories();
 
 		$categories = array();
 
-		foreach ( $category_labels as $slug => $label ) {
+		foreach ( $all_categories as $slug => $label ) {
 			$categories[] = array(
 				'slug' => $slug,
 				'name' => $label,
