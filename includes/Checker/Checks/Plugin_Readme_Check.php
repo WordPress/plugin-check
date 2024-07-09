@@ -228,7 +228,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	private function check_license( Check_Result $result, string $readme_file, Parser $parser ) {
 		$license          = $parser->license;
 		$matches_license  = array();
-		$plugin_main_file = WP_PLUGIN_DIR . '/' . $result->plugin()->basename();
+		$plugin_main_file = $result->plugin()->main_file();
 
 		// Filter the readme files.
 		if ( empty( $license ) ) {
@@ -368,7 +368,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		}
 
 		// Check the readme file Stable tag against the plugin's main file version.
-		$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $result->plugin()->basename() );
+		$plugin_data = get_plugin_data( $result->plugin()->main_file() );
 
 		if (
 			! empty( $plugin_data['Version'] ) &&
