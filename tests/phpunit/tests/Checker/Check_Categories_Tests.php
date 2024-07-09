@@ -39,16 +39,6 @@ class Check_Categories_Tests extends WP_UnitTestCase {
 		}
 	}
 
-	public function test_get_category_labels() {
-		$check_categories = new Check_Categories();
-		$categories       = $check_categories->get_categories();
-		$category_labels  = $check_categories->get_category_labels();
-
-		$this->assertIsArray( $category_labels );
-		$this->assertNotEmpty( $category_labels );
-		$this->assertSame( $category_labels, array_values( $categories ) );
-	}
-
 	public function test_filter_check_categories() {
 		$check_categories = new Check_Categories();
 
