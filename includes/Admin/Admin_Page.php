@@ -196,7 +196,7 @@ final class Admin_Page {
 
 		$selected_plugin_basename = filter_input( INPUT_GET, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
-		$category_labels = Check_Categories::get_category_labels();
+		$categories = Check_Categories::get_categories();
 
 		// Get user settings for category preferences.
 		$user_enabled_categories = get_user_setting( 'plugin_check_category_preferences', implode( '__', $this->get_default_check_categories_to_be_selected() ) );

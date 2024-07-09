@@ -37,11 +37,11 @@
 				<span id="plugin-check__spinner" class="spinner" style="float: none;"></span>
 				<h4><?php esc_attr_e( 'Categories', 'plugin-check' ); ?></h4>
 				<?php
-				if ( ! empty( $category_labels ) ) {
+				if ( ! empty( $categories ) ) {
 				?>
 				<table>
 				<?php
-				foreach ( $category_labels as $category => $label ) { ?>
+				foreach ( $categories as $category => $label ) { ?>
 					<tr>
 						<td>
 							<fieldset>
