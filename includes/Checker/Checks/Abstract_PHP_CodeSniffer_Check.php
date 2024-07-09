@@ -122,7 +122,8 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 					$file_message['source'],
 					$file_name,
 					$file_message['line'],
-					$file_message['column']
+					$file_message['column'],
+					$file_message['severity']
 				);
 			}
 		}

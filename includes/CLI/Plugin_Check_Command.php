@@ -101,6 +101,9 @@ final class Plugin_Check_Command {
 	 * [--exclude-files=<files>]
 	 * : Additional files to exclude from checks.
 	 *
+	 * [--severity=<severity>]
+	 * : Severity level.
+	 *
 	 * ## EXAMPLES
 	 *
 	 *   wp plugin check akismet
@@ -129,6 +132,7 @@ final class Plugin_Check_Command {
 				'ignore-warnings'      => false,
 				'ignore-errors'        => false,
 				'include-experimental' => false,
+				'severity'             => 0,
 			)
 		);
 
@@ -228,6 +232,9 @@ final class Plugin_Check_Command {
 		// Get formatter.
 		$formatter = $this->get_formatter( $assoc_args, $default_fields );
 
+		// Severity level. Zero means no filter.
+		$severity = absint( $options['severity'] );
+
 		// Print the formatted results.
 		// Go over all files with errors first and print them, combined with any warnings in the same file.
 		foreach ( $errors as $file_name => $file_errors ) {
@@ -237,13 +244,27 @@ final class Plugin_Check_Command {
 				unset( $warnings[ $file_name ] );
 			}
 			$file_results = $this->flatten_file_results( $file_errors, $file_warnings );
-			$this->display_results( $formatter, $file_name, $file_results );
+
+			if ( $severity ) {
+				$file_results = $this->get_filtered_results_by_severity( $file_results, $severity );
+			}
+
+			if ( ! empty( $file_results ) ) {
+				$this->display_results( $formatter, $file_name, $file_results );
+			}
 		}
 
 		// If there are any files left with only warnings, print those next.
 		foreach ( $warnings as $file_name => $file_warnings ) {
 			$file_results = $this->flatten_file_results( array(), $file_warnings );
-			$this->display_results( $formatter, $file_name, $file_results );
+
+			if ( $severity ) {
+				$file_results = $this->get_filtered_results_by_severity( $file_results, $severity );
+			}
+
+			if ( ! empty( $file_results ) ) {
+				$this->display_results( $formatter, $file_name, $file_results );
+			}
 		}
 	}
 
@@ -598,5 +619,23 @@ final class Plugin_Check_Command {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Returns check results filtered by severity level.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $results  Check results.
+	 * @param int   $severity Severity level.
+	 * @return array Filtered results.
+	 */
+	private function get_filtered_results_by_severity( $results, $severity ) {
+		return array_filter(
+			$results,
+			function ( $item ) use ( $severity ) {
+				return ( $item['severity'] >= $severity );
+			}
+		);
 	}
 }
