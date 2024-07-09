@@ -241,7 +241,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 			return;
 		} else {
-			$license = $this->normalice_licenses( $license );
+			$license = $this->normalize_licenses( $license );
 		}
 
 		// Test for a valid SPDX license identifier.
@@ -264,7 +264,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				$plugin_main_file
 			);
 		} else {
-			$plugin_license = $this->normalice_licenses( $matches_license[1] );
+			$plugin_license = $this->normalize_licenses( $matches_license[1] );
 		}
 
 		// Checks for a valid license in Plugin Header.
@@ -289,14 +289,14 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	}
 
 	/**
-	 * Normalice licenses to compare them.
+	 * Normalize licenses to compare them.
 	 *
-	 * @param string $license The license to normalice.
-	 * @since 1.1.0
+	 * @since 1.0.2
 	 *
+	 * @param string $license The license to normalize.
 	 * @return string
 	 */
-	private function normalice_licenses( $license ) {
+	private function normalize_licenses( $license ) {
 		$license = trim( $license );
 		$license = str_replace( '  ', ' ', $license );
 

@@ -54,6 +54,7 @@ class Default_Check_Repository extends Empty_Check_Repository {
 				'enqueued_resources'         => new Checks\Enqueued_Resources_Check(),
 				'plugin_readme'              => new Checks\Plugin_Readme_Check(),
 				'enqueued_styles_scope'      => new Checks\Enqueued_Styles_Scope_Check(),
+				'enqueued_scripts_scope'     => new Checks\Enqueued_Scripts_Scope_Check(),
 				'localhost'                  => new Checks\Localhost_Check(),
 				'no_unfiltered_uploads'      => new Checks\No_Unfiltered_Uploads_Check(),
 				'trademarks'                 => new Checks\Trademarks_Check(),
