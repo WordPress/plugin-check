@@ -13,6 +13,8 @@ use WordPress\Plugin_Check\Checker\Check_Categories;
  * Class is handling admin tools page functionality.
  *
  * @since 1.0.0
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 final class Admin_Page {
 
@@ -196,8 +198,8 @@ final class Admin_Page {
 
 		$categories = Check_Categories::get_categories();
 
-		// Get user settings for category preferences and set a default value to check plugin_repo by default.
-		$user_enabled_categories = get_user_setting( 'plugin_check_category_preferences', 'plugin_repo' );
+		// Get user settings for category preferences.
+		$user_enabled_categories = get_user_setting( 'plugin_check_category_preferences', implode( '__', $this->get_default_check_categories_to_be_selected() ) );
 		$user_enabled_categories = explode( '__', $user_enabled_categories );
 
 		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'templates/admin-page.php';
@@ -299,5 +301,29 @@ final class Admin_Page {
 	 */
 	public function get_hook_suffix() {
 		return $this->hook_suffix;
+	}
+
+	/**
+	 * Gets default check categories to be selected.
+	 *
+	 * @since 1.0.2
+	 *
+	 * @return string[] An array of category slugs.
+	 */
+	private function get_default_check_categories_to_be_selected() {
+		$default_check_categories = array(
+			'plugin_repo',
+		);
+
+		/**
+		 * Filters the default check categories to be selected.
+		 *
+		 * @since 1.0.2
+		 *
+		 * @param string[] $default_check_categories An array of category slugs.
+		 */
+		$default_categories = (array) apply_filters( 'wp_plugin_check_default_categories', $default_check_categories );
+
+		return $default_categories;
 	}
 }
