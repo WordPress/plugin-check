@@ -236,7 +236,8 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 				$this->add_result_warning_for_file(
 					$result,
 					sprintf(
-						'This script has a size of %1$s which in combination with the other scripts enqueued on %2$s exceeds the script size threshold of %3$s.',
+						/* translators: 1: style file size. 2: tested URL. 3: threshold file size. */
+						__( 'This script has a size of %1$s which in combination with the other scripts enqueued on %2$s exceeds the script size threshold of %3$s.', 'plugin-check' ),
 						size_format( $plugin_script['size'] ),
 						$url,
 						size_format( $this->threshold_size )

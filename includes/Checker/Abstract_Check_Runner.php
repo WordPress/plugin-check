@@ -481,8 +481,13 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 */
 	final public function get_plugin_basename() {
 		if ( null === $this->plugin_basename ) {
-			$plugin                = null !== $this->plugin ? $this->plugin : $this->get_plugin_param();
-			$this->plugin_basename = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin );
+			$plugin = null !== $this->plugin ? $this->plugin : $this->get_plugin_param();
+
+			if ( is_dir( $plugin ) ) {
+				$this->plugin_basename = $plugin;
+			} else {
+				$this->plugin_basename = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin );
+			}
 		}
 
 		return $this->plugin_basename;
@@ -525,7 +530,9 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @return Check_Context The check context for the plugin file.
 	 */
 	private function get_check_context() {
-		return new Check_Context( WP_PLUGIN_DIR . '/' . $this->get_plugin_basename() );
+		$plugin_basename = $this->get_plugin_basename();
+		$plugin_path     = is_dir( $plugin_basename ) ? $plugin_basename : WP_PLUGIN_DIR . '/' . $plugin_basename;
+		return new Check_Context( $plugin_path );
 	}
 
 	/**
