@@ -67,14 +67,21 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertNotEmpty( $errors );
 		$this->assertArrayHasKey( 'readme.txt', $errors );
-		$this->assertEmpty( $warnings );
-		$this->assertEquals( 0, $check_result->get_warning_count() );
+		// After https://github.com/WordPress/plugin-check/issues/402 there will be warning of missing "Tested up to" field.
+		$this->assertNotEmpty( $warnings );
+		$this->assertEquals( 1, $check_result->get_warning_count() );
 
 		// Check for empty name error.
 		$this->assertArrayHasKey( 0, $errors['readme.txt'] );
 		$this->assertArrayHasKey( 0, $errors['readme.txt'][0] );
 		$this->assertArrayHasKey( 'code', $errors['readme.txt'][0][0][0] );
 		$this->assertEquals( 'empty_plugin_name', $errors['readme.txt'][0][0][0]['code'] );
+
+		// Tested up to warning.
+		$this->assertArrayHasKey( 0, $warnings['readme.txt'] );
+		$this->assertArrayHasKey( 0, $warnings['readme.txt'][0] );
+		$this->assertArrayHasKey( 'code', $warnings['readme.txt'][0][0][0] );
+		$this->assertEquals( 'missing_readme_header', $warnings['readme.txt'][0][0][0]['code'] );
 	}
 
 	public function test_run_with_errors_default_text() {
@@ -156,13 +163,16 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertNotEmpty( $warnings );
 		$this->assertArrayHasKey( 'readme.txt', $warnings );
-		$this->assertEquals( 1, $check_result->get_warning_count() );
+		$this->assertEquals( 2, $check_result->get_warning_count() );
 
 		// Check for invalid license warning.
 		$this->assertArrayHasKey( 0, $warnings['readme.txt'] );
 		$this->assertArrayHasKey( 0, $warnings['readme.txt'][0] );
 		$this->assertArrayHasKey( 'code', $warnings['readme.txt'][0][0][0] );
 		$this->assertEquals( 'invalid_license', $warnings['readme.txt'][0][0][0]['code'] );
+
+		// Check for not same license warning.
+		$this->assertEquals( 'license_mismatch', $warnings['readme.txt'][0][0][1]['code'] );
 	}
 
 	public function test_run_with_errors_no_license() {
@@ -237,7 +247,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertNotEmpty( $warnings );
 		$this->assertArrayHasKey( 'readme.md', $warnings );
-		$this->assertEquals( 2, $check_result->get_warning_count() );
+		$this->assertEquals( 3, $check_result->get_warning_count() );
 
 		// Check for default text file warning.
 		$this->assertArrayHasKey( 0, $warnings['readme.md'] );
