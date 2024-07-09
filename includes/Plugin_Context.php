@@ -83,7 +83,7 @@ class Plugin_Context {
 	/**
 	 * Returns the plugin main file.
 	 *
-	 * @since 1.0.0
+	 * @since 1.0.2
 	 *
 	 * @return string Plugin main file.
 	 */
