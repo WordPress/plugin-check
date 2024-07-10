@@ -69,12 +69,15 @@ In any case, passing the checks in this tool likely helps to achieve a smooth pl
 
 = 1.1.0 =
 
+* Enhancement - Changed the namespace of included checks.
+
+= 1.0.2 =
+
 * Feature - New `Enqueued_Scripts_Scope_Check` (`enqueued_scripts_scope`), `Enqueued_Styles_Size_Check` (`enqueued_styles_size`) and `Enqueued_Resources_Check` (`enqueued_resources`) performance checks.
 * Enhancement - Improved readme check and added a new `wp_plugin_check_ignored_readme_warnings` filter.
 * Enhancement - New `wp_plugin_check_default_categories` filter to change the categories which are selected by default.
 * Enhancement - New `wp_plugin_check_ignore_files` filter to allow ignoring specific files.
 * Fix - Correct detection of readme files in Windows by normalizing file paths.
-* Enhancement - Changed the namespace of included checks. [#460](https://github.com/WordPress/plugin-check/pull/460)
 
 = 1.0.1 =
 
