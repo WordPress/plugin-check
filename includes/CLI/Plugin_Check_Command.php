@@ -20,6 +20,8 @@ use WP_CLI;
 
 /**
  * Plugin check command.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 final class Plugin_Check_Command {
 
@@ -121,6 +123,7 @@ final class Plugin_Check_Command {
 	 *
 	 * @SuppressWarnings(PHPMD.NPathComplexity)
 	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+	 * @SuppressWarnings(PHPMD.CyclomaticComplexity)
 	 */
 	public function check( $args, $assoc_args ) {
 		// Get options based on the CLI arguments.
