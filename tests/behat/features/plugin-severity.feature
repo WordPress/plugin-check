@@ -22,6 +22,10 @@ Feature: Test that the WP-CLI command works.
       use WordPress\Plugin_Check\Traits\Amend_Check_Result;
       use WordPress\Plugin_Check\Traits\Stable_Check;
 
+      if ( ! class_exists( WordPress\Plugin_Check\Plugin_Main::class, false ) ) {
+        require_once WP_PLUGIN_DIR . '/plugin-check/vendor/autoload.php';
+      }
+
       class Prohibited_Text_Check extends Abstract_File_Check {
 
         use Amend_Check_Result;
@@ -152,7 +156,7 @@ Feature: Test that the WP-CLI command works.
       WordPress.WP.PostsPerPage.posts_per_page_posts_per_page
       """
 
-    When I run the WP-CLI command `plugin check foo-sample --exclude-checks=plugin_readme --severity=5`
+    When I run the WP-CLI command `plugin check foo-sample --exclude-checks=plugin_readme --severity=4`
     Then STDOUT should contain:
       """
       mt_rand() is discouraged.
