@@ -118,6 +118,26 @@ Feature: Test that the WP-CLI command works.
       );
       """
 
+    When I run the WP-CLI command `plugin list --status=active`
+    Then STDOUT should contain:
+      """
+      pcp-addon
+      """
+    And STDOUT should contain:
+      """
+      plugin-check
+      """
+
+    When I run the WP-CLI command `plugin list-checks`
+    Then STDOUT should contain:
+      """
+      prohibited_text
+      """
+    And STDOUT should contain:
+      """
+      postsperpage
+      """
+
     When I run the WP-CLI command `plugin check foo-sample --exclude-checks=plugin_readme`
     Then STDOUT should contain:
       """
