@@ -109,7 +109,7 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
 
-		$plugin_main_file = WP_PLUGIN_DIR . '/' . $result->plugin()->basename();
+		$plugin_main_file = $result->plugin()->main_file();
 		$plugin_header    = get_plugin_data( $plugin_main_file );
 		if ( ! empty( $plugin_header['UpdateURI'] ) ) {
 			$this->add_result_error_for_file(

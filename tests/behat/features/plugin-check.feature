@@ -156,6 +156,71 @@ Feature: Test that the WP-CLI command works.
       FILE: subdirectory/bar.php
       """
 
+  Scenario: Exclude files in plugin check
+    Given a WP install with the Plugin Check plugin
+    And an empty wp-content/plugins/foo-plugin directory
+    And an empty wp-content/plugins/foo-plugin/subdirectory directory
+    And a wp-content/plugins/foo-plugin/foo-plugin.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Plugin
+       * Plugin URI:  https://example.com
+       * Description:
+       * Version:     0.1.0
+       * Author:
+       * Author URI:
+       * License:     GPL-2.0+
+       * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+       * Text Domain: foo-plugin
+       * Domain Path: /languages
+       */
+
+      """
+    And a wp-content/plugins/foo-plugin/bar.php file:
+      """
+      <?php
+      $value = 1;
+      echo $value;
+      """
+    And a wp-content/plugins/foo-plugin/foobar.php file:
+      """
+      <?php
+      $value = 1;
+      echo $value;
+      """
+    And a wp-content/plugins/foo-plugin/subdirectory/error.php file:
+      """
+      <?php
+      $value = 1;
+      echo $value;
+      """
+    When I run the WP-CLI command `plugin check foo-plugin`
+    Then STDOUT should contain:
+      """
+      FILE: bar.php
+      """
+    And STDOUT should contain:
+      """
+      FILE: foobar.php
+      """
+
+    When I run the WP-CLI command `plugin check foo-plugin --exclude-files=bar.php`
+    Then STDOUT should contain:
+      """
+      FILE: foobar.php
+      """
+    Then STDOUT should not contain:
+      """
+      FILE: bar.php
+      """
+
+    When I run the WP-CLI command `plugin check foo-plugin --exclude-files=subdirectory/error.php`
+    Then STDOUT should not contain:
+      """
+      FILE: subdirectory/error.php
+      """
+
   Scenario: Perform runtime check
     Given a WP install with the Plugin Check plugin
     And a wp-content/plugins/foo-single.php file:
@@ -185,4 +250,36 @@ Feature: Test that the WP-CLI command works.
     Then STDOUT should contain:
       """
       mt_rand() is discouraged.
+      """
+
+  Scenario: Check a plugin from external location
+    Given a WP install with the Plugin Check plugin
+    And an empty external-folder/foo-plugin directory
+    And a external-folder/foo-plugin/foo-plugin.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Plugin
+       * Plugin URI:  https://example.com
+       * Description:
+       * Version:     0.1.0
+       * Author:
+       * Author URI:
+       * License:     GPL-2.0+
+       * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+       * Text Domain: foo-plugin
+       * Domain Path: /languages
+       */
+
+      """
+
+    When I run the WP-CLI command `plugin check {RUN_DIR}/external-folder/foo-plugin`
+    Then STDERR should be empty
+    And STDOUT should contain:
+      """
+      trademarked_term
+      """
+    And STDOUT should contain:
+      """
+      no_plugin_readme
       """

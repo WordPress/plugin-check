@@ -229,7 +229,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	private function check_license( Check_Result $result, string $readme_file, Parser $parser ) {
 		$license          = $parser->license;
 		$matches_license  = array();
-		$plugin_main_file = WP_PLUGIN_DIR . '/' . $result->plugin()->basename();
+		$plugin_main_file = $result->plugin()->main_file();
 
 		// Filter the readme files.
 		if ( empty( $license ) ) {
@@ -242,7 +242,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 			return;
 		} else {
-			$license = $this->normalice_licenses( $license );
+			$license = $this->normalize_licenses( $license );
 		}
 
 		// Test for a valid SPDX license identifier.
@@ -265,7 +265,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				$plugin_main_file
 			);
 		} else {
-			$plugin_license = $this->normalice_licenses( $matches_license[1] );
+			$plugin_license = $this->normalize_licenses( $matches_license[1] );
 		}
 
 		// Checks for a valid license in Plugin Header.
@@ -290,14 +290,14 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	}
 
 	/**
-	 * Normalice licenses to compare them.
+	 * Normalize licenses to compare them.
 	 *
-	 * @param string $license The license to normalice.
-	 * @since 1.1.0
+	 * @since 1.0.2
 	 *
+	 * @param string $license The license to normalize.
 	 * @return string
 	 */
-	private function normalice_licenses( $license ) {
+	private function normalize_licenses( $license ) {
 		$license = trim( $license );
 		$license = str_replace( '  ', ' ', $license );
 
@@ -369,7 +369,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		}
 
 		// Check the readme file Stable tag against the plugin's main file version.
-		$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $result->plugin()->basename() );
+		$plugin_data = get_plugin_data( $result->plugin()->main_file() );
 
 		if (
 			! empty( $plugin_data['Version'] ) &&

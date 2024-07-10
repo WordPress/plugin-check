@@ -51,6 +51,7 @@ class Default_Check_Repository extends Empty_Check_Repository {
 				'direct_db_queries'          => new Checks\Security\Direct_DB_Queries_Check(),
 				'performant_wp_query_params' => new Checks\Performance\Performant_WP_Query_Params_Check(),
 				'enqueued_scripts_in_footer' => new Checks\Performance\Enqueued_Scripts_In_Footer_Check(),
+				'enqueued_resources'         => new Checks\Performance\Enqueued_Resources_Check(),
 				'plugin_readme'              => new Checks\Plugin_Repo\Plugin_Readme_Check(),
 				'enqueued_styles_scope'      => new Checks\Performance\Enqueued_Styles_Scope_Check(),
 				'enqueued_scripts_scope'     => new Checks\Performance\Enqueued_Scripts_Scope_Check(),
