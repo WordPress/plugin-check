@@ -75,8 +75,8 @@ class Non_Blocking_Scripts_Check_Tests extends Runtime_Check_UnitTestCase {
 
 		$header_script = 'tests/phpunit/testdata/plugins/test-plugin-non-blocking-scripts-check/header.js';
 		$footer_script = 'tests/phpunit/testdata/plugins/test-plugin-non-blocking-scripts-check/footer.js';
-		$async_script = 'tests/phpunit/testdata/plugins/test-plugin-non-blocking-scripts-check/async.js';
-		$defer_script = 'tests/phpunit/testdata/plugins/test-plugin-non-blocking-scripts-check/defer.js';
+		$async_script  = 'tests/phpunit/testdata/plugins/test-plugin-non-blocking-scripts-check/async.js';
+		$defer_script  = 'tests/phpunit/testdata/plugins/test-plugin-non-blocking-scripts-check/defer.js';
 
 		$this->assertArrayNotHasKey( $async_script, $warnings, 'An async script should not cause any warnings' );
 		$this->assertArrayNotHasKey( $defer_script, $warnings, 'A deferred script should not cause any warnings' );
