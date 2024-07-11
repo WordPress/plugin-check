@@ -28,14 +28,6 @@ class Non_Blocking_Scripts_Check extends Abstract_Runtime_Check implements With_
 	use URL_Aware;
 
 	/**
-	 * Threshold for script size to surface a warning for.
-	 *
-	 * @since 1.1.0
-	 * @var int
-	 */
-	private $threshold_size;
-
-	/**
 	 * List of viewable post types.
 	 *
 	 * @since 1.1.0
