@@ -83,7 +83,7 @@ jobs:
       WP_ENV_CORE: ${{ matrix.wordpress == 'trunk' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', matrix.wordpress ) }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -95,7 +95,7 @@ jobs:
           ini-values: pcov.directory=.,pcov.exclude=~(vendor|tests)~
 
       - name: Install PHP dependencies
-        uses: ramsey/composer-install@83af392bf5f031813d25e6fe4cd626cdba9a2df6
+        uses: ramsey/composer-install@57532f8be5bda426838819c5ee9afb8af389d51a
         with:
           composer-options: '--prefer-dist'
 
@@ -157,7 +157,7 @@ jobs:
 
       - name: Upload code coverage report
         if: ${{ matrix.coverage }}
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4.5.0
         with:
           files: ${{ steps.coverage_files.outputs.files }}
           flags: feature

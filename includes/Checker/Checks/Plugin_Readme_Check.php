@@ -18,6 +18,8 @@ use WordPressdotorg\Plugin_Directory\Readme\Parser;
  * Check the plugins readme file and contents.
  *
  * @since 1.0.0
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class Plugin_Readme_Check extends Abstract_File_Check {
 
@@ -89,6 +91,9 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		// Check the readme file for a valid version.
 		$this->check_stable_tag( $result, $readme_file, $parser );
 
+		// Check the readme file for upgrade notice.
+		$this->check_upgrade_notice( $result, $readme_file, $parser );
+
 		// Check the readme file for warnings.
 		$this->check_for_warnings( $result, $readme_file, $parser );
 	}
@@ -148,17 +153,37 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		$parser_warnings = is_array( $parser->warnings ) ? $parser->warnings : array();
 
 		foreach ( $fields as $field_key => $field ) {
-			if ( empty( $parser->{$field_key} ) && ! in_array( $field['ignore_key'], $ignored_warnings, true ) && ! isset( $parser_warnings[ $field['ignore_key'] ] ) ) {
-				$this->add_result_warning_for_file(
-					$result,
-					sprintf(
-						/* translators: %s: plugin header tag */
-						__( 'The "%s" field is missing.', 'plugin-check' ),
-						$field['label']
-					),
-					'missing_readme_header',
-					$readme_file
-				);
+			if ( ! in_array( $field['ignore_key'], $ignored_warnings, true ) && ! isset( $parser_warnings[ $field['ignore_key'] ] ) ) {
+
+				if ( ! empty( $parser->{$field_key} ) && 'tested' === $field_key ) {
+					$latest_wordpress_version = $this->get_wordpress_stable_version();
+					if ( version_compare( $parser->{$field_key}, $latest_wordpress_version, '<' ) ) {
+						$this->add_result_error_for_file(
+							$result,
+							sprintf(
+								/* translators: 1: currently used version, 2: latest stable WordPress version */
+								__( 'Tested up to: %1$s < %2$s', 'plugin-check' ),
+								$parser->{$field_key},
+								$latest_wordpress_version
+							),
+							'outdated_tested_upto_header',
+							$readme_file
+						);
+					}
+				} else {
+					if ( empty( $parser->{$field_key} ) ) {
+						$this->add_result_error_for_file(
+							$result,
+							sprintf(
+								/* translators: %s: plugin header tag */
+								__( 'The "%s" field is missing.', 'plugin-check' ),
+								$field['label']
+							),
+							'missing_readme_header',
+							$readme_file
+						);
+					}
+				}
 			}
 		}
 	}
@@ -203,7 +228,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	private function check_license( Check_Result $result, string $readme_file, Parser $parser ) {
 		$license          = $parser->license;
 		$matches_license  = array();
-		$plugin_main_file = WP_PLUGIN_DIR . '/' . $result->plugin()->basename();
+		$plugin_main_file = $result->plugin()->main_file();
 
 		// Filter the readme files.
 		if ( empty( $license ) ) {
@@ -216,7 +241,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 			return;
 		} else {
-			$license = $this->normalice_licenses( $license );
+			$license = $this->normalize_licenses( $license );
 		}
 
 		// Test for a valid SPDX license identifier.
@@ -239,7 +264,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				$plugin_main_file
 			);
 		} else {
-			$plugin_license = $this->normalice_licenses( $matches_license[1] );
+			$plugin_license = $this->normalize_licenses( $matches_license[1] );
 		}
 
 		// Checks for a valid license in Plugin Header.
@@ -264,14 +289,14 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	}
 
 	/**
-	 * Normalice licenses to compare them.
+	 * Normalize licenses to compare them.
 	 *
-	 * @param string $license The license to normalice.
-	 * @since 1.1.0
+	 * @since 1.0.2
 	 *
+	 * @param string $license The license to normalize.
 	 * @return string
 	 */
-	private function normalice_licenses( $license ) {
+	private function normalize_licenses( $license ) {
 		$license = trim( $license );
 		$license = str_replace( '  ', ' ', $license );
 
@@ -343,7 +368,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		}
 
 		// Check the readme file Stable tag against the plugin's main file version.
-		$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $result->plugin()->basename() );
+		$plugin_data = get_plugin_data( $result->plugin()->main_file() );
 
 		if (
 			! empty( $plugin_data['Version'] ) &&
@@ -355,6 +380,40 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				'stable_tag_mismatch',
 				$readme_file
 			);
+		}
+	}
+
+	/**
+	 * Checks the readme file upgrade notice.
+	 *
+	 * @since 1.0.2
+	 *
+	 * @param Check_Result $result      The Check Result to amend.
+	 * @param string       $readme_file Readme file.
+	 * @param Parser       $parser      The Parser object.
+	 */
+	private function check_upgrade_notice( Check_Result $result, string $readme_file, Parser $parser ) {
+		$notices = $parser->upgrade_notice;
+
+		$maximum_characters = 300;
+
+		// Bail if no upgrade notices.
+		if ( 0 === count( $notices ) ) {
+			return;
+		}
+
+		foreach ( $notices as $version => $notice ) {
+			if ( strlen( $notice ) > $maximum_characters ) {
+				if ( empty( $version ) ) {
+					/* translators: %d: maximum limit. */
+					$message = sprintf( _n( 'The upgrade notice exceeds the limit of %d character.', 'The upgrade notice exceeds the limit of %d characters.', $maximum_characters, 'plugin-check' ), $maximum_characters );
+				} else {
+					/* translators: 1: version, 2: maximum limit. */
+					$message = sprintf( _n( 'The upgrade notice for "%1$s" exceeds the limit of %2$d character.', 'The upgrade notice for "%1$s" exceeds the limit of %2$d characters.', $maximum_characters, 'plugin-check' ), $version, $maximum_characters );
+				}
+
+				$this->add_result_warning_for_file( $result, $message, 'upgrade_notice_limit', $readme_file );
+			}
 		}
 	}
 
@@ -457,7 +516,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				if ( isset( $body['offers'] ) && ! empty( $body['offers'] ) ) {
 					$latest_release = reset( $body['offers'] );
 
-					$version = $latest_release['new_bundled'];
+					$version = $latest_release['current'];
 
 					set_transient( 'wp_plugin_check_latest_wp_version', $version, DAY_IN_SECONDS );
 				}
@@ -470,10 +529,10 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 			// Strip off any -alpha, -RC, -beta suffixes.
 			list( $version, ) = explode( '-', $version );
+		}
 
-			if ( preg_match( '#^\d.\d#', $version, $matches ) ) {
-				$version = $matches[0];
-			}
+		if ( preg_match( '#^\d.\d#', $version, $matches ) ) {
+			$version = $matches[0];
 		}
 
 		return $version;

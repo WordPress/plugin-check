@@ -56,6 +56,17 @@ class Plugin_Context {
 				__( 'Unknown environment, normalize_path function not found', 'plugin-check' )
 			);
 		}
+
+		if ( false === strpos( $this->main_file, '.php' ) ) {
+			$files = glob( $this->main_file . '/*.php' );
+			foreach ( $files as $file ) {
+				$plugin_data = get_plugin_data( $file );
+				if ( ! empty( $plugin_data['Name'] ) ) {
+					$this->main_file = $file;
+					break;
+				}
+			}
+		}
 	}
 
 	/**
@@ -70,6 +81,17 @@ class Plugin_Context {
 	}
 
 	/**
+	 * Returns the plugin main file.
+	 *
+	 * @since 1.0.2
+	 *
+	 * @return string Plugin main file.
+	 */
+	public function main_file() {
+		return $this->main_file;
+	}
+
+	/**
 	 * Returns the absolute path for a relative path to the plugin directory.
 	 *
 	 * @since 1.0.0
@@ -78,7 +100,11 @@ class Plugin_Context {
 	 * @return string Absolute path.
 	 */
 	public function path( $relative_path = '/' ) {
-		return plugin_dir_path( $this->main_file ) . ltrim( $relative_path, '/' );
+		if ( is_dir( $this->main_file ) ) {
+			return trailingslashit( $this->main_file ) . ltrim( $relative_path, '/' );
+		} else {
+			return plugin_dir_path( $this->main_file ) . ltrim( $relative_path, '/' );
+		}
 	}
 
 	/**

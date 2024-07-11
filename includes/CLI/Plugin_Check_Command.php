@@ -95,8 +95,11 @@ final class Plugin_Check_Command {
 	 * : Include experimental checks.
 	 *
 	 * [--exclude-directories=<directories>]
-	 * : Additional directories to exclude from checks
+	 * : Additional directories to exclude from checks.
 	 * By default, `.git`, `vendor` and `node_modules` directories are excluded.
+	 *
+	 * [--exclude-files=<files>]
+	 * : Additional files to exclude from checks.
 	 *
 	 * ## EXAMPLES
 	 *
@@ -142,6 +145,15 @@ final class Plugin_Check_Command {
 			'wp_plugin_check_ignore_directories',
 			static function ( $dirs ) use ( $excluded_directories ) {
 				return array_unique( array_merge( $dirs, $excluded_directories ) );
+			}
+		);
+
+		$excluded_files = isset( $options['exclude-files'] ) ? wp_parse_list( $options['exclude-files'] ) : array();
+
+		add_filter(
+			'wp_plugin_check_ignore_files',
+			static function ( $dirs ) use ( $excluded_files ) {
+				return array_unique( array_merge( $dirs, $excluded_files ) );
 			}
 		);
 
@@ -388,11 +400,11 @@ final class Plugin_Check_Command {
 	 */
 	private function get_check_categories() {
 		$check_categories = new Check_Categories();
-		$category_labels  = $check_categories->get_category_labels();
+		$all_categories   = $check_categories->get_categories();
 
 		$categories = array();
 
-		foreach ( $category_labels as $slug => $label ) {
+		foreach ( $all_categories as $slug => $label ) {
 			$categories[] = array(
 				'slug' => $slug,
 				'name' => $label,
