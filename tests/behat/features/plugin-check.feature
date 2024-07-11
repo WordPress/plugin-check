@@ -286,23 +286,33 @@ Feature: Test that the WP-CLI command works.
 
   Scenario: Check a plugin with addon enabled with extra checks
     Given a WP install with the Plugin Check plugin
-    And a wp-content/plugins/pcp-addon/pcp-addon.php file:
+    And a wp-content/plugins/pcp-addon/class-postsperpage-check.php file:
       """
       <?php
-      /**
-      * Plugin Name: PCP Addon
-      * Plugin URI: https://example.com
-      * Description: Plugin Check addon.
-      * Version: 0.1.0
-      * Author: WordPress Performance Team
-      * Author URI: https://make.wordpress.org/performance/
-      * License: GPL-2.0+
-      * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
-      */
+      use WordPress\Plugin_Check\Checker\Checks\Abstract_PHP_CodeSniffer_Check;
+      use WordPress\Plugin_Check\Traits\Stable_Check;
 
+      class PostsPerPage_Check extends Abstract_PHP_CodeSniffer_Check {
+
+        use Stable_Check;
+
+        public function get_categories() {
+          return array( 'new_category' );
+        }
+
+        protected function get_args() {
+          return array(
+            'extensions' => 'php',
+            'standard'   => plugin_dir_path( __FILE__ ) . 'postsperpage.xml',
+          );
+        }
+      }
+      """
+    And a wp-content/plugins/pcp-addon/class-prohibited-text-check.php file:
+      """
+      <?php
       use WordPress\Plugin_Check\Checker\Check_Result;
       use WordPress\Plugin_Check\Checker\Checks\Abstract_File_Check;
-      use WordPress\Plugin_Check\Checker\Checks\Abstract_PHP_CodeSniffer_Check;
       use WordPress\Plugin_Check\Traits\Amend_Check_Result;
       use WordPress\Plugin_Check\Traits\Stable_Check;
 
@@ -328,22 +338,22 @@ Feature: Test that the WP-CLI command works.
           }
         }
       }
+      """
 
-      class PostsPerPage_Check extends Abstract_PHP_CodeSniffer_Check {
-
-        use Stable_Check;
-
-        public function get_categories() {
-          return array( 'new_category' );
-        }
-
-        protected function get_args() {
-          return array(
-            'extensions' => 'php',
-            'standard'   => plugin_dir_path( __FILE__ ) . 'postsperpage.xml',
-          );
-        }
-      }
+    And a wp-content/plugins/pcp-addon/pcp-addon.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: PCP Addon
+       * Plugin URI: https://example.com
+       * Description: Plugin Check addon.
+       * Version: 0.1.0
+       * Author: WordPress Performance Team
+       * Author URI: https://make.wordpress.org/performance/
+       * License: GPL-2.0+
+       * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+       * Requires Plugins: plugin-check
+       */
 
       add_filter(
         'wp_plugin_check_categories',
@@ -355,6 +365,9 @@ Feature: Test that the WP-CLI command works.
       add_filter(
         'wp_plugin_check_checks',
         function ( array $checks ) {
+          require_once plugin_dir_path( __FILE__ ) . 'class-prohibited-text-check.php';
+          require_once plugin_dir_path( __FILE__ ) . 'class-postsperpage-check.php';
+
           return array_merge(
             $checks,
             array(
@@ -445,6 +458,20 @@ Feature: Test that the WP-CLI command works.
     And STDOUT should not contain:
       """
       plugin_review_phpcs,plugin_repo
+      """
+
+    When I run the WP-CLI command `plugin check foo-sample --fields=code,type --format=csv`
+    Then STDOUT should contain:
+      """
+      WordPress.WP.AlternativeFunctions.rand_mt_rand,ERROR
+      """
+    And STDOUT should contain:
+      """
+      prohibited_text_detected,ERROR
+      """
+    And STDOUT should contain:
+      """
+      WordPress.WP.PostsPerPage.posts_per_page_posts_per_page,ERROR
       """
 
     When I run the WP-CLI command `plugin check foo-sample --fields=code,type --format=csv`
