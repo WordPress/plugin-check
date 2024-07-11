@@ -217,6 +217,35 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_filter_ignore_files() {
+		// Define custom files to ignore for testing.
+		$custom_ignore_files = array(
+			'file-1.php',
+			'inc/file-2.php',
+		);
+
+		// Create a mock filter that will return our custom files to ignore.
+		$filter_name = 'wp_plugin_check_ignore_files';
+		add_filter(
+			$filter_name,
+			static function () use ( $custom_ignore_files ) {
+				return $custom_ignore_files;
+			}
+		);
+
+		$result = Plugin_Request_Utility::get_files_to_ignore();
+
+		$this->assertEquals( $custom_ignore_files, $result );
+
+		// Remove the filter to avoid interfering with other tests.
+		remove_filter(
+			$filter_name,
+			static function () use ( $custom_ignore_files ) {
+				return $custom_ignore_files;
+			}
+		);
+	}
+
 	public function test_plugin_without_error_for_ignore_directories() {
 
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-ignore-directories/load.php' );
@@ -301,5 +330,102 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 30, $errors['custom_directory/error.php'][18] );
 		$this->assertArrayHasKey( 'code', $errors['custom_directory/error.php'][18][30][0] );
 		$this->assertEquals( 'WordPress.WP.I18n.NonSingularStringLiteralDomain', $errors['custom_directory/error.php'][18][30][0]['code'] );
+	}
+
+	public function test_plugin_for_ignore_files_with_empty_filter() {
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-ignore-files/load.php' );
+		$checks        = new Checks();
+		$checks_to_run = array(
+			new I18n_Usage_Check(),
+		);
+
+		add_filter(
+			'wp_plugin_check_checks',
+			function ( $checks ) {
+				return array(
+					'i18n_usage_check' => new I18n_Usage_Check(),
+				);
+			}
+		);
+
+		$results = $checks->run_checks( $check_context, $checks_to_run );
+
+		$this->assertInstanceOf( Check_Result::class, $results );
+
+		$errors = $results->get_errors();
+
+		$this->assertNotEmpty( $errors );
+		$this->assertArrayHasKey( 'bar.php', $errors );
+		$this->assertArrayHasKey( 'foobar.php', $errors );
+		$this->assertArrayHasKey( 'subdirectory/error.php', $errors );
+		$this->assertEquals( 3, $results->get_error_count() );
+
+		// Check for WordPress.WP.I18n.MissingTranslatorsComment error on Line no 7 and column 10.
+		$this->assertArrayHasKey( 7, $errors['bar.php'] );
+		$this->assertArrayHasKey( 10, $errors['bar.php'][7] );
+		$this->assertArrayHasKey( 'code', $errors['bar.php'][7][10][0] );
+		$this->assertEquals( 'WordPress.WP.I18n.MissingTranslatorsComment', $errors['bar.php'][7][10][0]['code'] );
+
+		// Check for WordPress.WP.I18n.NonSingularStringLiteralText error on Line no 7 and column 13.
+		$this->assertArrayHasKey( 7, $errors['foobar.php'] );
+		$this->assertArrayHasKey( 13, $errors['foobar.php'][7] );
+		$this->assertArrayHasKey( 'code', $errors['foobar.php'][7][13][0] );
+		$this->assertEquals( 'WordPress.WP.I18n.NonSingularStringLiteralText', $errors['foobar.php'][7][13][0]['code'] );
+
+		// Check for WordPress.WP.I18n.NonSingularStringLiteralDomain error on Line no 7 and column 29.
+		$this->assertArrayHasKey( 7, $errors['subdirectory/error.php'] );
+		$this->assertArrayHasKey( 29, $errors['subdirectory/error.php'][7] );
+		$this->assertArrayHasKey( 'code', $errors['subdirectory/error.php'][7][29][0] );
+		$this->assertEquals( 'WordPress.WP.I18n.NonSingularStringLiteralDomain', $errors['subdirectory/error.php'][7][29][0]['code'] );
+	}
+
+	public function test_plugin_for_ignore_files_with_custom_filter() {
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-ignore-files/load.php' );
+		$checks        = new Checks();
+		$checks_to_run = array(
+			new I18n_Usage_Check(),
+		);
+
+		add_filter(
+			'wp_plugin_check_checks',
+			function ( $checks ) {
+				return array(
+					'i18n_usage_check' => new I18n_Usage_Check(),
+				);
+			}
+		);
+
+		$custom_ignore_files = array(
+			'bar.php',
+		);
+
+		// Create a mock filter that will return our custom files to ignore.
+		$filter_name = 'wp_plugin_check_ignore_files';
+		add_filter(
+			$filter_name,
+			static function () use ( $custom_ignore_files ) {
+				return $custom_ignore_files;
+			}
+		);
+
+		$results = $checks->run_checks( $check_context, $checks_to_run );
+
+		$this->assertInstanceOf( Check_Result::class, $results );
+
+		$errors   = $results->get_errors();
+		$warnings = $results->get_warnings();
+
+		$this->assertNotEmpty( $errors );
+		$this->assertEmpty( $warnings );
+		$this->assertEquals( 2, $results->get_error_count() );
+		$this->assertEquals( 0, $results->get_warning_count() );
+
+		// Remove the filter to avoid interfering with other tests.
+		remove_filter(
+			$filter_name,
+			static function () use ( $custom_ignore_files ) {
+				return $custom_ignore_files;
+			}
+		);
 	}
 }

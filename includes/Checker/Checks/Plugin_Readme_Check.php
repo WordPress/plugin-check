@@ -18,6 +18,8 @@ use WordPressdotorg\Plugin_Directory\Readme\Parser;
  * Check the plugins readme file and contents.
  *
  * @since 1.0.0
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class Plugin_Readme_Check extends Abstract_File_Check {
 
@@ -77,6 +79,9 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		// Check the readme file for plugin name.
 		$this->check_name( $result, $readme_file, $parser );
 
+		// Check the readme file for missing headers.
+		$this->check_headers( $result, $readme_file, $parser );
+
 		// Check the readme file for default text.
 		$this->check_default_text( $result, $readme_file, $parser );
 
@@ -85,6 +90,9 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 		// Check the readme file for a valid version.
 		$this->check_stable_tag( $result, $readme_file, $parser );
+
+		// Check the readme file for upgrade notice.
+		$this->check_upgrade_notice( $result, $readme_file, $parser );
 
 		// Check the readme file for warnings.
 		$this->check_for_warnings( $result, $readme_file, $parser );
@@ -116,6 +124,67 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 			);
 
 			$this->add_result_error_for_file( $result, $message, 'empty_plugin_name', $readme_file );
+		}
+	}
+
+	/**
+	 * Checks the readme file for missing headers.
+	 *
+	 * @since 1.0.2
+	 *
+	 * @param Check_Result $result      The Check Result to amend.
+	 * @param string       $readme_file Readme file.
+	 * @param Parser       $parser      The Parser object.
+	 */
+	private function check_headers( Check_Result $result, string $readme_file, Parser $parser ) {
+		$ignored_warnings = $this->get_ignored_warnings( $parser );
+
+		$fields = array(
+			'tested'       => array(
+				'label'      => __( 'Tested up to', 'plugin-check' ),
+				'ignore_key' => 'tested_header_ignored',
+			),
+			'contributors' => array(
+				'label'      => __( 'Contributors', 'plugin-check' ),
+				'ignore_key' => 'contributor_ignored',
+			),
+		);
+
+		$parser_warnings = is_array( $parser->warnings ) ? $parser->warnings : array();
+
+		foreach ( $fields as $field_key => $field ) {
+			if ( ! in_array( $field['ignore_key'], $ignored_warnings, true ) && ! isset( $parser_warnings[ $field['ignore_key'] ] ) ) {
+
+				if ( ! empty( $parser->{$field_key} ) && 'tested' === $field_key ) {
+					$latest_wordpress_version = $this->get_wordpress_stable_version();
+					if ( version_compare( $parser->{$field_key}, $latest_wordpress_version, '<' ) ) {
+						$this->add_result_error_for_file(
+							$result,
+							sprintf(
+								/* translators: 1: currently used version, 2: latest stable WordPress version */
+								__( 'Tested up to: %1$s < %2$s', 'plugin-check' ),
+								$parser->{$field_key},
+								$latest_wordpress_version
+							),
+							'outdated_tested_upto_header',
+							$readme_file
+						);
+					}
+				} else {
+					if ( empty( $parser->{$field_key} ) ) {
+						$this->add_result_error_for_file(
+							$result,
+							sprintf(
+								/* translators: %s: plugin header tag */
+								__( 'The "%s" field is missing.', 'plugin-check' ),
+								$field['label']
+							),
+							'missing_readme_header',
+							$readme_file
+						);
+					}
+				}
+			}
 		}
 	}
 
@@ -157,8 +226,11 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 * @param Parser       $parser      The Parser object.
 	 */
 	private function check_license( Check_Result $result, string $readme_file, Parser $parser ) {
-		$license = $parser->license;
+		$license          = $parser->license;
+		$matches_license  = array();
+		$plugin_main_file = $result->plugin()->main_file();
 
+		// Filter the readme files.
 		if ( empty( $license ) ) {
 			$this->add_result_error_for_file(
 				$result,
@@ -168,6 +240,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 			);
 
 			return;
+		} else {
+			$license = $this->normalize_licenses( $license );
 		}
 
 		// Test for a valid SPDX license identifier.
@@ -179,6 +253,82 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				$readme_file
 			);
 		}
+
+		$pattern     = preg_quote( 'License', '/' );
+		$has_license = self::file_preg_match( "/(*ANYCRLF)^.*$pattern\s*:\s*(.*)$/im", array( $plugin_main_file ), $matches_license );
+		if ( ! $has_license ) {
+			$this->add_result_error_for_file(
+				$result,
+				__( 'Your plugin has no license declared in Plugin Header. Please update your plugin header with a GPLv2 (or later) compatible license.', 'plugin-check' ),
+				'no_license',
+				$plugin_main_file
+			);
+		} else {
+			$plugin_license = $this->normalize_licenses( $matches_license[1] );
+		}
+
+		// Checks for a valid license in Plugin Header.
+		if ( ! empty( $plugin_license ) && ! preg_match( '/GPL|GNU|MIT|FreeBSD|New BSD|BSD-3-Clause|BSD 3 Clause|OpenLDAP|Expat/im', $plugin_license ) ) {
+			$this->add_result_error_for_file(
+				$result,
+				__( 'Your plugin has an invalid license declared in Plugin Header. Please update your readme with a valid GPL license identifier.', 'plugin-check' ),
+				'invalid_license',
+				$plugin_main_file
+			);
+		}
+
+		// Check different license types.
+		if ( ! empty( $plugin_license ) && ! empty( $license ) && $license !== $plugin_license ) {
+			$this->add_result_warning_for_file(
+				$result,
+				__( 'Your plugin has a different license declared in the readme file and plugin header. Please update your readme with a valid GPL license identifier.', 'plugin-check' ),
+				'license_mismatch',
+				$readme_file
+			);
+		}
+	}
+
+	/**
+	 * Normalize licenses to compare them.
+	 *
+	 * @since 1.0.2
+	 *
+	 * @param string $license The license to normalize.
+	 * @return string
+	 */
+	private function normalize_licenses( $license ) {
+		$license = trim( $license );
+		$license = str_replace( '  ', ' ', $license );
+
+		// Remove some strings at the end.
+		$strings_to_remove = array(
+			'.',
+			'http://www.gnu.org/licenses/old-licenses/gpl-2.0.html',
+			'https://www.gnu.org/licenses/old-licenses/gpl-2.0.html',
+			'https://www.gnu.org/licenses/gpl-3.0.html',
+			' or later',
+			'-or-later',
+			'+',
+		);
+		foreach ( $strings_to_remove as $string_to_remove ) {
+			$position = strrpos( $license, $string_to_remove );
+
+			if ( false !== $position ) {
+				// To remove from the end, the string to remove must be at the end.
+				if ( $position + strlen( $string_to_remove ) === strlen( $license ) ) {
+					$license = trim( substr( $license, 0, $position ) );
+				}
+			}
+		}
+
+		// Versions.
+		$license = str_replace( '-', '', $license );
+		$license = str_replace( 'GNU General Public License (GPL)', 'GPL', $license );
+		$license = str_replace( 'GNU General Public License', 'GPL', $license );
+		$license = preg_replace( '/GPL\s*[-|\.]*\s*[v]?([0-9])(\.[0])?/i', 'GPL$1', $license, 1 );
+		$license = str_replace( '.', '', $license );
+
+		return $license;
 	}
 
 	/**
@@ -218,7 +368,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		}
 
 		// Check the readme file Stable tag against the plugin's main file version.
-		$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $result->plugin()->basename() );
+		$plugin_data = get_plugin_data( $result->plugin()->main_file() );
 
 		if (
 			! empty( $plugin_data['Version'] ) &&
@@ -230,6 +380,40 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				'stable_tag_mismatch',
 				$readme_file
 			);
+		}
+	}
+
+	/**
+	 * Checks the readme file upgrade notice.
+	 *
+	 * @since 1.0.2
+	 *
+	 * @param Check_Result $result      The Check Result to amend.
+	 * @param string       $readme_file Readme file.
+	 * @param Parser       $parser      The Parser object.
+	 */
+	private function check_upgrade_notice( Check_Result $result, string $readme_file, Parser $parser ) {
+		$notices = $parser->upgrade_notice;
+
+		$maximum_characters = 300;
+
+		// Bail if no upgrade notices.
+		if ( 0 === count( $notices ) ) {
+			return;
+		}
+
+		foreach ( $notices as $version => $notice ) {
+			if ( strlen( $notice ) > $maximum_characters ) {
+				if ( empty( $version ) ) {
+					/* translators: %d: maximum limit. */
+					$message = sprintf( _n( 'The upgrade notice exceeds the limit of %d character.', 'The upgrade notice exceeds the limit of %d characters.', $maximum_characters, 'plugin-check' ), $maximum_characters );
+				} else {
+					/* translators: 1: version, 2: maximum limit. */
+					$message = sprintf( _n( 'The upgrade notice for "%1$s" exceeds the limit of %2$d character.', 'The upgrade notice for "%1$s" exceeds the limit of %2$d characters.', $maximum_characters, 'plugin-check' ), $version, $maximum_characters );
+				}
+
+				$this->add_result_warning_for_file( $result, $message, 'upgrade_notice_limit', $readme_file );
+			}
 		}
 	}
 
@@ -251,10 +435,6 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		$warning_keys = array_keys( $warnings );
 
 		$latest_wordpress_version = (float) $this->get_wordpress_stable_version();
-
-		$ignored_warnings = array(
-			'contributor_ignored',
-		);
 
 		$messages = array(
 			'contributor_ignored'          => sprintf(
@@ -306,15 +486,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 			),
 		);
 
-		/**
-		 * Filter the list of ignored readme parser warnings.
-		 *
-		 * @since 1.0.0
-		 *
-		 * @param array  $ignored_warnings Array of ignored warning keys.
-		 * @param Parser $parser           The Parser object.
-		 */
-		$ignored_warnings = (array) apply_filters( 'wp_plugin_check_ignored_readme_warnings', $ignored_warnings, $parser );
+		$ignored_warnings = $this->get_ignored_warnings( $parser );
 
 		$warning_keys = array_diff( $warning_keys, $ignored_warnings );
 
@@ -344,7 +516,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				if ( isset( $body['offers'] ) && ! empty( $body['offers'] ) ) {
 					$latest_release = reset( $body['offers'] );
 
-					$version = $latest_release['new_bundled'];
+					$version = $latest_release['current'];
 
 					set_transient( 'wp_plugin_check_latest_wp_version', $version, DAY_IN_SECONDS );
 				}
@@ -357,12 +529,38 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 			// Strip off any -alpha, -RC, -beta suffixes.
 			list( $version, ) = explode( '-', $version );
+		}
 
-			if ( preg_match( '#^\d.\d#', $version, $matches ) ) {
-				$version = $matches[0];
-			}
+		if ( preg_match( '#^\d.\d#', $version, $matches ) ) {
+			$version = $matches[0];
 		}
 
 		return $version;
+	}
+
+	/**
+	 * Returns ignored warnings.
+	 *
+	 * @since 1.0.2
+	 *
+	 * @param Parser $parser The Parser object.
+	 * @return array Ignored warnings.
+	 */
+	private function get_ignored_warnings( Parser $parser ) {
+		$ignored_warnings = array(
+			'contributor_ignored',
+		);
+
+		/**
+		 * Filter the list of ignored readme parser warnings.
+		 *
+		 * @since 1.0.2
+		 *
+		 * @param array  $ignored_warnings Array of ignored warning keys.
+		 * @param Parser $parser           The Parser object.
+		 */
+		$ignored_warnings = (array) apply_filters( 'wp_plugin_check_ignored_readme_warnings', $ignored_warnings, $parser );
+
+		return $ignored_warnings;
 	}
 }
