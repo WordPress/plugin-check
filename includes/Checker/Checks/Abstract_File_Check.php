@@ -144,7 +144,7 @@ abstract class Abstract_File_Check implements Static_Check {
 	/**
 	 * Returns matched files performing a regular expression match on the file contents of the given list of files.
 	 *
-	 * @since 1.0.2
+	 * @since 1.1.0
 	 *
 	 * @param string $pattern The pattern to search for.
 	 * @param array  $files   List of absolute file paths.
@@ -169,7 +169,7 @@ abstract class Abstract_File_Check implements Static_Check {
 	/**
 	 * Returns matched files performing a regular expression match on the file contents of the given list of files with line and column information.
 	 *
-	 * @since 1.0.2
+	 * @since 1.1.0
 	 *
 	 * @param string $pattern The pattern to search for.
 	 * @param array  $files   List of absolute file paths.
