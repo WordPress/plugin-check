@@ -25,8 +25,6 @@ trait File_Editor_URL {
 	 * @param string       $filename Error file name.
 	 * @param int          $line     Optional. Line number of error. Default 0 (no specific line).
 	 * @return string|null File editor URL or null if not available.
-	 *
-	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
 	 */
 	protected function get_file_editor_url( Check_Result $result, $filename, $line = 0 ) {
 
@@ -105,13 +103,8 @@ trait File_Editor_URL {
 
 			if ( $result->plugin()->is_single_file_plugin() ) {
 				$file = $filename;
-			} else {
-				$plugin_dirname = dirname( $result->plugin()->basename() );
-				$editable_files = $result->plugin()->editable_files();
-
-				if ( in_array( $plugin_dirname . '/' . $filename, $editable_files, true ) ) {
-					$file = $plugin_slug . '/' . $filename;
-				}
+			} elseif ( $result->plugin()->is_file_editable( $filename ) ) {
+				$file = $plugin_slug . '/' . $filename;
 			}
 
 			if ( ! empty( $file ) ) {

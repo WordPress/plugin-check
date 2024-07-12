@@ -193,13 +193,32 @@ class Plugin_Context {
 	}
 
 	/**
+	 * Checks if the file is editable.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $file Filename.
+	 * @return bool true if the file is editable, otherwise false.
+	 */
+	public function is_file_editable( $file ) {
+		$is_editable = false;
+		$plugin_slug = dirname( $this->basename() );
+
+		if ( in_array( $plugin_slug . '/' . $file, $this->editable_files(), true ) ) {
+			$is_editable = true;
+		}
+
+		return $is_editable;
+	}
+
+	/**
 	 * Gets the list of editable file names of the plugin.
 	 *
 	 * @since 1.1.0
 	 *
 	 * @return string[] Array of editable file names relative to the plugin root.
 	 */
-	public function editable_files() {
+	private function editable_files() {
 		if ( ! is_null( $this->editable_files ) ) {
 			return $this->editable_files;
 		}
