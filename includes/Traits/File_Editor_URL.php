@@ -99,18 +99,58 @@ trait File_Editor_URL {
 
 		// Fall back to using the plugin editor if no external editor is offered.
 		if ( ! $edit_url && current_user_can( 'edit_plugins' ) ) {
-			$query_args = array(
-				'plugin' => rawurlencode( $result->plugin()->basename() ),
-				'file'   => rawurlencode( $result->plugin()->is_single_file_plugin() ? $filename : $plugin_slug . '/' . $filename ),
-			);
-			if ( $line ) {
-				$query_args['line'] = $line;
+			$file = '';
+
+			if ( $result->plugin()->is_single_file_plugin() ) {
+				$file = $filename;
+			} else {
+				$plugin_dirname = dirname( $result->plugin()->basename() );
+				$editable_files = $this->get_editable_files( $result->plugin()->basename() );
+
+				if ( in_array( $plugin_dirname . '/' . $filename, $editable_files, true ) ) {
+					$file = $plugin_slug . '/' . $filename;
+				}
 			}
-			return add_query_arg(
-				$query_args,
-				admin_url( 'plugin-editor.php' )
-			);
+
+			if ( ! empty( $file ) ) {
+				$query_args = array(
+					'plugin' => rawurlencode( $result->plugin()->basename() ),
+					'file'   => rawurlencode( $file ),
+				);
+				if ( $line ) {
+					$query_args['line'] = $line;
+				}
+				return add_query_arg(
+					$query_args,
+					admin_url( 'plugin-editor.php' )
+				);
+			}
 		}
+
 		return $edit_url;
+	}
+
+	/**
+	 * Gets the list of editable file names of the plugin.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $plugin Path to the plugin file relative to the plugins directory.
+	 * @return string[] Array of editable file names relative to the plugin root.
+	 */
+	protected function get_editable_files( $plugin ) {
+		$plugin_files = get_plugin_files( $plugin );
+
+		$editable_extensions = wp_get_plugin_file_editable_extensions( $plugin );
+
+		$plugin_editable_files = array();
+
+		foreach ( $plugin_files as $plugin_file ) {
+			if ( preg_match( '/\.([^.]+)$/', $plugin_file, $matches ) && in_array( $matches[1], $editable_extensions, true ) ) {
+				$plugin_editable_files[] = $plugin_file;
+			}
+		}
+
+		return $plugin_editable_files;
 	}
 }
