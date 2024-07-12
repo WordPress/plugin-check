@@ -212,7 +212,7 @@ class Non_Blocking_Scripts_Check extends Abstract_Runtime_Check implements With_
 				$this->add_result_warning_for_file(
 					$result,
 					sprintf(
-					/* translators: 1: tested URL. 2: 'async'. 3: 'defer' */
+						/* translators: 1: tested URL. 2: 'async'. 3: 'defer' */
 						__( 'This script on %1$s is loaded in the footer. Consider an %2$s or %3$s script loading strategy instead.', 'plugin-check' ),
 						$url,
 						'async',
