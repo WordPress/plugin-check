@@ -17,7 +17,7 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
 use WordPress\Plugin_Check\Traits\URL_Aware;
 
 /**
- * Check for enqueued script sizes.
+ * Check for non-blocking scripts.
  *
  * @since 1.1.0
  */
