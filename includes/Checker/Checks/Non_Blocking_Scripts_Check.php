@@ -176,7 +176,7 @@ class Non_Blocking_Scripts_Check extends Abstract_Runtime_Check implements With_
 		wp_enqueue_scripts();
 		wp_scripts()->do_head_items();
 		wp_scripts()->do_footer_items();
-		ob_get_clean();
+		ob_end_clean();
 
 		foreach ( wp_scripts()->done as $handle ) {
 			$script = wp_scripts()->registered[ $handle ];
