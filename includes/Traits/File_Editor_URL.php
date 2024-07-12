@@ -25,6 +25,8 @@ trait File_Editor_URL {
 	 * @param string       $filename Error file name.
 	 * @param int          $line     Optional. Line number of error. Default 0 (no specific line).
 	 * @return string|null File editor URL or null if not available.
+	 *
+	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
 	 */
 	protected function get_file_editor_url( Check_Result $result, $filename, $line = 0 ) {
 
@@ -99,17 +101,32 @@ trait File_Editor_URL {
 
 		// Fall back to using the plugin editor if no external editor is offered.
 		if ( ! $edit_url && current_user_can( 'edit_plugins' ) ) {
-			$query_args = array(
-				'plugin' => rawurlencode( $result->plugin()->basename() ),
-				'file'   => rawurlencode( $result->plugin()->is_single_file_plugin() ? $filename : $plugin_slug . '/' . $filename ),
-			);
-			if ( $line ) {
-				$query_args['line'] = $line;
+			$file = '';
+
+			if ( $result->plugin()->is_single_file_plugin() ) {
+				$file = $filename;
+			} else {
+				$plugin_dirname = dirname( $result->plugin()->basename() );
+				$editable_files = $result->plugin()->editable_files();
+
+				if ( in_array( $plugin_dirname . '/' . $filename, $editable_files, true ) ) {
+					$file = $plugin_slug . '/' . $filename;
+				}
 			}
-			return add_query_arg(
-				$query_args,
-				admin_url( 'plugin-editor.php' )
-			);
+
+			if ( ! empty( $file ) ) {
+				$query_args = array(
+					'plugin' => rawurlencode( $result->plugin()->basename() ),
+					'file'   => rawurlencode( $file ),
+				);
+				if ( $line ) {
+					$query_args['line'] = $line;
+				}
+				return add_query_arg(
+					$query_args,
+					admin_url( 'plugin-editor.php' )
+				);
+			}
 		}
 		return $edit_url;
 	}

@@ -38,6 +38,14 @@ class Plugin_Context {
 	protected $minimum_supported_wp;
 
 	/**
+	 * Array of editable file names.
+	 *
+	 * @since 1.1.0
+	 * @var string[]
+	 */
+	protected $editable_files;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.0.0
@@ -182,5 +190,36 @@ class Plugin_Context {
 		}
 
 		return $this->minimum_supported_wp;
+	}
+
+	/**
+	 * Gets the list of editable file names of the plugin.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string[] Array of editable file names relative to the plugin root.
+	 */
+	public function editable_files() {
+		if ( ! is_null( $this->editable_files ) ) {
+			return $this->editable_files;
+		}
+
+		$this->editable_files = array();
+
+		$plugin_files = get_plugin_files( $this->basename() );
+
+		$editable_extensions = wp_get_plugin_file_editable_extensions( $this->basename() );
+
+		$plugin_editable_files = array();
+
+		foreach ( $plugin_files as $plugin_file ) {
+			if ( preg_match( '/\.([^.]+)$/', $plugin_file, $matches ) && in_array( $matches[1], $editable_extensions, true ) ) {
+				$plugin_editable_files[] = $plugin_file;
+			}
+		}
+
+		$this->editable_files = $plugin_editable_files;
+
+		return $this->editable_files;
 	}
 }
