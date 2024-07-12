@@ -38,14 +38,6 @@ class Plugin_Context {
 	protected $minimum_supported_wp;
 
 	/**
-	 * Array of editable file names.
-	 *
-	 * @since 1.1.0
-	 * @var string[]
-	 */
-	protected $editable_files;
-
-	/**
 	 * Constructor.
 	 *
 	 * @since 1.0.0
@@ -201,44 +193,10 @@ class Plugin_Context {
 	 * @return bool true if the file is editable, otherwise false.
 	 */
 	public function is_file_editable( $file ) {
-		$is_editable = false;
-		$plugin_slug = dirname( $this->basename() );
-
-		if ( in_array( $plugin_slug . '/' . $file, $this->editable_files(), true ) ) {
-			$is_editable = true;
-		}
-
-		return $is_editable;
-	}
-
-	/**
-	 * Gets the list of editable file names of the plugin.
-	 *
-	 * @since 1.1.0
-	 *
-	 * @return string[] Array of editable file names relative to the plugin root.
-	 */
-	private function editable_files() {
-		if ( ! is_null( $this->editable_files ) ) {
-			return $this->editable_files;
-		}
-
-		$this->editable_files = array();
-
-		$plugin_files = get_plugin_files( $this->basename() );
-
 		$editable_extensions = wp_get_plugin_file_editable_extensions( $this->basename() );
 
-		$plugin_editable_files = array();
+		$extension = strtolower( pathinfo( $file, PATHINFO_EXTENSION ) );
 
-		foreach ( $plugin_files as $plugin_file ) {
-			if ( preg_match( '/\.([^.]+)$/', $plugin_file, $matches ) && in_array( $matches[1], $editable_extensions, true ) ) {
-				$plugin_editable_files[] = $plugin_file;
-			}
-		}
-
-		$this->editable_files = $plugin_editable_files;
-
-		return $this->editable_files;
+		return in_array( $extension, $editable_extensions, true ) && file_exists( dirname( $this->main_file() ) . '/' . $file );
 	}
 }
