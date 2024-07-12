@@ -199,11 +199,11 @@ class Non_Blocking_Scripts_Check extends Abstract_Runtime_Check implements With_
 				$this->add_result_warning_for_file(
 					$result,
 					sprintf(
-						/* translators: 1: tested URL. 2: 'async'. 3: 'defer' */
+						/* translators: 1: tested URL. 2: 'defer'. 3: 'async' */
 						__( 'This script on %1$s is potentially blocking. Consider an %2$s or %3$s script strategy or moving it to the footer', 'plugin-check' ),
 						$url,
-						'async',
-						'defer'
+						'defer',
+						'async'
 					),
 					'NonBlockingScripts.BlockingHeadScript',
 					$script_path
@@ -212,11 +212,11 @@ class Non_Blocking_Scripts_Check extends Abstract_Runtime_Check implements With_
 				$this->add_result_warning_for_file(
 					$result,
 					sprintf(
-						/* translators: 1: tested URL. 2: 'async'. 3: 'defer' */
+						/* translators: 1: tested URL. 2: 'defer'. 3: 'async' */
 						__( 'This script on %1$s is loaded in the footer. Consider an %2$s or %3$s script loading strategy instead.', 'plugin-check' ),
 						$url,
-						'async',
-						'defer'
+						'defer',
+						'async'
 					),
 					'NonBlockingScripts.NoStrategy',
 					$script_path
