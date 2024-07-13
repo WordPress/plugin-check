@@ -1,23 +1,24 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\Localhost_Check
+ * Class No_Unfiltered_Uploads_Check.
  *
  * @package plugin-check
  */
 
-namespace WordPress\Plugin_Check\Checker\Checks;
+namespace WordPress\Plugin_Check\Checker\Checks\Plugin_Repo;
 
 use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Checks\Abstract_File_Check;
 use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 
 /**
- * Check for detecting localhost in plugin files.
+ * Check for detecting "ALLOW_UNFILTERED_UPLOADS" constant in plugin files.
  *
  * @since 1.0.0
  */
-class Localhost_Check extends Abstract_File_Check {
+class No_Unfiltered_Uploads_Check extends Abstract_File_Check {
 
 	use Amend_Check_Result;
 	use Stable_Check;
@@ -36,7 +37,7 @@ class Localhost_Check extends Abstract_File_Check {
 	}
 
 	/**
-	 * Check the localhost in files.
+	 * Check the "ALLOW_UNFILTERED_UPLOADS" constant in file.
 	 *
 	 * @since 1.0.0
 	 *
@@ -45,19 +46,14 @@ class Localhost_Check extends Abstract_File_Check {
 	 */
 	protected function check_files( Check_Result $result, array $files ) {
 		$php_files = self::filter_files_by_extension( $files, 'php' );
-		$files     = self::files_preg_match_all( '#https?:\/\/(localhost|127.0.0.1|(.*\.local(host)?))\/#', $php_files );
-
-		if ( ! empty( $files ) ) {
-			foreach ( $files as $file ) {
-				$this->add_result_error_for_file(
-					$result,
-					__( 'Do not use Localhost/127.0.0.1 in your code.', 'plugin-check' ),
-					'localhost_code_detected',
-					$file['file'],
-					$file['line'],
-					$file['column']
-				);
-			}
+		$file      = self::file_str_contains( $php_files, 'ALLOW_UNFILTERED_UPLOADS' );
+		if ( $file ) {
+			$this->add_result_error_for_file(
+				$result,
+				__( 'ALLOW_UNFILTERED_UPLOADS is not permitted.', 'plugin-check' ),
+				'allow_unfiltered_uploads_detected',
+				$file
+			);
 		}
 	}
 }

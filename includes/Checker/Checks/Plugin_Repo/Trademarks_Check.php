@@ -1,15 +1,16 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\Trademarks_Check
+ * Class Trademarks_Check.
  *
  * @package plugin-check
  */
 
-namespace WordPress\Plugin_Check\Checker\Checks;
+namespace WordPress\Plugin_Check\Checker\Checks\Plugin_Repo;
 
 use Exception;
 use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Checks\Abstract_File_Check;
 use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Traits\Find_Readme;
 use WordPress\Plugin_Check\Traits\Stable_Check;

@@ -1,15 +1,16 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\Enqueued_Scripts_Size_Check
+ * Class Enqueued_Scripts_Size_Check.
  *
  * @package plugin-check
  */
 
-namespace WordPress\Plugin_Check\Checker\Checks;
+namespace WordPress\Plugin_Check\Checker\Checks\Performance;
 
 use Exception;
 use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Checks\Abstract_Runtime_Check;
 use WordPress\Plugin_Check\Checker\Preparations\Demo_Posts_Creation_Preparation;
 use WordPress\Plugin_Check\Checker\With_Shared_Preparations;
 use WordPress\Plugin_Check\Traits\Amend_Check_Result;

@@ -7,7 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
-use WordPress\Plugin_Check\Checker\Checks\Plugin_Header_Text_Domain_Check;
+use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\Plugin_Header_Text_Domain_Check;
 
 class Plugin_Header_Text_Domain_Check_Tests extends WP_UnitTestCase {
 

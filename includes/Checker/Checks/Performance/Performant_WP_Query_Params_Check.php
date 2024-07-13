@@ -1,21 +1,22 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\Plugin_Review_PHPCS_Check
+ * Class Performant_WP_Query_Params_Check.
  *
  * @package plugin-check
  */
 
-namespace WordPress\Plugin_Check\Checker\Checks;
+namespace WordPress\Plugin_Check\Checker\Checks\Performance;
 
 use WordPress\Plugin_Check\Checker\Check_Categories;
+use WordPress\Plugin_Check\Checker\Checks\Abstract_PHP_CodeSniffer_Check;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 
 /**
- * Check for running WordPress plugin review PHPCS standard.
+ * Check for running WordPress performant WP_Query params sniffs.
  *
  * @since 1.0.0
  */
-class Plugin_Review_PHPCS_Check extends Abstract_PHP_CodeSniffer_Check {
+class Performant_WP_Query_Params_Check extends Abstract_PHP_CodeSniffer_Check {
 
 	use Stable_Check;
 
@@ -29,7 +30,7 @@ class Plugin_Review_PHPCS_Check extends Abstract_PHP_CodeSniffer_Check {
 	 * @return array The categories for the check.
 	 */
 	public function get_categories() {
-		return array( Check_Categories::CATEGORY_PLUGIN_REPO );
+		return array( Check_Categories::CATEGORY_PERFORMANCE );
 	}
 
 	/**
@@ -42,7 +43,8 @@ class Plugin_Review_PHPCS_Check extends Abstract_PHP_CodeSniffer_Check {
 	protected function get_args() {
 		return array(
 			'extensions' => 'php',
-			'standard'   => WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'phpcs-rulesets/plugin-review.xml',
+			'standard'   => 'WordPress,WordPressVIPMinimum',
+			'sniffs'     => 'WordPress.DB.SlowDBQuery,WordPressVIPMinimum.Performance.WPQueryParams',
 		);
 	}
 }
