@@ -142,6 +142,69 @@ abstract class Abstract_File_Check implements Static_Check {
 	}
 
 	/**
+	 * Returns matched files performing a regular expression match on the file contents of the given list of files.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $pattern The pattern to search for.
+	 * @param array  $files   List of absolute file paths.
+	 * @return array|bool Array of file paths and matched string/pattern if matches were found, false otherwise.
+	 */
+	final protected static function files_preg_match( $pattern, array $files ) {
+		$matched_files = array();
+
+		foreach ( $files as $file ) {
+			$matches = array();
+
+			$matched_file_name = self::file_preg_match( $pattern, array( $file ), $matches );
+
+			if ( false !== $matched_file_name ) {
+				$matched_files[] = array( $matched_file_name, $matches[0] );
+			}
+		}
+
+		return count( $matched_files ) > 0 ? $matched_files : false;
+	}
+
+	/**
+	 * Returns matched files performing a regular expression match on the file contents of the given list of files with line and column information.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $pattern The pattern to search for.
+	 * @param array  $files   List of absolute file paths.
+	 * @return array|bool Array of file paths and matched string/pattern if matches were found, false otherwise.
+	 */
+	final protected static function files_preg_match_all( $pattern, array $files ) {
+		$matched_files = array();
+
+		foreach ( $files as $file ) {
+			$matches = array();
+
+			$contents = self::file_get_contents( $file );
+
+			preg_match_all( $pattern, $contents, $matches, PREG_OFFSET_CAPTURE );
+
+			if ( is_array( $matches ) && ! empty( $matches ) ) {
+				foreach ( $matches[0] as $match ) {
+					list( $before ) = str_split( $contents, $match[1] );
+
+					$exploded  = explode( PHP_EOL, $before );
+					$last_item = end( $exploded );
+
+					$matched_files[] = array(
+						'file'   => $file,
+						'line'   => count( $exploded ),
+						'column' => strlen( $last_item ) + 1,
+					);
+				}
+			}
+		}
+
+		return count( $matched_files ) > 0 ? $matched_files : false;
+	}
+
+	/**
 	 * Performs a check indicating if the needle is contained in the file contents of the given list of files.
 	 *
 	 * This is a wrapper around the native `str_contains()` function that will find the needle within the list of
