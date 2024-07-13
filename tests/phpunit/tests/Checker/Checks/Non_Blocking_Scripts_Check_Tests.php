@@ -5,7 +5,7 @@
  * @package plugin-check
  */
 
-use WordPress\Plugin_Check\Checker\Checks\Non_Blocking_Scripts_Check;
+use WordPress\Plugin_Check\Checker\Checks\Performance\Non_Blocking_Scripts_Check;
 use WordPress\Plugin_Check\Checker\Preparation;
 use WordPress\Plugin_Check\Test_Utils\TestCase\Runtime_Check_UnitTestCase;
 
