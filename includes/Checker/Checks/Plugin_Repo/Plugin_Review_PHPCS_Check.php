@@ -1,21 +1,22 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\Direct_DB_Queries_Check
+ * Class Plugin_Review_PHPCS_Check.
  *
  * @package plugin-check
  */
 
-namespace WordPress\Plugin_Check\Checker\Checks;
+namespace WordPress\Plugin_Check\Checker\Checks\Plugin_Repo;
 
 use WordPress\Plugin_Check\Checker\Check_Categories;
+use WordPress\Plugin_Check\Checker\Checks\Abstract_PHP_CodeSniffer_Check;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 
 /**
- * Check for running WordPress direct DB queries sniffs.
+ * Check for running WordPress plugin review PHPCS standard.
  *
  * @since 1.0.0
  */
-class Direct_DB_Queries_Check extends Abstract_PHP_CodeSniffer_Check {
+class Plugin_Review_PHPCS_Check extends Abstract_PHP_CodeSniffer_Check {
 
 	use Stable_Check;
 
@@ -29,7 +30,7 @@ class Direct_DB_Queries_Check extends Abstract_PHP_CodeSniffer_Check {
 	 * @return array The categories for the check.
 	 */
 	public function get_categories() {
-		return array( Check_Categories::CATEGORY_SECURITY );
+		return array( Check_Categories::CATEGORY_PLUGIN_REPO );
 	}
 
 	/**
@@ -42,8 +43,7 @@ class Direct_DB_Queries_Check extends Abstract_PHP_CodeSniffer_Check {
 	protected function get_args() {
 		return array(
 			'extensions' => 'php',
-			'standard'   => 'WordPress',
-			'sniffs'     => 'WordPress.DB.DirectDatabaseQuery',
+			'standard'   => WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'phpcs-rulesets/plugin-review.xml',
 		);
 	}
 }

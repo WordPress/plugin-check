@@ -7,7 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
-use WordPress\Plugin_Check\Checker\Checks\File_Type_Check;
+use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\File_Type_Check;
 
 class File_Type_Check_Tests extends WP_UnitTestCase {
 

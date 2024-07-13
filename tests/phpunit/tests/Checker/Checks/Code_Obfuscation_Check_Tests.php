@@ -7,7 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
-use WordPress\Plugin_Check\Checker\Checks\Code_Obfuscation_Check;
+use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\Code_Obfuscation_Check;
 
 class Code_Obfuscation_Check_Tests extends WP_UnitTestCase {
 
