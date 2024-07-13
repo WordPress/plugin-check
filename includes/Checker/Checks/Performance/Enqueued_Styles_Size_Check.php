@@ -1,6 +1,6 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\Performance\Enqueued_Styles_Size_Check
+ * Class Enqueued_Styles_Size_Check.
  *
  * @package plugin-check
  */

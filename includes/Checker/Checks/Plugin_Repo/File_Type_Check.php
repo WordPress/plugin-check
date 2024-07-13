@@ -1,6 +1,6 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\File_Type_Check
+ * Class File_Type_Check.
  *
  * @package plugin-check
  */

@@ -1,6 +1,6 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\No_Unfiltered_Uploads_Check
+ * Class No_Unfiltered_Uploads_Check.
  *
  * @package plugin-check
  */

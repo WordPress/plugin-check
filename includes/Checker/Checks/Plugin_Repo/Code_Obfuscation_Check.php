@@ -1,6 +1,6 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\Code_Obfuscation_Check
+ * Class Code_Obfuscation_Check.
  *
  * @package plugin-check
  */

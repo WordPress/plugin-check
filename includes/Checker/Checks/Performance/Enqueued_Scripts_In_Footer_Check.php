@@ -1,6 +1,6 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\Enqueued_Scripts_In_Footer_Check
+ * Class Enqueued_Scripts_In_Footer_Check.
  *
  * @package plugin-check
  */

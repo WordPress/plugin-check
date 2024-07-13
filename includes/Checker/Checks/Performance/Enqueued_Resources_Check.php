@@ -1,6 +1,6 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\Performance\Enqueued_Resources_Check
+ * Class Enqueued_Resources_Check.
  *
  * @package plugin-check
  */

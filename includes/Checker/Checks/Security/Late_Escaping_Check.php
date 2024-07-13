@@ -1,6 +1,6 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\Late_Escaping_Check
+ * Class Late_Escaping_Check.
  *
  * @package plugin-check
  */

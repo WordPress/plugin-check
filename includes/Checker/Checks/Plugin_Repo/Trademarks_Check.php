@@ -1,6 +1,6 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\Trademarks_Check
+ * Class Trademarks_Check.
  *
  * @package plugin-check
  */

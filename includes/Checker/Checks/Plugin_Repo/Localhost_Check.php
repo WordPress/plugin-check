@@ -1,6 +1,6 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\Localhost_Check
+ * Class Localhost_Check.
  *
  * @package plugin-check
  */

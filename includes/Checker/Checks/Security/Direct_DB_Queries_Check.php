@@ -1,6 +1,6 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\Direct_DB_Queries_Check
+ * Class Direct_DB_Queries_Check.
  *
  * @package plugin-check
  */

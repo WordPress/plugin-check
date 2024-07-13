@@ -1,6 +1,6 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\Plugin_Updater_Check
+ * Class Plugin_Updater_Check.
  *
  * @package plugin-check
  */

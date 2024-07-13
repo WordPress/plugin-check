@@ -1,6 +1,6 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\Performance\Enqueued_Scripts_Scope_Check
+ * Class Enqueued_Scripts_Scope_Check.
  *
  * @package plugin-check
  */

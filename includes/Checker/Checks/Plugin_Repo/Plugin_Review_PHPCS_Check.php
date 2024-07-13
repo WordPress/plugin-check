@@ -1,6 +1,6 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\Plugin_Review_PHPCS_Check
+ * Class Plugin_Review_PHPCS_Check.
  *
  * @package plugin-check
  */

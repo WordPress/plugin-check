@@ -1,6 +1,6 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\I18n_Usage_Check
+ * Class I18n_Usage_Check.
  *
  * @package plugin-check
  */

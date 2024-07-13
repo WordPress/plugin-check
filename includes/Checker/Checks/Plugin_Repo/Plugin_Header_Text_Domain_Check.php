@@ -1,6 +1,6 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\Plugin_Header_Text_Domain_Check
+ * Class Plugin_Header_Text_Domain_Check.
  *
  * @package plugin-check
  */

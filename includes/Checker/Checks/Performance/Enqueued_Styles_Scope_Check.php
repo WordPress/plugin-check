@@ -1,6 +1,6 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\Enqueued_Styles_Scope_Check
+ * Class Enqueued_Styles_Scope_Check.
  *
  * @package plugin-check
  */

@@ -1,6 +1,6 @@
 <?php
 /**
- * Class WordPress\Plugin_Check\Checker\Checks\Performant_WP_Query_Params_Check
+ * Class Performant_WP_Query_Params_Check.
  *
  * @package plugin-check
  */
