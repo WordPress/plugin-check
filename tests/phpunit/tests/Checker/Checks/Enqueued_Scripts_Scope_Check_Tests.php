@@ -7,7 +7,7 @@
 
 namespace phpunit\tests\Checker\Checks;
 
-use WordPress\Plugin_Check\Checker\Checks\Enqueued_Scripts_Scope_Check;
+use WordPress\Plugin_Check\Checker\Checks\Performance\Enqueued_Scripts_Scope_Check;
 use WordPress\Plugin_Check\Test_Utils\TestCase\Runtime_Check_UnitTestCase;
 
 class Enqueued_Scripts_Scope_Check_Tests extends Runtime_Check_UnitTestCase {

@@ -7,7 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
-use WordPress\Plugin_Check\Checker\Checks\Enqueued_Resources_Check;
+use WordPress\Plugin_Check\Checker\Checks\Performance\Enqueued_Resources_Check;
 
 class Enqueued_Resources_Check_Tests extends WP_UnitTestCase {
 
