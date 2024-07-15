@@ -1,6 +1,6 @@
 <?php
 /**
- * Class Non_Blocking_Scripts_Check
+ * Class Non_Blocking_Scripts_Check.
  *
  * @package plugin-check
  */
@@ -188,20 +188,18 @@ class Non_Blocking_Scripts_Check extends Abstract_Runtime_Check implements With_
 				continue;
 			}
 
-			$script_path = str_replace( $result->plugin()->url(), $result->plugin()->path(), $script->src );
-
-			$is_script_in_footer = in_array( $handle, wp_scripts()->in_footer, true );
-
 			if ( ! empty( $script->extra['strategy'] ) ) {
 				continue;
 			}
 
-			if ( ! $is_script_in_footer ) {
+			$script_path = str_replace( $result->plugin()->url(), $result->plugin()->path(), $script->src );
+
+			if ( ! in_array( $handle, wp_scripts()->in_footer, true ) ) {
 				$this->add_result_warning_for_file(
 					$result,
 					sprintf(
 						/* translators: 1: tested URL. 2: 'defer'. 3: 'async' */
-						__( 'This script on %1$s is potentially blocking. Consider an %2$s or %3$s script strategy or moving it to the footer', 'plugin-check' ),
+						__( 'This script on %1$s is potentially blocking. Consider a %2$s or %3$s script strategy or moving it to the footer.', 'plugin-check' ),
 						$url,
 						'defer',
 						'async'
@@ -214,7 +212,7 @@ class Non_Blocking_Scripts_Check extends Abstract_Runtime_Check implements With_
 					$result,
 					sprintf(
 						/* translators: 1: tested URL. 2: 'defer'. 3: 'async' */
-						__( 'This script on %1$s is loaded in the footer. Consider an %2$s or %3$s script loading strategy instead.', 'plugin-check' ),
+						__( 'This script on %1$s is loaded in the footer. Consider a %2$s or %3$s script loading strategy instead.', 'plugin-check' ),
 						$url,
 						'defer',
 						'async'
