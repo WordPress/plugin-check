@@ -193,13 +193,25 @@ class Plugin_Context {
 	 * @return bool true if the file is editable, otherwise false.
 	 */
 	public function is_file_editable( $file ) {
+		$editable = false;
+
 		$editable_extensions = wp_get_plugin_file_editable_extensions( $this->basename() );
 
 		$info = pathinfo( $file );
 
 		$filename  = $info['filename'];
+		$dirname   = $info['dirname'];
 		$extension = isset( $info['extension'] ) ? strtolower( $info['extension'] ) : '';
 
-		return in_array( $extension, $editable_extensions, true ) && file_exists( dirname( $this->main_file() ) . '/' . $file ) && ( ! empty( $filename ) && ( '.' !== $filename[0] ) );
+		if (
+			in_array( $extension, $editable_extensions, true )
+			&& file_exists( dirname( $this->main_file() ) . '/' . $file )
+			&& ( ! empty( $filename ) && ( '.' !== $filename[0] ) )
+			&& ! ( '.' === $dirname[0] && strlen( $dirname ) > 1 )
+		) {
+			$editable = true;
+		}
+
+		return $editable;
 	}
 }
