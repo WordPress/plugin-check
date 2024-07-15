@@ -195,8 +195,11 @@ class Plugin_Context {
 	public function is_file_editable( $file ) {
 		$editable_extensions = wp_get_plugin_file_editable_extensions( $this->basename() );
 
-		$extension = strtolower( pathinfo( $file, PATHINFO_EXTENSION ) );
+		$info = pathinfo( $file );
 
-		return in_array( $extension, $editable_extensions, true ) && file_exists( dirname( $this->main_file() ) . '/' . $file );
+		$filename  = $info['filename'];
+		$extension = isset( $info['extension'] ) ? strtolower( $info['extension'] ) : '';
+
+		return in_array( $extension, $editable_extensions, true ) && file_exists( dirname( $this->main_file() ) . '/' . $file ) && ( ! empty( $filename ) && ( '.' !== $filename[0] ) );
 	}
 }
