@@ -47,6 +47,9 @@ By default, `.git`, `vendor` and `node_modules` directories are excluded.
 
 [--exclude-files=<files>]
 : Additional files to exclude from checks.
+
+[--severity=<severity>]
+: Severity level.
 ```
 ## EXAMPLES
 ```
