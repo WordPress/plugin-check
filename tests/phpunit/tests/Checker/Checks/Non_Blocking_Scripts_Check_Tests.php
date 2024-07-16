@@ -63,7 +63,7 @@ class Non_Blocking_Scripts_Check_Tests extends Runtime_Check_UnitTestCase {
 	public function test_run_with_warnings() {
 		require UNIT_TESTS_PLUGIN_DIR . 'test-plugin-non-blocking-scripts-check/load.php';
 
-		$check   = new Non_Blocking_Scripts_Check( 1 );
+		$check   = new Non_Blocking_Scripts_Check();
 		$context = $this->get_context( WP_PLUGIN_CHECK_MAIN_FILE );
 		$results = $this->run_check( $check, $context );
 
