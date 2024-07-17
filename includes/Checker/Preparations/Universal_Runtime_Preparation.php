@@ -42,7 +42,7 @@ class Universal_Runtime_Preparation implements Preparation {
 	 * and returns a closure as a cleanup function.
 	 *
 	 * This preparation needs to be called very early in the WordPress lifecycle, before
-	 * plugins are loaded, e.g. from a drop-in like `object-cache.php`.
+	 * plugins are loaded.
 	 *
 	 * @since 1.0.0
 	 *

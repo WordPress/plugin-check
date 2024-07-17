@@ -89,7 +89,6 @@ class Plugin_Request_Utility {
 	 */
 	public static function initialize_runner() {
 		$runners = array(
-			new CLI_Runner(),
 			new AJAX_Runner(),
 		);
 

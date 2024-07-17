@@ -20,7 +20,7 @@ final class Runtime_Environment_Setup {
 	 * @since 1.0.0
 	 */
 	public function set_up() {
-		global $wpdb, $table_prefix, $wp_filesystem;
+		global $wpdb, $table_prefix;
 
 		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 
@@ -66,19 +66,6 @@ final class Runtime_Environment_Setup {
 
 		// Restore the old prefix.
 		$wpdb->set_prefix( $old_prefix );
-
-		// Return early if the plugin check object cache already exists.
-		if ( defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) && WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION ) {
-			return;
-		}
-
-		// Create the object-cache.php file.
-		if ( $wp_filesystem || WP_Filesystem() ) {
-			// Do not replace the object-cache.php file if it already exists.
-			if ( ! $wp_filesystem->exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
-				$wp_filesystem->copy( WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'drop-ins/object-cache.copy.php', WP_CONTENT_DIR . '/object-cache.php' );
-			}
-		}
 	}
 
 	/**
@@ -87,7 +74,7 @@ final class Runtime_Environment_Setup {
 	 * @since 1.0.0
 	 */
 	public function clean_up() {
-		global $wpdb, $table_prefix, $wp_filesystem;
+		global $wpdb, $table_prefix;
 
 		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 
@@ -100,75 +87,5 @@ final class Runtime_Environment_Setup {
 
 		// Restore the old prefix.
 		$wpdb->set_prefix( $old_prefix );
-
-		// Return early if the plugin check object cache does not exist.
-		if ( ! defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) || ! WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION ) {
-			return;
-		}
-
-		// Remove the object-cache.php file.
-		if ( $wp_filesystem || WP_Filesystem() ) {
-			if ( ! $wp_filesystem->exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
-				return;
-			}
-
-			// Check the drop-in file matches the copy.
-			$original_content = $wp_filesystem->get_contents( WP_CONTENT_DIR . '/object-cache.php' );
-			$copy_content     = $wp_filesystem->get_contents( WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'drop-ins/object-cache.copy.php' );
-
-			if ( $original_content && $original_content === $copy_content ) {
-				$wp_filesystem->delete( WP_CONTENT_DIR . '/object-cache.php' );
-			}
-		}
-	}
-
-	/**
-	 * Checks if the WordPress Environment can be set up for runtime checks.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return bool Returns true if the runtime environment can be set up, false if not.
-	 */
-	public function can_set_up() {
-		global $wp_filesystem;
-
-		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
-
-		if ( ! is_object( $wp_filesystem ) && ! WP_Filesystem() ) {
-			return false;
-		}
-
-		// Check if the object-cache.php file exists.
-		if ( $wp_filesystem->exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
-			// Check If the object-cache.php file is the Plugin Check version.
-			if ( defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) && WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION ) {
-				return true;
-			}
-		} else {
-			// Get the correct Plugin Check directory when run too early.
-			if ( ! defined( 'WP_PLUGIN_CHECK_PLUGIN_DIR_PATH' ) ) {
-				$object_cache_copy = dirname( __DIR__, 2 ) . '/plugin-check/drop-ins/object-cache.copy.php';
-			} else {
-				$object_cache_copy = WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'drop-ins/object-cache.copy.php';
-			}
-
-			// If the file does not exist, check if we can place it.
-			$wp_filesystem->copy( $object_cache_copy, WP_CONTENT_DIR . '/object-cache.php' );
-
-			/**
-			 * PHPStan ignore reason: PHPStan raised an issue because we have redundant file existence checks in our code.
-			 * We perform this double check because we want to ensure that we can write the file we're testing.
-			 *
-			 * @phpstan-ignore-next-line
-			 */
-			if ( $wp_filesystem->exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
-				// Remove the file before returning.
-				$wp_filesystem->delete( WP_CONTENT_DIR . '/object-cache.php' );
-
-				return true;
-			}
-		}
-
-		return false;
 	}
 }
