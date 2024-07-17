@@ -8,7 +8,6 @@
  * @since 1.0.0
  */
 
-use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\CLI\Plugin_Check_Command;
 use WordPress\Plugin_Check\Plugin_Context;
 
