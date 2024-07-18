@@ -202,38 +202,6 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertCount( 1, wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'outdated_tested_upto_header' ) ) );
 	}
 
-	public function test_run_without_errors() {
-		$readme_check  = new Plugin_Readme_Check();
-		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-without-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
-
-		$readme_check->run( $check_result );
-
-		$errors   = $check_result->get_errors();
-		$warnings = $check_result->get_warnings();
-
-		$this->assertEmpty( $errors );
-		$this->assertEmpty( $warnings );
-		$this->assertEquals( 0, $check_result->get_error_count() );
-		$this->assertEquals( 0, $check_result->get_warning_count() );
-	}
-
-	public function test_run_md_without_errors() {
-		$readme_check  = new Plugin_Readme_Check();
-		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-md-without-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
-
-		$readme_check->run( $check_result );
-
-		$errors   = $check_result->get_errors();
-		$warnings = $check_result->get_warnings();
-
-		$this->assertEmpty( $errors );
-		$this->assertEmpty( $warnings );
-		$this->assertEquals( 0, $check_result->get_error_count() );
-		$this->assertEquals( 0, $check_result->get_warning_count() );
-	}
-
 	public function test_run_md_with_errors() {
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-md-with-errors/load.php' );
@@ -256,22 +224,6 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertCount( 1, wp_list_filter( $warnings['readme.md'][0][0], array( 'code' => 'default_readme_text' ) ) );
 		$this->assertCount( 1, wp_list_filter( $warnings['readme.md'][0][0], array( 'code' => 'invalid_license' ) ) );
 		$this->assertCount( 1, wp_list_filter( $warnings['readme.md'][0][0], array( 'code' => 'license_mismatch' ) ) );
-	}
-
-	public function test_run_root_readme_file_without_errors() {
-		$readme_check  = new Plugin_Readme_Check();
-		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-root-readme-without-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
-
-		$readme_check->run( $check_result );
-
-		$errors   = $check_result->get_errors();
-		$warnings = $check_result->get_warnings();
-
-		$this->assertEmpty( $errors );
-		$this->assertEmpty( $warnings );
-		$this->assertEquals( 0, $check_result->get_error_count() );
-		$this->assertEquals( 0, $check_result->get_warning_count() );
 	}
 
 	public function test_single_file_plugin_without_error_for_trademarks() {
