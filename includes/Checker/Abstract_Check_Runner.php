@@ -486,6 +486,9 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			if ( is_dir( $plugin ) ) {
 				$this->plugin_basename = $plugin;
 			} else {
+				if ( filter_var( $plugin, FILTER_VALIDATE_URL ) ) {
+					$plugin = Plugin_Request_Utility::download_plugin( $plugin );
+				}
 				$this->plugin_basename = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin );
 			}
 		}
