@@ -195,7 +195,9 @@ class Plugin_Request_Utility {
 
 		// Prevents URL from wporg.
 		if ( false !== strpos( $plugin_url, '#' ) ) {
-			$plugin_url = substr( $plugin_url, 0, strpos( $plugin_url, '#' ) );
+			$plugin_info_url = substr( $plugin_url, strpos( $plugin_url, '#' ) );
+			$plugin_info_url = str_replace( '#wporgapi:', '', $plugin_info_url );
+			$plugin_url      = substr( $plugin_url, 0, strpos( $plugin_url, '#' ) );
 		}
 		$basename = basename( $plugin_url );
 
@@ -224,6 +226,14 @@ class Plugin_Request_Utility {
 			if ( ! empty( $files ) && is_array( $files ) && 1 === count( $files ) ) {
 				$basename = reset( $files );
 				move_dir( $plugin_check_dir . $basename, WP_PLUGIN_DIR . '/' . $basename );
+
+				if ( ! empty( $plugin_info_url ) ) {
+					$response_json = wp_remote_get( $plugin_info_url );
+					$file_path     = $plugin_check_dir . 'plugin-info.json';
+					$file_process  = fopen( $file_path, 'w' );
+					fwrite( $file_process, $response_json['body'] );
+					fclose( $file_process );
+				}
 
 				return $basename;
 			} else {
