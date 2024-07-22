@@ -258,7 +258,7 @@ final class Plugin_Check_Command {
 
 		$options = array(
 			'format'               => get_flag_value( $assoc_args, 'format', 'table' ),
-			'categories'           => wp_parse_list( get_flag_value( $assoc_args, 'categories', '' ) ),
+			'categories'           => array_map( 'trim', wp_parse_list( get_flag_value( $assoc_args, 'categories', '' ) ) ),
 			'include-experimental' => (bool) get_flag_value( $assoc_args, 'include-experimental', false ),
 		);
 
@@ -273,8 +273,7 @@ final class Plugin_Check_Command {
 
 		// Filters the checks by specific categories.
 		if ( ! empty( $options['categories'] ) ) {
-			$categories = array_map( 'trim', explode( ',', $options['categories'] ) );
-			$collection = Check_Categories::filter_checks_by_categories( $collection, $categories );
+			$collection = Check_Categories::filter_checks_by_categories( $collection, $options['categories'] );
 		}
 
 		$all_checks = array();
