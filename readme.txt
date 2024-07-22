@@ -67,6 +67,10 @@ In any case, passing the checks in this tool likely helps to achieve a smooth pl
 
 == Changelog ==
 
+= 1.1.0 =
+
+* Enhancement - Changed the namespace of included checks.
+
 = 1.0.2 =
 
 * Feature - New `Enqueued_Scripts_Scope_Check` (`enqueued_scripts_scope`), `Enqueued_Styles_Size_Check` (`enqueued_styles_size`) and `Enqueued_Resources_Check` (`enqueued_resources`) performance checks.
