@@ -72,6 +72,12 @@ Feature: Test that the WP-CLI command works.
       {"line":16,"column":15,"type":"ERROR","code":"WordPress.WP.AlternativeFunctions.rand_mt_rand","message":"mt_rand() is discouraged. Use the far less predictable wp_rand() instead."}
       """
 
+    When I run the WP-CLI command `plugin check foo-single.php --format=wporg`
+    Then STDOUT should contain:
+      """
+      {"pass":false,"errors":{"foo-single.php":{"17":{"10":[{"message":"All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$number'.","code":"WordPress.Security.EscapeOutput.OutputNotEscaped","link":null}]},"16":{"12":[{"message":"mt_rand() is discouraged. Use the far less predictable wp_rand() instead.","code":"WordPress.WP.AlternativeFunctions.rand_mt_rand","link":null}]}}},"warnings":[]}
+      """
+
     When I run the WP-CLI command `plugin check foo-single.php --ignore-errors`
     Then STDOUT should be empty
 
