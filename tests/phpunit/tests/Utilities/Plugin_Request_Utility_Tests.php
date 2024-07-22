@@ -59,47 +59,6 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		$this->assertInstanceOf( AJAX_Runner::class, $runner );
 	}
 
-	public function test_destroy_runner_with_cli() {
-		global $wpdb, $table_prefix, $wp_actions;
-
-		$this->set_up_mock_filesystem();
-
-		add_filter(
-			'wp_plugin_check_checks',
-			function ( $checks ) {
-				return array(
-					'runtime_check' => new Runtime_Check(),
-				);
-			}
-		);
-
-		$muplugins_loaded = $wp_actions['muplugins_loaded'];
-		unset( $wp_actions['muplugins_loaded'] );
-
-		Plugin_Request_Utility::initialize_runner();
-
-		$runner = Plugin_Request_Utility::get_runner();
-		$runner->set_plugin( 'plugin-check' );
-		$runner->set_check_slugs( array( 'runtime-check' ) );
-
-		do_action( 'muplugins_loaded' );
-
-		// Determine if one of the Universal_Runtime_Preparation was run.
-		$prepared = has_filter( 'option_active_plugins' );
-
-		Plugin_Request_Utility::destroy_runner();
-
-		// Determine if the cleanup function was run.
-		$cleanup = ! has_filter( 'option_active_plugins' );
-
-		$wp_actions['muplugins_loaded'] = $muplugins_loaded;
-		$wpdb->set_prefix( $table_prefix );
-
-		$this->assertTrue( $prepared );
-		$this->assertTrue( $cleanup );
-		$this->assertNull( $runner );
-	}
-
 	public function test_destroy_runner_with_ajax() {
 		global $wpdb, $table_prefix, $wp_actions;
 

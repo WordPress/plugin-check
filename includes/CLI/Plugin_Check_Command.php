@@ -15,7 +15,6 @@ use WordPress\Plugin_Check\Checker\Default_Check_Repository;
 use WordPress\Plugin_Check\Checker\Runtime_Check;
 use WordPress\Plugin_Check\Checker\Runtime_Environment_Setup;
 use WordPress\Plugin_Check\Plugin_Context;
-use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 use WP_CLI;
 use function WP_CLI\Utils\get_flag_value;
 
@@ -139,6 +138,8 @@ final class Plugin_Check_Command {
 
 		$checks_to_run = array();
 
+		$cleanup = static function () {};
+
 		try {
 			$runner->set_experimental_flag( $options['include-experimental'] );
 			$runner->set_check_slugs( $options['checks'] );
@@ -148,6 +149,8 @@ final class Plugin_Check_Command {
 			$runner->set_plugin( $args[0] );
 
 			$checks_to_run = $runner->get_checks_to_run();
+
+			$cleanup = $runner->prepare();
 		} catch ( Exception $error ) {
 			WP_CLI::error( $error->getMessage() );
 		}
@@ -163,7 +166,7 @@ final class Plugin_Check_Command {
 		try {
 			$result = $runner->run();
 		} catch ( Exception $error ) {
-			Plugin_Request_Utility::destroy_runner();
+			$cleanup();
 
 			if ( isset( $runtime_setup ) ) {
 				$runtime_setup->clean_up();
@@ -173,7 +176,7 @@ final class Plugin_Check_Command {
 			WP_CLI::error( $error->getMessage() );
 		}
 
-		Plugin_Request_Utility::destroy_runner();
+		$cleanup();
 
 		if ( isset( $runtime_setup ) ) {
 			$runtime_setup->clean_up();
