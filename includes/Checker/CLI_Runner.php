@@ -56,7 +56,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 	 * @return array An array of Check slugs to run.
 	 */
 	protected function get_check_slugs_param() {
-		return $this->check_slugs ?? array();
+		return $this->check_slugs;
 	}
 
 	/**
@@ -67,7 +67,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 	 * @return array An array of Check slugs to run.
 	 */
 	protected function get_check_exclude_slugs_param() {
-		return $this->check_exclude_slugs ?? array();
+		return $this->check_exclude_slugs;
 	}
 
 	/**
@@ -78,7 +78,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 	 * @return bool Returns true to include experimental checks else false.
 	 */
 	protected function get_include_experimental_param() {
-		return (bool) $this->include_experimental;
+		return $this->include_experimental;
 	}
 
 	/**
@@ -89,6 +89,6 @@ class CLI_Runner extends Abstract_Check_Runner {
 	 * @return array An array of categories.
 	 */
 	protected function get_categories_param() {
-		return $this->check_categories ?? array();
+		return $this->check_categories;
 	}
 }

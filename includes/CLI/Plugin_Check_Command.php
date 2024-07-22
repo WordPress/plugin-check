@@ -17,6 +17,7 @@ use WordPress\Plugin_Check\Checker\Runtime_Environment_Setup;
 use WordPress\Plugin_Check\Plugin_Context;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 use WP_CLI;
+use function WP_CLI\Utils\get_flag_value;
 
 /**
  * Plugin check command.
@@ -30,18 +31,6 @@ final class Plugin_Check_Command {
 	 * @var Plugin_Context
 	 */
 	protected $plugin_context;
-
-	/**
-	 * Output format type.
-	 *
-	 * @since 1.0.0
-	 * @var string[]
-	 */
-	protected $output_formats = array(
-		'table',
-		'csv',
-		'json',
-	);
 
 	/**
 	 * Constructor.
@@ -120,64 +109,43 @@ final class Plugin_Check_Command {
 	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
 	 */
 	public function check( $args, $assoc_args ) {
-		// Get options based on the CLI arguments.
-		$options = $this->get_options(
-			$assoc_args,
-			array(
-				'checks'               => '',
-				'format'               => 'table',
-				'ignore-warnings'      => false,
-				'ignore-errors'        => false,
-				'include-experimental' => false,
-			)
+		$options = array(
+			'checks'               => wp_parse_list( get_flag_value( $assoc_args, 'checks', '' ) ),
+			'exclude-checks'       => wp_parse_list( get_flag_value( $assoc_args, 'exclude-checks', '' ) ),
+			'exclude-files'        => wp_parse_list( get_flag_value( $assoc_args, 'exclude-files', '' ) ),
+			'exclude-directories'  => wp_parse_list( get_flag_value( $assoc_args, 'exclude-directories', '' ) ),
+			'categories'           => wp_parse_list( get_flag_value( $assoc_args, 'categories', '' ) ),
+			'format'               => get_flag_value( $assoc_args, 'format', 'table' ),
+			'ignore-warnings'      => (bool) get_flag_value( $assoc_args, 'ignore-warnings', false ),
+			'ignore-errors'        => (bool) get_flag_value( $assoc_args, 'ignore-errors', false ),
+			'include-experimental' => (bool) get_flag_value( $assoc_args, 'include-experimental', false ),
 		);
-
-		// Create the plugin and checks array from CLI arguments.
-		$plugin = isset( $args[0] ) ? $args[0] : '';
-		$checks = wp_parse_list( $options['checks'] );
-
-		// Create the categories array from CLI arguments.
-		$categories = isset( $options['categories'] ) ? wp_parse_list( $options['categories'] ) : array();
-
-		$excluded_directories = isset( $options['exclude-directories'] ) ? wp_parse_list( $options['exclude-directories'] ) : array();
 
 		add_filter(
 			'wp_plugin_check_ignore_directories',
-			static function ( $dirs ) use ( $excluded_directories ) {
-				return array_unique( array_merge( $dirs, $excluded_directories ) );
+			static function ( $dirs ) use ( $options ) {
+				return array_unique( array_merge( $dirs, $options['exclude-directories'] ) );
 			}
 		);
-
-		$excluded_files = isset( $options['exclude-files'] ) ? wp_parse_list( $options['exclude-files'] ) : array();
 
 		add_filter(
 			'wp_plugin_check_ignore_files',
-			static function ( $dirs ) use ( $excluded_files ) {
-				return array_unique( array_merge( $dirs, $excluded_files ) );
+			static function ( $dirs ) use ( $options ) {
+				return array_unique( array_merge( $dirs, $options['exclude-files'] ) );
 			}
 		);
 
-		// Get the CLI Runner.
-		$runner = Plugin_Request_Utility::get_runner();
-
-		// Create the runner if not already initialized.
-		if ( is_null( $runner ) ) {
-			$runner = new CLI_Runner();
-		}
-
-		// Make sure we are using the correct runner instance.
-		if ( ! ( $runner instanceof CLI_Runner ) ) {
-			WP_CLI::error(
-				__( 'CLI Runner was not initialized correctly.', 'plugin-check' )
-			);
-		}
+		$runner = new CLI_Runner();
 
 		$checks_to_run = array();
+
 		try {
 			$runner->set_experimental_flag( $options['include-experimental'] );
-			$runner->set_check_slugs( $checks );
-			$runner->set_plugin( $plugin );
-			$runner->set_categories( $categories );
+			$runner->set_check_slugs( $options['checks'] );
+			$runner->set_check_exclude_slugs( $options['exclude-checks'] );
+			$runner->set_categories( $options['categories'] );
+			$runner->set_categories( $options['categories'] );
+			$runner->set_plugin( $args[0] );
 
 			$checks_to_run = $runner->get_checks_to_run();
 		} catch ( Exception $error ) {
@@ -288,14 +256,10 @@ final class Plugin_Check_Command {
 	public function list_checks( $args, $assoc_args ) {
 		$check_repo = new Default_Check_Repository();
 
-		// Get options based on the CLI arguments.
-		$options = $this->get_options(
-			$assoc_args,
-			array(
-				'format'               => 'table',
-				'categories'           => '',
-				'include-experimental' => false,
-			)
+		$options = array(
+			'format'               => get_flag_value( $assoc_args, 'format', 'table' ),
+			'categories'           => wp_parse_list( get_flag_value( $assoc_args, 'categories', '' ) ),
+			'include-experimental' => (bool) get_flag_value( $assoc_args, 'include-experimental', false ),
 		);
 
 		$check_flags = Check_Repository::TYPE_ALL;
@@ -325,15 +289,20 @@ final class Plugin_Check_Command {
 			$all_checks[] = $item;
 		}
 
-		// Get formatter.
-		$formatter = $this->get_formatter(
-			$options,
-			array(
-				'slug',
-				'category',
-				'stability',
+		$fields = wp_parse_list(
+			get_flag_value(
+				$assoc_args,
+				'fields',
+				array(
+					'slug',
+					'category',
+					'stability',
+				)
 			)
 		);
+
+		// Get formatter.
+		$formatter = $this->get_formatter( $options, $fields );
 
 		// Display results.
 		$formatter->display_items( $all_checks );
@@ -372,20 +341,26 @@ final class Plugin_Check_Command {
 	 * @throws WP_CLI\ExitException Show error if invalid format argument.
 	 */
 	public function list_check_categories( $args, $assoc_args ) {
-		// Get options based on the CLI arguments.
-		$options = $this->get_options( $assoc_args, array( 'format' => 'table' ) );
+		$options = array(
+			'format' => get_flag_value( $assoc_args, 'format', 'table' ),
+		);
 
 		// Get check categories details.
 		$categories = $this->get_check_categories();
 
-		// Get formatter.
-		$formatter = $this->get_formatter(
-			$options,
-			array(
-				'name',
-				'slug',
+		$fields = wp_parse_list(
+			get_flag_value(
+				$assoc_args,
+				'fields',
+				array(
+					'name',
+					'slug',
+				)
 			)
 		);
+
+		// Get formatter.
+		$formatter = $this->get_formatter( $options, $fields );
 
 		// Display results.
 		$formatter->display_items( $categories );
@@ -415,49 +390,18 @@ final class Plugin_Check_Command {
 	}
 
 	/**
-	 * Validates the associative arguments.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param array $assoc_args List of the associative arguments.
-	 * @param array $defaults   List of the default arguments.
-	 * @return array List of the associative arguments.
-	 *
-	 * @throws WP_CLI\ExitException Show error if invalid format argument.
-	 */
-	private function get_options( $assoc_args, $defaults ) {
-		$options = wp_parse_args( $assoc_args, $defaults );
-
-		if ( ! in_array( $options['format'], $this->output_formats, true ) ) {
-			WP_CLI::error(
-				sprintf(
-					// translators: 1. Output formats.
-					__( 'Invalid format argument, valid value will be one of [%1$s]', 'plugin-check' ),
-					implode( ', ', $this->output_formats )
-				)
-			);
-		}
-
-		return $options;
-	}
-
-	/**
 	 * Gets the formatter instance to format check results.
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array $assoc_args     Associative arguments.
-	 * @param array $default_fields Default fields.
+	 * @param array $assoc_args Associative arguments.
+	 * @param array $fields     Fields to display of each item.
 	 * @return WP_CLI\Formatter The formatter instance.
 	 */
-	private function get_formatter( $assoc_args, $default_fields ) {
-		if ( isset( $assoc_args['fields'] ) ) {
-			$default_fields = wp_parse_args( $assoc_args['fields'], $default_fields );
-		}
-
+	private function get_formatter( $assoc_args, $fields ) {
 		return new WP_CLI\Formatter(
 			$assoc_args,
-			$default_fields
+			$fields
 		);
 	}
 
@@ -478,7 +422,7 @@ final class Plugin_Check_Command {
 		);
 
 		// If both errors and warnings are included, display the type of each result too.
-		if ( empty( $assoc_args['ignore_errors'] ) && empty( $assoc_args['ignore_warnings'] ) ) {
+		if ( empty( $assoc_args['ignore-errors'] ) && empty( $assoc_args['ignore-warnings'] ) ) {
 			$default_fields = array(
 				'line',
 				'column',

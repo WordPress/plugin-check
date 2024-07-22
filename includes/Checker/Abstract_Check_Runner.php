@@ -21,20 +21,12 @@ use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 abstract class Abstract_Check_Runner implements Check_Runner {
 
 	/**
-	 * True if the class was initialized early in the WordPress load process.
-	 *
-	 * @since 1.0.0
-	 * @var bool
-	 */
-	protected $initialized_early;
-
-	/**
 	 * The check slugs to run.
 	 *
 	 * @since 1.0.0
 	 * @var array
 	 */
-	protected $check_slugs;
+	protected $check_slugs = array();
 
 	/**
 	 * The check slugs to exclude.
@@ -42,7 +34,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @since 1.0.0
 	 * @var array
 	 */
-	protected $check_exclude_slugs;
+	protected $check_exclude_slugs = array();
 
 	/**
 	 * The plugin parameter.
@@ -50,7 +42,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @since 1.0.0
 	 * @var string
 	 */
-	protected $plugin;
+	protected $plugin = '';
 
 	/**
 	 * An instance of the Checks class.
@@ -90,7 +82,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @since 1.0.0
 	 * @var bool
 	 */
-	protected $include_experimental;
+	protected $include_experimental = false;
 
 	/**
 	 * Checks category for the filter.
@@ -98,7 +90,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @since 1.0.0
 	 * @var array
 	 */
-	protected $check_categories;
+	protected $check_categories = array();
 
 	/**
 	 * Returns the plugin parameter based on the request.
@@ -151,7 +143,6 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @since 1.0.0
 	 */
 	final public function __construct() {
-		$this->initialized_early   = ! did_action( 'muplugins_loaded' );
 		$this->check_repository    = new Default_Check_Repository();
 		$this->runtime_environment = new Runtime_Environment_Setup();
 	}
@@ -166,15 +157,6 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @throws Exception Thrown if the checks do not match those in the original request.
 	 */
 	final public function set_check_slugs( array $check_slugs ) {
-		if ( $this->initialized_early ) {
-			// Compare the check slugs to see if there was an error.
-			if ( $check_slugs !== $this->get_check_slugs_param() ) {
-				throw new Exception(
-					__( 'Invalid checks: The checks to run do not match the original request.', 'plugin-check' )
-				);
-			}
-		}
-
 		$this->check_slugs = $check_slugs;
 	}
 
@@ -188,15 +170,6 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @throws Exception Thrown if the checks do not match those in the original request.
 	 */
 	final public function set_check_exclude_slugs( array $check_slugs ) {
-		if ( $this->initialized_early ) {
-			// Compare the check slugs to see if there was an error.
-			if ( $check_slugs !== $this->get_check_exclude_slugs_param() ) {
-				throw new Exception(
-					__( 'Invalid checks: The checks to exclude do not match the original request.', 'plugin-check' )
-				);
-			}
-		}
-
 		$this->check_exclude_slugs = $check_slugs;
 	}
 
@@ -210,15 +183,6 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @throws Exception Thrown if the plugin set does not match the original request parameter.
 	 */
 	final public function set_plugin( $plugin ) {
-		if ( $this->initialized_early ) {
-			// Compare the plugin parameter to see if there was an error.
-			if ( $plugin !== $this->get_plugin_param() ) {
-				throw new Exception(
-					__( 'Invalid plugin: The plugin set does not match the original request parameter.', 'plugin-check' )
-				);
-			}
-		}
-
 		$this->plugin = $plugin;
 	}
 
@@ -232,18 +196,6 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @throws Exception Thrown if the flag set does not match the original request parameter.
 	 */
 	final public function set_experimental_flag( $include_experimental ) {
-		if ( $this->initialized_early ) {
-			if ( $include_experimental !== $this->get_include_experimental_param() ) {
-				throw new Exception(
-					sprintf(
-						/* translators: %s: include-experimental */
-						__( 'Invalid flag: The %s value does not match the original request parameter.', 'plugin-check' ),
-						'include-experimental'
-					)
-				);
-			}
-		}
-
 		$this->include_experimental = $include_experimental;
 	}
 
@@ -257,17 +209,6 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @throws Exception Thrown if the categories does not match the original request parameter.
 	 */
 	final public function set_categories( $categories ) {
-		if ( $this->initialized_early ) {
-			if ( $categories !== $this->get_categories_param() ) {
-				throw new Exception(
-					sprintf(
-						/* translators: %s: categories */
-						__( 'Invalid categories: The %s value does not match the original request parameter.', 'plugin-check' ),
-						'categories'
-					)
-				);
-			}
-		}
 		$this->check_categories = $categories;
 	}
 
