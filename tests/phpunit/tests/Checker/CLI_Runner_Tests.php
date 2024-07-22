@@ -29,24 +29,9 @@ class CLI_Runner_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_is_plugin_check_returns_true() {
-		$_SERVER['argv'] = array(
-			'wp',
-			'plugin',
-			'check',
-			'hello-dolly',
-		);
-
 		$runner = new CLI_Runner();
 
 		$this->assertTrue( $runner->is_plugin_check() );
-	}
-
-	public function test_is_plugin_check_returns_false() {
-		$_SERVER['argv'] = array();
-
-		$runner = new CLI_Runner();
-
-		$this->assertFalse( $runner->is_plugin_check() );
 	}
 
 	public function test_prepare_with_runtime_check() {

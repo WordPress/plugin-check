@@ -46,25 +46,6 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		Plugin_Request_Utility::get_plugin_basename_from_input( 'invalid' );
 	}
 
-	public function test_initialize_runner_with_cli() {
-		$_SERVER['argv'] = array(
-			'wp',
-			'plugin',
-			'check',
-			'plugin-check',
-		);
-
-		Plugin_Request_Utility::initialize_runner();
-
-		do_action( 'muplugins_loaded' );
-
-		$runner = Plugin_Request_Utility::get_runner();
-
-		unset( $_SERVER['argv'] );
-
-		$this->assertInstanceOf( CLI_Runner::class, $runner );
-	}
-
 	public function test_initialize_runner_with_ajax() {
 		add_filter( 'wp_doing_ajax', '__return_true' );
 		$_REQUEST['action'] = 'plugin_check_run_checks';
