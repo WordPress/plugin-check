@@ -78,7 +78,7 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 
 		Plugin_Request_Utility::initialize_runner();
 
-		$runner  = Plugin_Request_Utility::get_runner();
+		$runner = Plugin_Request_Utility::get_runner();
 		$runner->set_plugin( 'plugin-check' );
 		$runner->set_check_slugs( array( 'runtime-check' ) );
 
