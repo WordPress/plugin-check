@@ -40,9 +40,9 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * The plugin parameter.
 	 *
 	 * @since 1.0.0
-	 * @var string
+	 * @var string|null
 	 */
-	protected $plugin = '';
+	protected $plugin;
 
 	/**
 	 * An instance of the Checks class.

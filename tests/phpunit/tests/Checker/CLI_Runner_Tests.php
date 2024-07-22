@@ -28,22 +28,8 @@ class CLI_Runner_Tests extends WP_UnitTestCase {
 		parent::tear_down();
 	}
 
-	public function test_is_plugin_check_returns_true() {
-		$runner = new CLI_Runner();
-
-		$this->assertTrue( $runner->is_plugin_check() );
-	}
-
 	public function test_prepare_with_runtime_check() {
 		global $wp_actions;
-
-		$_SERVER['argv'] = array(
-			'wp',
-			'plugin',
-			'check',
-			'plugin-check',
-			'--checks=runtime-check',
-		);
 
 		add_filter(
 			'wp_plugin_check_checks',
@@ -58,6 +44,9 @@ class CLI_Runner_Tests extends WP_UnitTestCase {
 		unset( $wp_actions['muplugins_loaded'] );
 
 		$runner  = new CLI_Runner();
+		$runner->set_plugin( 'plugin-check' );
+		$runner->set_check_slugs( array( 'runtime-check' ) );
+
 		$cleanup = $runner->prepare();
 
 		$wp_actions['muplugins_loaded'] = $muplugins_loaded;
@@ -77,14 +66,6 @@ class CLI_Runner_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_prepare_with_static_check() {
-		$_SERVER['argv'] = array(
-			'wp',
-			'plugin',
-			'check',
-			'plugin-check',
-			'--checks=empty-check',
-		);
-
 		add_filter(
 			'wp_plugin_check_checks',
 			function ( $checks ) {
@@ -95,6 +76,9 @@ class CLI_Runner_Tests extends WP_UnitTestCase {
 		);
 
 		$runner  = new CLI_Runner();
+		$runner->set_plugin( 'plugin-check' );
+		$runner->set_check_slugs( array( 'empty-check' ) );
+
 		$cleanup = $runner->prepare();
 
 		$this->assertIsCallable( $cleanup );
@@ -112,14 +96,6 @@ class CLI_Runner_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_run() {
-		$_SERVER['argv'] = array(
-			'wp',
-			'plugin',
-			'check',
-			'plugin-check',
-			'--checks=empty-check',
-		);
-
 		add_filter(
 			'wp_plugin_check_checks',
 			function ( $checks ) {
@@ -130,7 +106,10 @@ class CLI_Runner_Tests extends WP_UnitTestCase {
 		);
 
 		$runner = new CLI_Runner();
+		$runner->set_plugin( 'plugin-check' );
+		$runner->set_check_slugs( array( 'empty-check' ) );
 		$runner->prepare();
+
 		$results = $runner->run();
 
 		$this->assertInstanceOf( Check_Result::class, $results );
@@ -139,14 +118,6 @@ class CLI_Runner_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_run_with_errors() {
-		$_SERVER['argv'] = array(
-			'wp',
-			'plugin',
-			'check',
-			'plugin-check',
-			'--checks=error-check',
-		);
-
 		add_filter(
 			'wp_plugin_check_checks',
 			function ( $checks ) {
@@ -157,7 +128,10 @@ class CLI_Runner_Tests extends WP_UnitTestCase {
 		);
 
 		$runner = new CLI_Runner();
+		$runner->set_plugin( 'plugin-check' );
+		$runner->set_check_slugs( array( 'error-check' ) );
 		$runner->prepare();
+
 		$results = $runner->run();
 
 		$this->assertInstanceOf( Check_Result::class, $results );
