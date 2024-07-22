@@ -32,7 +32,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 	 * @return bool Returns true if is an CLI request for the plugin check else false.
 	 */
 	public static function is_plugin_check() {
-		return true;
+		return defined( 'WP_CLI' ) && WP_CLI;
 	}
 
 	/**

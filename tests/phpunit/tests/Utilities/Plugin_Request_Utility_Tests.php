@@ -10,7 +10,6 @@ use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Checks;
 use WordPress\Plugin_Check\Checker\Checks\General\I18n_Usage_Check;
-use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Test_Data\Runtime_Check;
 use WordPress\Plugin_Check\Test_Utils\Traits\With_Mock_Filesystem;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
