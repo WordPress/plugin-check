@@ -202,12 +202,7 @@ class Plugin_Request_Utility {
 		$basename = basename( $plugin_url );
 
 		// Create the name of the file and the declare the directory and path.
-		$upload_dir       = wp_upload_dir();
-		$plugin_check_dir = $upload_dir['basedir'] . '/plugin-check/';
-
-		if ( ! is_dir( $plugin_check_dir ) ) {
-			mkdir( $plugin_check_dir, 0755, true );
-		}
+		$plugin_check_dir = self::get_upload_dir();
 
 		$file_path    = $plugin_check_dir . $basename;
 		$file_process = fopen( $file_path, 'w' );
@@ -242,5 +237,23 @@ class Plugin_Request_Utility {
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * Get the upload directory for the plugin check.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return string The upload directory for the plugin check.
+	 */
+	public static function get_upload_dir() {
+		$upload_dir = wp_upload_dir();
+		$upload_dir = trailingslashit( $upload_dir['basedir'] ) . 'plugin-check/';
+
+		if ( ! is_dir( $upload_dir ) ) {
+			mkdir( $upload_dir, 0755, true );
+		}
+
+		return $upload_dir;
 	}
 }
