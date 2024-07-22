@@ -64,14 +64,6 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 
 		$this->set_up_mock_filesystem();
 
-		$_SERVER['argv'] = array(
-			'wp',
-			'plugin',
-			'check',
-			'plugin-check',
-			'--checks=runtime_check',
-		);
-
 		add_filter(
 			'wp_plugin_check_checks',
 			function ( $checks ) {
@@ -86,6 +78,10 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 
 		Plugin_Request_Utility::initialize_runner();
 
+		$runner  = Plugin_Request_Utility::get_runner();
+		$runner->set_plugin( 'plugin-check' );
+		$runner->set_check_slugs( array( 'runtime-check' ) );
+
 		do_action( 'muplugins_loaded' );
 
 		// Determine if one of the Universal_Runtime_Preparation was run.
@@ -95,9 +91,7 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 
 		// Determine if the cleanup function was run.
 		$cleanup = ! has_filter( 'option_active_plugins' );
-		$runner  = Plugin_Request_Utility::get_runner();
 
-		unset( $_SERVER['argv'] );
 		$wp_actions['muplugins_loaded'] = $muplugins_loaded;
 		$wpdb->set_prefix( $table_prefix );
 
