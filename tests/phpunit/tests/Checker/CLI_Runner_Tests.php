@@ -43,7 +43,7 @@ class CLI_Runner_Tests extends WP_UnitTestCase {
 		$muplugins_loaded = $wp_actions['muplugins_loaded'];
 		unset( $wp_actions['muplugins_loaded'] );
 
-		$runner  = new CLI_Runner();
+		$runner = new CLI_Runner();
 		$runner->set_plugin( 'plugin-check' );
 		$runner->set_check_slugs( array( 'runtime-check' ) );
 
@@ -75,7 +75,7 @@ class CLI_Runner_Tests extends WP_UnitTestCase {
 			}
 		);
 
-		$runner  = new CLI_Runner();
+		$runner = new CLI_Runner();
 		$runner->set_plugin( 'plugin-check' );
 		$runner->set_check_slugs( array( 'empty-check' ) );
 
