@@ -7,7 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
-use WordPress\Plugin_Check\Checker\Checks\Localhost_Check;
+use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\Localhost_Check;
 
 class Localhost_Check_Tests extends WP_UnitTestCase {
 
@@ -22,11 +22,23 @@ class Localhost_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertNotEmpty( $errors );
 		$this->assertArrayHasKey( 'load.php', $errors );
-		$this->assertEquals( 1, $check_result->get_error_count() );
+		$this->assertArrayHasKey( 'another.php', $errors );
+		$this->assertSame( 4, $check_result->get_error_count() );
 
-		$this->assertArrayHasKey( 0, $errors['load.php'] );
-		$this->assertArrayHasKey( 0, $errors['load.php'][0] );
-		$this->assertArrayHasKey( 'code', $errors['load.php'][0][0][0] );
-		$this->assertEquals( 'localhost_code_detected', $errors['load.php'][0][0][0]['code'] );
+		$this->assertArrayHasKey( 19, $errors['load.php'] );
+		$this->assertArrayHasKey( 24, $errors['load.php'][19] );
+		$this->assertCount( 1, wp_list_filter( $errors['load.php'][19][24], array( 'code' => 'localhost_code_detected' ) ) );
+
+		$this->assertArrayHasKey( 2, $errors['another.php'] );
+		$this->assertArrayHasKey( 35, $errors['another.php'][2] );
+		$this->assertCount( 1, wp_list_filter( $errors['another.php'][2][35], array( 'code' => 'localhost_code_detected' ) ) );
+
+		$this->assertArrayHasKey( 3, $errors['another.php'] );
+		$this->assertArrayHasKey( 30, $errors['another.php'][3] );
+		$this->assertCount( 1, wp_list_filter( $errors['another.php'][3][30], array( 'code' => 'localhost_code_detected' ) ) );
+
+		$this->assertArrayHasKey( 4, $errors['another.php'] );
+		$this->assertArrayHasKey( 27, $errors['another.php'][4] );
+		$this->assertCount( 1, wp_list_filter( $errors['another.php'][4][27], array( 'code' => 'localhost_code_detected' ) ) );
 	}
 }

@@ -7,7 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
-use WordPress\Plugin_Check\Checker\Checks\Enqueued_Scripts_In_Footer_Check;
+use WordPress\Plugin_Check\Checker\Checks\Performance\Enqueued_Scripts_In_Footer_Check;
 
 class Enqueued_Scripts_In_Footer_Check_Tests extends WP_UnitTestCase {
 

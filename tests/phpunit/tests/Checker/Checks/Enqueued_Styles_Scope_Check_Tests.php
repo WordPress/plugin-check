@@ -5,7 +5,7 @@
  * @package plugin-check
  */
 
-use WordPress\Plugin_Check\Checker\Checks\Enqueued_Styles_Scope_Check;
+use WordPress\Plugin_Check\Checker\Checks\Performance\Enqueued_Styles_Scope_Check;
 use WordPress\Plugin_Check\Test_Utils\TestCase\Runtime_Check_UnitTestCase;
 
 class Enqueued_Styles_Scope_Check_Tests extends Runtime_Check_UnitTestCase {

@@ -7,7 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
-use WordPress\Plugin_Check\Checker\Checks\No_Unfiltered_Uploads_Check;
+use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\No_Unfiltered_Uploads_Check;
 
 class No_Unfiltered_Uploads_Check_Tests extends WP_UnitTestCase {
 
