@@ -209,34 +209,30 @@ class Plugin_Request_Utility {
 		fwrite( $file_process, $response['body'] );
 		fclose( $file_process );
 
+		$temp_dir = get_temp_dir();
+
+		$target_folder_name = pathinfo( $plugin_url, PATHINFO_FILENAME );
+
 		// Unzip file.
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 
 		WP_Filesystem();
-		if ( unzip_file( $file_path, $plugin_check_dir ) ) {
+
+		if ( unzip_file( $file_path, $temp_dir ) ) {
 			unlink( $file_path );
-			$files = scandir( $plugin_check_dir );
-			$files = array_diff( $files, array( '.', '..' ) );
 
-			if ( ! empty( $files ) && is_array( $files ) && 1 === count( $files ) ) {
-				$basename = reset( $files );
-				move_dir( $plugin_check_dir . $basename, WP_PLUGIN_DIR . '/' . $basename );
-
-				if ( ! empty( $plugin_info_url ) ) {
-					$response_json = wp_remote_get( $plugin_info_url );
-					$file_path     = $plugin_check_dir . 'plugin-info.json';
-					$file_process  = fopen( $file_path, 'w' );
-					fwrite( $file_process, $response_json['body'] );
-					fclose( $file_process );
-				}
-
-				return $basename;
-			} else {
-				return false;
+			if ( ! empty( $plugin_info_url ) ) {
+				$response_json = wp_remote_get( $plugin_info_url );
+				$file_path     = $plugin_check_dir . 'plugin-info.json';
+				$file_process  = fopen( $file_path, 'w' );
+				fwrite( $file_process, $response_json['body'] );
+				fclose( $file_process );
 			}
-		} else {
-			return false;
+
+			return $temp_dir . $target_folder_name;
 		}
+
+		return false;
 	}
 
 	/**
