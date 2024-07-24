@@ -188,12 +188,12 @@ class Plugin_Request_Utility {
 	 * @since 1.1.0
 	 *
 	 * @param string $plugin_url The URL of the plugin to download.
-	 * @return string|bool The plugin basename if the plugin is downloaded successfully, false otherwise.
+	 * @return string|bool The full plugin path if the plugin is downloaded successfully, false otherwise.
 	 */
 	public static function download_plugin( $plugin_url ) {
 		$response = wp_remote_get( $plugin_url );
 
-		if ( is_wp_error( $response ) ) {
+		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
 			return false;
 		}
 
