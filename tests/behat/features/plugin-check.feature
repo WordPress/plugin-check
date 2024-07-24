@@ -283,3 +283,16 @@ Feature: Test that the WP-CLI command works.
       """
       no_plugin_readme
       """
+
+  Scenario: Check a plugin from external zip
+    Given a WP install with the Plugin Check plugin
+
+    When I run the WP-CLI command `plugin check https://downloads.wordpress.org/plugin/hello-dolly.1.7.3.zip --fields=code,type --format=csv`
+    And STDOUT should contain:
+      """
+      WordPress.WP.AlternativeFunctions.rand_mt_rand,ERROR
+      """
+    And STDOUT should contain:
+      """
+      stable_tag_mismatch,ERROR
+      """

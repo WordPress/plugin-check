@@ -181,4 +181,63 @@ class Plugin_Request_Utility {
 
 		return $files_to_ignore;
 	}
+
+	/**
+	 * Downloads the plugin from the URL.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $plugin_url The URL of the plugin to download.
+	 * @return string|bool The plugin basename if the plugin is downloaded successfully, false otherwise.
+	 */
+	public static function download_plugin( $plugin_url ) {
+		$response = wp_remote_get( $plugin_url );
+
+		if ( is_wp_error( $response ) ) {
+			return false;
+		}
+
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+
+		WP_Filesystem();
+
+		$basename = basename( $plugin_url );
+
+		$plugin_check_dir = self::get_temporary_upload_dir();
+
+		$file_path    = $plugin_check_dir . $basename;
+		$file_process = fopen( $file_path, 'w' );
+		fwrite( $file_process, $response['body'] );
+		fclose( $file_process );
+
+		$folder_name = pathinfo( $plugin_url, PATHINFO_FILENAME );
+
+		$target_folder_name = explode( '.', $folder_name )[0];
+
+		// Unzip file.
+		if ( unzip_file( $file_path, $plugin_check_dir ) ) {
+			unlink( $file_path );
+
+			return $plugin_check_dir . $target_folder_name;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get the upload directory for the plugin check.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string The upload directory for the plugin check.
+	 */
+	public static function get_temporary_upload_dir() {
+		$upload_dir = trailingslashit( get_temp_dir() ) . 'plugin-check/';
+
+		if ( ! is_dir( $upload_dir ) ) {
+			mkdir( $upload_dir, 0755, true );
+		}
+
+		return $upload_dir;
+	}
 }
