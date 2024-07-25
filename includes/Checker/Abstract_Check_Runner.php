@@ -477,16 +477,50 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @since 1.0.0
 	 *
+	 * @throws Exception Throws exception if input is invalid.
+	 *
 	 * @return string The plugin basename to check.
 	 */
 	final public function get_plugin_basename() {
 		if ( null === $this->plugin_basename ) {
 			$plugin = null !== $this->plugin ? $this->plugin : $this->get_plugin_param();
 
-			if ( is_dir( $plugin ) ) {
-				$this->plugin_basename = $plugin;
-			} else {
+			// Check if a slug.
+			if ( preg_match( '/^[a-z0-9]+(-?[a-z0-9]+)*(\.php)?$/i', $plugin ) ) {
 				$this->plugin_basename = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin );
+			} else {
+				if ( is_dir( $plugin ) ) {
+
+					$files = glob( $plugin . '/*.php' );
+
+					$main_file_found = false;
+
+					foreach ( $files as $file ) {
+						$plugin_data = get_plugin_data( $file );
+						if ( ! empty( $plugin_data['Name'] ) ) {
+							$main_file_found = true;
+							break;
+						}
+					}
+
+					if ( true === $main_file_found ) {
+						$this->plugin_basename = $plugin;
+					} else {
+						throw new Exception(
+							sprintf(
+								'Invalid plugin: %s',
+								$plugin
+							)
+						);
+					}
+				} else {
+					throw new Exception(
+						sprintf(
+							'Invalid folder: %s',
+							$plugin
+						)
+					);
+				}
 			}
 		}
 

@@ -283,3 +283,43 @@ Feature: Test that the WP-CLI command works.
       """
       no_plugin_readme
       """
+
+  Scenario: Check a plugin from external location but with invalid plugin
+    Given a WP install with the Plugin Check plugin
+    And an empty external-folder/foo-plugin directory
+    And a external-folder/foo-plugin/foo-plugin.php file:
+      """
+      <?php
+      // Not a valid plugin.
+
+      """
+
+    When I try the WP-CLI command `plugin check {RUN_DIR}/non-existent-external-folder/foo-plugin`
+    Then STDOUT should be empty
+    And STDERR should not contain:
+      """
+      no_plugin_readme
+      """
+    And STDERR should contain:
+      """
+      Invalid folder
+      """
+    And STDERR should contain:
+      """
+      non-existent-external-folder/foo-plugin
+      """
+
+    When I try the WP-CLI command `plugin check {RUN_DIR}/external-folder/foo-plugin`
+    Then STDOUT should be empty
+    And STDERR should not contain:
+      """
+      no_plugin_readme
+      """
+    And STDERR should contain:
+      """
+      Invalid plugin
+      """
+    And STDERR should contain:
+      """
+      external-folder/foo-plugin
+      """
