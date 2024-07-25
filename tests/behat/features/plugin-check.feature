@@ -302,11 +302,7 @@ Feature: Test that the WP-CLI command works.
       """
     And STDERR should contain:
       """
-      Invalid folder
-      """
-    And STDERR should contain:
-      """
-      non-existent-external-folder/foo-plugin
+      Invalid plugin slug
       """
 
     When I try the WP-CLI command `plugin check {RUN_DIR}/external-folder/foo-plugin`
@@ -317,9 +313,5 @@ Feature: Test that the WP-CLI command works.
       """
     And STDERR should contain:
       """
-      Invalid plugin
-      """
-    And STDERR should contain:
-      """
-      external-folder/foo-plugin
+      Invalid plugin slug
       """
