@@ -181,4 +181,30 @@ class Plugin_Request_Utility {
 
 		return $files_to_ignore;
 	}
+
+	/**
+	 * Checks if the directory is a valid plugin.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $directory Directory.
+	 * @return bool true if the directory is valid plugin, otherwise false.
+	 */
+	public static function is_directory_valid_plugin( $directory ) {
+		$is_valid = false;
+
+		if ( is_dir( $directory ) ) {
+			$files = glob( $directory . '/*.php' );
+
+			foreach ( $files as $file ) {
+				$plugin_data = get_plugin_data( $file );
+				if ( ! empty( $plugin_data['Name'] ) ) {
+					$is_valid = true;
+					break;
+				}
+			}
+		}
+
+		return $is_valid;
+	}
 }
