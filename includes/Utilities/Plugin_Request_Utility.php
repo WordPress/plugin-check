@@ -194,8 +194,8 @@ class Plugin_Request_Utility {
 		$response = wp_remote_get( $plugin_url );
 
 		// Prevents URL from wporg.
-		if ( false !== strpos( $plugin_url, '#' ) ) {
-			$plugin_info_url = substr( $plugin_url, strpos( $plugin_url, '#' ) );
+		if ( false !== strpos( $plugin_url, '#wporgapi:' ) ) {
+			$plugin_info_url = substr( $plugin_url, strpos( $plugin_url, '#wporgapi:' ) );
 			$plugin_info_url = str_replace( '#wporgapi:', '', $plugin_info_url );
 			$plugin_url      = substr( $plugin_url, 0, strpos( $plugin_url, '#' ) );
 		}
@@ -209,34 +209,25 @@ class Plugin_Request_Utility {
 		fwrite( $file_process, $response['body'] );
 		fclose( $file_process );
 
+		$temp_dir = $plugin_check_dir . strtotime( 'now' ) . '/';
+
 		// Unzip file.
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 
 		WP_Filesystem();
-		if ( unzip_file( $file_path, $plugin_check_dir ) ) {
+		if ( unzip_file( $file_path, $temp_dir ) ) {
 			unlink( $file_path );
-			$files = scandir( $plugin_check_dir );
-			$files = array_diff( $files, array( '.', '..' ) );
-
-			if ( ! empty( $files ) && is_array( $files ) && 1 === count( $files ) ) {
-				$basename = reset( $files );
-				move_dir( $plugin_check_dir . $basename, WP_PLUGIN_DIR . '/' . $basename );
-
-				if ( ! empty( $plugin_info_url ) ) {
-					$response_json = wp_remote_get( $plugin_info_url );
-					$file_path     = $plugin_check_dir . 'plugin-info.json';
-					$file_process  = fopen( $file_path, 'w' );
-					fwrite( $file_process, $response_json['body'] );
-					fclose( $file_process );
-				}
-
-				return $basename;
-			} else {
-				return false;
+			if ( ! empty( $plugin_info_url ) ) {
+				$response_json = wp_remote_get( $plugin_info_url );
+				$file_path     = $plugin_check_dir . 'plugin-info.json';
+				$file_process  = fopen( $file_path, 'w' );
+				fwrite( $file_process, $response_json['body'] );
+				fclose( $file_process );
 			}
-		} else {
-			return false;
+
+			return $temp_dir . $target_folder_name;
 		}
+		return false;
 	}
 
 	/**
