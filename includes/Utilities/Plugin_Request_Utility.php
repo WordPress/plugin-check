@@ -248,7 +248,7 @@ class Plugin_Request_Utility {
 		return $upload_dir;
 	}
 
-	/*
+	/**
 	 * Checks if the directory is a valid plugin.
 	 *
 	 * @since 1.1.0
