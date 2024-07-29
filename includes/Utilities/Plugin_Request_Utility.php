@@ -196,7 +196,7 @@ class Plugin_Request_Utility {
 		$response = wp_remote_get( $plugin_url );
 
 		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
-			throw new Exception( 
+			throw new Exception(
 				__( 'Downloading the zip file failed.', 'plugin-check' )
 			);
 		}
