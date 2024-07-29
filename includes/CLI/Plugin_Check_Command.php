@@ -317,6 +317,8 @@ final class Plugin_Check_Command {
 		$all_checks = array();
 
 		/**
+		 * All checks to list.
+		 *
 		 * @var Check $check
 		 */
 		foreach ( $collection as $key => $check ) {

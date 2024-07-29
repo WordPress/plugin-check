@@ -99,6 +99,8 @@ final class Admin_Page {
 	}
 
 	/**
+	 * Adds the plugin help tab.
+	 *
 	 * @since 1.1.0
 	 */
 	public function add_help_tab() {
@@ -113,6 +115,8 @@ final class Admin_Page {
 	}
 
 	/**
+	 * Renders the plugin help tab.
+	 *
 	 * @since 1.1.0
 	 */
 	public function render_help_tab() {
@@ -128,6 +132,8 @@ final class Admin_Page {
 		echo '<dl>';
 
 		/**
+		 * All checks to list.
+		 *
 		 * @var Check $check
 		 */
 		foreach ( $collection as $key => $check ) {
@@ -135,7 +141,7 @@ final class Admin_Page {
 				static function ( $category ) use ( $category_labels ) {
 					return $category_labels[ $category ] ?? $category;
 				},
-				$check->get_categories(),
+				$check->get_categories()
 			);
 			$categories = join( ', ', $categories );
 			?>
