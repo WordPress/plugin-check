@@ -7,7 +7,10 @@
 
 namespace WordPress\Plugin_Check\Admin;
 
+use WordPress\Plugin_Check\Checker\Check;
 use WordPress\Plugin_Check\Checker\Check_Categories;
+use WordPress\Plugin_Check\Checker\Check_Repository;
+use WordPress\Plugin_Check\Checker\Default_Check_Repository;
 
 /**
  * Class is handling admin tools page functionality.
@@ -91,6 +94,68 @@ final class Admin_Page {
 	public function initialize_page() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'admin_footer', array( $this, 'admin_footer' ) );
+
+		$this->add_help_tab();
+	}
+
+	/**
+	 * @since 1.1.0
+	 */
+	public function add_help_tab() {
+		get_current_screen()->add_help_tab(
+			array(
+				'id'       => 'plugin-check',
+				'title'    => __( 'Checks', 'plugin-check' ),
+				'content'  => '',
+				'callback' => array( $this, 'render_help_tab' ),
+			)
+		);
+	}
+
+	/**
+	 * @since 1.1.0
+	 */
+	public function render_help_tab() {
+		$check_repo = new Default_Check_Repository();
+		$collection = $check_repo->get_checks( Check_Repository::TYPE_ALL );
+
+		if ( empty( $collection ) ) {
+			return;
+		}
+
+		$category_labels = Check_Categories::get_categories();
+
+		echo '<dl>';
+
+		/**
+		 * @var Check $check
+		 */
+		foreach ( $collection as $key => $check ) {
+			$categories = array_map(
+				static function ( $category ) use ( $category_labels ) {
+					return $category_labels[ $category ] ?? $category;
+				},
+				$check->get_categories(),
+			);
+			$categories = join( ', ', $categories );
+			?>
+			<dt>
+				<code><?php echo esc_html( $key ); ?></code>
+				(<?php echo esc_html( $categories ); ?>)
+			</dt>
+			<dd>
+				<?php echo wp_kses( $check->get_description(), array( 'code' => array() ) ); ?>
+				<br>
+				<a href="<?php echo esc_url( $check->get_documentation_url() ); ?>">
+					<?php esc_html_e( 'Learn more', 'plugin-check' ); ?>
+				</a>
+			</dd>
+			<?php
+
+			echo '';
+		}
+
+		echo '</dl>';
 	}
 
 	/**

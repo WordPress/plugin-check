@@ -578,7 +578,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		return sprintf(
 			/* translators: %s: readme.txt */
 			__( 'Checks adherence to the %s requirements.', 'plugin-check' ),
-			'<code>readme.txt</code'
+			'<code>readme.txt</code>'
 		);
 	}
 
