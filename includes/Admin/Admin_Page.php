@@ -104,7 +104,13 @@ final class Admin_Page {
 	 * @since 1.1.0
 	 */
 	public function add_help_tab() {
-		get_current_screen()->add_help_tab(
+		$screen = get_current_screen();
+
+		if ( ! $screen ) {
+			return;
+		}
+
+		$screen->add_help_tab(
 			array(
 				'id'       => 'plugin-check',
 				'title'    => __( 'Checks', 'plugin-check' ),
