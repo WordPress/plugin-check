@@ -183,15 +183,21 @@ class Plugin_Request_Utility {
 	}
 
 	/**
-	 * Downloads the plugin from the URL and installs it.
+	 * Returns the plugin basename after downloading and installing the plugin.
 	 *
-	 * @since 1.0.0
+	 * @since 1.1.0
 	 *
 	 * @param string $plugin_url The URL of the plugin to download.
-	 * @return string|bool The plugin basename if the plugin is downloaded and installed successfully, false otherwise.
+	 * @return string The plugin basename after downloading and installing the plugin.
+	 *
+	 * @throws Exception Thrown if an invalid URL given or zip could be extracted properly.
 	 */
 	public static function download_plugin( $plugin_url ) {
 		$response = wp_remote_get( $plugin_url );
+
+		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+			throw new Exception( 'Downloading the zip file failed.' );
+		}
 
 		// Prevents URL from wporg.
 		if ( false !== strpos( $plugin_url, '#wporgapi:' ) ) {
@@ -199,6 +205,7 @@ class Plugin_Request_Utility {
 			$plugin_info_url = str_replace( '#wporgapi:', '', $plugin_info_url );
 			$plugin_url      = substr( $plugin_url, 0, strpos( $plugin_url, '#' ) );
 		}
+
 		$basename = basename( $plugin_url );
 
 		// Create the name of the file and the declare the directory and path.
@@ -215,23 +222,29 @@ class Plugin_Request_Utility {
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 
 		WP_Filesystem();
-		if ( unzip_file( $file_path, $temp_dir ) ) {
-			unlink( $file_path );
-			if ( ! empty( $plugin_info_url ) ) {
-				$response_json = wp_remote_get( $plugin_info_url );
-				$file_path     = $plugin_check_dir . 'plugin-info.json';
-				$file_process  = fopen( $file_path, 'w' );
-				fwrite( $file_process, $response_json['body'] );
-				fclose( $file_process );
-			}
 
-			$files              = scandir( $temp_dir );
-			$files              = array_diff( $files, array( '.', '..' ) );
-			$target_folder_name = ! empty( $files ) && is_array( $files ) && 1 === count( $files ) ? reset( $files ) : '';
+		$unzip_file = unzip_file( $file_path, $temp_dir );
 
-			return $temp_dir . $target_folder_name;
+		if ( true !== $unzip_file ) {
+			throw new Exception( $unzip_file->get_error_message() );
 		}
-		return false;
+
+		// Remove zip file.
+		unlink( $file_path );
+
+		if ( ! empty( $plugin_info_url ) ) {
+			$response_json = wp_remote_get( $plugin_info_url );
+			$file_path     = $plugin_check_dir . 'plugin-info.json';
+			$file_process  = fopen( $file_path, 'w' );
+			fwrite( $file_process, $response_json['body'] );
+			fclose( $file_process );
+		}
+
+		$files              = scandir( $temp_dir );
+		$files              = array_diff( $files, array( '.', '..' ) );
+		$target_folder_name = ! empty( $files ) && is_array( $files ) && 1 === count( $files ) ? reset( $files ) : '';
+
+		return $temp_dir . $target_folder_name;
 	}
 
 	/**
