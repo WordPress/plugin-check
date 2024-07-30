@@ -212,23 +212,28 @@ class Plugin_Request_Utility {
 
 		$basename = basename( $plugin_url );
 
-		// Create the name of the file and the declare the directory and path.
-		$plugin_check_dir = self::get_upload_dir();
-
-		$file_path    = $plugin_check_dir . $basename;
-		$file_process = fopen( $file_path, 'w' );
-		fwrite( $file_process, $response['body'] );
-		fclose( $file_process );
-
-		$temp_dir = $plugin_check_dir . strtotime( 'now' ) . '/';
-
-		// Unzip file.
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 
 		WP_Filesystem();
 
 		global $wp_filesystem;
 
+		// Create the name of the file and the declare the directory and path.
+		$plugin_check_dir = self::get_upload_dir();
+
+		$response_zip_body = wp_remote_retrieve_body( $response );
+
+		$file_path = $plugin_check_dir . $basename;
+
+		if ( ! $wp_filesystem->put_contents( $plugin_check_dir . $basename, $response_zip_body ) ) {
+			throw new Exception(
+				__( 'Saving zip file failed.', 'plugin-check' )
+			);
+		}
+
+		$temp_dir = $plugin_check_dir . strtotime( 'now' ) . '/';
+
+		// Unzip file.
 		$unzip_file = unzip_file( $file_path, $temp_dir );
 
 		if ( true !== $unzip_file ) {
@@ -247,7 +252,9 @@ class Plugin_Request_Utility {
 				);
 			}
 
-			json_decode( $response_json['body'] );
+			$response_body = wp_remote_retrieve_body( $response_json );
+
+			json_decode( $response_body );
 
 			if ( JSON_ERROR_NONE !== json_last_error() ) {
 				throw new Exception(
@@ -255,7 +262,7 @@ class Plugin_Request_Utility {
 				);
 			}
 
-			if ( ! $wp_filesystem->put_contents( $plugin_check_dir . 'plugin-info.json', $response_json['body'] ) ) {
+			if ( ! $wp_filesystem->put_contents( $plugin_check_dir . 'plugin-info.json', $response_body ) ) {
 				throw new Exception(
 					__( 'Saving JSON file failed.', 'plugin-check' )
 				);
@@ -272,7 +279,7 @@ class Plugin_Request_Utility {
 	/**
 	 * Get the upload directory for the plugin check.
 	 *
-	 * @since 1.0.0
+	 * @since 1.1.0
 	 *
 	 * @return string The upload directory for the plugin check.
 	 */
