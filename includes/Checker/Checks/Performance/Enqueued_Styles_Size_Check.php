@@ -276,7 +276,7 @@ class Enqueued_Styles_Size_Check extends Abstract_Runtime_Check implements With_
 	 */
 	public function get_description(): string {
 		return sprintf(
-		/* translators: %s: Script size threshold. */
+			/* translators: %s: Script size threshold. */
 			__( 'Checks whether the cumulative size of all stylesheets enqueued on a page exceeds %s.', 'plugin-check' ),
 			size_format( $this->threshold_size )
 		);

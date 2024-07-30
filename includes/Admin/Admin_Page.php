@@ -163,8 +163,6 @@ final class Admin_Page {
 				</a>
 			</dd>
 			<?php
-
-			echo '';
 		}
 
 		echo '</dl>';

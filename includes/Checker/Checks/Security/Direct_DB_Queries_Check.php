@@ -58,7 +58,7 @@ class Direct_DB_Queries_Check extends Abstract_PHP_CodeSniffer_Check {
 	 * @return string Description.
 	 */
 	public function get_description(): string {
-		return __( 'Checks the usage of direct database queries, which should be avoided', 'plugin-check' );
+		return __( 'Checks the usage of direct database queries, which should be avoided.', 'plugin-check' );
 	}
 
 	/**

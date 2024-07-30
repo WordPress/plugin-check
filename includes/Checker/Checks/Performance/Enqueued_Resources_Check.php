@@ -58,7 +58,7 @@ class Enqueued_Resources_Check extends Abstract_PHP_CodeSniffer_Check {
 	 * @return string Description.
 	 */
 	public function get_description(): string {
-		return __( 'Checks whether scripts and styles are properly enqueued using the recommended way', 'plugin-check' );
+		return __( 'Checks whether scripts and styles are properly enqueued using the recommended way.', 'plugin-check' );
 	}
 
 	/**

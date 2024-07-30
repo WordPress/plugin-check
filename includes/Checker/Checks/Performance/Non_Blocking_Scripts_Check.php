@@ -251,7 +251,7 @@ class Non_Blocking_Scripts_Check extends Abstract_Runtime_Check implements With_
 	 * @return string Description.
 	 */
 	public function get_description(): string {
-		return __( 'Checks whether scripts and styles are enqueued using a recommended loading strategy', 'plugin-check' );
+		return __( 'Checks whether scripts and styles are enqueued using a recommended loading strategy.', 'plugin-check' );
 	}
 
 	/**
