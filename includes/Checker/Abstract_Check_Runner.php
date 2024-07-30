@@ -483,7 +483,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		if ( null === $this->plugin_basename ) {
 			$plugin = null !== $this->plugin ? $this->plugin : $this->get_plugin_param();
 
-			if ( is_dir( $plugin ) ) {
+			if ( Plugin_Request_Utility::is_directory_valid_plugin( $plugin ) ) {
 				$this->plugin_basename = $plugin;
 			} else {
 				$this->plugin_basename = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin );
