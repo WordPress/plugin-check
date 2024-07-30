@@ -191,6 +191,8 @@ class Plugin_Request_Utility {
 	 * @return string The plugin basename after downloading and installing the plugin.
 	 *
 	 * @throws Exception Thrown if an invalid URL given or zip could be extracted properly.
+	 *
+	 * @SuppressWarnings(PHPMD.NPathComplexity)
 	 */
 	public static function download_plugin( $plugin_url ) {
 		$response = wp_safe_remote_get( $plugin_url );
