@@ -51,3 +51,32 @@ Feature: Test that the WP-CLI plugin check command works with remote ZIP url.
       hello.php
       """
     And STDERR should be empty
+
+  Scenario: Test with valid ZIP and extra wporgapi parameter
+    When I run the WP-CLI command `plugin check https://github.com/ernilambar/foo-bar-wp/releases/latest/download/foo-bar-wp.zip#wporgapi:https://gist.githubusercontent.com/ernilambar/5eea472890e8f1b599efd1e563866784/raw/27958669515760d8be70d34ff53243c6598a02f6/just-test-file.json --fields=code,type --format=csv`
+    Then STDOUT should contain:
+      """
+      WordPress.WP.AlternativeFunctions.rand_mt_rand,ERROR
+      """
+    And STDOUT should contain:
+      """
+      WordPress.Security.EscapeOutput.OutputNotEscaped,ERROR
+      """
+    And STDOUT should contain:
+      """
+      outdated_tested_upto_header,ERROR
+      """
+    And STDOUT should not contain:
+      """
+      hello.php
+      """
+    And STDERR should be empty
+    And the {RUN_DIR}/wp-content/uploads/plugin-check/plugin-info.json file should exist
+    And the {RUN_DIR}/wp-content/uploads/plugin-check/plugin-info.json file should be:
+      """
+      {
+          "username": "johndoe",
+          "first_name": "John",
+          "last_name": "Doe"
+      }
+      """

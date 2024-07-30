@@ -225,6 +225,8 @@ class Plugin_Request_Utility {
 
 		WP_Filesystem();
 
+		global $wp_filesystem;
+
 		$unzip_file = unzip_file( $file_path, $temp_dir );
 
 		if ( true !== $unzip_file ) {
@@ -236,10 +238,26 @@ class Plugin_Request_Utility {
 
 		if ( ! empty( $plugin_info_url ) && filter_var( $plugin_info_url, FILTER_VALIDATE_URL ) ) {
 			$response_json = wp_safe_remote_get( $plugin_info_url );
-			$file_path     = $plugin_check_dir . 'plugin-info.json';
-			$file_process  = fopen( $file_path, 'w' );
-			fwrite( $file_process, $response_json['body'] );
-			fclose( $file_process );
+
+			if ( is_wp_error( $response_json ) || 200 !== wp_remote_retrieve_response_code( $response_json ) ) {
+				throw new Exception(
+					__( 'Fetching data failed.', 'plugin-check' )
+				);
+			}
+
+			json_decode( $response_json['body'] );
+
+			if ( JSON_ERROR_NONE !== json_last_error() ) {
+				throw new Exception(
+					__( 'Invalid JSON content.', 'plugin-check' )
+				);
+			}
+
+			if ( ! $wp_filesystem->put_contents( $plugin_check_dir . 'plugin-info.json', $response_json['body'] ) ) {
+				throw new Exception(
+					__( 'Saving JSON file failed.', 'plugin-check' )
+				);
+			}
 		}
 
 		$files              = scandir( $temp_dir );
