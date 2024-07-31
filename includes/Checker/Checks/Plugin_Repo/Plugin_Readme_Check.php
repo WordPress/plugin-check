@@ -163,7 +163,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 							$result,
 							sprintf(
 								/* translators: 1: currently used version, 2: latest stable WordPress version, 3: 'Tested up to' */
-								__( 'Tested up to: %1$s < %2$s.<br>The "%3$s" value in your plugin is not set to the current version of WordPress. This means your plugin will not show up in searches, as we require plugins to be compatible and documented as tested up to the most recent version of WordPress.', 'plugin-check' ),
+								__( '<strong>Tested up to: %1$s < %2$s.</strong><br>The "%3$s" value in your plugin is not set to the current version of WordPress. This means your plugin will not show up in searches, as we require plugins to be compatible and documented as tested up to the most recent version of WordPress.', 'plugin-check' ),
 								$parser->{$field_key},
 								$latest_wordpress_version,
 								'Tested up to'
