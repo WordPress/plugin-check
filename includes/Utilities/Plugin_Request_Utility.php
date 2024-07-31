@@ -271,7 +271,7 @@ class Plugin_Request_Utility {
 
 		$files              = scandir( $temp_dir );
 		$files              = array_diff( $files, array( '.', '..' ) );
-		$target_folder_name = ! empty( $files ) && is_array( $files ) && 1 === count( $files ) ? reset( $files ) : '';
+		$target_folder_name = ! empty( $files ) && 1 === count( $files ) ? reset( $files ) : '';
 
 		return $temp_dir . $target_folder_name;
 	}
