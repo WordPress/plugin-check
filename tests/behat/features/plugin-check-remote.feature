@@ -53,6 +53,10 @@ Feature: Test that the WP-CLI plugin check command works with remote ZIP url.
     And STDERR should be empty
 
   Scenario: Test with valid ZIP and extra wporgapi parameter
+    When I run `wp eval 'echo get_temp_dir();'`
+    Then STDOUT should not be empty
+    And save STDOUT as {TEMP_DIR}
+
     When I run the WP-CLI command `plugin check https://github.com/ernilambar/foo-bar-wp/releases/latest/download/foo-bar-wp.zip#wporgapi:https://gist.githubusercontent.com/ernilambar/5eea472890e8f1b599efd1e563866784/raw/27958669515760d8be70d34ff53243c6598a02f6/just-test-file.json --fields=code,type --format=csv`
     Then STDOUT should contain:
       """
@@ -71,8 +75,8 @@ Feature: Test that the WP-CLI plugin check command works with remote ZIP url.
       hello.php
       """
     And STDERR should be empty
-    And the {RUN_DIR}/wp-content/uploads/plugin-check/plugin-info.json file should exist
-    And the {RUN_DIR}/wp-content/uploads/plugin-check/plugin-info.json file should be:
+    And the {TEMP_DIR}/plugin-check/plugin-info.json file should exist
+    And the {TEMP_DIR}/plugin-check/plugin-info.json file should be:
       """
       {
           "username": "johndoe",

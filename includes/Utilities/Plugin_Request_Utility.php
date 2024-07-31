@@ -284,8 +284,7 @@ class Plugin_Request_Utility {
 	 * @return string The upload directory for the plugin check.
 	 */
 	public static function get_upload_dir() {
-		$upload_dir = wp_upload_dir();
-		$upload_dir = trailingslashit( $upload_dir['basedir'] ) . 'plugin-check/';
+		$upload_dir = trailingslashit( get_temp_dir() ) . 'plugin-check/';
 
 		if ( ! is_dir( $upload_dir ) ) {
 			mkdir( $upload_dir, 0755, true );
