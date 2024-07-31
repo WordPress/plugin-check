@@ -55,8 +55,8 @@ Feature: Test that the WP-CLI command works.
     When I run the WP-CLI command `plugin check foo-single.php --format=csv`
     Then STDOUT should contain:
       """
-      line,column,type,code,message
-      16,15,ERROR,WordPress.WP.AlternativeFunctions.rand_mt_rand,"mt_rand() is discouraged. Use the far less predictable wp_rand() instead."
+      line,column,type,code,message,docs
+      16,15,ERROR,WordPress.WP.AlternativeFunctions.rand_mt_rand,"mt_rand() is discouraged. Use the far less predictable wp_rand() instead.",
       """
 
     When I run the WP-CLI command `plugin check foo-single.php --format=csv --fields=line,column,code`
