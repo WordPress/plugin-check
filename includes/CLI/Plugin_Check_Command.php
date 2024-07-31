@@ -8,6 +8,7 @@
 namespace WordPress\Plugin_Check\CLI;
 
 use Exception;
+use WordPress\Plugin_Check\Checker\Check;
 use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Repository;
 use WordPress\Plugin_Check\Checker\CLI_Runner;
@@ -315,12 +316,19 @@ final class Plugin_Check_Command {
 
 		$all_checks = array();
 
+		/**
+		 * All checks to list.
+		 *
+		 * @var Check $check
+		 */
 		foreach ( $collection as $key => $check ) {
 			$item = array();
 
-			$item['slug']      = $key;
-			$item['stability'] = strtolower( $check->get_stability() );
-			$item['category']  = join( ', ', $check->get_categories() );
+			$item['slug']        = $key;
+			$item['stability']   = strtolower( $check->get_stability() );
+			$item['category']    = join( ', ', $check->get_categories() );
+			$item['description'] = $check->get_description();
+			$item['url']         = $check->get_documentation_url();
 
 			$all_checks[] = $item;
 		}
@@ -332,6 +340,8 @@ final class Plugin_Check_Command {
 				'slug',
 				'category',
 				'stability',
+				'description',
+				'url',
 			)
 		);
 

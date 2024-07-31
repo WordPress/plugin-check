@@ -18,4 +18,12 @@ class Static_Check implements Static_Check_Interface {
 	public function get_categories() {
 		return array( Check_Categories::CATEGORY_GENERAL );
 	}
+
+	public function get_description(): string {
+		return '';
+	}
+
+	public function get_documentation_url(): string {
+		return '';
+	}
 }

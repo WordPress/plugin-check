@@ -25,6 +25,14 @@ class My_Custom_Check implements Runtime_Check {
   public function run( Check_Result $result ) {
     // Handle running the check and adding warnings or errors to the result.
   }
+  
+  public function get_description(): string {
+    // Return a short description about this check.
+  }
+  
+  public function get_documentation_url(): string {
+    // Return the URL for further information about this check.
+  }
 }
 ```
 
@@ -54,6 +62,14 @@ class My_Custom_Check extends Abstract_Runtime_Check {
 
   public function run( Check_Result $result ) {
     // Handle running the check and adding warnings or errors to the result.
+  }
+  
+  public function get_description(): string {
+    // Return a short description about this check.
+  }
+  
+  public function get_documentation_url(): string {
+    // Return the URL for further information about this check.
   }
 }
 ```

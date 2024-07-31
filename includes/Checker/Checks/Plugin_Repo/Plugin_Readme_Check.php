@@ -564,4 +564,34 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 		return $ignored_warnings;
 	}
+
+	/**
+	 * Gets the description for the check.
+	 *
+	 * Every check must have a short description explaining what the check does.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string Description.
+	 */
+	public function get_description(): string {
+		return sprintf(
+			/* translators: %s: readme.txt */
+			__( 'Checks adherence to the %s requirements.', 'plugin-check' ),
+			'<code>readme.txt</code>'
+		);
+	}
+
+	/**
+	 * Gets the documentation URL for the check.
+	 *
+	 * Every check must have a URL with further information about the check.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string The documentation URL.
+	 */
+	public function get_documentation_url(): string {
+		return __( 'https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/', 'plugin-check' );
+	}
 }
