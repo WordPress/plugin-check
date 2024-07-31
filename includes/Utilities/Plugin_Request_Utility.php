@@ -195,7 +195,10 @@ class Plugin_Request_Utility {
 	 * @SuppressWarnings(PHPMD.NPathComplexity)
 	 */
 	public static function download_plugin( $plugin_url ) {
-		$response = wp_safe_remote_get( $plugin_url );
+		$args     = array(
+			'timeout' => 60,
+		);
+		$response = wp_safe_remote_get( $plugin_url, $args );
 
 		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
 			throw new Exception(
