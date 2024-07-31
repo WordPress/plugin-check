@@ -485,6 +485,7 @@ final class Plugin_Check_Command {
 			'column',
 			'code',
 			'message',
+			'docs',
 		);
 
 		// If both errors and warnings are included, display the type of each result too.
@@ -495,6 +496,7 @@ final class Plugin_Check_Command {
 				'type',
 				'code',
 				'message',
+				'docs',
 			);
 		}
 
@@ -518,6 +520,8 @@ final class Plugin_Check_Command {
 		foreach ( $file_errors as $line => $line_errors ) {
 			foreach ( $line_errors as $column => $column_errors ) {
 				foreach ( $column_errors as $column_error ) {
+
+					$column_error['message'] = str_replace( '<br>', "\n", $column_error['message'] );
 
 					$file_results[] = array_merge(
 						$column_error,
