@@ -73,7 +73,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * Used when downloading a plugin from a URL.
 	 *
-	 * @sicne 1.1.0
+	 * @since 1.1.0
 	 * @var bool
 	 */
 	private $delete_plugin_folder = false;
