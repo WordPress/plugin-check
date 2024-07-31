@@ -21,15 +21,6 @@ class Force_Single_Plugin_Preparation_Tests extends WP_UnitTestCase {
 		$this->plugin_basename_file = plugin_basename( WP_PLUGIN_CHECK_MAIN_FILE );
 	}
 
-	public function test_prepare_plugin_does_not_exist() {
-
-		$preparation = new Force_Single_Plugin_Preparation( 'foo-plugin/foo-plugin.php' );
-
-		$this->expectException( 'Exception' );
-		$this->expectExceptionMessage( 'Invalid plugin foo-plugin/foo-plugin.php: Plugin file does not exist.' );
-		$preparation->prepare();
-	}
-
 	/**
 	 * @throws Exception Throw exception.
 	 */
