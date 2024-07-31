@@ -294,7 +294,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		$cleanup_functions = array();
 
 		if ( $this->has_runtime_check( $this->get_checks_to_run() ) ) {
-			$preparation = new Universal_Runtime_Preparation( $this->get_check_context() );
+			$preparation         = new Universal_Runtime_Preparation( $this->get_check_context() );
 			$cleanup_functions[] = $preparation->prepare();
 		}
 
