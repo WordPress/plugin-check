@@ -23,14 +23,14 @@ trait Amend_Check_Result {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param Check_Result $result    The check result to amend, including the plugin context to check.
-	 * @param bool         $error     Whether it is an error or notice.
-	 * @param string       $message   Error message.
-	 * @param string       $code      Error code.
-	 * @param string       $file      Absolute path to the file where the issue was found.
-	 * @param int          $line      The line on which the message occurred. Default is 0 (unknown line).
-	 * @param int          $column    The column on which the message occurred. Default is 0 (unknown column).
-	 * @param string       $docs      URL for further information about the message.
+	 * @param Check_Result $result  The check result to amend, including the plugin context to check.
+	 * @param bool         $error   Whether it is an error or notice.
+	 * @param string       $message Error message.
+	 * @param string       $code    Error code.
+	 * @param string       $file    Absolute path to the file where the issue was found.
+	 * @param int          $line    The line on which the message occurred. Default is 0 (unknown line).
+	 * @param int          $column  The column on which the message occurred. Default is 0 (unknown column).
+	 * @param string       $docs    URL for further information about the message.
 	 */
 	protected function add_result_message_for_file( Check_Result $result, $error, $message, $code, $file, $line = 0, $column = 0, string $docs = '' ) {
 		$result->add_message(
