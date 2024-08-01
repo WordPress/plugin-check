@@ -17,4 +17,12 @@ class Check_Without_Category implements Static_Check {
 	public function get_categories() {
 		return array();
 	}
+
+	public function get_description(): string {
+		return '';
+	}
+
+	public function get_documentation_url(): string {
+		return '';
+	}
 }
