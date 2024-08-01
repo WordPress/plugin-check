@@ -522,6 +522,7 @@ final class Plugin_Check_Command {
 				foreach ( $column_errors as $column_error ) {
 
 					$column_error['message'] = str_replace( '<br>', "\n", $column_error['message'] );
+					$column_error['message'] = wp_strip_all_tags( $column_error['message'] );
 
 					$file_results[] = array_merge(
 						$column_error,
