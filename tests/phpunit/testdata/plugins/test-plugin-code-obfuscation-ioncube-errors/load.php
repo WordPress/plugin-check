@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Test Plugin Code Obfuscation ionCube Errors
+ * Plugin Name: Test Plugin Code Obfuscation IonCube Errors
  * Plugin URI: https://github.com/WordPress/plugin-check
  * Description: Some plugin description.
  * Author: WordPress Performance Team
