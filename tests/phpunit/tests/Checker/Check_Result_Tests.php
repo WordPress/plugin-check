@@ -60,6 +60,7 @@ class Check_Result_Tests extends WP_UnitTestCase {
 			'message' => 'Warning message',
 			'code'    => 'test_warning',
 			'link'    => '',
+			'docs'    => '',
 		);
 
 		$this->assertEquals( $expected, $warnings['test-plugin.php'][12][40][0] );
@@ -94,6 +95,7 @@ class Check_Result_Tests extends WP_UnitTestCase {
 			'message' => 'Error message',
 			'code'    => 'test_error',
 			'link'    => '',
+			'docs'    => '',
 		);
 
 		$this->assertEquals( $expected, $errors['test-plugin.php'][22][30][0] );
@@ -125,6 +127,7 @@ class Check_Result_Tests extends WP_UnitTestCase {
 			'message' => 'Error message',
 			'code'    => 'test_error',
 			'link'    => '',
+			'docs'    => '',
 		);
 
 		$this->assertEquals( $expected, $errors['test-plugin.php'][22][30][0] );
@@ -156,6 +159,7 @@ class Check_Result_Tests extends WP_UnitTestCase {
 			'message' => 'Warning message',
 			'code'    => 'test_warning',
 			'link'    => '',
+			'docs'    => '',
 		);
 
 		$this->assertEquals( $expected, $warnings['test-plugin.php'][22][30][0] );

@@ -69,6 +69,16 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	protected $plugin_basename;
 
 	/**
+	 * Whether to delete the plugin folder during cleanup.
+	 *
+	 * Used when downloading a plugin from a URL.
+	 *
+	 * @since 1.1.0
+	 * @var bool
+	 */
+	private $delete_plugin_folder = false;
+
+	/**
 	 * An instance of the Check_Repository.
 	 *
 	 * @since 1.0.0
@@ -281,12 +291,27 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @throws Exception Thrown exception when preparation fails.
 	 */
 	final public function prepare() {
+		$cleanup_functions = array();
+
 		if ( $this->has_runtime_check( $this->get_checks_to_run() ) ) {
-			$preparation = new Universal_Runtime_Preparation( $this->get_check_context() );
-			return $preparation->prepare();
+			$preparation         = new Universal_Runtime_Preparation( $this->get_check_context() );
+			$cleanup_functions[] = $preparation->prepare();
 		}
 
-		return function () {};
+		if ( $this->delete_plugin_folder ) {
+			$cleanup_functions = function () {
+				// It must be a directory at this point, but double check just in case.
+				if ( is_dir( $this->plugin_basename ) ) {
+					rmdir( $this->plugin_basename );
+				}
+			};
+		}
+
+		return function () use ( $cleanup_functions ) {
+			foreach ( $cleanup_functions as $cleanup_function ) {
+				$cleanup_function();
+			}
+		};
 	}
 
 	/**
@@ -483,7 +508,11 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		if ( null === $this->plugin_basename ) {
 			$plugin = null !== $this->plugin ? $this->plugin : $this->get_plugin_param();
 
-			if ( is_dir( $plugin ) ) {
+			if ( filter_var( $plugin, FILTER_VALIDATE_URL ) ) {
+				$this->plugin_basename = Plugin_Request_Utility::download_plugin( $plugin );
+
+				$this->delete_plugin_folder = true;
+			} elseif ( Plugin_Request_Utility::is_directory_valid_plugin( $plugin ) ) {
 				$this->plugin_basename = $plugin;
 			} else {
 				$this->plugin_basename = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin );

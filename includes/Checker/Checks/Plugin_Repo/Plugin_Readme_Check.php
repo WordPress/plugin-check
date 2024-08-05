@@ -162,13 +162,17 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 						$this->add_result_error_for_file(
 							$result,
 							sprintf(
-								/* translators: 1: currently used version, 2: latest stable WordPress version */
-								__( 'Tested up to: %1$s < %2$s', 'plugin-check' ),
+								/* translators: 1: currently used version, 2: latest stable WordPress version, 3: 'Tested up to' */
+								__( '<strong>Tested up to: %1$s < %2$s.</strong><br>The "%3$s" value in your plugin is not set to the current version of WordPress. This means your plugin will not show up in searches, as we require plugins to be compatible and documented as tested up to the most recent version of WordPress.', 'plugin-check' ),
 								$parser->{$field_key},
-								$latest_wordpress_version
+								$latest_wordpress_version,
+								'Tested up to'
 							),
 							'outdated_tested_upto_header',
-							$readme_file
+							$readme_file,
+							0,
+							0,
+							'https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/#readme-header-information'
 						);
 					}
 				} else {
@@ -563,5 +567,35 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		$ignored_warnings = (array) apply_filters( 'wp_plugin_check_ignored_readme_warnings', $ignored_warnings, $parser );
 
 		return $ignored_warnings;
+	}
+
+	/**
+	 * Gets the description for the check.
+	 *
+	 * Every check must have a short description explaining what the check does.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string Description.
+	 */
+	public function get_description(): string {
+		return sprintf(
+			/* translators: %s: readme.txt */
+			__( 'Checks adherence to the %s requirements.', 'plugin-check' ),
+			'<code>readme.txt</code>'
+		);
+	}
+
+	/**
+	 * Gets the documentation URL for the check.
+	 *
+	 * Every check must have a URL with further information about the check.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string The documentation URL.
+	 */
+	public function get_documentation_url(): string {
+		return __( 'https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/', 'plugin-check' );
 	}
 }
