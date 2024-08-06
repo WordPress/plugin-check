@@ -105,7 +105,10 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 					__( 'Zend Guard', 'plugin-check' )
 				),
 				'obfuscated_code_detected',
-				$obfuscated_file
+				$obfuscated_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#gpl-no-publicly-documented-resource'
 			);
 		}
 	}
@@ -129,7 +132,10 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 					__( 'Source Guardian', 'plugin-check' )
 				),
 				'obfuscated_code_detected',
-				$obfuscated_file
+				$obfuscated_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#gpl-no-publicly-documented-resource'
 			);
 		}
 	}
@@ -153,7 +159,10 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 					__( 'ionCube', 'plugin-check' )
 				),
 				'obfuscated_code_detected',
-				$obfuscated_file
+				$obfuscated_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#gpl-no-publicly-documented-resource'
 			);
 		}
 	}
