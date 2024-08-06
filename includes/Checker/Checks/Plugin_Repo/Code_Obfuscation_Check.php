@@ -95,21 +95,24 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 	 * @param array        $php_files List of absolute PHP file paths.
 	 */
 	protected function look_for_zendguard( Check_Result $result, array $php_files ) {
-		$obfuscated_file = self::file_preg_match( '/(<\?php \@Zend;)|(This file was encoded by)/', $php_files );
-		if ( $obfuscated_file ) {
-			$this->add_result_error_for_file(
-				$result,
-				sprintf(
-					/* translators: %s: tool name */
-					__( 'Code Obfuscation tools are not permitted. Detected: %s', 'plugin-check' ),
-					__( 'Zend Guard', 'plugin-check' )
-				),
-				'obfuscated_code_detected',
-				$obfuscated_file,
-				0,
-				0,
-				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#gpl-no-publicly-documented-resource'
-			);
+		$files = self::files_preg_match_all( '/(\<\?php \@Zend;)|(This file was encoded by)/', $php_files );
+
+		if ( ! empty( $files ) ) {
+			foreach ( $files as $file ) {
+				$this->add_result_error_for_file(
+					$result,
+					sprintf(
+						/* translators: %s: tool name */
+						__( 'Code Obfuscation tools are not permitted. Detected: %s', 'plugin-check' ),
+						__( 'Zend Guard', 'plugin-check' )
+					),
+					'obfuscated_code_detected',
+					$file['file'],
+					$file['line'],
+					$file['column'],
+				  'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#gpl-no-publicly-documented-resource'
+				);
+			}
 		}
 	}
 
@@ -122,21 +125,24 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 	 * @param array        $php_files List of absolute PHP file paths.
 	 */
 	protected function look_for_sourceguardian( Check_Result $result, array $php_files ) {
-		$obfuscated_file = self::file_preg_match( "/(sourceguardian\.com)|(function_exists\('sg_load'\))|(\$__x=)/", $php_files );
-		if ( $obfuscated_file ) {
-			$this->add_result_error_for_file(
-				$result,
-				sprintf(
-					/* translators: %s: tool name */
-					__( 'Code Obfuscation tools are not permitted. Detected: %s', 'plugin-check' ),
-					__( 'Source Guardian', 'plugin-check' )
-				),
-				'obfuscated_code_detected',
-				$obfuscated_file,
-				0,
-				0,
-				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#gpl-no-publicly-documented-resource'
-			);
+		$files = self::files_preg_match_all( "/(sourceguardian\.com)|(function_exists\('sg_load'\))|(\$__x=)/", $php_files );
+
+		if ( ! empty( $files ) ) {
+			foreach ( $files as $file ) {
+				$this->add_result_error_for_file(
+					$result,
+					sprintf(
+						/* translators: %s: tool name */
+						__( 'Code Obfuscation tools are not permitted. Detected: %s', 'plugin-check' ),
+						__( 'Source Guardian', 'plugin-check' )
+					),
+					'obfuscated_code_detected',
+					$file['file'],
+					$file['line'],
+					$file['column'],
+				  'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#gpl-no-publicly-documented-resource'
+				);
+			}
 		}
 	}
 
@@ -149,21 +155,24 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 	 * @param array        $php_files List of absolute PHP file paths.
 	 */
 	protected function look_for_ioncube( Check_Result $result, array $php_files ) {
-		$obfuscated_file = self::file_str_contains( $php_files, 'ionCube' );
-		if ( $obfuscated_file ) {
-			$this->add_result_error_for_file(
-				$result,
-				sprintf(
-					/* translators: %s: tool name */
-					__( 'Code Obfuscation tools are not permitted. Detected: %s', 'plugin-check' ),
-					__( 'ionCube', 'plugin-check' )
-				),
-				'obfuscated_code_detected',
-				$obfuscated_file,
-				0,
-				0,
-				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#gpl-no-publicly-documented-resource'
-			);
+		$files = self::files_preg_match_all( '/ionCube/', $php_files );
+
+		if ( ! empty( $files ) ) {
+			foreach ( $files as $file ) {
+				$this->add_result_error_for_file(
+					$result,
+					sprintf(
+						/* translators: %s: tool name */
+						__( 'Code Obfuscation tools are not permitted. Detected: %s', 'plugin-check' ),
+						__( 'ionCube', 'plugin-check' )
+					),
+					'obfuscated_code_detected',
+					$file['file'],
+					$file['line'],
+					$file['column'],
+				  'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#gpl-no-publicly-documented-resource'
+				);
+			}
 		}
 	}
 	/**
