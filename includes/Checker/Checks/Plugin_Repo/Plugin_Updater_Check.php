@@ -182,7 +182,7 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 					$result,
 					sprintf(
 						/* translators: %s: The match updater file name. */
-						__( '<strong>Plugin Updater detected.</strong> These are not permitted in WordPress.org hosted plugins. Detected: %s', 'plugin-check' ),
+						__( '<strong>Plugin Updater detected.</strong><br>These are not permitted in WordPress.org hosted plugins. Detected: %s', 'plugin-check' ),
 						esc_attr( $matches[0] )
 					),
 					'plugin_updater_detected',
@@ -216,11 +216,14 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 					$result,
 					sprintf(
 						/* translators: %s: The match file name. */
-						__( 'Detected code which may be altering WordPress update routines. Detected: %s', 'plugin-check' ),
+						__( '<strong>Plugin Updater detected.</strong><br>Detected code which may be altering WordPress update routines. Detected: %s', 'plugin-check' ),
 						esc_html( $matches[0] )
 					),
 					'update_modification_detected',
-					$updater_file
+					$updater_file,
+					0,
+					0,
+					'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#update-checker'
 				);
 			}
 		}
