@@ -110,21 +110,33 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 */
 	private function check_name( Check_Result $result, string $readme_file, Parser $parser ) {
 		if ( isset( $parser->warnings['invalid_plugin_name_header'] ) && false === $parser->name ) {
-			$message = sprintf(
-				/* translators: %s: Example plugin name header */
-				__( 'Plugin name header in your readme is missing or invalid. Please update your readme with a valid plugin name header. Eg: "%s"', 'plugin-check' ),
-				'=== Example Name ==='
+			$this->add_result_error_for_file(
+				$result,
+				sprintf(
+					/* translators: %s: Example plugin name header */
+					__( 'Plugin name header in your readme is missing or invalid. Please update your readme with a valid plugin name header. Eg: "%s"', 'plugin-check' ),
+					'=== Example Name ==='
+				),
+				'invalid_plugin_name',
+				$readme_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incomplete-readme'
 			);
-
-			$this->add_result_error_for_file( $result, $message, 'invalid_plugin_name', $readme_file );
 		} elseif ( empty( $parser->name ) ) {
-			$message = sprintf(
-				/* translators: %s: Example plugin name header */
-				__( 'We cannot find a plugin name in your readme. Please update your readme with a valid plugin name header. Eg: "%s"', 'plugin-check' ),
-				'=== Example Name ==='
+			$this->add_result_error_for_file(
+				$result,
+				sprintf(
+					/* translators: %s: Example plugin name header */
+					__( 'We cannot find a plugin name in your readme. Please update your readme with a valid plugin name header. Eg: "%s"', 'plugin-check' ),
+					'=== Example Name ==='
+				),
+				'empty_plugin_name',
+				$readme_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incomplete-readme'
 			);
-
-			$this->add_result_error_for_file( $result, $message, 'empty_plugin_name', $readme_file );
 		}
 	}
 
