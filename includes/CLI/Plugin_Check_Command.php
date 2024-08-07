@@ -540,6 +540,9 @@ final class Plugin_Check_Command {
 			foreach ( $line_warnings as $column => $column_warnings ) {
 				foreach ( $column_warnings as $column_warning ) {
 
+					$column_warning['message'] = str_replace( '<br>', "\n", $column_warning['message'] );
+					$column_warning['message'] = wp_strip_all_tags( $column_warning['message'] );
+
 					$file_results[] = array_merge(
 						$column_warning,
 						array(

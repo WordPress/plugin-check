@@ -110,21 +110,33 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 */
 	private function check_name( Check_Result $result, string $readme_file, Parser $parser ) {
 		if ( isset( $parser->warnings['invalid_plugin_name_header'] ) && false === $parser->name ) {
-			$message = sprintf(
-				/* translators: %s: Example plugin name header */
-				__( 'Plugin name header in your readme is missing or invalid. Please update your readme with a valid plugin name header. Eg: "%s"', 'plugin-check' ),
-				'=== Example Name ==='
+			$this->add_result_error_for_file(
+				$result,
+				sprintf(
+					/* translators: %s: Example plugin name header */
+					__( 'Plugin name header in your readme is missing or invalid. Please update your readme with a valid plugin name header. Eg: "%s"', 'plugin-check' ),
+					'=== Example Name ==='
+				),
+				'invalid_plugin_name',
+				$readme_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incomplete-readme'
 			);
-
-			$this->add_result_error_for_file( $result, $message, 'invalid_plugin_name', $readme_file );
 		} elseif ( empty( $parser->name ) ) {
-			$message = sprintf(
-				/* translators: %s: Example plugin name header */
-				__( 'We cannot find a plugin name in your readme. Please update your readme with a valid plugin name header. Eg: "%s"', 'plugin-check' ),
-				'=== Example Name ==='
+			$this->add_result_error_for_file(
+				$result,
+				sprintf(
+					/* translators: %s: Example plugin name header */
+					__( 'We cannot find a plugin name in your readme. Please update your readme with a valid plugin name header. Eg: "%s"', 'plugin-check' ),
+					'=== Example Name ==='
+				),
+				'empty_plugin_name',
+				$readme_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incomplete-readme'
 			);
-
-			$this->add_result_error_for_file( $result, $message, 'empty_plugin_name', $readme_file );
 		}
 	}
 
@@ -181,11 +193,14 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 							$result,
 							sprintf(
 								/* translators: %s: plugin header tag */
-								__( 'The "%s" field is missing.', 'plugin-check' ),
+								__( '<strong>Your readme is either missing or incomplete.</strong><br>The "%s" field is missing. Your readme has to have headers as well as a proper description and documentation as to how it works and how one can use it.', 'plugin-check' ),
 								$field['label']
 							),
 							'missing_readme_header',
-							$readme_file
+							$readme_file,
+							0,
+							0,
+							'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incomplete-readme'
 						);
 					}
 				}
@@ -214,9 +229,12 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		) {
 			$this->add_result_warning_for_file(
 				$result,
-				__( 'The readme appears to contain default text.', 'plugin-check' ),
+				__( '<strong>The readme appears to contain default text.</strong><br>This means your readme has to have headers as well as a proper description and documentation as to how it works and how one can use it.', 'plugin-check' ),
 				'default_readme_text',
-				$readme_file
+				$readme_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incomplete-readme'
 			);
 		}
 	}
@@ -239,9 +257,12 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		if ( empty( $license ) ) {
 			$this->add_result_error_for_file(
 				$result,
-				__( 'Your plugin has no license declared. Please update your readme with a GPLv2 (or later) compatible license.', 'plugin-check' ),
+				__( '<strong>Your plugin has no license declared.</strong><br>Please update your readme with a GPLv2 (or later) compatible license. It is necessary to declare the license of this plugin. You can do this by using the fields available both in the plugin readme and in the plugin headers.', 'plugin-check' ),
 				'no_license',
-				$readme_file
+				$readme_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#no-gpl-compatible-license-declared'
 			);
 
 			return;
@@ -253,9 +274,12 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		if ( ! preg_match( '/^([a-z0-9\-\+\.]+)(\sor\s([a-z0-9\-\+\.]+))*$/i', $license ) ) {
 			$this->add_result_warning_for_file(
 				$result,
-				__( 'Your plugin has an invalid license declared. Please update your readme with a valid SPDX license identifier.', 'plugin-check' ),
+				__( '<strong>Your plugin has an invalid license declared.</strong><br>Please update your readme with a valid SPDX license identifier.', 'plugin-check' ),
 				'invalid_license',
-				$readme_file
+				$readme_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#no-gpl-compatible-license-declared'
 			);
 		}
 
@@ -264,9 +288,12 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		if ( ! $has_license ) {
 			$this->add_result_error_for_file(
 				$result,
-				__( 'Your plugin has no license declared in Plugin Header. Please update your plugin header with a GPLv2 (or later) compatible license.', 'plugin-check' ),
+				__( '<strong>Your plugin has no license declared in Plugin Header.</strong><br>Please update your plugin header with a GPLv2 (or later) compatible license. It is necessary to declare the license of this plugin. You can do this by using the fields available both in the plugin readme and in the plugin headers.', 'plugin-check' ),
 				'no_license',
-				$plugin_main_file
+				$plugin_main_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#no-gpl-compatible-license-declared'
 			);
 		} else {
 			$plugin_license = $this->normalize_licenses( $matches_license[1] );
@@ -276,9 +303,12 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		if ( ! empty( $plugin_license ) && ! preg_match( '/GPL|GNU|MIT|FreeBSD|New BSD|BSD-3-Clause|BSD 3 Clause|OpenLDAP|Expat/im', $plugin_license ) ) {
 			$this->add_result_error_for_file(
 				$result,
-				__( 'Your plugin has an invalid license declared in Plugin Header. Please update your readme with a valid GPL license identifier.', 'plugin-check' ),
+				__( '<strong>Your plugin has an invalid license declared in Plugin Header.</strong><br>Please update your readme with a valid GPL license identifier. It is necessary to declare the license of this plugin. You can do this by using the fields available both in the plugin readme and in the plugin headers.', 'plugin-check' ),
 				'invalid_license',
-				$plugin_main_file
+				$plugin_main_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#no-gpl-compatible-license-declared'
 			);
 		}
 
@@ -286,9 +316,12 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		if ( ! empty( $plugin_license ) && ! empty( $license ) && $license !== $plugin_license ) {
 			$this->add_result_warning_for_file(
 				$result,
-				__( 'Your plugin has a different license declared in the readme file and plugin header. Please update your readme with a valid GPL license identifier.', 'plugin-check' ),
+				__( '<strong>Your plugin has a different license declared in the readme file and plugin header.</strong><br>Please update your readme with a valid GPL license identifier.', 'plugin-check' ),
 				'license_mismatch',
-				$readme_file
+				$readme_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#declared-license-mismatched'
 			);
 		}
 	}
@@ -351,13 +384,12 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		if ( empty( $stable_tag ) ) {
 			$this->add_result_error_for_file(
 				$result,
-				sprintf(
-					/* translators: %s: plugin header tag */
-					__( 'The "%s" field is missing.', 'plugin-check' ),
-					'Stable Tag'
-				),
+				__( '<strong>Incorrect Stable Tag.</strong><br>Your Stable Tag is meant to be the stable version of your plugin, not of WordPress. For your plugin to be properly downloaded from WordPress.org, those values need to be the same. If they’re out of sync, your users won’t get the right version of your code.', 'plugin-check' ),
 				'no_stable_tag',
-				$readme_file
+				$readme_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incorrect-stable-tag'
 			);
 
 			return;
@@ -366,9 +398,12 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		if ( 'trunk' === $stable_tag ) {
 			$this->add_result_error_for_file(
 				$result,
-				__( "It's recommended not to use 'Stable Tag: trunk'.", 'plugin-check' ),
+				__( "<strong>Incorrect Stable Tag.</strong><br>It's recommended not to use 'Stable Tag: trunk'. Your Stable Tag is meant to be the stable version of your plugin, not of WordPress. For your plugin to be properly downloaded from WordPress.org, those values need to be the same. If they’re out of sync, your users won’t get the right version of your code.", 'plugin-check' ),
 				'trunk_stable_tag',
-				$readme_file
+				$readme_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incorrect-stable-tag'
 			);
 		}
 
@@ -381,9 +416,12 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		) {
 			$this->add_result_error_for_file(
 				$result,
-				__( 'The Stable Tag in your readme file does not match the version in your main plugin file.', 'plugin-check' ),
+				__( '<strong>The Stable Tag in your readme file does not match the version in your main plugin file.</strong><br>Your Stable Tag is meant to be the stable version of your plugin, not of WordPress. For your plugin to be properly downloaded from WordPress.org, those values need to be the same. If they’re out of sync, your users won’t get the right version of your code.', 'plugin-check' ),
 				'stable_tag_mismatch',
-				$readme_file
+				$readme_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incorrect-stable-tag'
 			);
 		}
 	}
