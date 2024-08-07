@@ -14,13 +14,13 @@ These are the results and severity levels for each check.
 | Category | Check | Severity |
 | -------- | ------- | ------- |
 | General | Internationalization | 5 |
-| Performace | Enqueued Resources | 5 |
-| Performace | Scripts in Footer | 5 |
-| Performace | Scripts Scope | 5 |
-| Performace | Scripts Size | 5 |
-| Performace | Styles Scope | 5 |
-| Performace | Styles Size | 5 |
-| Performace | Query Parameters | 5 |
+| Performance | Enqueued Resources | 5 |
+| Performance | Scripts in Footer | 5 |
+| Performance | Scripts Scope | 5 |
+| Performance | Scripts Size | 5 |
+| Performance | Styles Scope | 5 |
+| Performance | Styles Size | 5 |
+| Performance | Query Parameters | 5 |
 | Plugin Repo | Code Obfuscation | 8 |
 | Plugin Repo | File Type Check | 8 |
 | Plugin Repo | LocalHost | 8 |
