@@ -41,4 +41,4 @@ These are the results and severity levels for each check.
 | Plugin Repo | Readme No short description | 6 |
 | Plugin Repo | PHP Coding Standards | 5 |
 | Plugin Repo | Updater Check | 9 |
-| Plugin Repo | Trademarks Check | 9 |
+| Plugin Repo | Trademarks Check | 5 |
