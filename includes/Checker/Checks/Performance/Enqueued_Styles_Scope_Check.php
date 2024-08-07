@@ -273,4 +273,30 @@ class Enqueued_Styles_Scope_Check extends Abstract_Runtime_Check implements With
 
 		return $this->viewable_post_types;
 	}
+
+	/**
+	 * Gets the description for the check.
+	 *
+	 * Every check must have a short description explaining what the check does.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string Description.
+	 */
+	public function get_description(): string {
+		return __( 'Checks whether any stylesheets are loaded on all pages, which is usually not desirable and can lead to performance issues.', 'plugin-check' );
+	}
+
+	/**
+	 * Gets the documentation URL for the check.
+	 *
+	 * Every check must have a URL with further information about the check.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string The documentation URL.
+	 */
+	public function get_documentation_url(): string {
+		return __( 'https://developer.wordpress.org/plugins/', 'plugin-check' );
+	}
 }

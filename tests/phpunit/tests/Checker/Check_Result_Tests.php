@@ -60,6 +60,7 @@ class Check_Result_Tests extends WP_UnitTestCase {
 			'message'  => 'Warning message',
 			'code'     => 'test_warning',
 			'link'     => '',
+			'docs'     => '',
 			'severity' => 5,
 		);
 
@@ -95,6 +96,7 @@ class Check_Result_Tests extends WP_UnitTestCase {
 			'message'  => 'Error message',
 			'code'     => 'test_error',
 			'link'     => '',
+			'docs'     => '',
 			'severity' => 5,
 		);
 
@@ -127,6 +129,7 @@ class Check_Result_Tests extends WP_UnitTestCase {
 			'message'  => 'Error message',
 			'code'     => 'test_error',
 			'link'     => '',
+			'docs'     => '',
 			'severity' => 5,
 		);
 
@@ -159,6 +162,7 @@ class Check_Result_Tests extends WP_UnitTestCase {
 			'message'  => 'Warning message',
 			'code'     => 'test_warning',
 			'link'     => '',
+			'docs'     => '',
 			'severity' => 5,
 		);
 

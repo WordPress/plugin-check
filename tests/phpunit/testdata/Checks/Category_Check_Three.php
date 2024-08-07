@@ -18,4 +18,12 @@ class Category_Check_Three implements Static_Check {
 	public function get_categories() {
 		return array( Check_Categories::CATEGORY_SECURITY );
 	}
+
+	public function get_description(): string {
+		return '';
+	}
+
+	public function get_documentation_url(): string {
+		return '';
+	}
 }

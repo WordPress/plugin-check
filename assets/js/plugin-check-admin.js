@@ -431,6 +431,7 @@
 			for ( const column in results[ line ] ) {
 				for ( let i = 0; i < results[ line ][ column ].length; i++ ) {
 					const message = results[ line ][ column ][ i ].message;
+					const docs = results[ line ][ column ][ i ].docs;
 					const code = results[ line ][ column ][ i ].code;
 					const link = results[ line ][ column ][ i ].link;
 
@@ -441,6 +442,7 @@
 							column,
 							type,
 							message,
+							docs,
 							code,
 							link,
 							hasLinks,

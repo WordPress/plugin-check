@@ -8,6 +8,7 @@
 namespace WordPress\Plugin_Check\CLI;
 
 use Exception;
+use WordPress\Plugin_Check\Checker\Check;
 use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Repository;
 use WordPress\Plugin_Check\Checker\CLI_Runner;
@@ -336,12 +337,19 @@ final class Plugin_Check_Command {
 
 		$all_checks = array();
 
+		/**
+		 * All checks to list.
+		 *
+		 * @var Check $check
+		 */
 		foreach ( $collection as $key => $check ) {
 			$item = array();
 
-			$item['slug']      = $key;
-			$item['stability'] = strtolower( $check->get_stability() );
-			$item['category']  = join( ', ', $check->get_categories() );
+			$item['slug']        = $key;
+			$item['stability']   = strtolower( $check->get_stability() );
+			$item['category']    = join( ', ', $check->get_categories() );
+			$item['description'] = $check->get_description();
+			$item['url']         = $check->get_documentation_url();
 
 			$all_checks[] = $item;
 		}
@@ -353,6 +361,8 @@ final class Plugin_Check_Command {
 				'slug',
 				'category',
 				'stability',
+				'description',
+				'url',
 			)
 		);
 
@@ -496,6 +506,7 @@ final class Plugin_Check_Command {
 			'column',
 			'code',
 			'message',
+			'docs',
 		);
 
 		// If both errors and warnings are included, display the type of each result too.
@@ -506,6 +517,7 @@ final class Plugin_Check_Command {
 				'type',
 				'code',
 				'message',
+				'docs',
 			);
 		}
 
@@ -530,6 +542,9 @@ final class Plugin_Check_Command {
 			foreach ( $line_errors as $column => $column_errors ) {
 				foreach ( $column_errors as $column_error ) {
 
+					$column_error['message'] = str_replace( '<br>', "\n", $column_error['message'] );
+					$column_error['message'] = wp_strip_all_tags( $column_error['message'] );
+
 					$file_results[] = array_merge(
 						$column_error,
 						array(
@@ -545,6 +560,9 @@ final class Plugin_Check_Command {
 		foreach ( $file_warnings as $line => $line_warnings ) {
 			foreach ( $line_warnings as $column => $column_warnings ) {
 				foreach ( $column_warnings as $column_warning ) {
+
+					$column_warning['message'] = str_replace( '<br>', "\n", $column_warning['message'] );
+					$column_warning['message'] = wp_strip_all_tags( $column_warning['message'] );
 
 					$file_results[] = array_merge(
 						$column_warning,
