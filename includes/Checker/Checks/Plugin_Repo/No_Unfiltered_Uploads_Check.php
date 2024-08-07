@@ -52,7 +52,7 @@ class No_Unfiltered_Uploads_Check extends Abstract_File_Check {
 				$result,
 				sprintf(
 					/* translators: %s: ALLOW_UNFILTERED_UPLOADS */
-					__( '<strong>%s is not permitted.</strong><br>Setting this constant to true will allow the user to upload any type of file (including PHP and other executables), creating serious potential security risks', 'plugin-check' ),
+					__( '<strong>%s is not permitted.</strong><br>Setting this constant to true will allow the user to upload any type of file (including PHP and other executables), creating serious potential security risks.', 'plugin-check' ),
 					'<code>ALLOW_UNFILTERED_UPLOADS</code>'
 				),
 				'allow_unfiltered_uploads_detected',
