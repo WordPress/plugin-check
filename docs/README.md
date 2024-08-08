@@ -21,7 +21,7 @@ These are the results and severity levels for each check.
 | Performance | Styles Scope | 5 |
 | Performance | Styles Size | 5 |
 | Performance | Query Parameters | 5 |
-| Plugin Repo | Code Obfuscation | 8 |
+| Plugin Repo | Code Obfuscation | 6 |
 | Plugin Repo | File Type Check | 8 |
 | Plugin Repo | LocalHost | 8 |
 | Plugin Repo | Unfiltered Uploads | 7 |
