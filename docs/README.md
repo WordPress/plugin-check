@@ -38,7 +38,6 @@ These are the results and severity levels for each check.
 | Plugin Repo | Readme Ignored Tags | 5 |
 | Plugin Repo | Readme No short description | 6 |
 | Plugin Repo | Readme Trimmed short description | 6 |
-| Plugin Repo | Readme No short description | 6 |
 | Plugin Repo | PHP Coding Standards | 5 |
 | Plugin Repo | Updater Check | 9 |
 | Plugin Repo | Trademarks Check | 5 |

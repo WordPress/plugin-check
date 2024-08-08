@@ -119,7 +119,8 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 				$plugin_main_file,
 				0,
 				0,
-				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#update-checker'
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#update-checker',
+				9
 			);
 		}
 	}
@@ -149,7 +150,8 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 					$file,
 					0,
 					0,
-					'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#update-checker'
+					'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#update-checker',
+					9
 				);
 			}
 		}
@@ -186,7 +188,11 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 						esc_attr( $matches[0] )
 					),
 					'plugin_updater_detected',
-					$updater_file
+					$updater_file,
+					0,
+					0,
+					'',
+					9
 				);
 			}
 		}
@@ -223,7 +229,8 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 					$updater_file,
 					0,
 					0,
-					'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#update-checker'
+					'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#update-checker',
+					9
 				);
 			}
 		}

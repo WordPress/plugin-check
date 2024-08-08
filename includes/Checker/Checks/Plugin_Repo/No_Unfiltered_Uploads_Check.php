@@ -59,7 +59,8 @@ class No_Unfiltered_Uploads_Check extends Abstract_File_Check {
 				$file,
 				0,
 				0,
-				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#files-unfiltered-uploads'
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#files-unfiltered-uploads',
+				7
 			);
 		}
 	}

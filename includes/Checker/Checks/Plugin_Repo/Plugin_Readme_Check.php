@@ -67,7 +67,11 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				$result,
 				__( 'The plugin readme.txt does not exist.', 'plugin-check' ),
 				'no_plugin_readme',
-				'readme.txt'
+				'readme.txt',
+				0,
+				0,
+				'',
+				9
 			);
 
 			return;
@@ -121,7 +125,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				$readme_file,
 				0,
 				0,
-				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incomplete-readme'
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incomplete-readme',
+				9
 			);
 		} elseif ( empty( $parser->name ) ) {
 			$this->add_result_error_for_file(
@@ -135,7 +140,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				$readme_file,
 				0,
 				0,
-				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incomplete-readme'
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incomplete-readme',
+				9
 			);
 		}
 	}
@@ -184,7 +190,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 							$readme_file,
 							0,
 							0,
-							'https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/#readme-header-information'
+							'https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/#readme-header-information',
+							7
 						);
 					}
 				} else {
@@ -234,7 +241,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				$readme_file,
 				0,
 				0,
-				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incomplete-readme'
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incomplete-readme',
+				7
 			);
 		}
 	}
@@ -262,7 +270,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				$readme_file,
 				0,
 				0,
-				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#no-gpl-compatible-license-declared'
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#no-gpl-compatible-license-declared',
+				9
 			);
 
 			return;
@@ -279,7 +288,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				$readme_file,
 				0,
 				0,
-				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#no-gpl-compatible-license-declared'
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#no-gpl-compatible-license-declared',
+				9
 			);
 		}
 
@@ -293,7 +303,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				$plugin_main_file,
 				0,
 				0,
-				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#no-gpl-compatible-license-declared'
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#no-gpl-compatible-license-declared',
+				9
 			);
 		} else {
 			$plugin_license = $this->normalize_licenses( $matches_license[1] );
@@ -308,7 +319,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				$plugin_main_file,
 				0,
 				0,
-				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#no-gpl-compatible-license-declared'
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#no-gpl-compatible-license-declared',
+				9
 			);
 		}
 
@@ -321,7 +333,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				$readme_file,
 				0,
 				0,
-				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#declared-license-mismatched'
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#declared-license-mismatched',
+				9
 			);
 		}
 	}
@@ -389,7 +402,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				$readme_file,
 				0,
 				0,
-				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incorrect-stable-tag'
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incorrect-stable-tag',
+				9
 			);
 
 			return;
@@ -403,7 +417,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				$readme_file,
 				0,
 				0,
-				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incorrect-stable-tag'
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incorrect-stable-tag',
+				9
 			);
 		}
 
@@ -421,7 +436,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				$readme_file,
 				0,
 				0,
-				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incorrect-stable-tag'
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incorrect-stable-tag',
+				9
 			);
 		}
 	}

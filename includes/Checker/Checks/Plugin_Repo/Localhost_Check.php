@@ -56,7 +56,9 @@ class Localhost_Check extends Abstract_File_Check {
 					'localhost_code_detected',
 					$file['file'],
 					$file['line'],
-					$file['column']
+					$file['column'],
+					'',
+					8
 				);
 			}
 		}
