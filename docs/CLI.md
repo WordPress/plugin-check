@@ -1,6 +1,6 @@
 [Back to overview](./README.md)
 
-# wp plugin check 
+# wp plugin check
 
 Runs plugin check.
 
@@ -50,6 +50,12 @@ By default, `.git`, `vendor` and `node_modules` directories are excluded.
 
 [--severity=<severity>]
 : Severity level.
+
+[--error-severity=<error-severity>]
+: Error severity level.
+
+[--warning-severity=<warning-severity>]
+: Warning severity level.
 ```
 ## EXAMPLES
 ```
@@ -58,7 +64,7 @@ wp plugin check akismet --checks=late_escaping
 wp plugin check akismet --format=json
 ```
 
-# wp plugin list-checks 
+# wp plugin list-checks
 
 Lists the available checks for plugins.
 
@@ -89,7 +95,7 @@ wp plugin list-checks
 wp plugin list-checks --format=json
 ```
 
-# wp plugin list-check-categories 
+# wp plugin list-check-categories
 
 Lists the available check categories for plugins.
 
