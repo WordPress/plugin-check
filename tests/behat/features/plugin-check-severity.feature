@@ -140,5 +140,57 @@ Feature: Test that the severity level in plugin check works.
       upgrade_notice_limit,WARNING,5
       """
 
+    When I run the WP-CLI command `plugin check foo-bar-wp --format=csv --fields=code,type,severity --error-severity=6`
+    Then STDOUT should contain:
+      """
+      allow_unfiltered_uploads_detected,ERROR,7
+      """
+    And STDOUT should contain:
+      """
+      obfuscated_code_detected,ERROR,6
+      """
+    And STDOUT should not contain:
+      """
+      WordPress.WP.AlternativeFunctions.rand_mt_rand,ERROR,5
+      """
+    And STDOUT should contain:
+      """
+      outdated_tested_upto_header,ERROR,7
+      """
+    And STDOUT should contain:
+      """
+      default_readme_text,WARNING,7
+      """
+    And STDOUT should contain:
+      """
+      upgrade_notice_limit,WARNING,5
+      """
+
+    When I run the WP-CLI command `plugin check foo-bar-wp --format=csv --fields=code,type,severity --warning-severity=7`
+    Then STDOUT should contain:
+      """
+      allow_unfiltered_uploads_detected,ERROR,7
+      """
+    And STDOUT should contain:
+      """
+      obfuscated_code_detected,ERROR,6
+      """
+    And STDOUT should contain:
+      """
+      WordPress.WP.AlternativeFunctions.rand_mt_rand,ERROR,5
+      """
+    And STDOUT should contain:
+      """
+      outdated_tested_upto_header,ERROR,7
+      """
+    And STDOUT should contain:
+      """
+      default_readme_text,WARNING,7
+      """
+    And STDOUT should not contain:
+      """
+      upgrade_notice_limit,WARNING,5
+      """
+
     When I run the WP-CLI command `plugin check foo-bar-wp --format=csv --fields=code,type,severity --severity=10`
     Then STDOUT should be empty
