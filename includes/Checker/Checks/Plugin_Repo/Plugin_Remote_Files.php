@@ -69,8 +69,8 @@ class Plugin_Remote_Files extends Abstract_File_Check {
 	protected function check_files( Check_Result $result, array $files ) {
 		$php_files = self::filter_files_by_extension( $files, 'php' );
 
-		// Looks for Kwnown URLs.
-		$this->look_for_known_urls( $result, $php_files );
+		// Looks for Kwnown External URLs.
+		$this->look_for_known_urls( $result, $files );
 	}
 
 	/**
@@ -81,7 +81,7 @@ class Plugin_Remote_Files extends Abstract_File_Check {
 	 * @param Check_Result $result    The check result to amend, including the plugin context to check.
 	 * @param array        $php_files List of absolute PHP file paths.
 	 */
-	protected function look_for_known_urls( Check_Result $result, array $php_files ) {
+	protected function look_for_known_urls( Check_Result $result, array $files ) {
 		// Known offloading services.
 		$look_known_offloading_services = array(
 			'code\.jquery\.com',
@@ -114,7 +114,7 @@ class Plugin_Remote_Files extends Abstract_File_Check {
 		);
 
 		$offloaded_pattern = '/(' . implode( '|', $look_known_offloading_services ) . ')/i';
-		$files = self::files_preg_match_all( $offloaded_pattern, $php_files );
+		$files = self::files_preg_match_all( $offloaded_pattern, $files );
 
 		if ( ! empty( $files ) ) {
 			foreach ( $files as $file ) {
