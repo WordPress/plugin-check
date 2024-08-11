@@ -70,7 +70,7 @@ class Plugin_Remote_Files extends Abstract_File_Check {
 		$php_files = self::filter_files_by_extension( $files, 'php' );
 
 		// Looks for Kwnown External URLs.
-		$this->look_for_known_urls( $result, $files );
+		$this->look_for_offloading( $result, $php_files );
 	}
 
 	/**
@@ -81,7 +81,7 @@ class Plugin_Remote_Files extends Abstract_File_Check {
 	 * @param Check_Result $result    The check result to amend, including the plugin context to check.
 	 * @param array        $php_files List of absolute PHP file paths.
 	 */
-	protected function look_for_known_urls( Check_Result $result, array $files ) {
+	protected function look_for_offloading( Check_Result $result, array $files ) {
 		// Known offloading services.
 		$look_known_offloading_services = array(
 			'code\.jquery\.com',
@@ -114,10 +114,32 @@ class Plugin_Remote_Files extends Abstract_File_Check {
 		);
 
 		$offloaded_pattern = '/(' . implode( '|', $look_known_offloading_services ) . ')/i';
-		$files = self::files_preg_match_all( $offloaded_pattern, $files );
+		$files_urls = self::files_preg_match_all( $offloaded_pattern, $files );
 
-		if ( ! empty( $files ) ) {
-			foreach ( $files as $file ) {
+		// Known offloading extensions.
+		$look_known_offloading_ext = array(
+			'css',
+			'svg',
+			'jpg',
+			'jpeg',
+			'gif',
+			'png',
+			'webm',
+			'mp4',
+			'mpg',
+			'mpeg',
+			'mp3',
+			'json'
+		);
+
+		$offloading_ext    = '\.' . implode( '|\.', $look_known_offloading_ext );
+		$offloaded_pattern = '/(https?:\/\/[www\.]?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*(' . $offloading_ext . '){1})[\/]?([\?|#]{1}[-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)?[\s|\'|"]/';
+		$files_ext = self::files_preg_match_all( $offloaded_pattern, $files );
+
+		$files_offloading = array_merge( $files_urls, $files_ext );
+
+		if ( ! empty( $files_offloading ) ) {
+			foreach ( $files_offloading as $file ) {
 				$this->add_result_error_for_file(
 					$result,
 					__( '<strong>Offloaded Content.</strong><br>Offloading images, js, css, and other scripts to your servers or any remote service is disallowed.', 'plugin-check' ),
