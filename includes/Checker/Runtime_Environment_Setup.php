@@ -48,6 +48,10 @@ final class Runtime_Environment_Setup {
 				}
 			);
 
+			if ( ! isset( $_SERVER['HTTP_HOST'] ) ) {
+				$_SERVER['HTTP_HOST'] = '';
+			}
+
 			// Do not send post-install notification email, see https://github.com/WordPress/plugin-check/issues/424.
 			add_filter( 'pre_wp_mail', '__return_false' );
 
