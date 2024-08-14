@@ -108,7 +108,11 @@ class File_Type_Check extends Abstract_File_Check {
 					$result,
 					__( 'Compressed files are not permitted.', 'plugin-check' ),
 					'compressed_files',
-					$file
+					$file,
+					0,
+					0,
+					'',
+					8
 				);
 			}
 		}
@@ -130,7 +134,11 @@ class File_Type_Check extends Abstract_File_Check {
 					$result,
 					__( 'Phar files are not permitted.', 'plugin-check' ),
 					'phar_files',
-					$file
+					$file,
+					0,
+					0,
+					'',
+					8
 				);
 			}
 		}
@@ -170,7 +178,11 @@ class File_Type_Check extends Abstract_File_Check {
 					$is_error,
 					__( 'Version control checkouts should not be present.', 'plugin-check' ),
 					'vcs_present',
-					$dir
+					$dir,
+					0,
+					0,
+					'',
+					8
 				);
 			}
 		}
@@ -193,7 +205,11 @@ class File_Type_Check extends Abstract_File_Check {
 					$result,
 					__( 'Hidden files are not permitted.', 'plugin-check' ),
 					'hidden_files',
-					$file
+					$file,
+					0,
+					0,
+					'',
+					8
 				);
 			}
 		}
@@ -218,7 +234,11 @@ class File_Type_Check extends Abstract_File_Check {
 					$result,
 					__( 'Application files are not permitted.', 'plugin-check' ),
 					'application_detected',
-					$file
+					$file,
+					0,
+					0,
+					'',
+					8
 				);
 			}
 		}
