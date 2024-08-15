@@ -55,8 +55,8 @@ Feature: Test that the WP-CLI command works.
     When I run the WP-CLI command `plugin check foo-single.php --format=csv`
     Then STDOUT should contain:
       """
-      line,column,type,code,message
-      16,15,ERROR,WordPress.WP.AlternativeFunctions.rand_mt_rand,"mt_rand() is discouraged. Use the far less predictable wp_rand() instead."
+      line,column,type,code,message,docs
+      16,15,ERROR,WordPress.WP.AlternativeFunctions.rand_mt_rand,"mt_rand() is discouraged. Use the far less predictable wp_rand() instead.",
       """
 
     When I run the WP-CLI command `plugin check foo-single.php --format=csv --fields=line,column,code`
@@ -69,7 +69,7 @@ Feature: Test that the WP-CLI command works.
     When I run the WP-CLI command `plugin check foo-single.php --format=json`
     Then STDOUT should contain:
       """
-      {"line":16,"column":15,"type":"ERROR","code":"WordPress.WP.AlternativeFunctions.rand_mt_rand","message":"mt_rand() is discouraged. Use the far less predictable wp_rand() instead."}
+      {"line":16,"column":15,"type":"ERROR","code":"WordPress.WP.AlternativeFunctions.rand_mt_rand","message":"mt_rand() is discouraged. Use the far less predictable wp_rand() instead.","docs":""}
       """
 
     When I run the WP-CLI command `plugin check foo-single.php --format=wporg`
@@ -288,4 +288,36 @@ Feature: Test that the WP-CLI command works.
     And STDOUT should contain:
       """
       no_plugin_readme
+      """
+
+  Scenario: Check a plugin from external location but with invalid plugin
+    Given a WP install with the Plugin Check plugin
+    And an empty external-folder/foo-plugin directory
+    And a external-folder/foo-plugin/foo-plugin.php file:
+      """
+      <?php
+      // Not a valid plugin.
+
+      """
+
+    When I try the WP-CLI command `plugin check {RUN_DIR}/non-existent-external-folder/foo-plugin`
+    Then STDOUT should be empty
+    And STDERR should not contain:
+      """
+      no_plugin_readme
+      """
+    And STDERR should contain:
+      """
+      Invalid plugin slug
+      """
+
+    When I try the WP-CLI command `plugin check {RUN_DIR}/external-folder/foo-plugin`
+    Then STDOUT should be empty
+    And STDERR should not contain:
+      """
+      no_plugin_readme
+      """
+    And STDERR should contain:
+      """
+      Invalid plugin slug
       """

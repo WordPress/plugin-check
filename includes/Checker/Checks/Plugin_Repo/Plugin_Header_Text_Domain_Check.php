@@ -75,8 +75,38 @@ class Plugin_Header_Text_Domain_Check implements Static_Check {
 					esc_html( $plugin_slug )
 				),
 				'textdomain_mismatch',
-				$plugin_main_file
+				$plugin_main_file,
+				0,
+				0,
+				'',
+				6
 			);
 		}
+	}
+
+	/**
+	 * Gets the description for the check.
+	 *
+	 * Every check must have a short description explaining what the check does.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string Description.
+	 */
+	public function get_description(): string {
+		return __( 'Verifies the plugin\'s text domain matches the plugin slug.', 'plugin-check' );
+	}
+
+	/**
+	 * Gets the documentation URL for the check.
+	 *
+	 * Every check must have a URL with further information about the check.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string The documentation URL.
+	 */
+	public function get_documentation_url(): string {
+		return __( 'https://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/', 'plugin-check' );
 	}
 }
