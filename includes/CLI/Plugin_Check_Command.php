@@ -230,6 +230,16 @@ final class Plugin_Check_Command {
 			WP_CLI::line( __( 'Cleaning up runtime environment.', 'plugin-check' ) );
 		}
 
+		// Severity.
+		$error_severity   = ! empty( $options['error-severity'] ) ? $options['error-severity'] : $options['severity'];
+		$warning_severity = ! empty( $options['warning-severity'] ) ? $options['warning-severity'] : $options['severity'];
+		$format_is_wporg  = isset( $options['format'] ) && 'wporg' === $options['format'] ? true : false;
+
+		// Defaults error severity for wporg.
+		if ( empty( $error_severity ) && $format_is_wporg ) {
+			$error_severity = 7;
+		}
+
 		// Get errors and warnings from the results.
 		$errors = array();
 		if ( $result && empty( $assoc_args['ignore-errors'] ) ) {
@@ -240,30 +250,18 @@ final class Plugin_Check_Command {
 			$warnings = $result->get_warnings();
 		}
 
-		// Print the json formatted results for WPORG.
-		if ( isset( $options['format'] ) && 'wporg' === $options['format'] ) {
-			$wporg_results = array(
-				'pass'     => empty( $errors ) ? true : false,
-				'errors'   => $errors,
-				'warnings' => $warnings,
-			);
-
-			WP_CLI::line( json_encode( $wporg_results ) );
-			return;
-		}
-
 		// Default fields.
 		$default_fields = $this->get_check_default_fields( $assoc_args );
 
 		// Get formatter.
-		$formatter = $this->get_formatter( $assoc_args, $default_fields );
-
-		// Severity.
-		$error_severity   = ! empty( $options['error-severity'] ) ? $options['error-severity'] : $options['severity'];
-		$warning_severity = ! empty( $options['warning-severity'] ) ? $options['warning-severity'] : $options['severity'];
+		$formatter       = $this->get_formatter( $assoc_args, $default_fields );
 
 		// Print the formatted results.
 		// Go over all files with errors first and print them, combined with any warnings in the same file.
+		$total_results = array(
+			'errors'   => array(),
+			'warnings' => array(),
+		);
 		foreach ( $errors as $file_name => $file_errors ) {
 			$file_warnings = array();
 			if ( isset( $warnings[ $file_name ] ) ) {
@@ -276,8 +274,12 @@ final class Plugin_Check_Command {
 				$file_results = $this->get_filtered_results_by_severity( $file_results, intval( $error_severity ), intval( $warning_severity ) );
 			}
 
-			if ( ! empty( $file_results ) ) {
-				$this->display_results( $formatter, $file_name, $file_results );
+			$file_results_display = array_merge( $file_results['errors'], $file_results['warnings'] );
+			if ( $format_is_wporg ) {
+				$total_results['errors']   = array_merge( $total_results['errors'], $file_results['errors'] );
+				$total_results['warnings'] = array_merge( $total_results['warnings'], $file_results['warnings'] );
+			} elseif ( ! empty( $file_results_display ) ) {
+				$this->display_results( $formatter, $file_name, $file_results_display );
 			}
 		}
 
@@ -289,9 +291,17 @@ final class Plugin_Check_Command {
 				$file_results = $this->get_filtered_results_by_severity( $file_results, intval( $error_severity ), intval( $warning_severity ) );
 			}
 
-			if ( ! empty( $file_results ) ) {
-				$this->display_results( $formatter, $file_name, $file_results );
+			$file_results_display = array_merge( $file_results['errors'], $file_results['warnings'] );
+			if ( $format_is_wporg ) {
+				$total_results['errors']   = array_merge( $total_results['errors'], $file_results['errors'] );
+				$total_results['warnings'] = array_merge( $total_results['warnings'], $file_results['warnings'] );
+			} elseif ( ! empty( $file_results_display ) ) {
+				$this->display_results( $formatter, $file_name, $file_results_display );
 			}
+		}
+
+		if ( $format_is_wporg ) {
+			WP_CLI::line( json_encode( $total_results ) );
 		}
 	}
 
@@ -690,6 +700,9 @@ final class Plugin_Check_Command {
 			}
 		);
 
-		return array_merge( $errors, $warnings );
+		return array(
+			'errors'   => $errors,
+			'warnings' => $warnings
+		);
 	}
 }
