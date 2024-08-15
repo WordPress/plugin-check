@@ -254,7 +254,7 @@ final class Plugin_Check_Command {
 		$default_fields = $this->get_check_default_fields( $assoc_args );
 
 		// Get formatter.
-		$formatter       = $this->get_formatter( $assoc_args, $default_fields );
+		$formatter = $this->get_formatter( $assoc_args, $default_fields );
 
 		// Print the formatted results.
 		// Go over all files with errors first and print them, combined with any warnings in the same file.
@@ -702,7 +702,7 @@ final class Plugin_Check_Command {
 
 		return array(
 			'errors'   => $errors,
-			'warnings' => $warnings
+			'warnings' => $warnings,
 		);
 	}
 }
