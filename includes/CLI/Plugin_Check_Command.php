@@ -74,7 +74,7 @@ final class Plugin_Check_Command {
 	 * Applies after evaluating `--checks`.
 	 *
 	 * [--format=<format>]
-	 * : Format to display the results. Options are table, csv, and json. The default will be a table.
+	 * : Format to display the results. Options are table, csv, json, and wporg. The default will be a table.
 	 * ---
 	 * default: table
 	 * options:
