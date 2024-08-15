@@ -275,7 +275,7 @@ final class Plugin_Check_Command {
 
 			if ( ! empty( $file_results ) ) {
 				if ( $format_is_wporg ) {
-					$total_results = $file_results;
+					$total_results = array_merge( $total_results, $file_results );
 				} else {
 					$this->display_results( $formatter, $file_name, $file_results );
 				}
@@ -727,8 +727,8 @@ final class Plugin_Check_Command {
 		);
 
 		return array(
-			'errors'   => $errors,
-			'warnings' => $warnings,
+			'errors'   => array_values( $errors ),
+			'warnings' => array_values( $warnings ),
 		);
 	}
 }
