@@ -72,12 +72,6 @@ Feature: Test that the WP-CLI command works.
       {"line":16,"column":15,"type":"ERROR","code":"WordPress.WP.AlternativeFunctions.rand_mt_rand","message":"mt_rand() is discouraged. Use the far less predictable wp_rand() instead.","docs":""}
       """
 
-    When I run the WP-CLI command `plugin check foo-single.php --format=wporg`
-    Then STDOUT should contain:
-      """
-      {"pass":false,"errors":{"foo-single.php":{"17":{"10":[{"message":"All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$number'.","code":"WordPress.Security.EscapeOutput.OutputNotEscaped","link":null}]},"16":{"15":[{"message":"mt_rand() is discouraged. Use the far less predictable wp_rand() instead.","code":"WordPress.WP.AlternativeFunctions.rand_mt_rand","link":null}]}}},"warnings":[]}
-      """
-
     When I run the WP-CLI command `plugin check foo-single.php --ignore-errors`
     Then STDOUT should be empty
 
@@ -320,4 +314,68 @@ Feature: Test that the WP-CLI command works.
     And STDERR should contain:
       """
       Invalid plugin slug
+      """
+
+  Scenario: Check a plugin and display output in "wporg" format
+    Given a WP install with the Plugin Check plugin
+    And a wp-content/plugins/foo-bar-wp/foo-bar-wp.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Bar WP
+       * Plugin URI: https://example.com
+       * Description: Custom plugin.
+       * Version: 0.1.0
+       * Requires at least: 6.0
+       * Requires PHP: 7.0
+       * Author: WordPress Team
+       * Author URI: https://make.wordpress.org/plugins/
+       * License: GPL-2.0+
+       * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+       * Text Domain: foo-bar-wp
+       */
+
+      // This file was encoded by.
+      define( 'ALLOW_UNFILTERED_UPLOADS', true );
+
+      add_action(
+        'init',
+        function () {
+          $number = mt_rand( 10, 100 );
+          echo $number;
+        }
+      );
+      """
+    And a wp-content/plugins/foo-bar-wp/readme.txt file:
+      """
+      === Foo Bar WP ===
+
+      Contributors: wordpressdotorg
+      Tags: foo, bar, tag1
+      Tested up to: 6.5
+      Stable tag: 0.1.0
+      License: GPLv2 or later
+      License URI: http://www.gnu.org/licenses/gpl-2.0.html
+
+      Short description will be here.
+
+      == Description ==
+
+      Long description will be here. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+      == Upgrade Notice ==
+
+      Long upgrade notice here. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+      """
+
+    When I run the WP-CLI command `plugin check foo-bar-wp --format=wporg`
+    Then STDOUT should be:
+      """
+      {"errors":[{"message":"Tested up to: 6.5 < 6.6.\nThe \"Tested up to\" value in your plugin is not set to the current version of WordPress. This means your plugin will not show up in searches, as we require plugins to be compatible and documented as tested up to the most recent version of WordPress.","code":"outdated_tested_upto_header","link":null,"docs":"https:\/\/developer.wordpress.org\/plugins\/wordpress-org\/how-your-readme-txt-works\/#readme-header-information","severity":7,"type":"ERROR","line":0,"column":0}],"warnings":{"1":{"message":"The readme appears to contain default text.\nThis means your readme has to have headers as well as a proper description and documentation as to how it works and how one can use it.","code":"default_readme_text","link":null,"docs":"https:\/\/developer.wordpress.org\/plugins\/wordpress-org\/common-issues\/#incomplete-readme","severity":7,"type":"WARNING","line":0,"column":0},"2":{"message":"The upgrade notice exceeds the limit of 300 characters.","code":"upgrade_notice_limit","link":null,"docs":"","severity":5,"type":"WARNING","line":0,"column":0}}}
+      """
+
+    When I run the WP-CLI command `plugin check foo-bar-wp --error-severity=8 --format=wporg`
+    Then STDOUT should be:
+      """
+      {"errors":[],"warnings":[{"message":"The readme appears to contain default text.\nThis means your readme has to have headers as well as a proper description and documentation as to how it works and how one can use it.","code":"default_readme_text","link":null,"docs":"https:\/\/developer.wordpress.org\/plugins\/wordpress-org\/common-issues\/#incomplete-readme","severity":7,"type":"WARNING","line":0,"column":0},{"message":"The upgrade notice exceeds the limit of 300 characters.","code":"upgrade_notice_limit","link":null,"docs":"","severity":5,"type":"WARNING","line":0,"column":0}]}
       """
