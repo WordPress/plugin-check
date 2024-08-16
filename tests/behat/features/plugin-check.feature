@@ -252,6 +252,65 @@ Feature: Test that the WP-CLI command works.
       mt_rand() is discouraged.
       """
 
+  Scenario: Perform runtime check for multi-file plugin
+    Given a WP install with the Plugin Check plugin
+    And a wp-content/plugins/foo-sample/foo-sample.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Sample
+       * Plugin URI: https://example.com
+       * Description: Custom plugin.
+       * Version: 0.1.0
+       * Author: WordPress Performance Team
+       * Author URI: https://make.wordpress.org/performance/
+       * License: GPL-2.0+
+       * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+       */
+
+      add_action(
+        'init',
+        function () {
+          $number = mt_rand( 10, 100 );
+          echo absint( $number );
+        }
+      );
+
+      add_action(
+        'wp_enqueue_scripts',
+        function() {
+          wp_enqueue_style(
+            'style',
+            plugin_dir_url( __FILE__ ) . 'style.css',
+            array(),
+            '1.0'
+          );
+        }
+      );
+
+      """
+    And a wp-content/plugins/foo-sample/style.css file:
+      """
+      a {
+        text-decoration: underline;
+      }
+      """
+
+    When I run the WP-CLI command `plugin activate foo-sample`
+    And I run the WP-CLI command `plugin check foo-sample --fields=code,type --format=csv --require=./wp-content/plugins/plugin-check/cli.php`
+    Then STDOUT should contain:
+      """
+      WordPress.WP.AlternativeFunctions.rand_mt_rand,ERROR
+      """
+    And STDOUT should contain:
+      """
+      EnqueuedStylesScope,WARNING
+      """
+    And STDOUT should contain:
+      """
+      no_plugin_readme,WARNING
+      """
+
   Scenario: Check a plugin from external location
     Given a WP install with the Plugin Check plugin
     And an empty external-folder/foo-plugin directory
