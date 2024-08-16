@@ -504,14 +504,13 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				),
 			),
 			'requires_php_header_ignored'  => array(
-				'message'  => sprintf(
+				'message' => sprintf(
 					/* translators: 1: plugin header tag; 2: Example version 5.2.4. 3: Example version 7.0. */
 					__( 'The "%1$s" field was ignored. This field should only contain a PHP version such as "%2$s" or "%3$s".', 'plugin-check' ),
 					'Requires PHP',
 					'5.2.4',
 					'7.0'
 				),
-				'severity' => 5,
 			),
 			'tested_header_ignored'        => array(
 				'message'  => sprintf(
