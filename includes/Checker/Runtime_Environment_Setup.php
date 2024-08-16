@@ -49,7 +49,8 @@ final class Runtime_Environment_Setup {
 			);
 
 			if ( ! isset( $_SERVER['HTTP_HOST'] ) ) {
-				$_SERVER['HTTP_HOST'] = get_option( 'siteurl' );
+				$site_url             = get_option( 'siteurl' );
+				$_SERVER['HTTP_HOST'] = preg_replace( '#^https?://#', '', rtrim( $site_url, '/' ) );
 			}
 
 			// Do not send post-install notification email, see https://github.com/WordPress/plugin-check/issues/424.
