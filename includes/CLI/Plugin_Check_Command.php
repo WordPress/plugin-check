@@ -554,7 +554,7 @@ final class Plugin_Check_Command {
 			foreach ( $line_errors as $column => $column_errors ) {
 				foreach ( $column_errors as $column_error ) {
 
-					$column_error['message'] = str_replace( array( '<br>', '<strong>', '</strong>', '<code>', '</code>' ), array( ' ', '', '', '', '' ), $column_error['message'] );
+					$column_error['message'] = str_replace( array( '<br>', '<strong>', '</strong>', '<code>', '</code>' ), array( ' ', '', '', '`', '`' ), $column_error['message'] );
 
 					$file_results[] = array_merge(
 						$column_error,
@@ -572,7 +572,7 @@ final class Plugin_Check_Command {
 			foreach ( $line_warnings as $column => $column_warnings ) {
 				foreach ( $column_warnings as $column_warning ) {
 
-					$column_warning['message'] = str_replace( array( '<br>', '<strong>', '</strong>', '<code>', '</code>' ), array( ' ', '', '', '', '' ), $column_warning['message'] );
+					$column_warning['message'] = str_replace( array( '<br>', '<strong>', '</strong>', '<code>', '</code>' ), array( ' ', '', '', '`', '`' ), $column_warning['message'] );
 
 					$file_results[] = array_merge(
 						$column_warning,
