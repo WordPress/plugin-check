@@ -75,7 +75,11 @@ class Plugin_Header_Text_Domain_Check implements Static_Check {
 					esc_html( $plugin_slug )
 				),
 				'textdomain_mismatch',
-				$plugin_main_file
+				$plugin_main_file,
+				0,
+				0,
+				'',
+				6
 			);
 		}
 	}

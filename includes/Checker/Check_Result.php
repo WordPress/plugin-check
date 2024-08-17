@@ -95,12 +95,13 @@ final class Check_Result {
 	 */
 	public function add_message( $error, $message, $args = array() ) {
 		$defaults = array(
-			'code'   => '',
-			'file'   => '',
-			'line'   => 0,
-			'column' => 0,
-			'link'   => '',
-			'docs'   => '',
+			'code'     => '',
+			'file'     => '',
+			'line'     => 0,
+			'column'   => 0,
+			'link'     => '',
+			'docs'     => '',
+			'severity' => 5,
 		);
 
 		$data = array_merge(

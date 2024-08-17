@@ -110,7 +110,8 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 					$file['file'],
 					$file['line'],
 					$file['column'],
-					'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#gpl-no-publicly-documented-resource'
+					'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#gpl-no-publicly-documented-resource',
+					6
 				);
 			}
 		}
@@ -140,7 +141,8 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 					$file['file'],
 					$file['line'],
 					$file['column'],
-					'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#gpl-no-publicly-documented-resource'
+					'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#gpl-no-publicly-documented-resource',
+					6
 				);
 			}
 		}
@@ -170,7 +172,8 @@ class Code_Obfuscation_Check extends Abstract_File_Check {
 					$file['file'],
 					$file['line'],
 					$file['column'],
-					'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#gpl-no-publicly-documented-resource'
+					'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#gpl-no-publicly-documented-resource',
+					6
 				);
 			}
 		}

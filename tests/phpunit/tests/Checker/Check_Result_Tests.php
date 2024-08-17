@@ -57,10 +57,11 @@ class Check_Result_Tests extends WP_UnitTestCase {
 
 		// Tests the warning exists in the array.
 		$expected = array(
-			'message' => 'Warning message',
-			'code'    => 'test_warning',
-			'link'    => '',
-			'docs'    => '',
+			'message'  => 'Warning message',
+			'code'     => 'test_warning',
+			'link'     => '',
+			'docs'     => '',
+			'severity' => 5,
 		);
 
 		$this->assertEquals( $expected, $warnings['test-plugin.php'][12][40][0] );
@@ -92,10 +93,11 @@ class Check_Result_Tests extends WP_UnitTestCase {
 
 		// Tests the error exists in the array.
 		$expected = array(
-			'message' => 'Error message',
-			'code'    => 'test_error',
-			'link'    => '',
-			'docs'    => '',
+			'message'  => 'Error message',
+			'code'     => 'test_error',
+			'link'     => '',
+			'docs'     => '',
+			'severity' => 5,
 		);
 
 		$this->assertEquals( $expected, $errors['test-plugin.php'][22][30][0] );
@@ -124,10 +126,11 @@ class Check_Result_Tests extends WP_UnitTestCase {
 
 		// Tests the error exists in the array.
 		$expected = array(
-			'message' => 'Error message',
-			'code'    => 'test_error',
-			'link'    => '',
-			'docs'    => '',
+			'message'  => 'Error message',
+			'code'     => 'test_error',
+			'link'     => '',
+			'docs'     => '',
+			'severity' => 5,
 		);
 
 		$this->assertEquals( $expected, $errors['test-plugin.php'][22][30][0] );
@@ -156,10 +159,11 @@ class Check_Result_Tests extends WP_UnitTestCase {
 
 		// Tests the warning exists in the array.
 		$expected = array(
-			'message' => 'Warning message',
-			'code'    => 'test_warning',
-			'link'    => '',
-			'docs'    => '',
+			'message'  => 'Warning message',
+			'code'     => 'test_warning',
+			'link'     => '',
+			'docs'     => '',
+			'severity' => 5,
 		);
 
 		$this->assertEquals( $expected, $warnings['test-plugin.php'][22][30][0] );
