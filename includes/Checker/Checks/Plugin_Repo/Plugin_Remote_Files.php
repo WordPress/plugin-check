@@ -115,6 +115,7 @@ class Plugin_Remote_Files extends Abstract_File_Check {
 
 		$offloaded_pattern = '/(' . implode( '|', $look_known_offloading_services ) . ')/i';
 		$files_urls = self::files_preg_match_all( $offloaded_pattern, $files );
+		$files_urls = empty( $files_urls ) ? array() : $files_urls;
 
 		// Known offloading extensions.
 		$look_known_offloading_ext = array(
@@ -135,6 +136,7 @@ class Plugin_Remote_Files extends Abstract_File_Check {
 		$offloading_ext    = '\.' . implode( '|\.', $look_known_offloading_ext );
 		$offloaded_pattern = '/(https?:\/\/[www\.]?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*(' . $offloading_ext . '){1})[\/]?([\?|#]{1}[-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)?[\s|\'|"]/';
 		$files_ext = self::files_preg_match_all( $offloaded_pattern, $files );
+		$files_ext = empty( $files_ext ) ? array() : $files_ext;
 
 		$files_offloading = array_merge( $files_urls, $files_ext );
 
