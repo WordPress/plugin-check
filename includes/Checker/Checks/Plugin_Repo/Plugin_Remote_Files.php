@@ -71,6 +71,8 @@ class Plugin_Remote_Files extends Abstract_File_Check {
 
 		// Looks for Kwnown External URLs.
 		$this->look_for_offloading( $result, $php_files );
+
+		$this->look_functions_offloading( $result, $php_files );
 	}
 
 	/**
@@ -141,6 +143,36 @@ class Plugin_Remote_Files extends Abstract_File_Check {
 		$files_offloading = array_merge( $files_urls, $files_ext );
 
 		if ( ! empty( $files_offloading ) ) {
+			foreach ( $files_offloading as $file ) {
+				$this->add_result_error_for_file(
+					$result,
+					__( '<strong>Offloaded Content.</strong><br>Offloading images, js, css, and other scripts to your servers or any remote service is disallowed.', 'plugin-check' ),
+					'external_offloaded',
+					$file['file'],
+					$file['line'],
+					$file['column'],
+					'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#calling-files-remotely'
+				);
+			}
+		}
+	}
+
+	/**
+	 * Looks for functions that makes remote calls.
+	 *
+	 * @since n.e.x.t.
+	 *
+	 * @param Check_Result $result    The check result to amend, including the plugin context to check.
+	 * @param array        $php_files List of absolute PHP file paths.
+	 */
+	protected function look_functions_offloading( Check_Result $result, array $files ) {
+		$files_offloading = self::files_preg_match_all( '/wp_(register|enqueue)_(script|style)\s*\(/', $files );
+		$files_offloading = empty( $files_offloading ) ? array() : $files_offloading;
+
+		if ( ! empty( $files_offloading ) ) {
+			// TODO: filter functions that are using external services.
+
+
 			foreach ( $files_offloading as $file ) {
 				$this->add_result_error_for_file(
 					$result,
