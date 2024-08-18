@@ -17,7 +17,7 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
 /**
  * Check to detect plugin updater.
  *
- * @since 1.0.0
+ * @since n.e.x.t.
  */
 class Plugin_Remote_Files extends Abstract_File_Check {
 
@@ -27,7 +27,7 @@ class Plugin_Remote_Files extends Abstract_File_Check {
 	/**
 	 * Bitwise flags to control check behavior.
 	 *
-	 * @since 1.0.0
+	 * @since n.e.x.t.
 	 * @var int
 	 */
 	protected $flags = 0;
@@ -35,9 +35,7 @@ class Plugin_Remote_Files extends Abstract_File_Check {
 	/**
 	 * Constructor.
 	 *
-	 * @since 1.0.0
-	 *
-	 * @param int $flags Bitwise flags to control check behavior.
+	 * @since n.e.x.t.
 	 */
 	public function __construct() {
 	}
@@ -47,7 +45,7 @@ class Plugin_Remote_Files extends Abstract_File_Check {
 	 *
 	 * Every check must have at least one category.
 	 *
-	 * @since 1.0.0
+	 * @since n.e.x.t.
 	 *
 	 * @return array The categories for the check.
 	 */
@@ -58,7 +56,7 @@ class Plugin_Remote_Files extends Abstract_File_Check {
 	/**
 	 * Amends the given result by running the check on the given list of files.
 	 *
-	 * @since 1.0.0
+	 * @since n.e.x.t.
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 * @param array        $files  List of absolute file paths.
@@ -69,7 +67,7 @@ class Plugin_Remote_Files extends Abstract_File_Check {
 	protected function check_files( Check_Result $result, array $files ) {
 		$php_files = self::filter_files_by_extension( $files, 'php' );
 
-		// Looks for Kwnown External URLs.
+		// Looks for Known External URLs.
 		$this->look_for_offloading( $result, $php_files );
 
 		$this->look_functions_offloading( $result, $php_files );
@@ -80,8 +78,8 @@ class Plugin_Remote_Files extends Abstract_File_Check {
 	 *
 	 * @since n.e.x.t.
 	 *
-	 * @param Check_Result $result    The check result to amend, including the plugin context to check.
-	 * @param array        $php_files List of absolute PHP file paths.
+	 * @param Check_Result $result The check result to amend, including the plugin context to check.
+	 * @param array        $files  List of absolute PHP file paths.
 	 */
 	protected function look_for_offloading( Check_Result $result, array $files ) {
 		// Known offloading services.
