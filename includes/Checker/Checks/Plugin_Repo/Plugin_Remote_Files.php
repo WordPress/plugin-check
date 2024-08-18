@@ -166,6 +166,10 @@ class Plugin_Remote_Files extends Abstract_File_Check {
 	 * @param array        $php_files List of absolute PHP file paths.
 	 */
 	protected function look_functions_offloading( Check_Result $result, array $files ) {
+
+		// TODO: preg_match for functions?.
+
+
 		$files_offloading = self::files_preg_match_all( '/wp_(register|enqueue)_(script|style)\s*\(/', $files );
 		$files_offloading = empty( $files_offloading ) ? array() : $files_offloading;
 
