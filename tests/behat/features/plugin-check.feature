@@ -397,6 +397,14 @@ Feature: Test that the WP-CLI command works.
             'standard'   => plugin_dir_path( __FILE__ ) . 'postsperpage.xml',
           );
         }
+
+        public function get_description(): string {
+          return '';
+        }
+
+        public function get_documentation_url(): string {
+          return '';
+        }
       }
       """
     And a wp-content/plugins/pcp-addon/class-prohibited-text-check.php file:
@@ -424,9 +432,21 @@ Feature: Test that the WP-CLI command works.
               $result,
               __( 'Prohibited text found.', 'pcp-addon' ),
               'prohibited_text_detected',
-              $file
+              $file,
+              0,
+              0,
+              '',
+              8
             );
           }
+        }
+
+        public function get_description(): string {
+          return '';
+        }
+
+        public function get_documentation_url(): string {
+          return '';
         }
       }
       """
