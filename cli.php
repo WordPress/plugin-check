@@ -34,8 +34,17 @@ if ( ! isset( $context ) ) {
 
 // Create the CLI command instance and add to WP CLI.
 $plugin_command = new Plugin_Check_Command( $context );
-WP_CLI::add_command( 'plugin', $plugin_command );
-
+WP_CLI::add_command(
+	'plugin',
+	$plugin_command,
+	array(
+		'after_invoke' => function () {
+			if ( file_exists( ABSPATH . 'wp-content/object-cache.php' ) ) {
+				unlink( ABSPATH . 'wp-content/object-cache.php' );
+			}
+		},
+	)
+);
 
 /**
  * Adds hook to set up the object-cache.php drop-in file.
@@ -50,22 +59,6 @@ WP_CLI::add_hook(
 				if ( ! copy( __DIR__ . '/drop-ins/object-cache.copy.php', ABSPATH . 'wp-content/object-cache.php' ) ) {
 					WP_CLI::error( 'Unable to copy object-cache.php file.' );
 				}
-			}
-		}
-	}
-);
-
-/**
- * Removed object-cache.php in the end.
- *
- * @since 1.1.0
- */
-WP_CLI::add_hook(
-	'after_invoke',
-	function () {
-		if ( CLI_Runner::is_plugin_check() ) {
-			if ( file_exists( ABSPATH . 'wp-content/object-cache.php' ) ) {
-				unlink( ABSPATH . 'wp-content/object-cache.php' );
 			}
 		}
 	}
