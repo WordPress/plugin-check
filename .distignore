@@ -23,7 +23,6 @@ tests
 .wp-env.override.json
 behat.yml
 codecov.yml
-composer.json
 composer.lock
 CONTRIBUTING.md
 package.json
