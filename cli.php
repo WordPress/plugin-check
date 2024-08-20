@@ -54,3 +54,19 @@ WP_CLI::add_hook(
 		}
 	}
 );
+
+/**
+ * Removed object-cache.php in the end.
+ *
+ * @since 1.1.0
+ */
+WP_CLI::add_hook(
+	'after_invoke',
+	function () {
+		if ( CLI_Runner::is_plugin_check() ) {
+			if ( file_exists( ABSPATH . 'wp-content/object-cache.php' ) ) {
+				unlink( ABSPATH . 'wp-content/object-cache.php' );
+			}
+		}
+	}
+);
