@@ -187,15 +187,26 @@ abstract class Abstract_File_Check implements Static_Check {
 
 			if ( is_array( $matches ) && ! empty( $matches ) ) {
 				foreach ( $matches[0] as $match ) {
-					list( $before ) = str_split( $contents, $match[1] );
+					$line   = 0;
+					$column = 0;
 
-					$exploded  = explode( PHP_EOL, $before );
-					$last_item = end( $exploded );
+					if ( 0 === $match[1] ) {
+						$line   = 1;
+						$column = 1;
+					} else {
+						list( $before ) = str_split( $contents, $match[1] );
+
+						$exploded  = explode( PHP_EOL, $before );
+						$last_item = end( $exploded );
+
+						$line   = count( $exploded );
+						$column = strlen( $last_item ) + 1;
+					}
 
 					$matched_files[] = array(
 						'file'   => $file,
-						'line'   => count( $exploded ),
-						'column' => strlen( $last_item ) + 1,
+						'line'   => $line,
+						'column' => $column,
 					);
 				}
 			}

@@ -18,4 +18,12 @@ class Category_Check_Five implements Static_Check {
 	public function get_categories() {
 		return array( Check_Categories::CATEGORY_ACCESSIBILITY );
 	}
+
+	public function get_description(): string {
+		return '';
+	}
+
+	public function get_documentation_url(): string {
+		return '';
+	}
 }

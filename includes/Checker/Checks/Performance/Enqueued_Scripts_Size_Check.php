@@ -264,4 +264,34 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 
 		return $this->viewable_post_types;
 	}
+
+	/**
+	 * Gets the description for the check.
+	 *
+	 * Every check must have a short description explaining what the check does.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string Description.
+	 */
+	public function get_description(): string {
+		return sprintf(
+			/* translators: %s: Script size threshold. */
+			__( 'Checks whether the cumulative size of all scripts enqueued on a page exceeds %s.', 'plugin-check' ),
+			size_format( $this->threshold_size )
+		);
+	}
+
+	/**
+	 * Gets the documentation URL for the check.
+	 *
+	 * Every check must have a URL with further information about the check.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string The documentation URL.
+	 */
+	public function get_documentation_url(): string {
+		return __( 'https://developer.wordpress.org/plugins/', 'plugin-check' );
+	}
 }
