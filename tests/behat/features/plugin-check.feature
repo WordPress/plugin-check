@@ -517,9 +517,9 @@ Feature: Test that the WP-CLI command works.
       add_action(
         'init',
         function () {
-          echo absint( mt_rand( 10, 100 ) );
+          $random_number = absint( mt_rand( 10, 100 ) );
 
-          echo 'I am bad'; // This should trigger the error.
+          $text = 'I am bad'; // This should trigger the error.
 
           $qargs = array(
             'post_type'      => 'post',
@@ -529,7 +529,21 @@ Feature: Test that the WP-CLI command works.
           );
         }
       );
+
+      add_action(
+        'wp_enqueue_scripts',
+        function() {
+          wp_enqueue_style( 'style', plugin_dir_url( __FILE__ ) . 'style.css', array(), '1.0' );
+        }
+      );
       """
+    And a wp-content/plugins/foo-sample/style.css file:
+      """
+      a {
+        text-decoration: underline;
+      }
+      """
+    And I run the WP-CLI command `plugin activate foo-sample`
 
     When I run the WP-CLI command `plugin list --field=name --status=active`
     Then STDOUT should contain:
@@ -653,4 +667,10 @@ Feature: Test that the WP-CLI command works.
     And STDOUT should not contain:
       """
       WordPress.WP.PostsPerPage.posts_per_page_posts_per_page,ERROR
+      """
+
+    When I run the WP-CLI command `plugin check foo-sample --fields=code,type --format=csv --require=./wp-content/plugins/plugin-check/cli.php`
+    Then STDOUT should contain:
+      """
+      EnqueuedStylesScope,WARNING
       """
