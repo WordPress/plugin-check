@@ -38,11 +38,6 @@
       "dealerdirect/phpcodesniffer-composer-installer": true
     }
   },
-  "extra": {
-    "branch-alias": {
-      "dev-main": "2.12.x-dev"
-    }
-  },
   "scripts": {
     "lint": [
       "@php ./vendor/php-parallel-lint/php-parallel-lint/parallel-lint . -e php --show-deprecated --exclude vendor --exclude .git"

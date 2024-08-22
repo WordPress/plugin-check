@@ -7,10 +7,7 @@
 
 namespace WordPress\Plugin_Check\Checker\Checks\Plugin_Repo;
 
-use Exception;
 use WordPress\Plugin_Check\Checker\Check_Categories;
-use WordPress\Plugin_Check\Checker\Check_Result;
-use WordPress\Plugin_Check\Checker\Checks\Abstract_File_Check;
 use WordPress\Plugin_Check\Checker\Checks\Abstract_PHP_CodeSniffer_Check;
 use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Traits\Stable_Check;
@@ -20,7 +17,7 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
  *
  * @since n.e.x.t.
  */
-class Offloading_Files extends Abstract_PHP_CodeSniffer_Check {
+class Offloading_Files_Check extends Abstract_PHP_CodeSniffer_Check {
 
 	use Amend_Check_Result;
 	use Stable_Check;
@@ -57,7 +54,7 @@ class Offloading_Files extends Abstract_PHP_CodeSniffer_Check {
 		return array(
 			'extensions' => 'php',
 			'standard'   => 'PluginCheck',
-			'sniffs'     => 'PluginCheck.EnqueuedResourceOffloading,PluginCheck.Offloading',
+			'sniffs'     => 'PluginCheck.CodeAnalysis.EnqueuedResourceOffloading,PluginCheck.CodeAnalysis.Offloading',
 		);
 	}
 

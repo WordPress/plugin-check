@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "57475d38e66e7428a643b2275bdfcfba",
+    "content-hash": "2a8797d774603446db9f6adc0e2dd1aa",
     "packages": [
         {
             "name": "afragen/wordpress-plugin-readme-parser",
@@ -553,7 +553,7 @@
             "dist": {
                 "type": "path",
                 "url": "./phpcs-sniffs",
-                "reference": "4e233b645e1babb0aa1f9d840ba855a78b6c6e2a"
+                "reference": "bde431aa931da0bb3a65e0473a541f630fbd8264"
             },
             "require": {
                 "ext-libxml": "*",
@@ -574,11 +574,6 @@
                 "ext-mbstring": "For improved results"
             },
             "type": "phpcodesniffer-standard",
-            "extra": {
-                "branch-alias": {
-                    "dev-main": "2.12.x-dev"
-                }
-            },
             "scripts": {
                 "lint": [
                     "@php ./vendor/php-parallel-lint/php-parallel-lint/parallel-lint . -e php --show-deprecated --exclude vendor --exclude .git"
@@ -615,7 +610,7 @@
                 "static analysis"
             ],
             "transport-options": {
-                "symlink": false,
+                "symlink": true,
                 "relative": true
             }
         },

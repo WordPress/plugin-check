@@ -29,7 +29,7 @@
       "type": "path",
       "url": "./phpcs-sniffs",
       "options": {
-        "symlink": false
+        "symlink": true
       }
     }
   ],
