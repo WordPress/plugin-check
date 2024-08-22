@@ -12,7 +12,6 @@
 namespace PluginCheckCS\PluginCheck\Sniffs\CodeAnalysis;
 
 use PHP_CodeSniffer\Util\Tokens;
-use PHPCSUtils\Utils\Numbers;
 use PHPCSUtils\Utils\PassedParameters;
 use WordPressCS\WordPress\AbstractFunctionParameterSniff;
 
