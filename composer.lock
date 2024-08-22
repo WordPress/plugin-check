@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2a8797d774603446db9f6adc0e2dd1aa",
+    "content-hash": "a57281fb4903eb3b999f8ea43131de60",
     "packages": [
         {
             "name": "afragen/wordpress-plugin-readme-parser",
