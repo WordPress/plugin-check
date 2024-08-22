@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8659a900d916eb86b5aab92af786710e",
+    "content-hash": "57475d38e66e7428a643b2275bdfcfba",
     "packages": [
         {
             "name": "afragen/wordpress-plugin-readme-parser",
@@ -548,6 +548,78 @@
             "time": "2024-05-20T13:34:27+00:00"
         },
         {
+            "name": "plugin-check/phpcs-sniffs",
+            "version": "dev-486-check-calling-remote-files-js-css-images-etc-offloading-external",
+            "dist": {
+                "type": "path",
+                "url": "./phpcs-sniffs",
+                "reference": "4e233b645e1babb0aa1f9d840ba855a78b6c6e2a"
+            },
+            "require": {
+                "ext-libxml": "*",
+                "ext-tokenizer": "*",
+                "ext-xmlreader": "*",
+                "php": ">=7.0",
+                "phpcsstandards/phpcsutils": "^1.0.8",
+                "squizlabs/php_codesniffer": "^3.7.2"
+            },
+            "require-dev": {
+                "php-parallel-lint/php-console-highlighter": "^1.0.0",
+                "php-parallel-lint/php-parallel-lint": "^1.3.2",
+                "phpcompatibility/php-compatibility": "^9.0",
+                "phpunit/phpunit": "^5.0 || ^6.0 || ^7.0",
+                "wp-coding-standards/wpcs": "^3.0"
+            },
+            "suggest": {
+                "ext-mbstring": "For improved results"
+            },
+            "type": "phpcodesniffer-standard",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "2.12.x-dev"
+                }
+            },
+            "scripts": {
+                "lint": [
+                    "@php ./vendor/php-parallel-lint/php-parallel-lint/parallel-lint . -e php --show-deprecated --exclude vendor --exclude .git"
+                ],
+                "check-cs": [
+                    "@php ./vendor/squizlabs/php_codesniffer/bin/phpcs"
+                ],
+                "fix-cs": [
+                    "@php ./vendor/squizlabs/php_codesniffer/bin/phpcbf"
+                ],
+                "run-tests": [
+                    "@php ./vendor/phpunit/phpunit/phpunit --filter PluginCheck ./vendor/squizlabs/php_codesniffer/tests/AllTests.php --no-coverage"
+                ],
+                "check-all": [
+                    "@lint",
+                    "@check-cs",
+                    "@run-tests"
+                ]
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/WordPress/plugin-check/graphs/contributors"
+                }
+            ],
+            "description": "PHP_CodeSniffer rules (sniffs) for static checks in Plugin Check",
+            "keywords": [
+                "phpcs",
+                "plugin-check",
+                "standards",
+                "static analysis"
+            ],
+            "transport-options": {
+                "symlink": false,
+                "relative": true
+            }
+        },
+        {
             "name": "sirbrillig/phpcs-variable-analysis",
             "version": "v2.11.19",
             "source": {
@@ -954,26 +1026,26 @@
         },
         {
             "name": "composer/pcre",
-            "version": "2.2.0",
+            "version": "2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/pcre.git",
-                "reference": "0e455b78ac53637929b29d5ab5bf3c978329c1eb"
+                "reference": "06d0e49d6e136e4521c6bad18598bf0f6062ae37"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/pcre/zipball/0e455b78ac53637929b29d5ab5bf3c978329c1eb",
-                "reference": "0e455b78ac53637929b29d5ab5bf3c978329c1eb",
+                "url": "https://api.github.com/repos/composer/pcre/zipball/06d0e49d6e136e4521c6bad18598bf0f6062ae37",
+                "reference": "06d0e49d6e136e4521c6bad18598bf0f6062ae37",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.2 || ^8.0"
             },
             "conflict": {
-                "phpstan/phpstan": "<1.11.8"
+                "phpstan/phpstan": "<1.11.10"
             },
             "require-dev": {
-                "phpstan/phpstan": "^1.11.8",
+                "phpstan/phpstan": "^1.11.10",
                 "phpstan/phpstan-strict-rules": "^1.1",
                 "phpunit/phpunit": "^8 || ^9"
             },
@@ -1013,7 +1085,7 @@
             ],
             "support": {
                 "issues": "https://github.com/composer/pcre/issues",
-                "source": "https://github.com/composer/pcre/tree/2.2.0"
+                "source": "https://github.com/composer/pcre/tree/2.3.0"
             },
             "funding": [
                 {
@@ -1029,7 +1101,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-07-25T09:28:32+00:00"
+            "time": "2024-08-19T19:14:31+00:00"
         },
         {
             "name": "composer/semver",
@@ -5091,16 +5163,16 @@
         },
         {
             "name": "wp-cli/config-command",
-            "version": "v2.3.5",
+            "version": "v2.3.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-cli/config-command.git",
-                "reference": "a4ae2c73a03706b7f5b8c74426a44b4df198352c"
+                "reference": "82a64ae0dbd8bc91e2bf0446666ae24650223775"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-cli/config-command/zipball/a4ae2c73a03706b7f5b8c74426a44b4df198352c",
-                "reference": "a4ae2c73a03706b7f5b8c74426a44b4df198352c",
+                "url": "https://api.github.com/repos/wp-cli/config-command/zipball/82a64ae0dbd8bc91e2bf0446666ae24650223775",
+                "reference": "82a64ae0dbd8bc91e2bf0446666ae24650223775",
                 "shasum": ""
             },
             "require": {
@@ -5159,9 +5231,9 @@
             "homepage": "https://github.com/wp-cli/config-command",
             "support": {
                 "issues": "https://github.com/wp-cli/config-command/issues",
-                "source": "https://github.com/wp-cli/config-command/tree/v2.3.5"
+                "source": "https://github.com/wp-cli/config-command/tree/v2.3.6"
             },
-            "time": "2024-07-22T10:31:46+00:00"
+            "time": "2024-08-05T13:34:06+00:00"
         },
         {
             "name": "wp-cli/core-command",
@@ -5764,7 +5836,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "afragen/wordpress-plugin-readme-parser": 20
+        "afragen/wordpress-plugin-readme-parser": 20,
+        "plugin-check/phpcs-sniffs": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
