@@ -108,7 +108,11 @@ class File_Type_Check extends Abstract_File_Check {
 					$result,
 					__( 'Compressed files are not permitted.', 'plugin-check' ),
 					'compressed_files',
-					$file
+					$file,
+					0,
+					0,
+					'',
+					8
 				);
 			}
 		}
@@ -130,7 +134,11 @@ class File_Type_Check extends Abstract_File_Check {
 					$result,
 					__( 'Phar files are not permitted.', 'plugin-check' ),
 					'phar_files',
-					$file
+					$file,
+					0,
+					0,
+					'',
+					8
 				);
 			}
 		}
@@ -170,7 +178,11 @@ class File_Type_Check extends Abstract_File_Check {
 					$is_error,
 					__( 'Version control checkouts should not be present.', 'plugin-check' ),
 					'vcs_present',
-					$dir
+					$dir,
+					0,
+					0,
+					'',
+					8
 				);
 			}
 		}
@@ -193,7 +205,11 @@ class File_Type_Check extends Abstract_File_Check {
 					$result,
 					__( 'Hidden files are not permitted.', 'plugin-check' ),
 					'hidden_files',
-					$file
+					$file,
+					0,
+					0,
+					'',
+					8
 				);
 			}
 		}
@@ -218,9 +234,39 @@ class File_Type_Check extends Abstract_File_Check {
 					$result,
 					__( 'Application files are not permitted.', 'plugin-check' ),
 					'application_detected',
-					$file
+					$file,
+					0,
+					0,
+					'',
+					8
 				);
 			}
 		}
+	}
+
+	/**
+	 * Gets the description for the check.
+	 *
+	 * Every check must have a short description explaining what the check does.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string Description.
+	 */
+	public function get_description(): string {
+		return __( 'Detects the usage of hidden and compressed files, VCS directories, and application files.', 'plugin-check' );
+	}
+
+	/**
+	 * Gets the documentation URL for the check.
+	 *
+	 * Every check must have a URL with further information about the check.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string The documentation URL.
+	 */
+	public function get_documentation_url(): string {
+		return __( 'https://developer.wordpress.org/plugins/wordpress-org/detailed-plugin-guidelines/', 'plugin-check' );
 	}
 }

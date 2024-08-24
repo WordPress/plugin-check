@@ -59,6 +59,7 @@ class Default_Check_Repository extends Empty_Check_Repository {
 				'no_unfiltered_uploads'      => new Checks\Plugin_Repo\No_Unfiltered_Uploads_Check(),
 				'trademarks'                 => new Checks\Plugin_Repo\Trademarks_Check(),
 				'prefix_all_globals'         => new Checks\Plugin_Repo\Prefix_All_Globals_Check(),
+				'non_blocking_scripts'       => new Checks\Performance\Non_Blocking_Scripts_Check(),
 			)
 		);
 

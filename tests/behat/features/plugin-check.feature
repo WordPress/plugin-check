@@ -55,8 +55,8 @@ Feature: Test that the WP-CLI command works.
     When I run the WP-CLI command `plugin check foo-single.php --format=csv`
     Then STDOUT should contain:
       """
-      line,column,type,code,message
-      16,15,ERROR,WordPress.WP.AlternativeFunctions.rand_mt_rand,"mt_rand() is discouraged. Use the far less predictable wp_rand() instead."
+      line,column,type,code,message,docs
+      16,15,ERROR,WordPress.WP.AlternativeFunctions.rand_mt_rand,"mt_rand() is discouraged. Use the far less predictable wp_rand() instead.",
       """
 
     When I run the WP-CLI command `plugin check foo-single.php --format=csv --fields=line,column,code`
@@ -69,7 +69,7 @@ Feature: Test that the WP-CLI command works.
     When I run the WP-CLI command `plugin check foo-single.php --format=json`
     Then STDOUT should contain:
       """
-      {"line":16,"column":15,"type":"ERROR","code":"WordPress.WP.AlternativeFunctions.rand_mt_rand","message":"mt_rand() is discouraged. Use the far less predictable wp_rand() instead."}
+      {"line":16,"column":15,"type":"ERROR","code":"WordPress.WP.AlternativeFunctions.rand_mt_rand","message":"mt_rand() is discouraged. Use the far less predictable wp_rand() instead.","docs":""}
       """
 
     When I run the WP-CLI command `plugin check foo-single.php --ignore-errors`
@@ -252,6 +252,65 @@ Feature: Test that the WP-CLI command works.
       mt_rand() is discouraged.
       """
 
+  Scenario: Perform runtime check for multi-file plugin
+    Given a WP install with the Plugin Check plugin
+    And a wp-content/plugins/foo-sample/foo-sample.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Sample
+       * Plugin URI: https://example.com
+       * Description: Custom plugin.
+       * Version: 0.1.0
+       * Author: WordPress Performance Team
+       * Author URI: https://make.wordpress.org/performance/
+       * License: GPL-2.0+
+       * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+       */
+
+      add_action(
+        'init',
+        function () {
+          $number = mt_rand( 10, 100 );
+          echo absint( $number );
+        }
+      );
+
+      add_action(
+        'wp_enqueue_scripts',
+        function() {
+          wp_enqueue_style(
+            'style',
+            plugin_dir_url( __FILE__ ) . 'style.css',
+            array(),
+            '1.0'
+          );
+        }
+      );
+
+      """
+    And a wp-content/plugins/foo-sample/style.css file:
+      """
+      a {
+        text-decoration: underline;
+      }
+      """
+
+    When I run the WP-CLI command `plugin activate foo-sample`
+    And I run the WP-CLI command `plugin check foo-sample --fields=code,type --format=csv --require=./wp-content/plugins/plugin-check/cli.php`
+    Then STDOUT should contain:
+      """
+      WordPress.WP.AlternativeFunctions.rand_mt_rand,ERROR
+      """
+    And STDOUT should contain:
+      """
+      EnqueuedStylesScope,WARNING
+      """
+    And STDOUT should contain:
+      """
+      no_plugin_readme,WARNING
+      """
+
   Scenario: Check a plugin from external location
     Given a WP install with the Plugin Check plugin
     And an empty external-folder/foo-plugin directory
@@ -282,4 +341,36 @@ Feature: Test that the WP-CLI command works.
     And STDOUT should contain:
       """
       no_plugin_readme
+      """
+
+  Scenario: Check a plugin from external location but with invalid plugin
+    Given a WP install with the Plugin Check plugin
+    And an empty external-folder/foo-plugin directory
+    And a external-folder/foo-plugin/foo-plugin.php file:
+      """
+      <?php
+      // Not a valid plugin.
+
+      """
+
+    When I try the WP-CLI command `plugin check {RUN_DIR}/non-existent-external-folder/foo-plugin`
+    Then STDOUT should be empty
+    And STDERR should not contain:
+      """
+      no_plugin_readme
+      """
+    And STDERR should contain:
+      """
+      Invalid plugin slug
+      """
+
+    When I try the WP-CLI command `plugin check {RUN_DIR}/external-folder/foo-plugin`
+    Then STDOUT should be empty
+    And STDERR should not contain:
+      """
+      no_plugin_readme
+      """
+    And STDERR should contain:
+      """
+      Invalid plugin slug
       """

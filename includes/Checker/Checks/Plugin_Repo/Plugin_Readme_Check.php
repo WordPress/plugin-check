@@ -67,7 +67,11 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				$result,
 				__( 'The plugin readme.txt does not exist.', 'plugin-check' ),
 				'no_plugin_readme',
-				'readme.txt'
+				'readme.txt',
+				0,
+				0,
+				'',
+				9
 			);
 
 			return;
@@ -110,21 +114,35 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 */
 	private function check_name( Check_Result $result, string $readme_file, Parser $parser ) {
 		if ( isset( $parser->warnings['invalid_plugin_name_header'] ) && false === $parser->name ) {
-			$message = sprintf(
-				/* translators: %s: Example plugin name header */
-				__( 'Plugin name header in your readme is missing or invalid. Please update your readme with a valid plugin name header. Eg: "%s"', 'plugin-check' ),
-				'=== Example Name ==='
+			$this->add_result_error_for_file(
+				$result,
+				sprintf(
+					/* translators: %s: Example plugin name header */
+					__( 'Plugin name header in your readme is missing or invalid. Please update your readme with a valid plugin name header. Eg: "%s"', 'plugin-check' ),
+					'=== Example Name ==='
+				),
+				'invalid_plugin_name',
+				$readme_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incomplete-readme',
+				9
 			);
-
-			$this->add_result_error_for_file( $result, $message, 'invalid_plugin_name', $readme_file );
 		} elseif ( empty( $parser->name ) ) {
-			$message = sprintf(
-				/* translators: %s: Example plugin name header */
-				__( 'We cannot find a plugin name in your readme. Please update your readme with a valid plugin name header. Eg: "%s"', 'plugin-check' ),
-				'=== Example Name ==='
+			$this->add_result_error_for_file(
+				$result,
+				sprintf(
+					/* translators: %s: Example plugin name header */
+					__( 'We cannot find a plugin name in your readme. Please update your readme with a valid plugin name header. Eg: "%s"', 'plugin-check' ),
+					'=== Example Name ==='
+				),
+				'empty_plugin_name',
+				$readme_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incomplete-readme',
+				9
 			);
-
-			$this->add_result_error_for_file( $result, $message, 'empty_plugin_name', $readme_file );
 		}
 	}
 
@@ -162,13 +180,18 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 						$this->add_result_error_for_file(
 							$result,
 							sprintf(
-								/* translators: 1: currently used version, 2: latest stable WordPress version */
-								__( 'Tested up to: %1$s < %2$s', 'plugin-check' ),
+								/* translators: 1: currently used version, 2: latest stable WordPress version, 3: 'Tested up to' */
+								__( '<strong>Tested up to: %1$s < %2$s.</strong><br>The "%3$s" value in your plugin is not set to the current version of WordPress. This means your plugin will not show up in searches, as we require plugins to be compatible and documented as tested up to the most recent version of WordPress.', 'plugin-check' ),
 								$parser->{$field_key},
-								$latest_wordpress_version
+								$latest_wordpress_version,
+								'Tested up to'
 							),
 							'outdated_tested_upto_header',
-							$readme_file
+							$readme_file,
+							0,
+							0,
+							'https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/#readme-header-information',
+							7
 						);
 					}
 				} else {
@@ -177,11 +200,14 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 							$result,
 							sprintf(
 								/* translators: %s: plugin header tag */
-								__( 'The "%s" field is missing.', 'plugin-check' ),
+								__( '<strong>Your readme is either missing or incomplete.</strong><br>The "%s" field is missing. Your readme has to have headers as well as a proper description and documentation as to how it works and how one can use it.', 'plugin-check' ),
 								$field['label']
 							),
 							'missing_readme_header',
-							$readme_file
+							$readme_file,
+							0,
+							0,
+							'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incomplete-readme'
 						);
 					}
 				}
@@ -210,9 +236,13 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		) {
 			$this->add_result_warning_for_file(
 				$result,
-				__( 'The readme appears to contain default text.', 'plugin-check' ),
+				__( '<strong>The readme appears to contain default text.</strong><br>This means your readme has to have headers as well as a proper description and documentation as to how it works and how one can use it.', 'plugin-check' ),
 				'default_readme_text',
-				$readme_file
+				$readme_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incomplete-readme',
+				7
 			);
 		}
 	}
@@ -235,9 +265,13 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		if ( empty( $license ) ) {
 			$this->add_result_error_for_file(
 				$result,
-				__( 'Your plugin has no license declared. Please update your readme with a GPLv2 (or later) compatible license.', 'plugin-check' ),
+				__( '<strong>Your plugin has no license declared.</strong><br>Please update your readme with a GPLv2 (or later) compatible license. It is necessary to declare the license of this plugin. You can do this by using the fields available both in the plugin readme and in the plugin headers.', 'plugin-check' ),
 				'no_license',
-				$readme_file
+				$readme_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#no-gpl-compatible-license-declared',
+				9
 			);
 
 			return;
@@ -249,9 +283,13 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		if ( ! preg_match( '/^([a-z0-9\-\+\.]+)(\sor\s([a-z0-9\-\+\.]+))*$/i', $license ) ) {
 			$this->add_result_warning_for_file(
 				$result,
-				__( 'Your plugin has an invalid license declared. Please update your readme with a valid SPDX license identifier.', 'plugin-check' ),
+				__( '<strong>Your plugin has an invalid license declared.</strong><br>Please update your readme with a valid SPDX license identifier.', 'plugin-check' ),
 				'invalid_license',
-				$readme_file
+				$readme_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#no-gpl-compatible-license-declared',
+				9
 			);
 		}
 
@@ -260,9 +298,13 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		if ( ! $has_license ) {
 			$this->add_result_error_for_file(
 				$result,
-				__( 'Your plugin has no license declared in Plugin Header. Please update your plugin header with a GPLv2 (or later) compatible license.', 'plugin-check' ),
+				__( '<strong>Your plugin has no license declared in Plugin Header.</strong><br>Please update your plugin header with a GPLv2 (or later) compatible license. It is necessary to declare the license of this plugin. You can do this by using the fields available both in the plugin readme and in the plugin headers.', 'plugin-check' ),
 				'no_license',
-				$plugin_main_file
+				$plugin_main_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#no-gpl-compatible-license-declared',
+				9
 			);
 		} else {
 			$plugin_license = $this->normalize_licenses( $matches_license[1] );
@@ -272,9 +314,13 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		if ( ! empty( $plugin_license ) && ! preg_match( '/GPL|GNU|MIT|FreeBSD|New BSD|BSD-3-Clause|BSD 3 Clause|OpenLDAP|Expat/im', $plugin_license ) ) {
 			$this->add_result_error_for_file(
 				$result,
-				__( 'Your plugin has an invalid license declared in Plugin Header. Please update your readme with a valid GPL license identifier.', 'plugin-check' ),
+				__( '<strong>Your plugin has an invalid license declared in Plugin Header.</strong><br>Please update your readme with a valid GPL license identifier. It is necessary to declare the license of this plugin. You can do this by using the fields available both in the plugin readme and in the plugin headers.', 'plugin-check' ),
 				'invalid_license',
-				$plugin_main_file
+				$plugin_main_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#no-gpl-compatible-license-declared',
+				9
 			);
 		}
 
@@ -282,9 +328,13 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		if ( ! empty( $plugin_license ) && ! empty( $license ) && $license !== $plugin_license ) {
 			$this->add_result_warning_for_file(
 				$result,
-				__( 'Your plugin has a different license declared in the readme file and plugin header. Please update your readme with a valid GPL license identifier.', 'plugin-check' ),
+				__( '<strong>Your plugin has a different license declared in the readme file and plugin header.</strong><br>Please update your readme with a valid GPL license identifier.', 'plugin-check' ),
 				'license_mismatch',
-				$readme_file
+				$readme_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#declared-license-mismatched',
+				9
 			);
 		}
 	}
@@ -347,13 +397,13 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		if ( empty( $stable_tag ) ) {
 			$this->add_result_error_for_file(
 				$result,
-				sprintf(
-					/* translators: %s: plugin header tag */
-					__( 'The "%s" field is missing.', 'plugin-check' ),
-					'Stable Tag'
-				),
+				__( '<strong>Incorrect Stable Tag.</strong><br>Your Stable Tag is meant to be the stable version of your plugin, not of WordPress. For your plugin to be properly downloaded from WordPress.org, those values need to be the same. If they’re out of sync, your users won’t get the right version of your code.', 'plugin-check' ),
 				'no_stable_tag',
-				$readme_file
+				$readme_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incorrect-stable-tag',
+				9
 			);
 
 			return;
@@ -362,9 +412,13 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		if ( 'trunk' === $stable_tag ) {
 			$this->add_result_error_for_file(
 				$result,
-				__( "It's recommended not to use 'Stable Tag: trunk'.", 'plugin-check' ),
+				__( "<strong>Incorrect Stable Tag.</strong><br>It's recommended not to use 'Stable Tag: trunk'. Your Stable Tag is meant to be the stable version of your plugin, not of WordPress. For your plugin to be properly downloaded from WordPress.org, those values need to be the same. If they’re out of sync, your users won’t get the right version of your code.", 'plugin-check' ),
 				'trunk_stable_tag',
-				$readme_file
+				$readme_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incorrect-stable-tag',
+				9
 			);
 		}
 
@@ -377,9 +431,13 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		) {
 			$this->add_result_error_for_file(
 				$result,
-				__( 'The Stable Tag in your readme file does not match the version in your main plugin file.', 'plugin-check' ),
+				__( '<strong>The Stable Tag in your readme file does not match the version in your main plugin file.</strong><br>Your Stable Tag is meant to be the stable version of your plugin, not of WordPress. For your plugin to be properly downloaded from WordPress.org, those values need to be the same. If they’re out of sync, your users won’t get the right version of your code.', 'plugin-check' ),
 				'stable_tag_mismatch',
-				$readme_file
+				$readme_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incorrect-stable-tag',
+				9
 			);
 		}
 	}
@@ -437,53 +495,71 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 		$latest_wordpress_version = (float) $this->get_wordpress_stable_version();
 
-		$messages = array(
-			'contributor_ignored'          => sprintf(
-				/* translators: %s: plugin header tag */
-				__( 'One or more contributors listed were ignored. The "%s" field should only contain WordPress.org usernames. Remember that usernames are case-sensitive.', 'plugin-check' ),
-				'Contributors'
+		$warning_details = array(
+			'contributor_ignored'          => array(
+				'message' => sprintf(
+					/* translators: %s: plugin header tag */
+					__( 'One or more contributors listed were ignored. The "%s" field should only contain WordPress.org usernames. Remember that usernames are case-sensitive.', 'plugin-check' ),
+					'Contributors'
+				),
 			),
-			'requires_php_header_ignored'  => sprintf(
-				/* translators: 1: plugin header tag; 2: Example version 5.2.4. 3: Example version 7.0. */
-				__( 'The "%1$s" field was ignored. This field should only contain a PHP version such as "%2$s" or "%3$s".', 'plugin-check' ),
-				'Requires PHP',
-				'5.2.4',
-				'7.0'
+			'requires_php_header_ignored'  => array(
+				'message' => sprintf(
+					/* translators: 1: plugin header tag; 2: Example version 5.2.4. 3: Example version 7.0. */
+					__( 'The "%1$s" field was ignored. This field should only contain a PHP version such as "%2$s" or "%3$s".', 'plugin-check' ),
+					'Requires PHP',
+					'5.2.4',
+					'7.0'
+				),
 			),
-			'tested_header_ignored'        => sprintf(
-				/* translators: 1: plugin header tag; 2: Example version 5.0. 3: Example version 5.1. */
-				__( 'The "%1$s" field was ignored. This field should only contain a valid WordPress version such as "%2$s" or "%3$s".', 'plugin-check' ),
-				'Tested up to',
-				number_format( $latest_wordpress_version, 1 ),
-				number_format( $latest_wordpress_version + 0.1, 1 )
+			'tested_header_ignored'        => array(
+				'message'  => sprintf(
+					/* translators: 1: plugin header tag; 2: Example version 5.0. 3: Example version 5.1. */
+					__( 'The "%1$s" field was ignored. This field should only contain a valid WordPress version such as "%2$s" or "%3$s".', 'plugin-check' ),
+					'Tested up to',
+					number_format( $latest_wordpress_version, 1 ),
+					number_format( $latest_wordpress_version + 0.1, 1 )
+				),
+				'severity' => 7,
 			),
-			'requires_header_ignored'      => sprintf(
-				/* translators: 1: plugin header tag; 2: Example version 5.0. 3: Example version 4.9. */
-				__( 'The "%1$s" field was ignored. This field should only contain a valid WordPress version such as "%2$s" or "%3$s".', 'plugin-check' ),
-				'Requires at least',
-				number_format( $latest_wordpress_version, 1 ),
-				number_format( $latest_wordpress_version - 0.1, 1 )
+			'requires_header_ignored'      => array(
+				'message' => sprintf(
+					/* translators: 1: plugin header tag; 2: Example version 5.0. 3: Example version 4.9. */
+					__( 'The "%1$s" field was ignored. This field should only contain a valid WordPress version such as "%2$s" or "%3$s".', 'plugin-check' ),
+					'Requires at least',
+					number_format( $latest_wordpress_version, 1 ),
+					number_format( $latest_wordpress_version - 0.1, 1 )
+				),
 			),
-			'too_many_tags'                => sprintf(
-				/* translators: %d: maximum tags limit */
-				__( 'One or more tags were ignored. Please limit your plugin to %d tags.', 'plugin-check' ),
-				5
+			'too_many_tags'                => array(
+				'message' => sprintf(
+					/* translators: %d: maximum tags limit */
+					__( 'One or more tags were ignored. Please limit your plugin to %d tags.', 'plugin-check' ),
+					5
+				),
 			),
-			'ignored_tags'                 => sprintf(
-				/* translators: %s: list of tags not supported */
-				__( 'One or more tags were ignored. The following tags are not permitted: %s', 'plugin-check' ),
-				'"' . implode( '", "', $parser->ignore_tags ) . '"'
+			'ignored_tags'                 => array(
+				'message' => sprintf(
+					/* translators: %s: list of tags not supported */
+					__( 'One or more tags were ignored. The following tags are not permitted: %s', 'plugin-check' ),
+					'"' . implode( '", "', $parser->ignore_tags ) . '"'
+				),
 			),
-			'no_short_description_present' => sprintf(
-				/* translators: %s: section title */
-				__( 'The "%s" section is missing. An excerpt was generated from your main plugin description.', 'plugin-check' ),
-				'Short Description'
+			'no_short_description_present' => array(
+				'message' => sprintf(
+					/* translators: %s: section title */
+					__( 'The "%s" section is missing. An excerpt was generated from your main plugin description.', 'plugin-check' ),
+					'Short Description'
+				),
 			),
-			'trimmed_short_description'    => sprintf(
-				/* translators: 1: section title; 2: maximum limit */
-				_n( 'The "%1$s" section is too long and was truncated. A maximum of %2$d character is supported.', 'The "%1$s" section is too long and was truncated. A maximum of %2$d characters is supported.', 150, 'plugin-check' ),
-				'Short Description',
-				150
+			'trimmed_short_description'    => array(
+				'message'  => sprintf(
+					/* translators: 1: section title; 2: maximum limit */
+					_n( 'The "%1$s" section is too long and was truncated. A maximum of %2$d character is supported.', 'The "%1$s" section is too long and was truncated. A maximum of %2$d characters is supported.', 150, 'plugin-check' ),
+					'Short Description',
+					150
+				),
+				'severity' => 6,
 			),
 		);
 
@@ -493,7 +569,16 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 		if ( ! empty( $warning_keys ) ) {
 			foreach ( $warning_keys as $warning ) {
-				$this->add_result_warning_for_file( $result, $messages[ $warning ], 'readme_parser_warnings', $readme_file );
+				$this->add_result_warning_for_file(
+					$result,
+					$warning_details[ $warning ]['message'],
+					'readme_parser_warnings_' . $warning,
+					$readme_file,
+					0,
+					0,
+					'',
+					isset( $warning_details[ $warning ]['severity'] ) ? $warning_details[ $warning ]['severity'] : 5
+				);
 			}
 		}
 	}
@@ -563,5 +648,35 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		$ignored_warnings = (array) apply_filters( 'wp_plugin_check_ignored_readme_warnings', $ignored_warnings, $parser );
 
 		return $ignored_warnings;
+	}
+
+	/**
+	 * Gets the description for the check.
+	 *
+	 * Every check must have a short description explaining what the check does.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string Description.
+	 */
+	public function get_description(): string {
+		return sprintf(
+			/* translators: %s: readme.txt */
+			__( 'Checks adherence to the %s requirements.', 'plugin-check' ),
+			'<code>readme.txt</code>'
+		);
+	}
+
+	/**
+	 * Gets the documentation URL for the check.
+	 *
+	 * Every check must have a URL with further information about the check.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string The documentation URL.
+	 */
+	public function get_documentation_url(): string {
+		return __( 'https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/', 'plugin-check' );
 	}
 }

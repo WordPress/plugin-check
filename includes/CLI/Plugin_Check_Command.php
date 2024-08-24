@@ -8,6 +8,7 @@
 namespace WordPress\Plugin_Check\CLI;
 
 use Exception;
+use WordPress\Plugin_Check\Checker\Check;
 use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Repository;
 use WordPress\Plugin_Check\Checker\CLI_Runner;
@@ -20,6 +21,8 @@ use WP_CLI;
 
 /**
  * Plugin check command.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 final class Plugin_Check_Command {
 
@@ -101,6 +104,15 @@ final class Plugin_Check_Command {
 	 * [--exclude-files=<files>]
 	 * : Additional files to exclude from checks.
 	 *
+	 * [--severity=<severity>]
+	 * : Severity level.
+	 *
+	 * [--error-severity=<error-severity>]
+	 * : Error severity level.
+	 *
+	 * [--warning-severity=<warning-severity>]
+	 * : Warning severity level.
+	 *
 	 * ## EXAMPLES
 	 *
 	 *   wp plugin check akismet
@@ -118,6 +130,7 @@ final class Plugin_Check_Command {
 	 *
 	 * @SuppressWarnings(PHPMD.NPathComplexity)
 	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+	 * @SuppressWarnings(PHPMD.CyclomaticComplexity)
 	 */
 	public function check( $args, $assoc_args ) {
 		// Get options based on the CLI arguments.
@@ -129,6 +142,9 @@ final class Plugin_Check_Command {
 				'ignore-warnings'      => false,
 				'ignore-errors'        => false,
 				'include-experimental' => false,
+				'severity'             => '',
+				'error-severity'       => '',
+				'warning-severity'     => '',
 			)
 		);
 
@@ -228,6 +244,10 @@ final class Plugin_Check_Command {
 		// Get formatter.
 		$formatter = $this->get_formatter( $assoc_args, $default_fields );
 
+		// Severity.
+		$error_severity   = ! empty( $options['error-severity'] ) ? $options['error-severity'] : $options['severity'];
+		$warning_severity = ! empty( $options['warning-severity'] ) ? $options['warning-severity'] : $options['severity'];
+
 		// Print the formatted results.
 		// Go over all files with errors first and print them, combined with any warnings in the same file.
 		foreach ( $errors as $file_name => $file_errors ) {
@@ -237,13 +257,27 @@ final class Plugin_Check_Command {
 				unset( $warnings[ $file_name ] );
 			}
 			$file_results = $this->flatten_file_results( $file_errors, $file_warnings );
-			$this->display_results( $formatter, $file_name, $file_results );
+
+			if ( '' !== $error_severity || '' !== $warning_severity ) {
+				$file_results = $this->get_filtered_results_by_severity( $file_results, intval( $error_severity ), intval( $warning_severity ) );
+			}
+
+			if ( ! empty( $file_results ) ) {
+				$this->display_results( $formatter, $file_name, $file_results );
+			}
 		}
 
 		// If there are any files left with only warnings, print those next.
 		foreach ( $warnings as $file_name => $file_warnings ) {
 			$file_results = $this->flatten_file_results( array(), $file_warnings );
-			$this->display_results( $formatter, $file_name, $file_results );
+
+			if ( '' !== $error_severity || '' !== $warning_severity ) {
+				$file_results = $this->get_filtered_results_by_severity( $file_results, intval( $error_severity ), intval( $warning_severity ) );
+			}
+
+			if ( ! empty( $file_results ) ) {
+				$this->display_results( $formatter, $file_name, $file_results );
+			}
 		}
 	}
 
@@ -315,12 +349,19 @@ final class Plugin_Check_Command {
 
 		$all_checks = array();
 
+		/**
+		 * All checks to list.
+		 *
+		 * @var Check $check
+		 */
 		foreach ( $collection as $key => $check ) {
 			$item = array();
 
-			$item['slug']      = $key;
-			$item['stability'] = strtolower( $check->get_stability() );
-			$item['category']  = join( ', ', $check->get_categories() );
+			$item['slug']        = $key;
+			$item['stability']   = strtolower( $check->get_stability() );
+			$item['category']    = join( ', ', $check->get_categories() );
+			$item['description'] = $check->get_description();
+			$item['url']         = $check->get_documentation_url();
 
 			$all_checks[] = $item;
 		}
@@ -332,6 +373,8 @@ final class Plugin_Check_Command {
 				'slug',
 				'category',
 				'stability',
+				'description',
+				'url',
 			)
 		);
 
@@ -475,6 +518,7 @@ final class Plugin_Check_Command {
 			'column',
 			'code',
 			'message',
+			'docs',
 		);
 
 		// If both errors and warnings are included, display the type of each result too.
@@ -485,6 +529,7 @@ final class Plugin_Check_Command {
 				'type',
 				'code',
 				'message',
+				'docs',
 			);
 		}
 
@@ -509,6 +554,8 @@ final class Plugin_Check_Command {
 			foreach ( $line_errors as $column => $column_errors ) {
 				foreach ( $column_errors as $column_error ) {
 
+					$column_error['message'] = str_replace( array( '<br>', '<strong>', '</strong>', '<code>', '</code>' ), array( ' ', '', '', '`', '`' ), $column_error['message'] );
+
 					$file_results[] = array_merge(
 						$column_error,
 						array(
@@ -524,6 +571,8 @@ final class Plugin_Check_Command {
 		foreach ( $file_warnings as $line => $line_warnings ) {
 			foreach ( $line_warnings as $column => $column_warnings ) {
 				foreach ( $column_warnings as $column_warning ) {
+
+					$column_warning['message'] = str_replace( array( '<br>', '<strong>', '</strong>', '<code>', '</code>' ), array( ' ', '', '', '`', '`' ), $column_warning['message'] );
 
 					$file_results[] = array_merge(
 						$column_warning,
@@ -598,5 +647,33 @@ final class Plugin_Check_Command {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Returns check results filtered by severity level.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param array $results          Check results.
+	 * @param int   $error_severity   Error severity level.
+	 * @param int   $warning_severity Warning severity level.
+	 * @return array Filtered results.
+	 */
+	private function get_filtered_results_by_severity( $results, $error_severity, $warning_severity ) {
+		$errors = array_filter(
+			$results,
+			function ( $item ) use ( $error_severity ) {
+				return ( 'ERROR' === $item['type'] && $item['severity'] >= $error_severity );
+			}
+		);
+
+		$warnings = array_filter(
+			$results,
+			function ( $item ) use ( $warning_severity ) {
+				return ( 'WARNING' === $item['type'] && $item['severity'] >= $warning_severity );
+			}
+		);
+
+		return array_merge( $errors, $warnings );
 	}
 }
