@@ -44,7 +44,7 @@ class Sanitized_Input_Check extends Abstract_PHP_CodeSniffer_Check {
 		return array(
 			'extensions' => 'php',
 			'standard'   => 'WordPress',
-			'sniffs'     => 'WordPress.Security.ValidatedSanitizedInputSniff',
+			'sniffs'     => 'WordPress.Security.ValidatedSanitizedInput',
 		);
 	}
 

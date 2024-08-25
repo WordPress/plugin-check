@@ -46,6 +46,12 @@
 		<type>warning</type>
 	</rule>
 
+	<!-- Sanitized Input rules -->
+	<rule ref="WordPress.Security.ValidatedSanitizedInput">
+		<type>error</type>
+		<severity>7</severity>
+	</rule>
+
 	<!-- Prohibit the use of the backtick operator. -->
 	<rule ref="Generic.PHP.BacktickOperator"/>
 
