@@ -13,8 +13,8 @@ class Sanitized_Input_Check_Tests extends WP_UnitTestCase {
 
 	public function test_run_with_errors() {
 		$sanitized_input_check = new Sanitized_Input_Check();
-		$check_context     = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-sanitized-input-errors/load.php' );
-		$check_result      = new Check_Result( $check_context );
+		$check_context         = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-sanitized-input-errors/load.php' );
+		$check_result          = new Check_Result( $check_context );
 
 		$sanitized_input_check->run( $check_result );
 
@@ -33,8 +33,8 @@ class Sanitized_Input_Check_Tests extends WP_UnitTestCase {
 
 	public function test_run_without_errors() {
 		$sanitized_input_check = new Sanitized_Input_Check();
-		$check_context     = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-sanitized-input-without-errors/load.php' );
-		$check_result      = new Check_Result( $check_context );
+		$check_context         = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-sanitized-input-without-errors/load.php' );
+		$check_result          = new Check_Result( $check_context );
 
 		$sanitized_input_check->run( $check_result );
 
