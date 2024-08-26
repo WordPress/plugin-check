@@ -253,13 +253,13 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertNotEmpty( $warnings );
 		$this->assertArrayHasKey( 'readme.txt', $warnings );
-		$this->assertEquals( 1, $check_result->get_warning_count() );
+		$this->assertSame( 1, $check_result->get_warning_count() );
 
 		// Check for parser warning.
 		$this->assertArrayHasKey( 0, $warnings['readme.txt'] );
 		$this->assertArrayHasKey( 0, $warnings['readme.txt'][0] );
 		$this->assertArrayHasKey( 'code', $warnings['readme.txt'][0][0][0] );
-		$this->assertEquals( 'readme_parser_warnings', $warnings['readme.txt'][0][0][0]['code'] );
+		$this->assertSame( 'readme_parser_warnings_tested_header_ignored', $warnings['readme.txt'][0][0][0]['code'] );
 	}
 
 	public function test_run_with_errors_multiple_parser_warnings() {
@@ -274,18 +274,20 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertNotEmpty( $warnings );
 		$this->assertArrayHasKey( 'readme.txt', $warnings );
-		$this->assertEquals( 6, $check_result->get_warning_count() );
+		$this->assertSame( 6, $check_result->get_warning_count() );
 		$this->assertEmpty( $errors );
-		$this->assertEquals( 0, $check_result->get_error_count() );
+		$this->assertSame( 0, $check_result->get_error_count() );
 
 		// Check for parser warnings.
 		$this->assertArrayHasKey( 0, $warnings['readme.txt'] );
 		$this->assertArrayHasKey( 0, $warnings['readme.txt'][0] );
 
-		for ( $i = 0; $i < 6; ++$i ) {
-			$this->assertArrayHasKey( 'code', $warnings['readme.txt'][0][0][ $i ] );
-			$this->assertEquals( 'readme_parser_warnings', $warnings['readme.txt'][0][0][ $i ]['code'] );
-		}
+		$this->assertCount( 1, wp_list_filter( $warnings['readme.txt'][0][0], array( 'code' => 'readme_parser_warnings_ignored_tags' ) ) );
+		$this->assertCount( 1, wp_list_filter( $warnings['readme.txt'][0][0], array( 'code' => 'readme_parser_warnings_too_many_tags' ) ) );
+		$this->assertCount( 1, wp_list_filter( $warnings['readme.txt'][0][0], array( 'code' => 'readme_parser_warnings_requires_header_ignored' ) ) );
+		$this->assertCount( 1, wp_list_filter( $warnings['readme.txt'][0][0], array( 'code' => 'readme_parser_warnings_tested_header_ignored' ) ) );
+		$this->assertCount( 1, wp_list_filter( $warnings['readme.txt'][0][0], array( 'code' => 'readme_parser_warnings_requires_php_header_ignored' ) ) );
+		$this->assertCount( 1, wp_list_filter( $warnings['readme.txt'][0][0], array( 'code' => 'readme_parser_warnings_trimmed_short_description' ) ) );
 	}
 
 	public function test_run_with_errors_parser_warnings_with_custom_set_transient_version() {
@@ -304,13 +306,13 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertEmpty( $errors );
 		$this->assertNotEmpty( $warnings );
-		$this->assertEquals( 0, $check_result->get_error_count() );
-		$this->assertEquals( 1, $check_result->get_warning_count() );
+		$this->assertSame( 0, $check_result->get_error_count() );
+		$this->assertSame( 1, $check_result->get_warning_count() );
 
 		$this->assertArrayHasKey( 0, $warnings['readme.txt'] );
 		$this->assertArrayHasKey( 0, $warnings['readme.txt'][0] );
 		$this->assertArrayHasKey( 'code', $warnings['readme.txt'][0][0][0] );
-		$this->assertEquals( 'readme_parser_warnings', $warnings['readme.txt'][0][0][0]['code'] );
+		$this->assertSame( 'readme_parser_warnings_tested_header_ignored', $warnings['readme.txt'][0][0][0]['code'] );
 		$this->assertStringContainsString( 'The "Tested up to" field was ignored. This field should only contain a valid WordPress version such as "' . $version . '"', $warnings['readme.txt'][0][0][0]['message'] );
 
 		delete_transient( 'wp_plugin_check_latest_wp_version' );
