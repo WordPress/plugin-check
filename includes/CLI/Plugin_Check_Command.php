@@ -250,7 +250,7 @@ final class Plugin_Check_Command {
 		$error_severity   = ! empty( $options['error-severity'] ) ? $options['error-severity'] : $options['severity'];
 		$warning_severity = ! empty( $options['warning-severity'] ) ? $options['warning-severity'] : $options['severity'];
 
-		$format_is_wporg = ( isset( $options['format'] ) && 'wporg' === $options['format'] ) ? true : false;
+		$format_is_wporg = ( isset( $options['format'] ) && 'wporg' === $options['format'] );
 
 		// Defaults error severity for wporg.
 		if ( empty( $error_severity ) && $format_is_wporg ) {
