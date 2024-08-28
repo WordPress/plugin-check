@@ -69,9 +69,9 @@ In any case, passing the checks in this tool likely helps to achieve a smooth pl
 
 = 1.1.0 =
 
+* Feature - New `Non_Blocking_Scripts_Check` (`non_blocking_scripts`) runtime check to warn about enqueued scripts that use neither `defer` nor `async`.
 * Enhancement - Changed the namespace of included checks.
 * Enhancement - Introduced severity levels for all errors and warnings.
-* Enhancement - New runtime check to warn about enqueued scripts that use neither `defer` nor `async`.
 * Enhancement - CLI: Support checking a plugin from a path or URL.
 * Enhancement - Added short descriptions and URLs for each check.
 * Enhancement - Improved messaging in check results.
