@@ -484,6 +484,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 * @param Check_Result $result      The Check Result to amend.
 	 * @param string       $readme_file Readme file.
 	 * @param Parser       $parser      The Parser object.
+	 *
+	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
 	 */
 	private function check_for_warnings( Check_Result $result, string $readme_file, Parser $parser ) {
 		$warnings = $parser->warnings ? $parser->warnings : array();
@@ -563,15 +565,45 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 			),
 		);
 
+		if ( ! empty( $parser->sections ) ) {
+			foreach ( array_keys( $parser->sections ) as $section ) {
+				$max_length = $parser->maximum_field_lengths['section'];
+
+				if ( isset( $parser->maximum_field_lengths[ 'section-' . $section ] ) ) {
+					$max_length = $parser->maximum_field_lengths[ 'section-' . $section ];
+				}
+
+				$section_title = str_replace( '_', ' ', $section );
+
+				$section_title = ( 'faq' === $section ) ? strtoupper( $section_title ) : ucwords( $section_title );
+
+				$warning_details[ 'trimmed_section_' . $section ] = array(
+					'message'  => sprintf(
+						/* translators: 1: section title; 2: maximum limit */
+						_n( 'The "%1$s" section is too long and was truncated. A maximum of %2$d character is supported.', 'The "%1$s" section is too long and was truncated. A maximum of %2$d characters is supported.', $max_length, 'plugin-check' ),
+						$section_title,
+						$max_length
+					),
+					'severity' => 6,
+				);
+			}
+		}
+
 		$ignored_warnings = $this->get_ignored_warnings( $parser );
 
 		$warning_keys = array_diff( $warning_keys, $ignored_warnings );
 
 		if ( ! empty( $warning_keys ) ) {
 			foreach ( $warning_keys as $warning ) {
+				$warning_message = isset( $warning_details[ $warning ]['message'] ) ? $warning_details[ $warning ]['message'] : sprintf(
+					/* translators: %s: warning code */
+					__( 'Readme parser warning detected: %s', 'plugin-check' ),
+					esc_html( $warning )
+				);
+
 				$this->add_result_warning_for_file(
 					$result,
-					$warning_details[ $warning ]['message'],
+					$warning_message,
 					'readme_parser_warnings_' . $warning,
 					$readme_file,
 					0,
