@@ -76,11 +76,9 @@ In any case, passing the checks in this tool likely helps to achieve a smooth pl
 * Enhancement - Added short descriptions and URLs for each check.
 * Enhancement - Improved messaging in check results.
 * Enhancement - Updated code obfuscation check with more accurate results.
-* Enhancement - Updated plugin review check to flag missing input sanitization.
+* Enhancement - Updated plugin review check to flag missing input sanitization (`WordPress.Security.ValidatedSanitizedInput`).
 * Fix - Improve readme checks to exclude invalid files.
 * Fix - Only show edit link if files are actually editable.
-
-Input data must be Sanitized and Validated
 
 = 1.0.2 =
 
