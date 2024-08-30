@@ -32,12 +32,15 @@ class CLI_Runner extends Abstract_Check_Runner {
 	 * @return bool Returns true if is an CLI request for the plugin check else false.
 	 */
 	public static function is_plugin_check() {
+		if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) {
+			return false;
+		}
+
 		if ( empty( $_SERVER['argv'] ) || 3 > count( $_SERVER['argv'] ) ) {
 			return false;
 		}
 
 		if (
-			'wp' === substr( $_SERVER['argv'][0], -2 ) &&
 			'plugin' === $_SERVER['argv'][1] &&
 			'check' === $_SERVER['argv'][2]
 		) {
