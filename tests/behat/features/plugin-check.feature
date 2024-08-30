@@ -375,131 +375,10 @@ Feature: Test that the WP-CLI command works.
       Invalid plugin slug
       """
 
-  Scenario: Check a plugin with addon enabled with extra checks
+  Scenario: Check a plugin with static checks from an add-on
     Given a WP install with the Plugin Check plugin
-    And a wp-content/plugins/pcp-addon/class-postsperpage-check.php file:
-      """
-      <?php
-      use WordPress\Plugin_Check\Checker\Checks\Abstract_PHP_CodeSniffer_Check;
-      use WordPress\Plugin_Check\Traits\Stable_Check;
+    And a Plugin Check add-on being installed
 
-      class PostsPerPage_Check extends Abstract_PHP_CodeSniffer_Check {
-
-        use Stable_Check;
-
-        public function get_categories() {
-          return array( 'new_category' );
-        }
-
-        protected function get_args() {
-          return array(
-            'extensions' => 'php',
-            'standard'   => plugin_dir_path( __FILE__ ) . 'postsperpage.xml',
-          );
-        }
-
-        public function get_description(): string {
-          return '';
-        }
-
-        public function get_documentation_url(): string {
-          return '';
-        }
-      }
-      """
-    And a wp-content/plugins/pcp-addon/class-prohibited-text-check.php file:
-      """
-      <?php
-      use WordPress\Plugin_Check\Checker\Check_Result;
-      use WordPress\Plugin_Check\Checker\Checks\Abstract_File_Check;
-      use WordPress\Plugin_Check\Traits\Amend_Check_Result;
-      use WordPress\Plugin_Check\Traits\Stable_Check;
-
-      class Prohibited_Text_Check extends Abstract_File_Check {
-
-        use Amend_Check_Result;
-        use Stable_Check;
-
-        public function get_categories() {
-          return array( 'new_category' );
-        }
-
-        protected function check_files( Check_Result $result, array $files ) {
-          $php_files = self::filter_files_by_extension( $files, 'php' );
-          $file      = self::file_preg_match( '#I\sam\sbad#', $php_files );
-          if ( $file ) {
-            $this->add_result_error_for_file(
-              $result,
-              __( 'Prohibited text found.', 'pcp-addon' ),
-              'prohibited_text_detected',
-              $file,
-              0,
-              0,
-              '',
-              8
-            );
-          }
-        }
-
-        public function get_description(): string {
-          return '';
-        }
-
-        public function get_documentation_url(): string {
-          return '';
-        }
-      }
-      """
-
-    And a wp-content/plugins/pcp-addon/pcp-addon.php file:
-      """
-      <?php
-      /**
-       * Plugin Name: PCP Addon
-       * Plugin URI: https://example.com
-       * Description: Plugin Check addon.
-       * Version: 0.1.0
-       * Author: WordPress Performance Team
-       * Author URI: https://make.wordpress.org/performance/
-       * License: GPL-2.0+
-       * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
-       * Requires Plugins: plugin-check
-       */
-
-      add_filter(
-        'wp_plugin_check_categories',
-        function ( array $categories ) {
-          return array_merge( $categories, array( 'new_category' => esc_html__( 'New Category', 'pcp-addon' ) ) );
-        }
-      );
-
-      add_filter(
-        'wp_plugin_check_checks',
-        function ( array $checks ) {
-          require_once plugin_dir_path( __FILE__ ) . 'class-prohibited-text-check.php';
-          require_once plugin_dir_path( __FILE__ ) . 'class-postsperpage-check.php';
-
-          return array_merge(
-            $checks,
-            array(
-              'prohibited_text' => new Prohibited_Text_Check(),
-              'postsperpage'    => new PostsPerPage_Check(),
-            )
-          );
-        }
-      );
-      """
-    And a wp-content/plugins/pcp-addon/postsperpage.xml file:
-      """
-      <?xml version="1.0"?>
-      <ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="PCPAddon" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/squizlabs/PHP_CodeSniffer/master/phpcs.xsd">
-        <rule ref="WordPress.WP.PostsPerPage">
-          <type>error</type>
-          <severity>9</severity>
-        </rule>
-      </ruleset>
-      """
-    And I run the WP-CLI command `plugin activate pcp-addon`
     And a wp-content/plugins/foo-sample/foo-sample.php file:
       """
       <?php
@@ -514,163 +393,98 @@ Feature: Test that the WP-CLI command works.
        * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
        */
 
-      add_action(
-        'init',
-        function () {
-          $random_number = absint( mt_rand( 10, 100 ) );
-
-          $text = 'I am bad'; // This should trigger the error.
-
-          $qargs = array(
-            'post_type'      => 'post',
-            'post_status'    => 'publish',
-            'posts_per_page' => 1000,
-            'no_found_rows'  => true,
-          );
-        }
-      );
-
-      add_action(
-        'wp_enqueue_scripts',
-        function() {
-          wp_enqueue_style( 'style', plugin_dir_url( __FILE__ ) . 'style.css', array(), '1.0' );
-        }
-      );
-      """
-    And a wp-content/plugins/foo-sample/style.css file:
-      """
-      a {
-        text-decoration: underline;
-      }
+      $text = 'I am bad'; // This should trigger the error.
       """
     And I run the WP-CLI command `plugin activate foo-sample`
 
-    When I run the WP-CLI command `plugin list --field=name --status=active`
-    Then STDOUT should contain:
-      """
-      pcp-addon
-      """
-    And STDOUT should contain:
-      """
-      plugin-check
-      """
-
+    # The two checks from pcp-addon should be available.
     When I run the WP-CLI command `plugin list-checks --fields=slug,category,stability --format=csv`
     Then STDOUT should contain:
       """
-      prohibited_text,new_category,stable
+      example_static,new_category,stable
       """
     And STDOUT should contain:
       """
-      postsperpage,new_category,stable
+      example_runtime,new_category,stable
       """
 
+    # The new check category should therefore also be available.
     When I run the WP-CLI command `plugin list-check-categories --fields=slug,name --format=csv`
     Then STDOUT should contain:
       """
       new_category,"New Category"
       """
 
-    When I run the WP-CLI command `plugin list-checks --fields=slug,category --format=csv --categories=new_category`
-    Then STDOUT should contain:
-      """
-      prohibited_text,new_category
-      """
-    And STDOUT should contain:
-      """
-      postsperpage,new_category
-      """
-    And STDOUT should not contain:
-      """
-      plugin_review_phpcs,plugin_repo
-      """
-
+    # Running static checks, including the one from pcp-addon
     When I run the WP-CLI command `plugin check foo-sample --fields=code,type --format=csv`
     Then STDOUT should contain:
       """
-      WordPress.WP.AlternativeFunctions.rand_mt_rand,ERROR
-      """
-    And STDOUT should contain:
-      """
       prohibited_text_detected,ERROR
       """
-    And STDOUT should contain:
-      """
-      WordPress.WP.PostsPerPage.posts_per_page_posts_per_page,ERROR
-      """
 
-    When I run the WP-CLI command `plugin check foo-sample --fields=code,type --format=csv`
-    Then STDOUT should contain:
-      """
-      WordPress.WP.AlternativeFunctions.rand_mt_rand,ERROR
-      """
-    And STDOUT should contain:
-      """
-      prohibited_text_detected,ERROR
-      """
-    And STDOUT should contain:
-      """
-      WordPress.WP.PostsPerPage.posts_per_page_posts_per_page,ERROR
-      """
-
+    # Same again, but after filtering only to the new categories from pcp-addon
     When I run the WP-CLI command `plugin check foo-sample --fields=code,type --format=csv --categories=new_category`
-    Then STDOUT should not contain:
-      """
-      WordPress.WP.AlternativeFunctions.rand_mt_rand,ERROR
-      """
-    And STDOUT should contain:
-      """
-      prohibited_text_detected,ERROR
-      """
-    And STDOUT should contain:
-      """
-      WordPress.WP.PostsPerPage.posts_per_page_posts_per_page,ERROR
-      """
-
-    When I run the WP-CLI command `plugin check foo-sample --fields=code,type --format=csv --categories=plugin_repo`
     Then STDOUT should contain:
       """
-      WordPress.WP.AlternativeFunctions.rand_mt_rand,ERROR
-      """
-    And STDOUT should not contain:
-      """
       prohibited_text_detected,ERROR
       """
-    And STDOUT should not contain:
-      """
-      WordPress.WP.PostsPerPage.posts_per_page_posts_per_page,ERROR
-      """
 
-    When I run the WP-CLI command `plugin check foo-sample --fields=code,type --format=csv --checks=postsperpage`
-    Then STDOUT should not contain:
-      """
-      WordPress.WP.AlternativeFunctions.rand_mt_rand,ERROR
-      """
-    And STDOUT should not contain:
-      """
-      prohibited_text_detected,ERROR
-      """
-    And STDOUT should contain:
-      """
-      WordPress.WP.PostsPerPage.posts_per_page_posts_per_page,ERROR
-      """
-
-    When I run the WP-CLI command `plugin check foo-sample --fields=code,type --format=csv --exclude-checks=postsperpage`
+    # Running only the check from pcp-addon
+    When I run the WP-CLI command `plugin check foo-sample --checks=example_static --fields=code,type --format=csv`
     Then STDOUT should contain:
       """
-      WordPress.WP.AlternativeFunctions.rand_mt_rand,ERROR
-      """
-    And STDOUT should contain:
-      """
       prohibited_text_detected,ERROR
       """
-    And STDOUT should not contain:
-      """
-      WordPress.WP.PostsPerPage.posts_per_page_posts_per_page,ERROR
-      """
 
+  Scenario: Check a plugin with runtime checks from an add-on
+    Given a WP install with the Plugin Check plugin
+    And a Plugin Check add-on being installed
+
+    And a wp-content/plugins/foo-sample/foo-sample.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Sample
+       * Plugin URI: https://example.com
+       * Description: Sample plugin.
+       * Version: 0.1.0
+       * Author: WordPress Performance Team
+       * Author URI: https://make.wordpress.org/performance/
+       * License: GPL-2.0+
+       * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+       */
+
+      // This should trigger the error.
+      add_action(
+        'wp_enqueue_scripts',
+        function() {
+          wp_enqueue_script( 'test', plugin_dir_url( __FILE__ ) . 'test.js', array(), '1.0' );
+        }
+      );
+      """
+    And I run the WP-CLI command `plugin activate foo-sample`
+
+    # Running runtime checks, including the one from pcp-addon
     When I run the WP-CLI command `plugin check foo-sample --fields=code,type --format=csv --require=./wp-content/plugins/plugin-check/cli.php`
     Then STDOUT should contain:
       """
-      EnqueuedStylesScope,WARNING
+      WordPress.WP.EnqueuedResourceParameters.NotInFooter,WARNING
+      """
+    And STDOUT should contain:
+      """
+      ExampleRuntimeCheck.ForbiddenScript,WARNING
+      """
+
+    # Same again, to verify object-cache.php was properly cleared again
+    When I run the WP-CLI command `plugin check foo-sample --fields=code,type --format=csv --require=./wp-content/plugins/plugin-check/cli.php`
+    Then STDOUT should contain:
+      """
+      ExampleRuntimeCheck.ForbiddenScript,WARNING
+      """
+
+    # Run only the runtime check from pcp-addon, no others
+    When I run the WP-CLI command `plugin check foo-sample --checks=example_runtime --fields=code,type --format=csv --require=./wp-content/plugins/plugin-check/cli.php`
+    Then STDOUT should contain:
+      """
+      ExampleRuntimeCheck.ForbiddenScript,WARNING
       """
