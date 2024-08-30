@@ -49,13 +49,14 @@ WP_CLI::add_command(
 	)
 );
 
-/**
- * Adds hook to set up the object-cache.php drop-in file.
+/*
+ * Add hook to set up the object-cache.php drop-in file.
  *
- * @since 1.0.0
+ * Runs after wp-config.php is loaded and thus ABSPATH is defined,
+ * but before any plugins are actually loaded.
  */
 WP_CLI::add_hook(
-	'before_wp_load',
+	'after_wp_config_load',
 	function () {
 		if ( CLI_Runner::is_plugin_check() ) {
 			if ( ! file_exists( ABSPATH . 'wp-content/object-cache.php' ) ) {
