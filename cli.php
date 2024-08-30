@@ -39,7 +39,10 @@ WP_CLI::add_command(
 	$plugin_command,
 	array(
 		'after_invoke' => function () {
-			if ( file_exists( ABSPATH . 'wp-content/object-cache.php' ) ) {
+			if (
+				file_exists( ABSPATH . 'wp-content/object-cache.php' ) &&
+				defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' )
+			) {
 				unlink( ABSPATH . 'wp-content/object-cache.php' );
 			}
 		},
