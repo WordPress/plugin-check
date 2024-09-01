@@ -319,7 +319,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @global wpdb $wpdb WordPress database abstraction object.
+	 * @global wpdb   $wpdb         WordPress database abstraction object.
 	 * @global string $table_prefix The database table prefix.
 	 *
 	 * @return Check_Result An object containing all check results.

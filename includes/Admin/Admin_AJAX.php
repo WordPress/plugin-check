@@ -146,7 +146,7 @@ final class Admin_AJAX {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @global wpdb $wpdb WordPress database abstraction object.
+	 * @global wpdb   $wpdb         WordPress database abstraction object.
 	 * @global string $table_prefix The database table prefix.
 	 */
 	public function clean_up_environment() {
