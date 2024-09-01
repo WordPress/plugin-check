@@ -11,3 +11,5 @@
 ob_start();
     the_author_email();
 $the_author_email = ob_get_clean();
+
+$var_post_not_sanitized = $_POST['not_sanitized'];

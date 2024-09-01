@@ -2,7 +2,7 @@
 
 Contributors:      wordpressdotorg
 Tested up to:      6.6
-Stable tag:        1.0.2
+Stable tag:        1.1.0
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 Tags:              plugin best practices, testing, accessibility, performance, security
@@ -69,7 +69,16 @@ In any case, passing the checks in this tool likely helps to achieve a smooth pl
 
 = 1.1.0 =
 
+* Feature - New `Non_Blocking_Scripts_Check` (`non_blocking_scripts`) runtime check to warn about enqueued scripts that use neither `defer` nor `async`.
 * Enhancement - Changed the namespace of included checks.
+* Enhancement - Introduced severity levels for all errors and warnings.
+* Enhancement - CLI: Support checking a plugin from a path or URL.
+* Enhancement - Added short descriptions and URLs for each check.
+* Enhancement - Improved messaging in check results.
+* Enhancement - Updated code obfuscation check with more accurate results.
+* Enhancement - Updated plugin review check to flag missing input sanitization (`WordPress.Security.ValidatedSanitizedInput`).
+* Fix - Improve readme checks to exclude invalid files.
+* Fix - Only show edit link if files are actually editable.
 
 = 1.0.2 =
 
