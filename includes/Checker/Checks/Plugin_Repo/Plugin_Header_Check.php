@@ -44,8 +44,10 @@ class Plugin_Header_Check implements Static_Check {
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 *
-	 * @throws Exception Thrown when the check fails with a critical error (unrelated to any errors detected as part of
-	 *                   the check).
+	 * @throws Exception Thrown when the check fails with a critical error (unrelated to any errors detected as part of the check).
+	 *
+	 * @SuppressWarnings(PHPMD.NPathComplexity)
+	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
 	 */
 	public function run( Check_Result $result ) {
 		if ( ! function_exists( 'get_plugin_data' ) ) {
