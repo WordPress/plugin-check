@@ -157,4 +157,23 @@ class CLI_Runner extends Abstract_Check_Runner {
 
 		return $categories;
 	}
+
+	/**
+	 * Checks whether the current environment allows for runtime checks to be used.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return bool True if runtime checks are allowed, false otherwise.
+	 */
+	protected function allow_runtime_checks(): bool {
+		/*
+		 * For WP-CLI, everything happens in one request. So if the runner was not initialized early, we won't be
+		 * able to set that up, since the object-cache.php drop-in would only become effective in subsequent requests.
+		 */
+		if ( ! $this->initialized_early ) {
+			return false;
+		}
+
+		return parent::allow_runtime_checks();
+	}
 }

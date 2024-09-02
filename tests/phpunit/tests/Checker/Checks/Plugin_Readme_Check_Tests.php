@@ -274,7 +274,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertNotEmpty( $warnings );
 		$this->assertArrayHasKey( 'readme.txt', $warnings );
-		$this->assertSame( 6, $check_result->get_warning_count() );
+		$this->assertSame( 7, $check_result->get_warning_count() );
 		$this->assertEmpty( $errors );
 		$this->assertSame( 0, $check_result->get_error_count() );
 
@@ -288,6 +288,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertCount( 1, wp_list_filter( $warnings['readme.txt'][0][0], array( 'code' => 'readme_parser_warnings_tested_header_ignored' ) ) );
 		$this->assertCount( 1, wp_list_filter( $warnings['readme.txt'][0][0], array( 'code' => 'readme_parser_warnings_requires_php_header_ignored' ) ) );
 		$this->assertCount( 1, wp_list_filter( $warnings['readme.txt'][0][0], array( 'code' => 'readme_parser_warnings_trimmed_short_description' ) ) );
+		$this->assertCount( 1, wp_list_filter( $warnings['readme.txt'][0][0], array( 'code' => 'readme_parser_warnings_trimmed_section_changelog' ) ) );
 	}
 
 	public function test_run_with_errors_parser_warnings_with_custom_set_transient_version() {
@@ -337,7 +338,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		 * Parser warning `contributor_ignored` is ignored by default. When empty array is returned for
 		 * 'wp_plugin_check_ignored_readme_warnings' then that ignored warning is also added in the list of warnings.
 		 */
-		$this->assertEquals( 7, $check_result->get_warning_count() );
+		$this->assertEquals( 8, $check_result->get_warning_count() );
 		$this->assertEmpty( $errors );
 		$this->assertEquals( 0, $check_result->get_error_count() );
 

@@ -25,7 +25,7 @@ Feature: Test that the WP-CLI plugin check command works with remote ZIP url.
        } );
        """
 
-    When I try the WP-CLI command `plugin check https://github.com/ernilambar/foo-bar-wp/releases/latest/download/foo-bar-wp.zip`
+    When I try the WP-CLI command `plugin check https://github.com/WordPress/plugin-check/raw/trunk/tests/behat/testdata/foo-bar-wp.zip`
     Then STDERR should be:
       """
       Error: Something bad happened while extracting the zip file.
@@ -33,7 +33,7 @@ Feature: Test that the WP-CLI plugin check command works with remote ZIP url.
     And STDOUT should be empty
 
   Scenario: Test with valid ZIP
-    When I run the WP-CLI command `plugin check https://github.com/ernilambar/foo-bar-wp/releases/latest/download/foo-bar-wp.zip --fields=code,type --format=csv`
+    When I run the WP-CLI command `plugin check https://github.com/WordPress/plugin-check/raw/trunk/tests/behat/testdata/foo-bar-wp.zip --fields=code,type --format=csv`
     Then STDOUT should contain:
       """
       WordPress.WP.AlternativeFunctions.rand_mt_rand,ERROR
@@ -57,7 +57,7 @@ Feature: Test that the WP-CLI plugin check command works with remote ZIP url.
     Then STDOUT should not be empty
     And save STDOUT as {TEMP_DIR}
 
-    When I run the WP-CLI command `plugin check https://github.com/ernilambar/foo-bar-wp/releases/latest/download/foo-bar-wp.zip#wporgapi:https://gist.githubusercontent.com/ernilambar/5eea472890e8f1b599efd1e563866784/raw/27958669515760d8be70d34ff53243c6598a02f6/just-test-file.json --fields=code,type --format=csv`
+    When I run the WP-CLI command `plugin check https://github.com/WordPress/plugin-check/raw/trunk/tests/behat/testdata/foo-bar-wp.zip#wporgapi:https://raw.githubusercontent.com/WordPress/plugin-check/trunk/tests/behat/testdata/user-detail.json --fields=code,type --format=csv`
     Then STDOUT should contain:
       """
       WordPress.WP.AlternativeFunctions.rand_mt_rand,ERROR
@@ -79,8 +79,8 @@ Feature: Test that the WP-CLI plugin check command works with remote ZIP url.
     And the {TEMP_DIR}/plugin-check/plugin-info.json file should be:
       """
       {
-          "username": "johndoe",
-          "first_name": "John",
-          "last_name": "Doe"
+        "username": "johndoe",
+        "first_name": "John",
+        "last_name": "Doe"
       }
       """
