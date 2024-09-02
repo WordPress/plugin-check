@@ -419,14 +419,11 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @throws Exception Thrown when invalid flag is passed, or Check slug does not exist.
 	 */
 	final public function get_checks_to_run() {
-		// Include file to use is_plugin_active() in CLI context.
-		require_once ABSPATH . 'wp-admin/includes/plugin.php';
-
 		$check_slugs = $this->get_check_slugs();
 		$check_flags = Check_Repository::TYPE_STATIC;
 
 		// Check if conditions are met in order to perform Runtime Checks.
-		if ( ( $this->initialized_early || $this->runtime_environment->can_set_up() ) && is_plugin_active( $this->get_plugin_basename() ) ) {
+		if ( $this->allow_runtime_checks() ) {
 			$check_flags = Check_Repository::TYPE_ALL;
 		}
 
@@ -449,6 +446,21 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		}
 
 		return $collection->to_map();
+	}
+
+	/**
+	 * Checks whether the current environment allows for runtime checks to be used.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return bool True if runtime checks are allowed, false otherwise.
+	 */
+	protected function allow_runtime_checks(): bool {
+		// Ensure that is_plugin_active() is available.
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+
+		return ( $this->initialized_early || $this->runtime_environment->can_set_up() )
+			&& is_plugin_active( $this->get_plugin_basename() );
 	}
 
 	/**
