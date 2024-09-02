@@ -22,7 +22,7 @@ class Plugin_Review_PHPCS_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertNotEmpty( $errors );
 		$this->assertArrayHasKey( 'load.php', $errors );
-		$this->assertEquals( 5, $check_result->get_error_count() );
+		$this->assertEquals( 9, $check_result->get_error_count() );
 
 		// Check for Generic.PHP.DisallowShortOpenTag.Found error on Line no 6 and column no at 1.
 		$this->assertArrayHasKey( 6, $errors['load.php'] );
@@ -41,6 +41,30 @@ class Plugin_Review_PHPCS_Check_Tests extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 27, $errors['load.php'][15] );
 		$this->assertArrayHasKey( 'code', $errors['load.php'][15][27][0] );
 		$this->assertEquals( 'WordPress.Security.ValidatedSanitizedInput.InputNotValidated', $errors['load.php'][15][27][0]['code'] );
+
+		// Check for WordPress.Security.Generic.PHP.ForbiddenFunctions.Found error on Line no 17 and column no at 1.
+		$this->assertArrayHasKey( 17, $errors['load.php'] );
+		$this->assertArrayHasKey( 1, $errors['load.php'][17] );
+		$this->assertArrayHasKey( 'code', $errors['load.php'][17][1][0] );
+		$this->assertEquals( 'Generic.PHP.ForbiddenFunctions.Found', $errors['load.php'][17][1][0]['code'] );
+
+		// Check for WordPress.Security.Generic.PHP.ForbiddenFunctions.Found error on Line no 18 and column no at 1.
+		$this->assertArrayHasKey( 18, $errors['load.php'] );
+		$this->assertArrayHasKey( 1, $errors['load.php'][18] );
+		$this->assertArrayHasKey( 'code', $errors['load.php'][18][1][0] );
+		$this->assertEquals( 'Generic.PHP.ForbiddenFunctions.Found', $errors['load.php'][18][1][0]['code'] );
+
+		// Check for WordPress.Security.Generic.PHP.ForbiddenFunctions.Found error on Line no 19 and column no at 1.
+		$this->assertArrayHasKey( 19, $errors['load.php'] );
+		$this->assertArrayHasKey( 1, $errors['load.php'][19] );
+		$this->assertArrayHasKey( 'code', $errors['load.php'][19][1][0] );
+		$this->assertEquals( 'Generic.PHP.ForbiddenFunctions.Found', $errors['load.php'][19][1][0]['code'] );
+
+		// Check for WordPress.Security.Generic.PHP.ForbiddenFunctions.Found error on Line no 20 and column no at 1.
+		$this->assertArrayHasKey( 20, $errors['load.php'] );
+		$this->assertArrayHasKey( 1, $errors['load.php'][20] );
+		$this->assertArrayHasKey( 'code', $errors['load.php'][20][1][0] );
+		$this->assertEquals( 'Generic.PHP.ForbiddenFunctions.Found', $errors['load.php'][20][1][0]['code'] );
 	}
 
 	public function test_run_without_errors() {
