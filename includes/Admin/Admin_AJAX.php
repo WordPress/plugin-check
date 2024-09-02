@@ -145,6 +145,9 @@ final class Admin_AJAX {
 	 * Handles the AJAX request to cleanup the runtime environment.
 	 *
 	 * @since 1.0.0
+	 *
+	 * @global wpdb   $wpdb         WordPress database abstraction object.
+	 * @global string $table_prefix The database table prefix.
 	 */
 	public function clean_up_environment() {
 		global $wpdb, $table_prefix;
