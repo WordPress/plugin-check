@@ -91,7 +91,7 @@ class Plugin_Header_Check implements Static_Check {
 		}
 
 		if ( ! empty( $plugin_header['PluginURI'] ) ) {
-			if ( filter_var( $plugin_header['PluginURI'], FILTER_VALIDATE_URL ) !== $plugin_header['PluginURI'] ) {
+			if ( true !== $this->is_valid_url( $plugin_header['PluginURI'] ) ) {
 				$this->add_result_warning_for_file(
 					$result,
 					sprintf(
@@ -124,8 +124,31 @@ class Plugin_Header_Check implements Static_Check {
 			}
 		}
 
+		if ( ! empty( $plugin_header['Description'] ) ) {
+			if (
+				str_contains( $plugin_header['Description'], 'This is a short description of what the plugin does' )
+				|| str_contains( $plugin_header['Description'], 'Here is a short description of the plugin' )
+				|| str_contains( $plugin_header['Description'], 'Handle the basics with this plugin' )
+				) {
+				$this->add_result_warning_for_file(
+					$result,
+					sprintf(
+						/* translators: %s: plugin header field */
+						__( 'The "%s" header in the plugin file should not contain default text.', 'plugin-check' ),
+						esc_html( $labels['Description'] )
+					),
+					'plugin_header_invalid_plugin_description',
+					$plugin_main_file,
+					0,
+					0,
+					'',
+					6
+				);
+			}
+		}
+
 		if ( ! empty( $plugin_header['AuthorURI'] ) ) {
-			if ( filter_var( $plugin_header['AuthorURI'], FILTER_VALIDATE_URL ) !== $plugin_header['AuthorURI'] ) {
+			if ( true !== $this->is_valid_url( $plugin_header['AuthorURI'] ) ) {
 				$this->add_result_warning_for_file(
 					$result,
 					sprintf(
@@ -142,6 +165,78 @@ class Plugin_Header_Check implements Static_Check {
 				);
 			}
 		}
+
+		if ( ! empty( $plugin_header['RequiresWP'] ) ) {
+			if ( ! preg_match( '!^\d+\.\d(\.\d+)?$!', $plugin_header['RequiresWP'] ) ) {
+				$this->add_result_warning_for_file(
+					$result,
+					sprintf(
+						/* translators: 1: plugin header field; 2: Example version 6.5.1. 3: Example version 6.6. */
+						__( 'The "%1$s" header in the plugin file should only contain a WordPress version such as "%2$s" or "%3$s".', 'plugin-check' ),
+						esc_html( $labels['RequiresWP'] ),
+						'6.5.1',
+						'6.6'
+					),
+					'plugin_header_invalid_requires_wp',
+					$plugin_main_file,
+					0,
+					0,
+					'',
+					6
+				);
+			}
+		}
+		if ( ! empty( $plugin_header['RequiresPHP'] ) ) {
+			if ( ! preg_match( '!^\d+(\.\d+){1,2}$!', $plugin_header['RequiresPHP'] ) ) {
+				$this->add_result_warning_for_file(
+					$result,
+					sprintf(
+						/* translators: 1: plugin header field; 2: Example version 5.2.4. 3: Example version 7.0. */
+						__( 'The "%1$s" header in the plugin file should only contain a PHP version such as "%2$s" or "%3$s".', 'plugin-check' ),
+						esc_html( $labels['RequiresPHP'] ),
+						'5.2.4',
+						'7.0'
+					),
+					'plugin_header_invalid_requires_php',
+					$plugin_main_file,
+					0,
+					0,
+					'',
+					6
+				);
+			}
+		}
+
+		if ( ! empty( $plugin_header['RequiresPlugins'] ) ) {
+			if ( ! preg_match( '/^[a-z0-9-]+(?:,[a-z0-9-]+)*$/', $plugin_header['RequiresPlugins'] ) ) {
+				$this->add_result_warning_for_file(
+					$result,
+					sprintf(
+						/* translators: %s: plugin header field */
+						__( 'The "%s" header in the plugin file must contain a comma-separated list of WordPress.org-formatted slugs.', 'plugin-check' ),
+						esc_html( $labels['RequiresPlugins'] )
+					),
+					'plugin_header_invalid_requires_plugins',
+					$plugin_main_file,
+					0,
+					0,
+					'',
+					6
+				);
+			}
+		}
+	}
+
+	/**
+	 * Checks if URL is valid.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param string $url URL.
+	 * @return bool true if the URL is valid, otherwise false.
+	 */
+	private function is_valid_url( $url ) {
+		return filter_var( $url, FILTER_VALIDATE_URL ) === $url && preg_match( '/^https?:\/\//', $url );
 	}
 
 	/**
