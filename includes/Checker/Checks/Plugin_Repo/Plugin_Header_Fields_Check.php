@@ -229,26 +229,68 @@ class Plugin_Header_Fields_Check implements Static_Check {
 			}
 		}
 
-		if ( ! $result->plugin()->is_single_file_plugin() && ! empty( $plugin_header['TextDomain'] ) ) {
-			$plugin_slug = basename( $result->plugin()->path() );
+		if ( ! $result->plugin()->is_single_file_plugin() ) {
+			if ( ! empty( $plugin_header['TextDomain'] ) ) {
+				$plugin_slug = basename( $result->plugin()->path() );
 
-			if ( ! empty( $plugin_slug ) && $plugin_slug !== $plugin_header['TextDomain'] ) {
-				$this->add_result_warning_for_file(
-					$result,
-					sprintf(
-						/* translators: 1: plugin header field, 2: plugin header text domain, 3: plugin slug */
-						__( 'The "%1$s" header in the plugin file does not match the slug. Found "%2$s", expected "%3$s".', 'plugin-check' ),
-						esc_html( $labels['TextDomain'] ),
-						esc_html( $plugin_header['TextDomain'] ),
-						esc_html( $plugin_slug )
-					),
-					'textdomain_mismatch',
-					$plugin_main_file,
-					0,
-					0,
-					'https://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/',
-					6
-				);
+				if ( ! empty( $plugin_slug ) && $plugin_slug !== $plugin_header['TextDomain'] ) {
+					$this->add_result_warning_for_file(
+						$result,
+						sprintf(
+							/* translators: 1: plugin header field, 2: plugin header text domain, 3: plugin slug */
+							__( 'The "%1$s" header in the plugin file does not match the slug. Found "%2$s", expected "%3$s".', 'plugin-check' ),
+							esc_html( $labels['TextDomain'] ),
+							esc_html( $plugin_header['TextDomain'] ),
+							esc_html( $plugin_slug )
+						),
+						'textdomain_mismatch',
+						$plugin_main_file,
+						0,
+						0,
+						'https://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/',
+						6
+					);
+				}
+			}
+
+			if ( ! empty( $plugin_header['DomainPath'] ) ) {
+				if ( ! str_starts_with( $plugin_header['DomainPath'], '/' ) ) {
+					$this->add_result_warning_for_file(
+						$result,
+						sprintf(
+							/* translators: %s: plugin header field */
+							__( 'The "%s" header in the plugin file must start with forward slash.', 'plugin-check' ),
+							esc_html( $labels['DomainPath'] )
+						),
+						'plugin_header_invalid_domain_path',
+						$plugin_main_file,
+						0,
+						0,
+						'https://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/#domain-path',
+						6
+					);
+				}
+
+				$domain_path = trim( $plugin_header['DomainPath'], '/' );
+
+				$target_path = wp_normalize_path( $result->plugin()->path() . $domain_path );
+
+				if ( ! is_dir( $target_path ) ) {
+					$this->add_result_warning_for_file(
+						$result,
+						sprintf(
+							/* translators: %s: plugin header field */
+							__( 'The "%s" header in the plugin file must point to the existing folder.', 'plugin-check' ),
+							esc_html( $labels['DomainPath'] )
+						),
+						'plugin_header_nonexistent_domain_path',
+						$plugin_main_file,
+						0,
+						0,
+						'https://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/#domain-path',
+						6
+					);
+				}
 			}
 		}
 	}

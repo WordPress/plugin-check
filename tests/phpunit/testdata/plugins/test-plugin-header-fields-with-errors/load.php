@@ -11,6 +11,7 @@
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  * Text Domain: test-mismathed-textdomain-here
+ * Domain Path: /nonexistent-folder
  * Requires Plugins: Example Plugin, OtherPlugin
  *
  * @package test-plugin-header-fields-with-errors
