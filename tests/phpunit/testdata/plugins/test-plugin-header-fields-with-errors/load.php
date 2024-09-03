@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Testing Header fields
+ * Plugin Name: Test Header fields with errors
  * Plugin URI: https://example.com/sample-link
  * Description: Here is a short description of the plugin.
  * Requires at least: Recent version
@@ -10,8 +10,8 @@
  * Author URI: This is not a valid URL
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- * Text Domain: test-plugin-header-with-errors
+ * Text Domain: test-plugin-header-fields-with-errors
  * Requires Plugins: Example Plugin, OtherPlugin
  *
- * @package test-plugin-header-with-errors
+ * @package test-plugin-header-fields-with-errors
  */

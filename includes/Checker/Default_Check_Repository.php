@@ -45,7 +45,7 @@ class Default_Check_Repository extends Empty_Check_Repository {
 				'code_obfuscation'           => new Checks\Plugin_Repo\Code_Obfuscation_Check(),
 				'file_type'                  => new Checks\Plugin_Repo\File_Type_Check(),
 				'plugin_header_text_domain'  => new Checks\Plugin_Repo\Plugin_Header_Text_Domain_Check(),
-				'plugin_header'              => new Checks\Plugin_Repo\Plugin_Header_Check(),
+				'plugin_header_fields'       => new Checks\Plugin_Repo\Plugin_Header_Fields_Check(),
 				'late_escaping'              => new Checks\Security\Late_Escaping_Check(),
 				'plugin_updater'             => new Checks\Plugin_Repo\Plugin_Updater_Check(),
 				'plugin_review_phpcs'        => new Checks\Plugin_Repo\Plugin_Review_PHPCS_Check(),

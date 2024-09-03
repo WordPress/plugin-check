@@ -1,19 +1,19 @@
 <?php
 /**
- * Tests for the Plugin_Header_Check class.
+ * Tests for the Plugin_Header_Fields_Check class.
  *
  * @package plugin-check
  */
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
-use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\Plugin_Header_Check;
+use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\Plugin_Header_Fields_Check;
 
-class Plugin_Header_Check_Tests extends WP_UnitTestCase {
+class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 
 	public function test_run_with_errors() {
-		$check         = new Plugin_Header_Check();
-		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-header-with-errors/load.php' );
+		$check         = new Plugin_Header_Fields_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-header-fields-with-errors/load.php' );
 		$check_result  = new Check_Result( $check_context );
 
 		$check->run( $check_result );

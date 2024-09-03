@@ -1,6 +1,6 @@
 <?php
 /**
- * Class Plugin_Header_Check.
+ * Class Plugin_Header_Fields_Check.
  *
  * @package plugin-check
  */
@@ -19,7 +19,7 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
  *
  * @since 1.2.0
  */
-class Plugin_Header_Check implements Static_Check {
+class Plugin_Header_Fields_Check implements Static_Check {
 
 	use Amend_Check_Result;
 	use Stable_Check;
@@ -238,7 +238,7 @@ class Plugin_Header_Check implements Static_Check {
 	 * @return bool true if the URL is valid, otherwise false.
 	 */
 	private function is_valid_url( $url ) {
-		return filter_var( $url, FILTER_VALIDATE_URL ) === $url && preg_match( '/^https?:\/\//', $url );
+		return filter_var( $url, FILTER_VALIDATE_URL ) === $url && str_starts_with( $url, 'http' );
 	}
 
 	/**
