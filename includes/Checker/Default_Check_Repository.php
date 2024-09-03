@@ -44,7 +44,6 @@ class Default_Check_Repository extends Empty_Check_Repository {
 				'enqueued_styles_size'       => new Checks\Performance\Enqueued_Styles_Size_Check(),
 				'code_obfuscation'           => new Checks\Plugin_Repo\Code_Obfuscation_Check(),
 				'file_type'                  => new Checks\Plugin_Repo\File_Type_Check(),
-				'plugin_header_text_domain'  => new Checks\Plugin_Repo\Plugin_Header_Text_Domain_Check(),
 				'plugin_header_fields'       => new Checks\Plugin_Repo\Plugin_Header_Fields_Check(),
 				'late_escaping'              => new Checks\Security\Late_Escaping_Check(),
 				'plugin_updater'             => new Checks\Plugin_Repo\Plugin_Updater_Check(),
