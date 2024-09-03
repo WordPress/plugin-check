@@ -46,8 +46,9 @@ class Plugin_Header_Fields_Check implements Static_Check {
 	 *
 	 * @throws Exception Thrown when the check fails with a critical error (unrelated to any errors detected as part of the check).
 	 *
-	 * @SuppressWarnings(PHPMD.NPathComplexity)
+	 * @SuppressWarnings(PHPMD.CyclomaticComplexity)
 	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+	 * @SuppressWarnings(PHPMD.NPathComplexity)
 	 */
 	public function run( Check_Result $result ) {
 		if ( ! function_exists( 'get_plugin_data' ) ) {
@@ -108,7 +109,7 @@ class Plugin_Header_Fields_Check implements Static_Check {
 					'',
 					6
 				);
-			} elseif ( preg_match( '#https?:\/\/(wordpress.org|example.com)#', $plugin_header['PluginURI'] ) ) {
+			} elseif ( str_contains( $plugin_header['PluginURI'], '//wordpress.org/' ) || str_contains( $plugin_header['PluginURI'], '//example.com/' ) ) {
 				$this->add_result_warning_for_file(
 					$result,
 					sprintf(
