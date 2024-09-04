@@ -114,10 +114,10 @@ class Plugin_Header_Fields_Check implements Static_Check {
 					$result,
 					sprintf(
 						/* translators: %s: plugin header field */
-						__( 'The "%s" header in the plugin file uses restricted domain.', 'plugin-check' ),
+						__( 'The "%s" header in the plugin file is not valid.', 'plugin-check' ),
 						esc_html( $labels['PluginURI'] )
 					),
-					'plugin_header_restricted_plugin_uri',
+					'plugin_header_invalid_plugin_uri_domain',
 					$plugin_main_file,
 					0,
 					0,
@@ -279,9 +279,10 @@ class Plugin_Header_Fields_Check implements Static_Check {
 					$this->add_result_warning_for_file(
 						$result,
 						sprintf(
-							/* translators: %s: plugin header field */
-							__( 'The "%s" header in the plugin file must point to the existing folder.', 'plugin-check' ),
-							esc_html( $labels['DomainPath'] )
+							/* translators: 1: plugin header field, 2: domain path */
+							__( 'The "%1$s" header in the plugin file must point to an existing folder. Found: "%2$s"', 'plugin-check' ),
+							esc_html( $labels['DomainPath'] ),
+							$domain_path
 						),
 						'plugin_header_nonexistent_domain_path',
 						$plugin_main_file,
