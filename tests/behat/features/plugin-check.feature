@@ -514,8 +514,16 @@ Feature: Test that the WP-CLI command works.
       WordPress.WP.EnqueuedResourceParameters.NotInFooter,WARNING
       """
 
-# This doesn't currently work, because we are not actually loading any other plugins, including pcp-addon.
+    # This doesn't currently work, because we are not actually loading any other plugins, including pcp-addon.
 #    And STDOUT should contain:
+#      """
+#      ExampleRuntimeCheck.ForbiddenScript,WARNING
+#      """
+
+    # This doesn't currently work.
+    # Run one runtime check from PCP and one from pcp-addon.
+#    When I run the WP-CLI command `plugin check foo-sample --checks=non_blocking_scripts,example_runtime --fields=code,type --format=csv --require=./wp-content/plugins/plugin-check/cli.php`
+#    Then STDOUT should contain:
 #      """
 #      ExampleRuntimeCheck.ForbiddenScript,WARNING
 #      """
