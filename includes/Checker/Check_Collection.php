@@ -9,8 +9,8 @@ namespace WordPress\Plugin_Check\Checker;
 
 use ArrayAccess;
 use Countable;
-use Exception;
 use IteratorAggregate;
+use WordPress\Plugin_Check\Checker\Exception\Invalid_Check_Slug_Exception;
 
 /**
  * Check Collection interface.
@@ -82,7 +82,7 @@ interface Check_Collection extends ArrayAccess, Countable, IteratorAggregate {
 	 * @param array $check_slugs List of slugs to limit to only those. If empty, the same collection is returned.
 	 * @return Check_Collection The unchanged check collection.
 	 *
-	 * @throws Exception Thrown when any of the given check slugs is not present in the collection.
+	 * @throws Invalid_Check_Slug_Exception Thrown when any of the given check slugs is not present in the collection.
 	 */
 	public function require( array $check_slugs ): Check_Collection;
 }
