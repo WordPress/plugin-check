@@ -113,24 +113,27 @@ class Force_Single_Plugin_Preparation implements Preparation {
 			$plugin_check_basename, // Plugin Check itself.
 		);
 
-		WP_Plugin_Dependencies::initialize();
+		// Plugin dependencies support was added in WordPress 6.5.
+		if ( class_exists( 'WP_Plugin_Dependencies' ) ) {
+			WP_Plugin_Dependencies::initialize();
 
-		$new_active_plugins = array_merge(
-			$new_active_plugins,
-			WP_Plugin_Dependencies::get_dependencies( $this->plugin_basename )
-		);
+			$new_active_plugins = array_merge(
+				$new_active_plugins,
+				WP_Plugin_Dependencies::get_dependencies( $this->plugin_basename )
+			);
 
-		$new_active_plugins = array_merge(
-			$new_active_plugins,
-			// Include any dependents of Plugin Check, but only if they were already active.
-			array_filter(
-				WP_Plugin_Dependencies::get_dependents( dirname( $plugin_check_basename ) ),
-				static function ( $dependent ) use ( $active_plugins, $new_active_plugins ) {
-					return in_array( $dependent, $active_plugins, true ) ||
-							in_array( $dependent, $new_active_plugins, true );
-				}
-			)
-		);
+			$new_active_plugins = array_merge(
+				$new_active_plugins,
+				// Include any dependents of Plugin Check, but only if they were already active.
+				array_filter(
+					WP_Plugin_Dependencies::get_dependents( dirname( $plugin_check_basename ) ),
+					static function ( $dependent ) use ( $active_plugins, $new_active_plugins ) {
+						return in_array( $dependent, $active_plugins, true ) ||
+								in_array( $dependent, $new_active_plugins, true );
+					}
+				)
+			);
+		}
 
 		// Removes duplicates, for example if Plugin Check is the plugin being tested.
 		return array_unique( $new_active_plugins );
