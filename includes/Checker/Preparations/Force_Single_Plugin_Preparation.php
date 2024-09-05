@@ -9,6 +9,7 @@ namespace WordPress\Plugin_Check\Checker\Preparations;
 
 use Exception;
 use WordPress\Plugin_Check\Checker\Preparation;
+use WP_Plugin_Dependencies;
 
 /**
  * Class for the preparation to force the plugin to be checked as the only active plugin.
@@ -20,7 +21,7 @@ use WordPress\Plugin_Check\Checker\Preparation;
 class Force_Single_Plugin_Preparation implements Preparation {
 
 	/**
-	 * Plugin slug.
+	 * Plugin slug of the plugin to check.
 	 *
 	 * @since 1.0.0
 	 * @var string
@@ -74,39 +75,66 @@ class Force_Single_Plugin_Preparation implements Preparation {
 	}
 
 	/**
-	 * Filter active plugins.
+	 * Filters active plugins to only include required ones.
+	 *
+	 * This means:
+	 *
+	 * * The plugin being tested
+	 * * All dependencies of the plugin being tested
+	 * * Plugin Check itself
+	 * * All plugins depending on Plugin Check (they could be adding new checks)
 	 *
 	 * @since 1.0.0
+	 * @since 1.2.0 Now includes dependencies and dependents.
 	 *
-	 * @param array $active_plugins List of active plugins.
-	 * @return array List of active plugins.
+	 * @param mixed $active_plugins List of active plugins.
+	 * @return mixed List of active plugins.
 	 */
 	public function filter_active_plugins( $active_plugins ) {
-		if ( is_array( $active_plugins ) && in_array( $this->plugin_basename, $active_plugins, true ) ) {
+		if ( ! is_array( $active_plugins ) ) {
+			return $active_plugins;
+		}
 
-			if ( defined( 'WP_PLUGIN_CHECK_MAIN_FILE' ) ) {
-				$plugin_check_file = WP_PLUGIN_CHECK_MAIN_FILE;
-			} else {
-				$plugins_dir       = defined( 'WP_PLUGIN_DIR' ) ? WP_PLUGIN_DIR : WP_CONTENT_DIR . '/plugins';
-				$plugin_check_file = $plugins_dir . '/plugin-check/plugin.php';
-			}
+		// The plugin being tested isn't actually active yet.
+		if ( ! in_array( $this->plugin_basename, $active_plugins, true ) ) {
+			return $active_plugins;
+		}
 
-			$plugin_base_file = plugin_basename( $plugin_check_file );
+		if ( defined( 'WP_PLUGIN_CHECK_MAIN_FILE' ) ) {
+			$plugin_check_file = WP_PLUGIN_CHECK_MAIN_FILE;
+		} else {
+			$plugin_check_file = basename( dirname( __DIR__, 3 ) ) . '/plugin.php';
+		}
 
-			// If the plugin-check is the only available plugin then return that one only.
-			if ( $this->plugin_basename === $plugin_base_file ) {
+		$plugin_check_basename = plugin_basename( $plugin_check_file );
 
-				return array(
-					$plugin_base_file,
-				);
-			}
+		$new_active_plugins = array(
+			$this->plugin_basename, // Plugin to test.
+			$plugin_check_basename, // Plugin Check itself.
+		);
 
-			return array(
-				$this->plugin_basename,
-				$plugin_base_file,
+		// Plugin dependencies support was added in WordPress 6.5.
+		if ( class_exists( 'WP_Plugin_Dependencies' ) ) {
+			WP_Plugin_Dependencies::initialize();
+
+			$new_active_plugins = array_merge(
+				$new_active_plugins,
+				WP_Plugin_Dependencies::get_dependencies( $this->plugin_basename )
+			);
+
+			$new_active_plugins = array_merge(
+				$new_active_plugins,
+				// Include any dependents of Plugin Check, but only if they were already active.
+				array_filter(
+					WP_Plugin_Dependencies::get_dependents( dirname( $plugin_check_basename ) ),
+					static function ( $dependent ) use ( $active_plugins ) {
+						return in_array( $dependent, $active_plugins, true );
+					}
+				)
 			);
 		}
 
-		return $active_plugins;
+		// Removes duplicates, for example if Plugin Check is the plugin being tested.
+		return array_unique( $new_active_plugins );
 	}
 }
