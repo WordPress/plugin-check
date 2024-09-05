@@ -129,8 +129,7 @@ class Force_Single_Plugin_Preparation implements Preparation {
 				array_filter(
 					WP_Plugin_Dependencies::get_dependents( dirname( $plugin_check_basename ) ),
 					static function ( $dependent ) use ( $active_plugins, $new_active_plugins ) {
-						return in_array( $dependent, $active_plugins, true ) ||
-								in_array( $dependent, $new_active_plugins, true );
+						return in_array( $dependent, $active_plugins, true );
 					}
 				)
 			);
