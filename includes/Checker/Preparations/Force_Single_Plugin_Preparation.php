@@ -85,6 +85,7 @@ class Force_Single_Plugin_Preparation implements Preparation {
 	 * * All plugins depending on Plugin Check (they could be adding new checks)
 	 *
 	 * @since 1.0.0
+	 * @since 1.2.0 Now includes dependencies and dependents.
 	 *
 	 * @param mixed $active_plugins List of active plugins.
 	 * @return mixed List of active plugins.
