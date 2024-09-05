@@ -127,7 +127,7 @@ class Force_Single_Plugin_Preparation implements Preparation {
 				// Include any dependents of Plugin Check, but only if they were already active.
 				array_filter(
 					WP_Plugin_Dependencies::get_dependents( dirname( $plugin_check_basename ) ),
-					static function ( $dependent ) use ( $active_plugins, $new_active_plugins ) {
+					static function ( $dependent ) use ( $active_plugins ) {
 						return in_array( $dependent, $active_plugins, true );
 					}
 				)
