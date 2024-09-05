@@ -10,6 +10,7 @@ namespace WordPress\Plugin_Check\Checker;
 use Exception;
 use WordPress\Plugin_Check\Checker\Preparations\Universal_Runtime_Preparation;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
+use WP_CLI;
 
 /**
  * Abstract Check Runner class.
@@ -293,9 +294,17 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	final public function prepare() {
 		$cleanup_functions = array();
 
-		if ( $this->has_runtime_check( $this->get_checks_to_run() ) ) {
-			$preparation         = new Universal_Runtime_Preparation( $this->get_check_context() );
-			$cleanup_functions[] = $preparation->prepare();
+		try {
+			if ( $this->has_runtime_check( $this->get_checks_to_run() ) ) {
+				$preparation         = new Universal_Runtime_Preparation( $this->get_check_context() );
+				$cleanup_functions[] = $preparation->prepare();
+			}
+		} catch ( Exception $error ) {
+			if ( defined( 'WP_CLI' ) && WP_CLI ) {
+				WP_CLI::error( $error->getMessage() );
+			} else {
+				throw $error;
+			}
 		}
 
 		if ( $this->delete_plugin_folder ) {
