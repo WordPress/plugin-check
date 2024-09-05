@@ -16,7 +16,7 @@ Feature: Test that the WP-CLI command works.
       <?php
       /**
        * Plugin Name: Foo Single
-       * Plugin URI: https://example.com
+       * Plugin URI: https://foo-single.com
        * Description: Custom plugin.
        * Version: 0.1.0
        * Author: WordPress Performance Team
@@ -125,7 +125,7 @@ Feature: Test that the WP-CLI command works.
       <?php
       /**
        * Plugin Name: Foo Plugin
-       * Plugin URI:  https://example.com
+       * Plugin URI:  https://foo-plugin.com
        * Description:
        * Version:     0.1.0
        * Author:
@@ -165,7 +165,7 @@ Feature: Test that the WP-CLI command works.
       <?php
       /**
        * Plugin Name: Foo Plugin
-       * Plugin URI:  https://example.com
+       * Plugin URI:  https://foo-plugin.com
        * Description:
        * Version:     0.1.0
        * Author:
@@ -228,7 +228,7 @@ Feature: Test that the WP-CLI command works.
       <?php
       /**
        * Plugin Name: Foo Single
-       * Plugin URI: https://example.com
+       * Plugin URI: https://foo-single.com
        * Description: Custom plugin.
        * Version: 0.1.0
        * Author: WordPress Performance Team
@@ -259,7 +259,7 @@ Feature: Test that the WP-CLI command works.
       <?php
       /**
        * Plugin Name: Foo Sample
-       * Plugin URI: https://example.com
+       * Plugin URI: https://foo-sample.com
        * Description: Custom plugin.
        * Version: 0.1.0
        * Author: WordPress Performance Team
@@ -319,7 +319,7 @@ Feature: Test that the WP-CLI command works.
       <?php
       /**
        * Plugin Name: Foo Plugin
-       * Plugin URI:  https://example.com
+       * Plugin URI:  https://foo-plugin.com
        * Description:
        * Version:     0.1.0
        * Author:
