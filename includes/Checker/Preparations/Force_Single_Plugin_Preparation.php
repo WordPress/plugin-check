@@ -103,8 +103,7 @@ class Force_Single_Plugin_Preparation implements Preparation {
 		if ( defined( 'WP_PLUGIN_CHECK_MAIN_FILE' ) ) {
 			$plugin_check_file = WP_PLUGIN_CHECK_MAIN_FILE;
 		} else {
-			$plugins_dir       = defined( 'WP_PLUGIN_DIR' ) ? WP_PLUGIN_DIR : WP_CONTENT_DIR . '/plugins';
-			$plugin_check_file = $plugins_dir . '/plugin-check/plugin.php';
+			$plugin_check_file = basename( dirname( __DIR__, 3 ) ) . '/plugin.php';
 		}
 
 		$plugin_check_basename = plugin_basename( $plugin_check_file );
