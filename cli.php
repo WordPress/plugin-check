@@ -38,6 +38,14 @@ WP_CLI::add_command(
 	'plugin',
 	$plugin_command,
 	array(
+		/**
+		 * This is a cleanup for the below hook which adds the object-cache.php drop-in.
+		 *
+		 * It is executed right after the command ran.
+		 *
+		 * Since the drop-in could be from somewhere else, a check of its contents is necessary
+		 * to verify it is the one that was added below.
+		 */
 		'after_invoke' => function () {
 			if (
 				file_exists( ABSPATH . 'wp-content/object-cache.php' ) &&
