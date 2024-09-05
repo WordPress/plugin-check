@@ -28,7 +28,13 @@ class CLI_Runner_Tests extends WP_UnitTestCase {
 		parent::tear_down();
 	}
 
+	/**
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
 	public function test_is_plugin_check_returns_true() {
+		define( 'WP_CLI', true );
+
 		$_SERVER['argv'] = array(
 			'wp',
 			'plugin',
