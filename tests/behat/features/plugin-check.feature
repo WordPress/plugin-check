@@ -440,6 +440,20 @@ Feature: Test that the WP-CLI command works.
     Given a WP install with the Plugin Check plugin
     And a Plugin Check add-on being installed
 
+    And a wp-content/plugins/foo-dependency/foo-dependency.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Dependency
+       * Plugin URI: https://example.com
+       * Description: Sample plugin.
+       * Version: 0.1.0
+       * Author: WordPress Performance Team
+       * Author URI: https://make.wordpress.org/performance/
+       * License: GPL-2.0+
+       * License URI: https://www.gnu.org/licenses/gpl-2.0.txt
+       */
+      """
     And a wp-content/plugins/foo-sample/foo-sample.php file:
       """
       <?php
@@ -451,7 +465,8 @@ Feature: Test that the WP-CLI command works.
        * Author: WordPress Performance Team
        * Author URI: https://make.wordpress.org/performance/
        * License: GPL-2.0+
-       * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+       * License URI: https://www.gnu.org/licenses/gpl-2.0.txt
+       * Requires Plugins: foo-dependency
        */
 
       // This should trigger the error.
@@ -462,7 +477,7 @@ Feature: Test that the WP-CLI command works.
         }
       );
       """
-    And I run the WP-CLI command `plugin activate foo-sample`
+    And I run the WP-CLI command `plugin activate foo-dependency foo-sample`
 
     # Running runtime checks, including the one from pcp-addon
     When I run the WP-CLI command `plugin check foo-sample --fields=code,type --format=csv --require=./wp-content/plugins/plugin-check/cli.php`
