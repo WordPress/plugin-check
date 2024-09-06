@@ -433,4 +433,64 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'code', $warnings['readme.txt'][0][0][1] );
 		$this->assertEquals( 'upgrade_notice_limit', $warnings['readme.txt'][0][0][1]['code'] );
 	}
+
+	public function test_run_with_errors_tested_up_to_latest_plus_two_version() {
+		$version = '5.9'; // Target plugin has "6.1" is readme.
+
+		set_transient( 'wp_plugin_check_latest_wp_version', $version );
+
+		$readme_check  = new Plugin_Readme_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-md-with-errors/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$readme_check->run( $check_result );
+
+		$errors = $check_result->get_errors();
+
+		$this->assertNotEmpty( $errors );
+
+		$filtered_items = wp_list_filter( $errors['readme.md'][0][0], array( 'code' => 'nonexistent_tested_upto_header' ) );
+
+		$this->assertCount( 1, $filtered_items );
+		$this->assertStringContainsString( 'Tested up to: 6.1', $filtered_items[0]['message'] );
+		$this->assertStringContainsString( 'This version of WordPress does not exist (yet).', $filtered_items[0]['message'] );
+
+		delete_transient( 'wp_plugin_check_latest_wp_version' );
+	}
+
+	public function test_run_with_errors_tested_up_to_latest_plus_one_version() {
+		$version = '6.0'; // Target plugin has "6.1" is readme.
+
+		set_transient( 'wp_plugin_check_latest_wp_version', $version );
+
+		$readme_check  = new Plugin_Readme_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-md-with-errors/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$readme_check->run( $check_result );
+
+		$errors = $check_result->get_errors();
+
+		$this->assertCount( 0, wp_list_filter( $errors['readme.md'][0][0], array( 'code' => 'nonexistent_tested_upto_header' ) ) );
+
+		delete_transient( 'wp_plugin_check_latest_wp_version' );
+	}
+
+	public function test_run_with_errors_tested_up_to_latest_stable_version() {
+		$version = '6.1'; // Target plugin has "6.1" is readme.
+
+		set_transient( 'wp_plugin_check_latest_wp_version', $version );
+
+		$readme_check  = new Plugin_Readme_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-md-with-errors/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$readme_check->run( $check_result );
+
+		$errors = $check_result->get_errors();
+
+		$this->assertCount( 0, wp_list_filter( $errors['readme.md'][0][0], array( 'code' => 'nonexistent_tested_upto_header' ) ) );
+
+		delete_transient( 'wp_plugin_check_latest_wp_version' );
+	}
 }
