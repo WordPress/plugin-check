@@ -57,6 +57,8 @@ class Plugin_Context {
 			);
 		}
 
+		$this->main_file = realpath( $this->main_file );
+
 		if ( false === strpos( $this->main_file, '.php' ) ) {
 			$files = glob( $this->main_file . '/*.php' );
 			foreach ( $files as $file ) {
