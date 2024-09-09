@@ -101,6 +101,8 @@ class Plugin_Context {
 		} else {
 			$this->mode = 'new';
 		}
+
+		$this->main_file = realpath( $this->main_file );
 	}
 
 	/**
