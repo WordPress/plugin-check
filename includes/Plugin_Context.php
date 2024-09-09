@@ -67,6 +67,8 @@ class Plugin_Context {
 				}
 			}
 		}
+
+		$this->main_file = realpath( $this->main_file );
 	}
 
 	/**
