@@ -34,14 +34,13 @@ trait Amend_Check_Result {
 	 * @param int          $severity Severity level. Default is 5.
 	 */
 	protected function add_result_message_for_file( Check_Result $result, $error, $message, $code, $file, $line = 0, $column = 0, string $docs = '', $severity = 5 ) {
-		$filename = explode( $result->plugin()->path(), $file );
 
 		$result->add_message(
 			(bool) $error,
 			$message,
 			array(
 				'code'     => $code,
-				'file'     => ( 1 === count( $filename ) ) ? reset( $filename ) : $filename[1],
+				'file'     => str_replace( $result->plugin()->path(), '', $file ),
 				'line'     => $line,
 				'column'   => $column,
 				'link'     => $this->get_file_editor_url( $result, $file, $line ),
