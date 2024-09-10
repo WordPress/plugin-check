@@ -193,6 +193,22 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 							'https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/#readme-header-information',
 							7
 						);
+					} elseif ( version_compare( $parser->{$field_key}, number_format( (float) $latest_wordpress_version + 0.1, 1 ), '>' ) ) {
+						$this->add_result_error_for_file(
+							$result,
+							sprintf(
+								/* translators: 1: currently used version, 2: 'Tested up to' */
+								__( '<strong>Tested up to: %1$s.</strong><br>The "%2$s" value in your plugin is not valid. This version of WordPress does not exist (yet).', 'plugin-check' ),
+								$parser->{$field_key},
+								'Tested up to'
+							),
+							'nonexistent_tested_upto_header',
+							$readme_file,
+							0,
+							0,
+							'https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/#readme-header-information',
+							7
+						);
 					}
 				} else {
 					if ( empty( $parser->{$field_key} ) ) {

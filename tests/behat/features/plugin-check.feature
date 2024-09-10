@@ -16,7 +16,7 @@ Feature: Test that the WP-CLI command works.
       <?php
       /**
        * Plugin Name: Foo Single
-       * Plugin URI: https://example.com
+       * Plugin URI: https://foo-single.com
        * Description: Custom plugin.
        * Version: 0.1.0
        * Author: WordPress Performance Team
@@ -125,7 +125,7 @@ Feature: Test that the WP-CLI command works.
       <?php
       /**
        * Plugin Name: Foo Plugin
-       * Plugin URI:  https://example.com
+       * Plugin URI:  https://foo-plugin.com
        * Description:
        * Version:     0.1.0
        * Author:
@@ -165,7 +165,7 @@ Feature: Test that the WP-CLI command works.
       <?php
       /**
        * Plugin Name: Foo Plugin
-       * Plugin URI:  https://example.com
+       * Plugin URI:  https://foo-plugin.com
        * Description:
        * Version:     0.1.0
        * Author:
@@ -228,7 +228,7 @@ Feature: Test that the WP-CLI command works.
       <?php
       /**
        * Plugin Name: Foo Single
-       * Plugin URI: https://example.com
+       * Plugin URI: https://foo-single.com
        * Description: Custom plugin.
        * Version: 0.1.0
        * Author: WordPress Performance Team
@@ -259,7 +259,7 @@ Feature: Test that the WP-CLI command works.
       <?php
       /**
        * Plugin Name: Foo Sample
-       * Plugin URI: https://example.com
+       * Plugin URI: https://foo-sample.com
        * Description: Custom plugin.
        * Version: 0.1.0
        * Author: WordPress Performance Team
@@ -319,7 +319,7 @@ Feature: Test that the WP-CLI command works.
       <?php
       /**
        * Plugin Name: Foo Plugin
-       * Plugin URI:  https://example.com
+       * Plugin URI:  https://foo-plugin.com
        * Description:
        * Version:     0.1.0
        * Author:
@@ -374,3 +374,164 @@ Feature: Test that the WP-CLI command works.
       """
       Invalid plugin slug
       """
+
+  Scenario: Check a plugin with static checks from an add-on
+    Given a WP install with the Plugin Check plugin
+    And a Plugin Check add-on being installed
+
+    And a wp-content/plugins/foo-sample/foo-sample.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Sample
+       * Plugin URI: https://example.com
+       * Description: Sample plugin.
+       * Version: 0.1.0
+       * Author: WordPress Performance Team
+       * Author URI: https://make.wordpress.org/performance/
+       * License: GPL-2.0+
+       * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+       */
+
+      $text = 'I am bad'; // This should trigger the error.
+      """
+    And I run the WP-CLI command `plugin activate foo-sample`
+
+    # The two checks from pcp-addon should be available.
+    When I run the WP-CLI command `plugin list-checks --fields=slug,category,stability --format=csv`
+    Then STDOUT should contain:
+      """
+      example_static,new_category,stable
+      """
+    And STDOUT should contain:
+      """
+      example_runtime,new_category,stable
+      """
+
+    # The new check category should therefore also be available.
+    When I run the WP-CLI command `plugin list-check-categories --fields=slug,name --format=csv`
+    Then STDOUT should contain:
+      """
+      new_category,"New Category"
+      """
+
+    # Running static checks, including the one from pcp-addon
+    When I run the WP-CLI command `plugin check foo-sample --fields=code,type --format=csv`
+    Then STDOUT should contain:
+      """
+      prohibited_text_detected,ERROR
+      """
+
+    # Same again, but after filtering only to the new categories from pcp-addon
+    When I run the WP-CLI command `plugin check foo-sample --fields=code,type --format=csv --categories=new_category`
+    Then STDOUT should contain:
+      """
+      prohibited_text_detected,ERROR
+      """
+
+    # Running only the check from pcp-addon
+    When I run the WP-CLI command `plugin check foo-sample --checks=example_static --fields=code,type --format=csv`
+    Then STDOUT should contain:
+      """
+      prohibited_text_detected,ERROR
+      """
+
+  Scenario: Check a plugin with runtime checks from an add-on
+    Given a WP install with the Plugin Check plugin
+    And a Plugin Check add-on being installed
+
+    And a wp-content/plugins/foo-dependency/foo-dependency.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Dependency
+       * Plugin URI: https://example.com
+       * Description: Sample plugin.
+       * Version: 0.1.0
+       * Author: WordPress Performance Team
+       * Author URI: https://make.wordpress.org/performance/
+       * License: GPL-2.0+
+       * License URI: https://www.gnu.org/licenses/gpl-2.0.txt
+       */
+      """
+    And a wp-content/plugins/foo-sample/foo-sample.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Sample
+       * Plugin URI: https://example.com
+       * Description: Sample plugin.
+       * Version: 0.1.0
+       * Author: WordPress Performance Team
+       * Author URI: https://make.wordpress.org/performance/
+       * License: GPL-2.0+
+       * License URI: https://www.gnu.org/licenses/gpl-2.0.txt
+       * Requires Plugins: foo-dependency
+       */
+
+      // This should trigger the error.
+      add_action(
+        'wp_enqueue_scripts',
+        function() {
+          wp_enqueue_script( 'test', plugin_dir_url( __FILE__ ) . 'test.js', array(), '1.0' );
+        }
+      );
+      """
+    And I run the WP-CLI command `plugin activate foo-dependency foo-sample`
+
+    # Running runtime checks, including the one from pcp-addon
+    When I run the WP-CLI command `plugin check foo-sample --fields=code,type --format=csv --require=./wp-content/plugins/plugin-check/cli.php`
+    Then STDOUT should contain:
+      """
+      Setting up runtime environment.
+      """
+    And STDOUT should contain:
+      """
+      Cleaning up runtime environment.
+      """
+    And STDOUT should contain:
+      """
+      WordPress.WP.EnqueuedResourceParameters.NotInFooter,WARNING
+      """
+# This doesn't currently work, because we are not actually loading any other plugins, including pcp-addon.
+#    And STDOUT should contain:
+#      """
+#      ExampleRuntimeCheck.ForbiddenScript,WARNING
+#      """
+
+    # Same again, to verify object-cache.php was properly cleared again
+    When I run the WP-CLI command `plugin check foo-sample --fields=code,type --format=csv --require=./wp-content/plugins/plugin-check/cli.php`
+    Then STDOUT should contain:
+      """
+      Setting up runtime environment.
+      """
+    And STDOUT should contain:
+      """
+      Cleaning up runtime environment.
+      """
+    And STDOUT should contain:
+      """
+      WordPress.WP.EnqueuedResourceParameters.NotInFooter,WARNING
+      """
+
+    # This doesn't currently work, because we are not actually loading any other plugins, including pcp-addon.
+#    And STDOUT should contain:
+#      """
+#      ExampleRuntimeCheck.ForbiddenScript,WARNING
+#      """
+
+    # This doesn't currently work.
+    # Run one runtime check from PCP and one from pcp-addon.
+#    When I run the WP-CLI command `plugin check foo-sample --checks=non_blocking_scripts,example_runtime --fields=code,type --format=csv --require=./wp-content/plugins/plugin-check/cli.php`
+#    Then STDOUT should contain:
+#      """
+#      ExampleRuntimeCheck.ForbiddenScript,WARNING
+#      """
+
+    # This doesn't currently work, because we are not actually loading any other plugins, including pcp-addon.
+    # Run only the runtime check from pcp-addon, no others
+#    When I run the WP-CLI command `plugin check foo-sample --checks=example_runtime --fields=code,type --format=csv --require=./wp-content/plugins/plugin-check/cli.php`
+#    Then STDOUT should contain:
+#      """
+#      ExampleRuntimeCheck.ForbiddenScript,WARNING
+#      """

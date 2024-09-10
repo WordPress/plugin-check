@@ -81,6 +81,19 @@ final class FeatureContext extends WP_CLI_FeatureContext {
 		// Activate the plugin.
 		$this->proc( 'wp plugin activate plugin-check' )->run_check();
 	}
+	/**
+	 * @Given a Plugin Check add-on being installed
+	 */
+	public function given_a_plugin_check_addon_being_installed() {
+		// Symlink the pcp-addon folder into the WP folder as a plugin.
+		$src_dir = realpath( self::get_vendor_dir() . '/../tests/behat/testdata/pcp-addon' );
+		$plugin_dir  = $this->variables['RUN_DIR'] . '/wp-content/plugins';
+		$this->ensure_dir_exists( $plugin_dir );
+		$this->proc( "ln -s {$src_dir} {$plugin_dir}/pcp-addon" )->run_check();
+
+		// Activate the plugin.
+		$this->proc( 'wp plugin activate pcp-addon' )->run_check();
+	}
 
 	/**
 	 * @When /^I (run|try) the WP-CLI command `([^`]+)`$/

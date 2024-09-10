@@ -8,6 +8,7 @@
 namespace WordPress\Plugin_Check\Checker;
 
 use Exception;
+use WordPress\Plugin_Check\Checker\Exception\Invalid_Check_Slug_Exception;
 use WordPress\Plugin_Check\Checker\Preparations\Universal_Runtime_Preparation;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 
@@ -293,7 +294,29 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	final public function prepare() {
 		$cleanup_functions = array();
 
-		if ( $this->has_runtime_check( $this->get_checks_to_run() ) ) {
+		if ( $this->initialized_early ) {
+			/*
+			 * When initialized early, plugins are not loaded yet when this method is called.
+			 * Therefore it could be that check slugs provided refer to addon checks that are not loaded yet.
+			 * In that case, the only reliable option is to assume that it refers to an addon check and that the addon
+			 * check is a runtime check. We don't know, but better to have the runtime preparations initialize
+			 * unnecessarily rather than not having them when needed.
+			 *
+			 * The actual checks to run are retrieved later (once plugins are loaded), so if one of the provided slugs
+			 * is actually invalid, the exception will still be thrown at that point.
+			 */
+			try {
+				$checks             = $this->get_checks_to_run();
+				$initialize_runtime = $this->has_runtime_check( $checks );
+			} catch ( Invalid_Check_Slug_Exception $e ) {
+				$initialize_runtime = true;
+			}
+		} else {
+			// When not initialized early, all checks are loaded, so we can simply see if there are runtime checks.
+			$initialize_runtime = $this->has_runtime_check( $this->get_checks_to_run() );
+		}
+
+		if ( $initialize_runtime ) {
 			$preparation         = new Universal_Runtime_Preparation( $this->get_check_context() );
 			$cleanup_functions[] = $preparation->prepare();
 		}
@@ -318,6 +341,9 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * Runs the checks against the plugin.
 	 *
 	 * @since 1.0.0
+	 *
+	 * @global wpdb   $wpdb         WordPress database abstraction object.
+	 * @global string $table_prefix The database table prefix.
 	 *
 	 * @return Check_Result An object containing all check results.
 	 */
@@ -416,14 +442,11 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @throws Exception Thrown when invalid flag is passed, or Check slug does not exist.
 	 */
 	final public function get_checks_to_run() {
-		// Include file to use is_plugin_active() in CLI context.
-		require_once ABSPATH . 'wp-admin/includes/plugin.php';
-
 		$check_slugs = $this->get_check_slugs();
 		$check_flags = Check_Repository::TYPE_STATIC;
 
 		// Check if conditions are met in order to perform Runtime Checks.
-		if ( ( $this->initialized_early || $this->runtime_environment->can_set_up() ) && is_plugin_active( $this->get_plugin_basename() ) ) {
+		if ( $this->allow_runtime_checks() ) {
 			$check_flags = Check_Repository::TYPE_ALL;
 		}
 
@@ -446,6 +469,21 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		}
 
 		return $collection->to_map();
+	}
+
+	/**
+	 * Checks whether the current environment allows for runtime checks to be used.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return bool True if runtime checks are allowed, false otherwise.
+	 */
+	protected function allow_runtime_checks(): bool {
+		// Ensure that is_plugin_active() is available.
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+
+		return ( $this->initialized_early || $this->runtime_environment->can_set_up() )
+			&& is_plugin_active( $this->get_plugin_basename() );
 	}
 
 	/**
