@@ -8,6 +8,7 @@ build-phpunit
 docs
 node_modules
 patches
+phpcs-sniffs # Distributed via vendor/plugin-check/phpcs-sniffs instead
 tests
 
 *.DS_Store
