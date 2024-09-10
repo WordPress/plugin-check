@@ -143,6 +143,27 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incomplete-readme',
 				9
 			);
+		} else {
+			$plugin_data = get_plugin_data( $result->plugin()->main_file() );
+
+			if ( $parser->name !== $plugin_data['Name'] ) {
+				$this->add_result_warning_for_file(
+					$result,
+					sprintf(
+						/* translators: 1: Plugin name, 2: Name in plugin header */
+						__( 'Plugin name "%1$s" is different from the name declared in plugin header "%2$s".', 'plugin-check' ),
+						$parser->name,
+						$plugin_data['Name']
+					),
+					'mismatched_plugin_name',
+					$readme_file,
+					0,
+					0,
+					'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incomplete-readme',
+					7
+				);
+
+			}
 		}
 	}
 
