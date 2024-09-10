@@ -13,4 +13,9 @@
 		</testsuite>
 	</testsuites>
 
+	<filter>
+		<whitelist processUncoveredFilesFromWhitelist="false">
+			<directory suffix=".php">./PluginCheck/Sniffs</directory>
+		</whitelist>
+	</filter>
 </phpunit>

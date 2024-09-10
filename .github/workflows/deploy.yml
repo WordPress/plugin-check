@@ -17,7 +17,7 @@ jobs:
       - name: Install PHP dependencies
         uses: ramsey/composer-install@57532f8be5bda426838819c5ee9afb8af389d51a
         with:
-          composer-options: '--prefer-dist --no-progress --no-interaction --no-dev'
+          composer-options: '--prefer-dist --no-dev'
 
       - name: WordPress Plugin Deploy
         id: deploy
