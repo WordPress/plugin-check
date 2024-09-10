@@ -2,11 +2,10 @@
 /**
  * OffloadingSniff
  *
- * Based on code from WPCS.
+ * Based on code from {@link https://github.com/WordPress/WordPress-Coding-Standards}
+ * which is licensed under {@link https://opensource.org/licenses/MIT}.
  *
  * @package PluginCheck
- * @link    https://github.com/WordPress/WordPress-Coding-Standards
- * @license https://opensource.org/licenses/MIT MIT
  */
 
 namespace PluginCheckCS\PluginCheck\Sniffs\CodeAnalysis;
