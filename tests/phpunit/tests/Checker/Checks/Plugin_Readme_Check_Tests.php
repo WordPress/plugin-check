@@ -220,6 +220,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertCount( 1, wp_list_filter( $warnings['readme.md'][0][0], array( 'code' => 'default_readme_text' ) ) );
 		$this->assertCount( 1, wp_list_filter( $warnings['readme.md'][0][0], array( 'code' => 'invalid_license' ) ) );
 		$this->assertCount( 1, wp_list_filter( $warnings['readme.md'][0][0], array( 'code' => 'license_mismatch' ) ) );
+		$this->assertCount( 1, wp_list_filter( $warnings['readme.md'][0][0], array( 'code' => 'mismatched_plugin_name' ) ) );
 	}
 
 	public function test_single_file_plugin_without_error_for_trademarks() {
