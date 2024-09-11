@@ -34,7 +34,7 @@ class Check_Context_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_path_with_parameter() {
-		$this->assertSame( WP_PLUGIN_DIR . '/' . $this->plugin_name . '/another/folder', $this->check_context->path( '/another/folder' ) );
+		$this->assertSame( WP_PLUGIN_DIR . '/' . $this->plugin_name . '/test-content/themes', $this->check_context->path( '/test-content/themes' ) );
 	}
 
 	public function test_url() {
@@ -42,6 +42,6 @@ class Check_Context_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_url_with_parameter() {
-		$this->assertSame( WP_PLUGIN_URL . '/' . $this->plugin_name . '/folder/file.css', $this->check_context->url( '/folder/file.css' ) );
+		$this->assertSame( WP_PLUGIN_URL . '/' . $this->plugin_name . '/assets/js/plugin-check-admin.js', $this->check_context->url( '/assets/js/plugin-check-admin.js' ) );
 	}
 }
