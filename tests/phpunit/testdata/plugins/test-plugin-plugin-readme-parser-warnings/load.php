@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Test Plugin Readme Errors (Parser Warnings)
+ * Plugin Name: Test Plugin Readme Errors Parser Warnings
  * Plugin URI: https://github.com/WordPress/plugin-check
  * Description: Test plugin for the Readme check.
  * Requires at least: 6.0
