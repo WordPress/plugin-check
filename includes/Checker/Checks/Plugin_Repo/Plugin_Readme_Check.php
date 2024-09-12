@@ -693,7 +693,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				$result,
 				sprintf(
 					/* translators: %s: plugin header field */
-					__( 'The "%s" header in the readme file must be a comma-separated list of WordPress.org-formatted userid\'s.', 'plugin-check' ),
+					__( 'The "%s" header in the readme file must be a comma-separated list of WordPress.org-formatted usernames.', 'plugin-check' ),
 					'Contributors'
 				),
 				'readme_invalid_contributors',
