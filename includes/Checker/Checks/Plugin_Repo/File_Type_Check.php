@@ -90,6 +90,9 @@ class File_Type_Check extends Abstract_File_Check {
 		if ( $this->flags & self::TYPE_APPLICATION ) {
 			$this->look_for_application_files( $result, $files );
 		}
+
+		// Check for badly named files.
+		$this->look_for_badly_named_files( $result, $files );
 	}
 
 	/**
@@ -241,6 +244,63 @@ class File_Type_Check extends Abstract_File_Check {
 					8
 				);
 			}
+		}
+	}
+
+	/**
+	 * Looks for application files and amends the given result with an error if found.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param Check_Result $result The check result to amend, including the plugin context to check.
+	 * @param array        $files  List of absolute file paths.
+	 */
+	protected function look_for_badly_named_files( Check_Result $result, array $files ) {
+		$conflict_chars = array( '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '+', '=', '[', ']', '{', '}', ';', ':', '"', '\'', '<', '>', ',', '?', '/', '\\', '|', '`', '~' );
+
+		foreach ( $files as $file ) {
+			$badly_name = false;
+			if ( preg_match('/\s/', $file ) ) {
+				$badly_name = true;
+			}
+
+			foreach ( $conflict_chars as $char ) {
+				if ( strpos( basename( $file ) , $char ) !== false ) {
+					$badly_name = true;
+					break;
+				}
+			}
+
+			if ( $badly_name ) {
+				$this->add_result_error_for_file(
+					$result,
+					__( 'Badly named files are not permitted.', 'plugin-check' ),
+					'badly_named_files',
+					$file,
+					0,
+					0,
+					'',
+					8
+				);
+			}
+		}
+
+		// Duplicated names.
+		$files            = array_map( 'basename', $files );
+		$files            = array_map( 'strtolower', $files );
+		$duplicated_files = array_unique( array_diff_assoc( $files, array_unique( $files ) ) );
+
+		if ( ! empty( $duplicated_files ) ) {
+			$this->add_result_error_for_file(
+				$result,
+				__( 'Duplicated file names are not permitted.', 'plugin-check' ),
+				'duplicated_files',
+				implode( ', ', $duplicated_files ),
+				0,
+				0,
+				'',
+				8
+			);
 		}
 	}
 
