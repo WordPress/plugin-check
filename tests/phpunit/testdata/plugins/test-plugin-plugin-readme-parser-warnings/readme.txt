@@ -1,7 +1,7 @@
 
 === Test Plugin Readme Errors Parser Warnings ===
 
-Contributors:      plugin-check
+Contributors:      plugin check, wordpressdotorg
 Requires at least: 6.0
 Tested up to:      Latest
 Requires PHP:      5.6

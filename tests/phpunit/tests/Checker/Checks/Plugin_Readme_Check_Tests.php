@@ -221,6 +221,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertCount( 1, wp_list_filter( $warnings['readme.md'][0][0], array( 'code' => 'invalid_license' ) ) );
 		$this->assertCount( 1, wp_list_filter( $warnings['readme.md'][0][0], array( 'code' => 'license_mismatch' ) ) );
 		$this->assertCount( 1, wp_list_filter( $warnings['readme.md'][0][0], array( 'code' => 'mismatched_plugin_name' ) ) );
+		$this->assertCount( 1, wp_list_filter( $warnings['readme.md'][0][0], array( 'code' => 'readme_invalid_contributors' ) ) );
 	}
 
 	public function test_single_file_plugin_without_error_for_trademarks() {
@@ -478,5 +479,18 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertCount( 0, wp_list_filter( $errors['readme.md'][0][0], array( 'code' => 'nonexistent_tested_upto_header' ) ) );
 
 		delete_transient( 'wp_plugin_check_latest_wp_version' );
+	}
+
+	public function test_run_without_errors_readme_contributors_warning() {
+		$readme_check  = new Plugin_Readme_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-parser-warnings/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$readme_check->run( $check_result );
+
+		$warnings = $check_result->get_warnings();
+
+		// Should not contain contributors warning.
+		$this->assertCount( 0, wp_list_filter( $warnings['readme.txt'][0][0], array( 'code' => 'readme_invalid_contributors' ) ) );
 	}
 }
