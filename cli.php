@@ -34,16 +34,37 @@ if ( ! isset( $context ) ) {
 
 // Create the CLI command instance and add to WP CLI.
 $plugin_command = new Plugin_Check_Command( $context );
-WP_CLI::add_command( 'plugin', $plugin_command );
+WP_CLI::add_command(
+	'plugin',
+	$plugin_command,
+	array(
+		/**
+		 * This is a cleanup for the below hook which adds the object-cache.php drop-in.
+		 *
+		 * It is executed right after the command ran.
+		 *
+		 * Since the drop-in could be from somewhere else, a check of its contents is necessary
+		 * to verify it is the one that was added below.
+		 */
+		'after_invoke' => function () {
+			if (
+				file_exists( ABSPATH . 'wp-content/object-cache.php' ) &&
+				false !== strpos( file_get_contents( ABSPATH . 'wp-content/object-cache.php' ), 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' )
+			) {
+				unlink( ABSPATH . 'wp-content/object-cache.php' );
+			}
+		},
+	)
+);
 
-
-/**
- * Adds hook to set up the object-cache.php drop-in file.
+/*
+ * Add hook to set up the object-cache.php drop-in file.
  *
- * @since 1.0.0
+ * Runs after wp-config.php is loaded and thus ABSPATH is defined,
+ * but before any plugins are actually loaded.
  */
 WP_CLI::add_hook(
-	'before_wp_load',
+	'after_wp_config_load',
 	function () {
 		if ( CLI_Runner::is_plugin_check() ) {
 			if ( ! file_exists( ABSPATH . 'wp-content/object-cache.php' ) ) {

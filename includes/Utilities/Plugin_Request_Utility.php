@@ -187,6 +187,8 @@ class Plugin_Request_Utility {
 	 *
 	 * @since 1.1.0
 	 *
+	 * @global WP_Filesystem_Base $wp_filesystem WordPress filesystem subclass.
+	 *
 	 * @param string $plugin_url The URL of the plugin to download.
 	 * @return string The plugin basename after downloading and installing the plugin.
 	 *

@@ -7,7 +7,7 @@ Feature: Test that the severity level in plugin check works.
       <?php
       /**
        * Plugin Name: Foo Bar WP
-       * Plugin URI: https://example.com
+       * Plugin URI: https://foo-bar.com
        * Description: Custom plugin.
        * Version: 0.1.0
        * Requires at least: 6.0

@@ -143,6 +143,27 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incomplete-readme',
 				9
 			);
+		} else {
+			$plugin_data = get_plugin_data( $result->plugin()->main_file() );
+
+			if ( $parser->name !== $plugin_data['Name'] ) {
+				$this->add_result_warning_for_file(
+					$result,
+					sprintf(
+						/* translators: 1: Plugin name, 2: Name in plugin header */
+						__( 'Plugin name "%1$s" is different from the name declared in plugin header "%2$s".', 'plugin-check' ),
+						$parser->name,
+						$plugin_data['Name']
+					),
+					'mismatched_plugin_name',
+					$readme_file,
+					0,
+					0,
+					'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incomplete-readme',
+					7
+				);
+
+			}
 		}
 	}
 
@@ -187,6 +208,22 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 								'Tested up to'
 							),
 							'outdated_tested_upto_header',
+							$readme_file,
+							0,
+							0,
+							'https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/#readme-header-information',
+							7
+						);
+					} elseif ( version_compare( $parser->{$field_key}, number_format( (float) $latest_wordpress_version + 0.1, 1 ), '>' ) ) {
+						$this->add_result_error_for_file(
+							$result,
+							sprintf(
+								/* translators: 1: currently used version, 2: 'Tested up to' */
+								__( '<strong>Tested up to: %1$s.</strong><br>The "%2$s" value in your plugin is not valid. This version of WordPress does not exist (yet).', 'plugin-check' ),
+								$parser->{$field_key},
+								'Tested up to'
+							),
+							'nonexistent_tested_upto_header',
 							$readme_file,
 							0,
 							0,
@@ -397,7 +434,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		if ( empty( $stable_tag ) ) {
 			$this->add_result_error_for_file(
 				$result,
-				__( '<strong>Incorrect Stable Tag.</strong><br>Your Stable Tag is meant to be the stable version of your plugin, not of WordPress. For your plugin to be properly downloaded from WordPress.org, those values need to be the same. If they’re out of sync, your users won’t get the right version of your code.', 'plugin-check' ),
+				__( "<strong>Incorrect Stable Tag.</strong><br>Your Stable Tag is meant to be the stable version of your plugin, not of WordPress. For your plugin to be properly downloaded from WordPress.org, those values need to be the same. If they're out of sync, your users won't get the right version of your code.", 'plugin-check' ),
 				'no_stable_tag',
 				$readme_file,
 				0,
@@ -412,7 +449,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		if ( 'trunk' === $stable_tag ) {
 			$this->add_result_error_for_file(
 				$result,
-				__( "<strong>Incorrect Stable Tag.</strong><br>It's recommended not to use 'Stable Tag: trunk'. Your Stable Tag is meant to be the stable version of your plugin, not of WordPress. For your plugin to be properly downloaded from WordPress.org, those values need to be the same. If they’re out of sync, your users won’t get the right version of your code.", 'plugin-check' ),
+				__( "<strong>Incorrect Stable Tag.</strong><br>It's recommended not to use 'Stable Tag: trunk'. Your Stable Tag is meant to be the stable version of your plugin, not of WordPress. For your plugin to be properly downloaded from WordPress.org, those values need to be the same. If they're out of sync, your users won't get the right version of your code.", 'plugin-check' ),
 				'trunk_stable_tag',
 				$readme_file,
 				0,
@@ -431,7 +468,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		) {
 			$this->add_result_error_for_file(
 				$result,
-				__( '<strong>The Stable Tag in your readme file does not match the version in your main plugin file.</strong><br>Your Stable Tag is meant to be the stable version of your plugin, not of WordPress. For your plugin to be properly downloaded from WordPress.org, those values need to be the same. If they’re out of sync, your users won’t get the right version of your code.', 'plugin-check' ),
+				__( "<strong>The Stable Tag in your readme file does not match the version in your main plugin file.</strong><br>Your Stable Tag is meant to be the stable version of your plugin, not of WordPress. For your plugin to be properly downloaded from WordPress.org, those values need to be the same. If they're out of sync, your users won't get the right version of your code.", 'plugin-check' ),
 				'stable_tag_mismatch',
 				$readme_file,
 				0,
@@ -484,6 +521,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 * @param Check_Result $result      The Check Result to amend.
 	 * @param string       $readme_file Readme file.
 	 * @param Parser       $parser      The Parser object.
+	 *
+	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
 	 */
 	private function check_for_warnings( Check_Result $result, string $readme_file, Parser $parser ) {
 		$warnings = $parser->warnings ? $parser->warnings : array();
@@ -563,15 +602,45 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 			),
 		);
 
+		if ( ! empty( $parser->sections ) ) {
+			foreach ( array_keys( $parser->sections ) as $section ) {
+				$max_length = $parser->maximum_field_lengths['section'];
+
+				if ( isset( $parser->maximum_field_lengths[ 'section-' . $section ] ) ) {
+					$max_length = $parser->maximum_field_lengths[ 'section-' . $section ];
+				}
+
+				$section_title = str_replace( '_', ' ', $section );
+
+				$section_title = ( 'faq' === $section ) ? strtoupper( $section_title ) : ucwords( $section_title );
+
+				$warning_details[ 'trimmed_section_' . $section ] = array(
+					'message'  => sprintf(
+						/* translators: 1: section title; 2: maximum limit */
+						_n( 'The "%1$s" section is too long and was truncated. A maximum of %2$d character is supported.', 'The "%1$s" section is too long and was truncated. A maximum of %2$d characters is supported.', $max_length, 'plugin-check' ),
+						$section_title,
+						$max_length
+					),
+					'severity' => 6,
+				);
+			}
+		}
+
 		$ignored_warnings = $this->get_ignored_warnings( $parser );
 
 		$warning_keys = array_diff( $warning_keys, $ignored_warnings );
 
 		if ( ! empty( $warning_keys ) ) {
 			foreach ( $warning_keys as $warning ) {
+				$warning_message = isset( $warning_details[ $warning ]['message'] ) ? $warning_details[ $warning ]['message'] : sprintf(
+					/* translators: %s: warning code */
+					__( 'Readme parser warning detected: %s', 'plugin-check' ),
+					esc_html( $warning )
+				);
+
 				$this->add_result_warning_for_file(
 					$result,
-					$warning_details[ $warning ]['message'],
+					$warning_message,
 					'readme_parser_warnings_' . $warning,
 					$readme_file,
 					0,

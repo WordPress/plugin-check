@@ -46,6 +46,12 @@
 		<type>warning</type>
 	</rule>
 
+	<!-- Sanitized Input rules -->
+	<rule ref="WordPress.Security.ValidatedSanitizedInput">
+		<type>error</type>
+		<severity>7</severity>
+	</rule>
+
 	<!-- Prohibit the use of the backtick operator. -->
 	<rule ref="Generic.PHP.BacktickOperator"/>
 
@@ -84,8 +90,14 @@
 				<element key="create_function" value="null"/>
 				<element key="eval" value="null"/>
 				<element key="str_rot13" value="null"/>
+				<element key="set_time_limit" value="null"/>
+				<element key="ini_set" value="null"/>
+				<element key="ini_alter" value="null"/>
+				<element key="dl" value="null"/>
 			</property>
 		</properties>
+		<type>error</type>
+		<severity>7</severity>
 	</rule>
 
 	<!-- Check for use of deprecated WordPress classes, functions and function parameters. -->

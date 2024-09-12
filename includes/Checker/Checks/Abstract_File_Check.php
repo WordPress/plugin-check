@@ -286,7 +286,7 @@ abstract class Abstract_File_Check implements Static_Check {
 					continue;
 				}
 
-				$file_path = $file->getPathname();
+				$file_path = wp_normalize_path( $file->getPathname() );
 
 				$directories_to_ignore = Plugin_Request_Utility::get_directories_to_ignore();
 
