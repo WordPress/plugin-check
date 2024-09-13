@@ -314,7 +314,7 @@ class File_Type_Check extends Abstract_File_Check {
 	 * @return string Description.
 	 */
 	public function get_description(): string {
-		return __( 'Detects the usage of hidden and compressed files, VCS directories, and application files.', 'plugin-check' );
+		return __( 'Detects the usage of hidden and compressed files, VCS directories, application files and badly named files.', 'plugin-check' );
 	}
 
 	/**
