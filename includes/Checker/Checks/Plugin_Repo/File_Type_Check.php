@@ -256,7 +256,7 @@ class File_Type_Check extends Abstract_File_Check {
 	 * @param array        $files  List of absolute file paths.
 	 */
 	protected function look_for_badly_named_files( Check_Result $result, array $files ) {
-		$conflict_chars = array( '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '+', '=', '[', ']', '{', '}', ';', ':', '"', '\'', '<', '>', ',', '?', '/', '\\', '|', '`', '~' );
+		$conflict_chars = '!@#$%^&*()+=[]{};:"\'<>,?/\\|`~';
 
 		foreach ( $files as $file ) {
 			$badly_name = false;
@@ -264,12 +264,9 @@ class File_Type_Check extends Abstract_File_Check {
 				$badly_name = true;
 			}
 
-			foreach ( $conflict_chars as $char ) {
-				if ( strpos( basename( $file ) , $char ) !== false ) {
-					$badly_name = true;
-					break;
-				}
-			}
+			if ( preg_match( '/[' . preg_quote( $conflict_chars, '/' ) . ']/', basename( $file ) ) ) {
+        $badly_name = true;
+    	}
 
 			if ( $badly_name ) {
 				$this->add_result_error_for_file(
