@@ -260,13 +260,13 @@ class File_Type_Check extends Abstract_File_Check {
 
 		foreach ( $files as $file ) {
 			$badly_name = false;
-			if ( preg_match('/\s/', $file ) ) {
+			if ( preg_match( '/\s/', $file ) ) {
 				$badly_name = true;
 			}
 
 			if ( preg_match( '/[' . preg_quote( $conflict_chars, '/' ) . ']/', basename( $file ) ) ) {
-        $badly_name = true;
-    	}
+				$badly_name = true;
+			}
 
 			if ( $badly_name ) {
 				$this->add_result_error_for_file(

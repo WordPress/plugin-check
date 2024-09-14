@@ -108,7 +108,7 @@ class File_Type_Check_Tests extends WP_UnitTestCase {
 		$check->run( $check_result );
 
 		$errors = $check_result->get_errors();
-		
+
 		$this->assertNotEmpty( $errors );
 		$this->assertArrayHasKey( 'plugin name.php', $errors );
 
