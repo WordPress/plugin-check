@@ -9,8 +9,9 @@ docs
 node_modules
 patches
 # Distributed via vendor/plugin-check/phpcs-sniffs instead
-phpcs-sniffs
+/phpcs-sniffs/
 tests
+/test-content/
 
 *.DS_Store
 .DS_Store
