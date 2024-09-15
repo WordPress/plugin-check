@@ -954,7 +954,7 @@
         },
         {
             "name": "composer/pcre",
-            "version": "2.3.1",
+            "version": "2.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/pcre.git",
