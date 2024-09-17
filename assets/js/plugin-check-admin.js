@@ -118,26 +118,14 @@
 	 * @param {Object} data Data object with props passed to form data.
 	 */
 	function setUpEnvironment( data ) {
-		const pluginCheckData = new FormData();
-		pluginCheckData.append( 'nonce', pluginCheck.nonce );
-		pluginCheckData.append( 'plugin', data.plugin );
-		pluginCheckData.append(
-			'action',
-			pluginCheck.actionSetUpRuntimeEnvironment
-		);
+		const pluginCheckData = {
+			nonce: pluginCheck.nonce,
+			plugin: data.plugin,
+			action: pluginCheck.actionSetUpRuntimeEnvironment,
+			checks: data.checks
+		};
 
-		for ( let i = 0; i < data.checks.length; i++ ) {
-			pluginCheckData.append( 'checks[]', data.checks[ i ] );
-		}
-
-		return fetch( ajaxurl, {
-			method: 'POST',
-			credentials: 'same-origin',
-			body: pluginCheckData,
-		} )
-			.then( ( response ) => {
-				return response.json();
-			} )
+		return wp.ajax.post( pluginCheck.actionSetUpRuntimeEnvironment, pluginCheckData )
 			.then( handleDataErrors )
 			.then( ( responseData ) => {
 				if ( ! responseData.data || ! responseData.data.message ) {
@@ -158,21 +146,12 @@
 	 * @return {Object} The response data.
 	 */
 	function cleanUpEnvironment() {
-		const pluginCheckData = new FormData();
-		pluginCheckData.append( 'nonce', pluginCheck.nonce );
-		pluginCheckData.append(
-			'action',
-			pluginCheck.actionCleanUpRuntimeEnvironment
-		);
+		const pluginCheckData = {
+			nonce: pluginCheck.nonce,
+			action: pluginCheck.actionCleanUpRuntimeEnvironment
+		};
 
-		return fetch( ajaxurl, {
-			method: 'POST',
-			credentials: 'same-origin',
-			body: pluginCheckData,
-		} )
-			.then( ( response ) => {
-				return response.json();
-			} )
+		return wp.ajax.post( pluginCheck.actionCleanUpRuntimeEnvironment, pluginCheckData )
 			.then( handleDataErrors )
 			.then( ( responseData ) => {
 				if ( ! responseData.data || ! responseData.data.message ) {
@@ -189,28 +168,20 @@
 	 * @since 1.0.0
 	 */
 	function getChecksToRun() {
-		const pluginCheckData = new FormData();
-		pluginCheckData.append( 'nonce', pluginCheck.nonce );
-		pluginCheckData.append( 'plugin', pluginsList.value );
-		pluginCheckData.append( 'action', pluginCheck.actionGetChecksToRun );
+		const pluginCheckData = {
+			nonce: pluginCheck.nonce,
+			plugin: pluginsList.value,
+			action: pluginCheck.actionGetChecksToRun,
+			categories: []
+		};
 
 		for ( let i = 0; i < categoriesList.length; i++ ) {
 			if ( categoriesList[ i ].checked ) {
-				pluginCheckData.append(
-					'categories[]',
-					categoriesList[ i ].value
-				);
+				pluginCheckData.categories.push( categoriesList[ i ].value );
 			}
 		}
 
-		return fetch( ajaxurl, {
-			method: 'POST',
-			credentials: 'same-origin',
-			body: pluginCheckData,
-		} )
-			.then( ( response ) => {
-				return response.json();
-			} )
+		return wp.ajax.post( pluginCheck.actionGetChecksToRun, pluginCheckData )
 			.then( handleDataErrors )
 			.then( ( responseData ) => {
 				if (
@@ -286,20 +257,14 @@
 	 * @return {Object} The check results.
 	 */
 	function runCheck( plugin, check ) {
-		const pluginCheckData = new FormData();
-		pluginCheckData.append( 'nonce', pluginCheck.nonce );
-		pluginCheckData.append( 'plugin', plugin );
-		pluginCheckData.append( 'checks[]', check );
-		pluginCheckData.append( 'action', pluginCheck.actionRunChecks );
+		const pluginCheckData = {
+			nonce: pluginCheck.nonce,
+			plugin: plugin,
+			checks: [ check ],
+			action: pluginCheck.actionRunChecks
+		};
 
-		return fetch( ajaxurl, {
-			method: 'POST',
-			credentials: 'same-origin',
-			body: pluginCheckData,
-		} )
-			.then( ( response ) => {
-				return response.json();
-			} )
+		return wp.ajax.post( pluginCheck.actionRunChecks, pluginCheckData )
 			.then( handleDataErrors )
 			.then( ( responseData ) => {
 				// If the response is successful and there is no message in the response.
