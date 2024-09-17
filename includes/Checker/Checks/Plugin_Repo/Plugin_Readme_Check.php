@@ -146,7 +146,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		} else {
 			$plugin_data = get_plugin_data( $result->plugin()->main_file() );
 
-			if ( html_entity_decode( $parser->name ) !== $plugin_data['Name'] ) {
+			if ( html_entity_decode( $parser->name, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401 ) !== $plugin_data['Name'] ) {
 				$this->add_result_warning_for_file(
 					$result,
 					sprintf(
