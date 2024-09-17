@@ -121,7 +121,4 @@
 	<!-- Check for usage of deprecated parameter values in WP functions and provide alternative based on the parameter passed. -->
 	<rule ref="WordPress.WP.DeprecatedParameterValues"/>
 
-
-
-
 </ruleset>
