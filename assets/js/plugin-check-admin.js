@@ -122,10 +122,11 @@
 			nonce: pluginCheck.nonce,
 			plugin: data.plugin,
 			action: pluginCheck.actionSetUpRuntimeEnvironment,
-			checks: data.checks
+			checks: data.checks,
 		};
 
-		return wp.ajax.post( pluginCheck.actionSetUpRuntimeEnvironment, pluginCheckData )
+		return wp.ajax
+			.post( pluginCheck.actionSetUpRuntimeEnvironment, pluginCheckData )
 			.then( handleDataErrors )
 			.then( ( responseData ) => {
 				if ( ! responseData.data || ! responseData.data.message ) {
@@ -148,10 +149,14 @@
 	function cleanUpEnvironment() {
 		const pluginCheckData = {
 			nonce: pluginCheck.nonce,
-			action: pluginCheck.actionCleanUpRuntimeEnvironment
+			action: pluginCheck.actionCleanUpRuntimeEnvironment,
 		};
 
-		return wp.ajax.post( pluginCheck.actionCleanUpRuntimeEnvironment, pluginCheckData )
+		return wp.ajax
+			.post(
+				pluginCheck.actionCleanUpRuntimeEnvironment,
+				pluginCheckData
+			)
 			.then( handleDataErrors )
 			.then( ( responseData ) => {
 				if ( ! responseData.data || ! responseData.data.message ) {
@@ -172,7 +177,7 @@
 			nonce: pluginCheck.nonce,
 			plugin: pluginsList.value,
 			action: pluginCheck.actionGetChecksToRun,
-			categories: []
+			categories: [],
 		};
 
 		for ( let i = 0; i < categoriesList.length; i++ ) {
@@ -181,7 +186,8 @@
 			}
 		}
 
-		return wp.ajax.post( pluginCheck.actionGetChecksToRun, pluginCheckData )
+		return wp.ajax
+			.post( pluginCheck.actionGetChecksToRun, pluginCheckData )
 			.then( handleDataErrors )
 			.then( ( responseData ) => {
 				if (
@@ -259,12 +265,13 @@
 	function runCheck( plugin, check ) {
 		const pluginCheckData = {
 			nonce: pluginCheck.nonce,
-			plugin: plugin,
+			plugin,
 			checks: [ check ],
-			action: pluginCheck.actionRunChecks
+			action: pluginCheck.actionRunChecks,
 		};
 
-		return wp.ajax.post( pluginCheck.actionRunChecks, pluginCheckData )
+		return wp.ajax
+			.post( pluginCheck.actionRunChecks, pluginCheckData )
 			.then( handleDataErrors )
 			.then( ( responseData ) => {
 				// If the response is successful and there is no message in the response.
