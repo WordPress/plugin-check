@@ -51,7 +51,7 @@ class I18n_Usage_Check extends Abstract_PHP_CodeSniffer_Check {
 		$slug_prefix = '--force-slug=';
 		$result      = array_filter(
 			$argv,
-			function( $element ) use ( $slug_prefix ) {
+			function ( $element ) use ( $slug_prefix ) {
 				return strpos( $element, $slug_prefix ) === 0;
 			}
 		);
