@@ -146,7 +146,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 
 		// Format check arguments for PHPCS.
 		foreach ( $check_args as $key => $value ) {
-			if ( $key === 'runtime-set' ) {
+			if ( 'runtime-set' === $key ) {
 				$defaults[] = "--{$key}";
 				$defaults   = array_merge( $defaults, explode( ' ', $value ) );
 			} else {

@@ -112,7 +112,7 @@ final class Plugin_Check_Command {
 	 *
 	 * [--warning-severity=<warning-severity>]
 	 * : Warning severity level.
-	 * 
+	 *
 	 * [--force-slug=<slug>]
 	 * : Slug that would be sent as correct while reviewing.
 	 *
