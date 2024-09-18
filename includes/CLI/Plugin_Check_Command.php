@@ -704,29 +704,42 @@ final class Plugin_Check_Command {
 	/**
 	 * Returns separated results by ERROR and WARNING.
 	 *
-	 * @since 1.1.0
+	 * @since 1.2.0
 	 *
 	 * @param array $results Check results.
 	 * @return array Separated results.
 	 */
 	private function get_separated_results( $results ) {
-		$errors = array_filter(
-			$results,
-			function ( $item ) {
-				return ( 'ERROR' === $item['type'] );
-			}
-		);
+		// Initialize arrays for errors and warnings.
+		$errors   = array();
+		$warnings = array();
 
-		$warnings = array_filter(
-			$results,
-			function ( $item ) {
-				return ( 'WARNING' === $item['type'] );
+		// Return early if $results is not an array or is empty.
+		if ( ! is_array( $results ) || empty( $results ) ) {
+			return array(
+				'errors'   => $errors,
+				'warnings' => $warnings,
+			);
+		}
+
+		// Separate errors and warnings in one pass.
+		foreach ( $results as $item ) {
+			if ( ! isset( $item['type'] ) ) {
+				continue;
 			}
-		);
+			switch ( $item['type'] ) {
+				case 'ERROR':
+					$errors[] = $item;
+					break;
+				case 'WARNING':
+					$warnings[] = $item;
+					break;
+			}
+		}
 
 		return array(
-			'errors'   => array_values( $errors ),
-			'warnings' => array_values( $warnings ),
+			'errors'   => $errors,
+			'warnings' => $warnings,
 		);
 	}
 }
