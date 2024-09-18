@@ -291,7 +291,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	}
 
 	/**
-	 * Sets the correct slug to compare in diferent checks.
+	 * Sets the correct slug to compare in different checks.
 	 *
 	 * @since 1.2.0
 	 *
