@@ -116,19 +116,19 @@ Feature: Test that the WP-CLI command works.
       WordPress.Security.EscapeOutput.OutputNotEscaped
       """
 
-  Scenario: Check plugin with apostrophe in plugin name
+  Scenario: Check plugin with special chars in plugin name
     Given a WP install with the Plugin Check plugin
     And a wp-content/plugins/johns-post-counter/johns-post-counter.php file:
       """
       <?php
       /**
-       * Plugin Name: John's Post Counter
+       * Plugin Name: John's — Post & Counter
        */
 
       """
     And a wp-content/plugins/johns-post-counter/readme.txt file:
       """
-      === John's Post Counter ===
+      === John's — Post & Counter ===
       """
 
     When I run the WP-CLI command `plugin check johns-post-counter --format=csv --fields=code,type`
