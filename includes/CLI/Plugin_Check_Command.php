@@ -250,10 +250,10 @@ final class Plugin_Check_Command {
 		$error_severity   = ! empty( $options['error-severity'] ) ? $options['error-severity'] : $options['severity'];
 		$warning_severity = ! empty( $options['warning-severity'] ) ? $options['warning-severity'] : $options['severity'];
 
-		$format_is_wporg = ( isset( $options['format'] ) && 'wporg' === $options['format'] );
+		$is_wporg_format = ( isset( $options['format'] ) && 'wporg' === $options['format'] );
 
 		// Defaults error severity for wporg.
-		if ( empty( $error_severity ) && $format_is_wporg ) {
+		if ( empty( $error_severity ) && $is_wporg_format ) {
 			$error_severity = 7;
 		}
 
@@ -274,7 +274,7 @@ final class Plugin_Check_Command {
 			}
 
 			if ( ! empty( $file_results ) ) {
-				if ( $format_is_wporg ) {
+				if ( $is_wporg_format ) {
 					$total_results = array_merge( $total_results, $file_results );
 				} else {
 					$this->display_results( $formatter, $file_name, $file_results );
@@ -291,7 +291,7 @@ final class Plugin_Check_Command {
 			}
 
 			if ( ! empty( $file_results ) ) {
-				if ( $format_is_wporg ) {
+				if ( $is_wporg_format ) {
 					$total_results = array_merge( $total_results, $file_results );
 				} else {
 					$this->display_results( $formatter, $file_name, $file_results );
@@ -299,7 +299,7 @@ final class Plugin_Check_Command {
 			}
 		}
 
-		if ( $format_is_wporg ) {
+		if ( $is_wporg_format ) {
 			$separated_results = $this->get_separated_results( $total_results );
 			WP_CLI::line( json_encode( $separated_results ) );
 		}
