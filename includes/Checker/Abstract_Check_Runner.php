@@ -46,6 +46,14 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	protected $check_exclude_slugs;
 
 	/**
+	 * The forced slug to compare.
+	 *
+	 * @since 1.2.0
+	 * @var array
+	 */
+	protected $forced_slug;
+
+	/**
 	 * The plugin parameter.
 	 *
 	 * @since 1.0.0
@@ -280,6 +288,19 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			}
 		}
 		$this->check_categories = $categories;
+	}
+
+	/**
+	 * Sets the correct slug to compare in diferent checks.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param string $forced_slug Slug to compare.
+	 *
+	 * @throws Exception Thrown if the flag set does not match the original request parameter.
+	 */
+	final public function set_forced_slug( $forced_slug ) {
+		$this->forced_slug = $forced_slug;
 	}
 
 	/**

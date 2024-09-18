@@ -41,11 +41,24 @@ class I18n_Usage_Check extends Abstract_PHP_CodeSniffer_Check {
 	 * @return array An associative array of PHPCS CLI arguments.
 	 */
 	protected function get_args() {
-		return array(
-			'extensions' => 'php',
+		$sniff_args = array(
 			'standard'   => 'WordPress',
+			'extensions' => 'php',
 			'sniffs'     => 'WordPress.WP.I18n',
 		);
+
+		global $argv;
+		$slug_prefix = '--force-slug=';
+		$result = array_filter( $argv, function( $element ) use ( $slug_prefix ) {
+			return strpos( $element, $slug_prefix ) === 0;
+		});
+
+		if ( ! empty( $result ) ) {
+			$forced_slug = str_replace( $slug_prefix, '', array_shift( $result ) );
+			$sniff_args['runtime-set'] = 'text_domain ' . $forced_slug;
+		}
+
+		return $sniff_args;
 	}
 
 	/**

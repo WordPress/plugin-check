@@ -30,10 +30,11 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	 * @var array
 	 */
 	protected $allowed_args = array(
-		'standard'   => true,
-		'extensions' => true,
-		'sniffs'     => true,
-		'exclude'    => true, //phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
+		'standard'    => true,
+		'extensions'  => true,
+		'sniffs'      => true,
+		'runtime-set' => true,
+		'exclude'     => true, //phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
 	);
 
 	/**
@@ -145,7 +146,12 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 
 		// Format check arguments for PHPCS.
 		foreach ( $check_args as $key => $value ) {
-			$defaults[] = "--{$key}=$value";
+			if ( $key === 'runtime-set' ) {
+				$defaults[] = "--{$key}";
+				$defaults   = array_merge( $defaults, explode( ' ', $value ) );
+			} else {
+				$defaults[] = "--{$key}=$value";
+			}
 		}
 
 		return $defaults;
