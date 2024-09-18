@@ -9,6 +9,7 @@ docs
 node_modules
 patches
 tests
+test-content
 
 *.DS_Store
 .DS_Store
