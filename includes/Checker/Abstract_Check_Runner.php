@@ -18,6 +18,7 @@ use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
  * @since 1.0.0
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 abstract class Abstract_Check_Runner implements Check_Runner {
 
