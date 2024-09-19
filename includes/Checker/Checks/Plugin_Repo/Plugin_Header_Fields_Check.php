@@ -231,9 +231,9 @@ class Plugin_Header_Fields_Check implements Static_Check {
 
 		if ( ! $result->plugin()->is_single_file_plugin() ) {
 			if ( ! empty( $plugin_header['TextDomain'] ) ) {
-				$plugin_slug = basename( $result->plugin()->path() );
+				$plugin_slug = $result->plugin()->slug();
 
-				if ( ! empty( $plugin_slug ) && $plugin_slug !== $plugin_header['TextDomain'] ) {
+				if ( $plugin_slug !== $plugin_header['TextDomain'] ) {
 					$this->add_result_warning_for_file(
 						$result,
 						sprintf(
