@@ -49,7 +49,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * The forced slug to compare.
 	 *
 	 * @since 1.2.0
-	 * @var array
+	 * @var string
 	 */
 	protected $forced_slug;
 

@@ -364,6 +364,37 @@ Feature: Test that the WP-CLI command works.
       no_plugin_readme
       """
 
+  Scenario: Check a plugin from external location with custom plugin slug
+    Given a WP install with the Plugin Check plugin
+    And an empty external-folder/pxzvccv345nhg directory
+    And a external-folder/pxzvccv345nhg/foo-sample.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Sample
+       * Plugin URI:  https://foo-sample.com
+       * Description:
+       * Version:     0.1.0
+       * Author:
+       * Author URI:
+       * License:     GPL-2.0+
+       * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+       * Text Domain: foo-sample
+       */
+
+      """
+
+    When I run the WP-CLI command `plugin check {RUN_DIR}/external-folder/pxzvccv345nhg/ --format=csv --fields=code,type --force-slug=foo-sample`
+    Then STDERR should be empty
+    And STDOUT should not contain:
+      """
+      textdomain_mismatch,WARNING
+      """
+    And STDOUT should contain:
+      """
+      no_plugin_readme,WARNING
+      """
+
   Scenario: Check a plugin from external location but with invalid plugin
     Given a WP install with the Plugin Check plugin
     And an empty external-folder/foo-plugin directory
