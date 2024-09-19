@@ -38,11 +38,10 @@ class Plugin_Review_PHPCS_Check_Tests extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'code', $errors['load.php'][12][5][0] );
 		$this->assertEquals( 'WordPress.WP.DeprecatedFunctions.the_author_emailFound', $errors['load.php'][12][5][0]['code'] );
 
-		// Check for WordPress.Security.ValidatedSanitizedInput.InputNotValidated error on Line no 15 and column no at 27.
-		$this->assertArrayHasKey( 15, $errors['load.php'] );
-		$this->assertArrayHasKey( 27, $errors['load.php'][15] );
-		$this->assertArrayHasKey( 'code', $errors['load.php'][15][27][0] );
-		$this->assertEquals( 'WordPress.Security.ValidatedSanitizedInput.InputNotValidated', $errors['load.php'][15][27][0]['code'] );
+		// Check for WordPress.Security.ValidatedSanitizedInput warnings on Line no 15 and column no at 27.
+		$this->assertCount( 1, wp_list_filter( $warnings['load.php'][15][27], array( 'code' => 'WordPress.Security.ValidatedSanitizedInput.InputNotValidated' ) ) );
+		$this->assertCount( 1, wp_list_filter( $warnings['load.php'][15][27], array( 'code' => 'WordPress.Security.ValidatedSanitizedInput.MissingUnslash' ) ) );
+		$this->assertCount( 1, wp_list_filter( $warnings['load.php'][15][27], array( 'code' => 'WordPress.Security.ValidatedSanitizedInput.InputNotSanitized' ) ) );
 
 		// Check for Squiz.PHP.DiscouragedFunctions.Discouraged warning on Line no 17 and column no at 1.
 		$this->assertSame( 'Squiz.PHP.DiscouragedFunctions.Discouraged', $warnings['load.php'][17][1][0]['code'] );
