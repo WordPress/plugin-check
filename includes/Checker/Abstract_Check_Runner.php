@@ -47,12 +47,12 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	protected $check_exclude_slugs;
 
 	/**
-	 * The forced slug to compare.
+	 * The force slug to compare.
 	 *
 	 * @since 1.2.0
 	 * @var string
 	 */
-	protected $forced_slug;
+	protected $force_slug;
 
 	/**
 	 * The plugin parameter.
@@ -164,6 +164,15 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @return array An array of categories.
 	 */
 	abstract protected function get_categories_param();
+
+	/**
+	 * Returns the force slug parameter based on the request.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return string Force plugin slug.
+	 */
+	abstract protected function get_force_slug_param();
 
 	/**
 	 * Sets whether the runner class was initialized early.
@@ -296,12 +305,24 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @since 1.2.0
 	 *
-	 * @param string $forced_slug Slug to compare.
+	 * @param string $force_slug Slug to compare.
 	 *
 	 * @throws Exception Thrown if the flag set does not match the original request parameter.
 	 */
-	final public function set_forced_slug( $forced_slug ) {
-		$this->forced_slug = $forced_slug;
+	final public function set_force_slug( $force_slug ) {
+		if ( $this->initialized_early ) {
+			if ( $force_slug !== $this->get_force_slug_param() ) {
+				throw new Exception(
+					sprintf(
+						/* translators: %s: slug */
+						__( 'Invalid slug: The %s value does not match the original request parameter.', 'plugin-check' ),
+						'force-slug'
+					)
+				);
+			}
+		}
+
+		$this->force_slug = $force_slug;
 	}
 
 	/**
@@ -612,6 +633,21 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		return $this->get_categories_param();
 	}
 
+	/**
+	 * Returns a force slug.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return string A force slug.
+	 */
+	final protected function get_force_slug() {
+		if ( null !== $this->force_slug ) {
+			return $this->force_slug;
+		}
+
+		return $this->get_force_slug_param();
+	}
+
 	/** Gets the Check_Context for the plugin.
 	 *
 	 * @since 1.0.0
@@ -621,7 +657,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	private function get_check_context() {
 		$plugin_basename = $this->get_plugin_basename();
 		$plugin_path     = is_dir( $plugin_basename ) ? $plugin_basename : WP_PLUGIN_DIR . '/' . $plugin_basename;
-		return new Check_Context( $plugin_path );
+		return new Check_Context( $plugin_path, $this->get_force_slug() );
 	}
 
 	/**

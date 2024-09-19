@@ -8,6 +8,7 @@
 namespace WordPress\Plugin_Check\Checker\Checks\General;
 
 use WordPress\Plugin_Check\Checker\Check_Categories;
+use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Checks\Abstract_PHP_CodeSniffer_Check;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 
@@ -40,26 +41,16 @@ class I18n_Usage_Check extends Abstract_PHP_CodeSniffer_Check {
 	 *
 	 * @return array An associative array of PHPCS CLI arguments.
 	 */
-	protected function get_args() {
+	protected function get_args( Check_Result $result ) {
+		$plugin_slug = $result->plugin()->slug();
+
 		$sniff_args = array(
-			'standard'   => 'WordPress',
 			'extensions' => 'php',
+			'standard'   => 'WordPress',
 			'sniffs'     => 'WordPress.WP.I18n',
 		);
 
-		global $argv;
-		$slug_prefix = '--force-slug=';
-		$result      = array_filter(
-			$argv,
-			function ( $element ) use ( $slug_prefix ) {
-				return strpos( $element, $slug_prefix ) === 0;
-			}
-		);
-
-		if ( ! empty( $result ) ) {
-			$forced_slug               = str_replace( $slug_prefix, '', array_shift( $result ) );
-			$sniff_args['runtime-set'] = 'text_domain ' . $forced_slug;
-		}
+		$sniff_args['runtime-set'] = 'text_domain ' . $plugin_slug;
 
 		return $sniff_args;
 	}

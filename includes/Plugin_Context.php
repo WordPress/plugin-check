@@ -30,6 +30,14 @@ class Plugin_Context {
 	protected $main_file;
 
 	/**
+	 * Plugin slug.
+	 *
+	 * @since 1.2.0
+	 * @var string
+	 */
+	protected $slug;
+
+	/**
 	 * The minimum supported WordPress version of the plugin.
 	 *
 	 * @since 1.0.0
@@ -43,10 +51,11 @@ class Plugin_Context {
 	 * @since 1.0.0
 	 *
 	 * @param string $main_file The absolute path to the plugin main file.
+	 * @param string $slug      Plugin slug.
 	 *
 	 * @throws Exception Throws exception if not called via regular WP-CLI or WordPress bootstrap order.
 	 */
-	public function __construct( $main_file ) {
+	public function __construct( $main_file, $slug = '' ) {
 		if ( function_exists( 'wp_normalize_path' ) ) {
 			$this->main_file = wp_normalize_path( $main_file );
 		} elseif ( function_exists( '\WP_CLI\Utils\normalize_path' ) ) {
@@ -66,6 +75,12 @@ class Plugin_Context {
 					break;
 				}
 			}
+		}
+
+		if ( ! empty( $slug ) ) {
+			$this->slug = $slug;
+		} else {
+			$this->slug = basename( $this->path() );
 		}
 	}
 
@@ -89,6 +104,17 @@ class Plugin_Context {
 	 */
 	public function main_file() {
 		return $this->main_file;
+	}
+
+	/**
+	 * Returns the plugin slug.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return string Plugin slug.
+	 */
+	public function slug() {
+		return $this->slug;
 	}
 
 	/**

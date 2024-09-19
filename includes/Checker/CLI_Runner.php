@@ -159,6 +159,26 @@ class CLI_Runner extends Abstract_Check_Runner {
 	}
 
 	/**
+	 * Returns the force slug parameter based on the request.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return string Force plugin slug.
+	 */
+	protected function get_force_slug_param() {
+		$slug = '';
+
+		foreach ( $_SERVER['argv'] as $value ) {
+			if ( false !== strpos( $value, '--force-slug=' ) ) {
+				$slug = str_replace( '--force-slug=', '', $value );
+				break;
+			}
+		}
+
+		return $slug;
+	}
+
+	/**
 	 * Checks whether the current environment allows for runtime checks to be used.
 	 *
 	 * @since n.e.x.t

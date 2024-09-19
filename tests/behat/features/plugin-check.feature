@@ -382,6 +382,19 @@ Feature: Test that the WP-CLI command works.
        * Text Domain: foo-sample
        */
 
+      echo esc_html__( 'Hello World', 'foo-sample' );
+
+      """
+
+    When I run the WP-CLI command `plugin check {RUN_DIR}/external-folder/pxzvccv345nhg/ --format=csv --fields=code,type`
+    Then STDERR should be empty
+    And STDOUT should contain:
+      """
+      textdomain_mismatch,WARNING
+      """
+    And STDOUT should contain:
+      """
+      no_plugin_readme,WARNING
       """
 
     When I run the WP-CLI command `plugin check {RUN_DIR}/external-folder/pxzvccv345nhg/ --format=csv --fields=code,type --force-slug=foo-sample`

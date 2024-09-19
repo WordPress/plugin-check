@@ -198,7 +198,7 @@ final class Plugin_Check_Command {
 			$runner->set_check_slugs( $checks );
 			$runner->set_plugin( $plugin );
 			$runner->set_categories( $categories );
-			$runner->set_forced_slug( $options['force-slug'] );
+			$runner->set_force_slug( $options['force-slug'] );
 
 			$checks_to_run = $runner->get_checks_to_run();
 		} catch ( Exception $error ) {

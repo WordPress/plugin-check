@@ -120,4 +120,15 @@ class AJAX_Runner extends Abstract_Check_Runner {
 
 		return $categories;
 	}
+
+	/**
+	 * Returns the force slug parameter based on the request.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return string Force plugin slug.
+	 */
+	protected function get_force_slug_param() {
+		return '';
+	}
 }
