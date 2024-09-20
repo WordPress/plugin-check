@@ -49,6 +49,10 @@ class Plugin_Context_Tests extends WP_UnitTestCase {
 		$this->assertSame( WP_PLUGIN_DIR . '/' . $this->plugin_name . '/', $this->plugin_context->location() );
 	}
 
+	public function test_slug() {
+		$this->assertSame( $this->plugin_name, $this->plugin_context->slug() );
+	}
+
 	public function test_location_with_single_file_plugin() {
 		$single_file = WP_PLUGIN_DIR . '/single-file-plugin.php';
 		$context     = new Plugin_Context( $single_file );
