@@ -28,7 +28,7 @@ build
 ############
 
 node_modules/
-vendor/
+/vendor/
 build-cs/vendor/
 build-cs/composer.lock
 build-phpunit/vendor/
