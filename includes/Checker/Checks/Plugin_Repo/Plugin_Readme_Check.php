@@ -149,14 +149,17 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		} else {
 			$plugin_data = get_plugin_data( $result->plugin()->main_file() );
 
-			if ( html_entity_decode( $parser->name, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401 ) !== $plugin_data['Name'] ) {
+			$plugin_readme_name = html_entity_decode( $parser->name, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401 );
+			$plugin_header_name = html_entity_decode( $plugin_data['Name'], ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401 );
+
+			if ( $plugin_readme_name !== $plugin_header_name ) {
 				$this->add_result_warning_for_file(
 					$result,
 					sprintf(
 						/* translators: 1: Plugin name, 2: Name in plugin header */
 						__( 'Plugin name "%1$s" is different from the name declared in plugin header "%2$s".', 'plugin-check' ),
-						$parser->name,
-						$plugin_data['Name']
+						$plugin_readme_name,
+						$plugin_header_name
 					),
 					'mismatched_plugin_name',
 					$readme_file,
