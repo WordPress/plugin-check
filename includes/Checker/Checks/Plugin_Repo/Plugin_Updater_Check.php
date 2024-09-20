@@ -134,8 +134,22 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 	 * @param array        $php_files List of absolute PHP file paths.
 	 */
 	protected function look_for_updater_file( Check_Result $result, array $php_files ) {
+		// Possible extra files which are not included in default files list.
+		$updater_files = array(
+			'vendor/yahnis-elsts/plugin-update-checker/plugin-update-checker.php',
+			'vendor/plugin-update-checker/plugin-update-checker.php',
+			'vendor/kernl/kernl-update-checker/kernl-update-checker.php',
+		);
 
-		$plugin_update_files = self::filter_files_by_regex( $php_files, '/plugin-update-checker\.php$/' );
+		$plugin_path = $result->plugin()->path();
+
+		foreach ( $updater_files as $updater_file ) {
+			if ( file_exists( $plugin_path . $updater_file ) ) {
+				$php_files[] = $plugin_path . $updater_file;
+			}
+		}
+
+		$plugin_update_files = self::filter_files_by_regex( $php_files, '/(plugin|kernl)-update-checker\.php$/' );
 
 		if ( $plugin_update_files ) {
 			foreach ( $plugin_update_files as $file ) {
