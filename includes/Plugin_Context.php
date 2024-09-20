@@ -32,7 +32,7 @@ class Plugin_Context {
 	/**
 	 * Plugin slug.
 	 *
-	 * @since 1.0.0
+	 * @since 1.2.0
 	 * @var string
 	 */
 	protected $slug;
@@ -49,6 +49,7 @@ class Plugin_Context {
 	 * Constructor.
 	 *
 	 * @since 1.0.0
+	 * @since 1.2.0 Second argument $slug was introduced.
 	 *
 	 * @param string $main_file The absolute path to the plugin main file.
 	 * @param string $slug      The plugin slug.
@@ -80,7 +81,7 @@ class Plugin_Context {
 		if ( ! empty( $slug ) ) {
 			$this->slug = $slug;
 		} else {
-			$this->slug = dirname( $this->main_file );
+			$this->slug = basename( dirname( $this->main_file ) );
 		}
 	}
 

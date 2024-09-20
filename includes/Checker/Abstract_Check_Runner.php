@@ -168,7 +168,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	/**
 	 * Returns plugin slug parameter.
 	 *
-	 * @since 1.0.0
+	 * @since 1.2.0
 	 *
 	 * @return string Plugin slug.
 	 */
