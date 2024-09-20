@@ -541,6 +541,8 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @since 1.0.0
 	 *
 	 * @return string The plugin basename to check.
+	 *
+	 * @throws Exception Thrown if an plugin basename could not be set.
 	 */
 	final public function get_plugin_basename() {
 		if ( null === $this->plugin_basename ) {
@@ -550,10 +552,16 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 				$this->plugin_basename = Plugin_Request_Utility::download_plugin( $plugin );
 
 				$this->delete_plugin_folder = true;
-			} elseif ( Plugin_Request_Utility::is_directory_valid_plugin( $plugin ) ) {
-				$this->plugin_basename = $plugin;
 			} else {
-				$this->plugin_basename = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin );
+				try {
+					$this->plugin_basename = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin );
+				} catch ( Exception $exception ) {
+					if ( Plugin_Request_Utility::is_directory_valid_plugin( $plugin ) ) {
+						$this->plugin_basename = $plugin;
+					} else {
+						throw $exception;
+					}
+				}
 			}
 		}
 

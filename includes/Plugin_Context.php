@@ -67,6 +67,8 @@ class Plugin_Context {
 				}
 			}
 		}
+
+		$this->main_file = $this->main_file;
 	}
 
 	/**
@@ -101,9 +103,9 @@ class Plugin_Context {
 	 */
 	public function path( $relative_path = '/' ) {
 		if ( is_dir( $this->main_file ) ) {
-			return trailingslashit( $this->main_file ) . ltrim( $relative_path, '/' );
+			return realpath( trailingslashit( $this->main_file ) . ltrim( $relative_path, '/' ) ) . '/';
 		} else {
-			return plugin_dir_path( $this->main_file ) . ltrim( $relative_path, '/' );
+			return realpath( plugin_dir_path( $this->main_file ) . ltrim( $relative_path, '/' ) ) . '/';
 		}
 	}
 
