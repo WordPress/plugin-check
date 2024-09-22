@@ -61,7 +61,7 @@
 	</rule>
 
 	<!-- Check for error logs in plugin -->
-	<rule ref="WordPress.PHP.DevelopmentFunctionsSniff">
+	<rule ref="WordPress.PHP.DevelopmentFunctions">
 		<type>warning</type>
 	</rule>
 
