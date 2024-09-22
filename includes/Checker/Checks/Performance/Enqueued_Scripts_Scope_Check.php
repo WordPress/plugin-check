@@ -139,7 +139,7 @@ class Enqueued_Scripts_Scope_Check extends Abstract_Runtime_Check implements Wit
 				if ( isset( $plugin_script['count'] ) && ( $url_count === $plugin_script['count'] ) ) {
 					$this->add_result_warning_for_file(
 						$result,
-						__( 'This script is being loaded in all contexts.', 'plugin-check' ),
+						__( 'This script is being loaded in all frontend contexts.', 'plugin-check' ),
 						'EnqueuedScriptsScope',
 						$plugin_script['path']
 					);

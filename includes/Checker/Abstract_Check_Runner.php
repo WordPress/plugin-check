@@ -18,6 +18,7 @@ use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
  * @since 1.0.0
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 abstract class Abstract_Check_Runner implements Check_Runner {
 
@@ -36,6 +37,14 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @var array
 	 */
 	protected $check_slugs;
+
+	/**
+	 * The plugin slug.
+	 *
+	 * @since 1.2.0
+	 * @var string
+	 */
+	protected $slug;
 
 	/**
 	 * The check slugs to exclude.
@@ -155,6 +164,15 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @return array An array of categories.
 	 */
 	abstract protected function get_categories_param();
+
+	/**
+	 * Returns plugin slug parameter.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return string Plugin slug.
+	 */
+	abstract protected function get_slug_param();
 
 	/**
 	 * Sets whether the runner class was initialized early.
@@ -590,6 +608,21 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		return $this->get_categories_param();
 	}
 
+	/**
+	 * Returns plugin slug.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return string Plugin slug.
+	 */
+	final protected function get_slug() {
+		if ( null !== $this->slug ) {
+			return $this->slug;
+		}
+
+		return $this->get_slug_param();
+	}
+
 	/** Gets the Check_Context for the plugin.
 	 *
 	 * @since 1.0.0
@@ -599,7 +632,24 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	private function get_check_context() {
 		$plugin_basename = $this->get_plugin_basename();
 		$plugin_path     = is_dir( $plugin_basename ) ? $plugin_basename : WP_PLUGIN_DIR . '/' . $plugin_basename;
-		return new Check_Context( $plugin_path );
+		return new Check_Context( $plugin_path, $this->get_slug() );
+	}
+
+	/**
+	 * Sets the plugin slug.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param string $slug Plugin slug.
+	 */
+	final public function set_slug( $slug ) {
+		if ( ! empty( $slug ) ) {
+			$this->slug = $slug;
+		} else {
+			$basename = $this->get_plugin_basename();
+
+			$this->slug = ( '.' === pathinfo( $basename, PATHINFO_DIRNAME ) ) ? $basename : dirname( $basename );
+		}
 	}
 
 	/**
