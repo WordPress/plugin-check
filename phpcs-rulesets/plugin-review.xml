@@ -60,6 +60,11 @@
 		<message>The "goto" language construct should not be used.</message>
 	</rule>
 
+	<!-- Check for error logs in plugin -->
+	<rule ref="WordPress.PHP.DevelopmentFunctionsSniff">
+		<type>warning</type>
+	</rule>
+
 	<!-- No PHP short open tags allowed. -->
 	<rule ref="Generic.PHP.DisallowShortOpenTag"/>
 
