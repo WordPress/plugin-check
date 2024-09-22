@@ -32,7 +32,7 @@ class I18n_Usage_Check extends Abstract_PHP_CodeSniffer_Check {
 	public function get_categories() {
 		return array(
 			Check_Categories::CATEGORY_GENERAL,
-			Check_Categories::CATEGORY_PLUGIN_REPO
+			Check_Categories::CATEGORY_PLUGIN_REPO,
 		);
 	}
 
