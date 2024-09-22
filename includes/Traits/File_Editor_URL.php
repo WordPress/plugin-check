@@ -31,7 +31,7 @@ trait File_Editor_URL {
 		$edit_url = null;
 
 		$plugin_path = $result->plugin()->path( '/' );
-		$plugin_slug = basename( $plugin_path );
+		$plugin_slug = $result->plugin()->slug();
 		$filename    = str_replace( $plugin_path, '', $filename );
 		/**
 		 * Filters the template for the URL for linking to an external editor to open a file for editing.
