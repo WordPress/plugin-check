@@ -308,7 +308,7 @@ class Trademarks_Check extends Abstract_File_Check {
 			return;
 		}
 
-		$plugin_slug = basename( $result->plugin()->path() );
+		$plugin_slug = $result->plugin()->slug();
 
 		try {
 			$this->validate_slug_has_no_trademarks( $plugin_slug );
