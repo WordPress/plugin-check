@@ -52,18 +52,6 @@
 		<severity>7</severity>
 	</rule>
 
-	<!-- Translation rules-->
-	<rule ref="WordPress.WP.I18n.NonSingularStringLiteralDomain">
-		<type>error</type>
-		<severity>7</severity>
-	</rule>
-
-	<!-- Translation rules: Translation Comment-->
-	<rule ref="WordPress.WP.I18n.MissingTranslatorsComment">
-		<type>error</type>
-		<severity>6</severity>
-	</rule>
-
 	<!-- Prohibit the use of the backtick operator. -->
 	<rule ref="Generic.PHP.BacktickOperator"/>
 
