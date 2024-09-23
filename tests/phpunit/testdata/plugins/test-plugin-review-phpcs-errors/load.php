@@ -18,3 +18,6 @@ set_time_limit( 20 );
 ini_set( 'max_execution_time', 20 );
 ini_alter( 'max_execution_time', 20 );
 dl( 'plugin-check.so' );
+
+var_dump( $custom_var );
+error_log( 'Error occurred.');
