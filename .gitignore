@@ -29,6 +29,7 @@ build
 
 node_modules/
 vendor/
+vendor-prefixed/
 build-cs/vendor/
 build-cs/composer.lock
 build-phpunit/vendor/
@@ -68,3 +69,5 @@ temp/
 ############
 
 .wp-env.override.json
+
+strauss.phar

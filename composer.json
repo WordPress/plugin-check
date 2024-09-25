@@ -36,7 +36,10 @@
   "autoload": {
     "psr-4": {
       "WordPress\\Plugin_Check\\": "includes/"
-    }
+    },
+    "classmap": [
+      "vendor-prefixed"
+    ]
   },
   "autoload-dev": {
     "psr-4": {
@@ -64,7 +67,17 @@
     "phpmd": "phpmd . text phpmd.xml",
     "phpstan": "phpstan analyse --memory-limit=2048M",
     "prepare-behat-tests": "install-package-tests",
-    "test": "phpunit"
+    "test": "phpunit",
+    "strauss": [
+      "test -e strauss.phar || curl -o strauss.phar -L -C - https://github.com/BrianHenryIE/strauss/releases/download/0.14.0/strauss.phar",
+      "php strauss.phar"
+    ],
+    "post-install-cmd": [
+      "@strauss"
+    ],
+    "post-update-cmd": [
+      "@strauss"
+    ]
   },
   "scripts-descriptions": {
     "behat": "Run functional tests",
@@ -75,5 +88,43 @@
     "phpstan": "Run static analysis",
     "prepare-behat-tests": "Prepare functional tests",
     "test": "Run unit tests"
+  },
+  "extra": {
+    "strauss": {
+        "target_directory": "vendor-prefixed",
+        "namespace_prefix": "WordPress\\Plugin_Check\\",
+        "classmap_prefix": "WordPress_Plugin_Check_",
+        "constant_prefix": "WPPC_",
+        "packages": [
+        ],
+        "update_call_sites": false,
+        "override_autoload": {
+        },
+        "exclude_from_copy": {
+            "packages": [
+            ],
+            "namespaces": [
+            ],
+            "file_patterns": [
+            ]
+        },
+        "exclude_from_prefix": {
+            "packages": [
+              "automattic/vipwpcs",
+              "composer/installers",
+              "dealerdirect/phpcodesniffer-composer-installer",
+              "plugin-check/phpcs-sniffs",
+              "wp-coding-standards/wpcs"
+            ],
+            "namespaces": [
+            ],
+            "file_patterns": [
+            ]
+        },
+        "namespace_replacement_patterns" : {
+        },
+        "delete_vendor_packages": false,
+        "delete_vendor_files": false
+    }
   }
 }

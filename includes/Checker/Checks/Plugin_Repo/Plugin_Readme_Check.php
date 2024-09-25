@@ -13,7 +13,7 @@ use WordPress\Plugin_Check\Checker\Checks\Abstract_File_Check;
 use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Traits\Find_Readme;
 use WordPress\Plugin_Check\Traits\Stable_Check;
-use WordPressdotorg\Plugin_Directory\Readme\Parser;
+use WordPress\Plugin_Check\WordPressdotorg\Plugin_Directory\Readme\Parser;
 
 /**
  * Check the plugins readme file and contents.
