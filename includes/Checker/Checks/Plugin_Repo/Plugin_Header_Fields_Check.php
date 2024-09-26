@@ -229,6 +229,41 @@ class Plugin_Header_Fields_Check implements Static_Check {
 			}
 		}
 
+		$restricted_headers = array(
+			'BitbucketPluginURI' => 'Bitbucket Plugin URI',
+			'GistPluginURI'      => 'Gist Plugin URI',
+			'GiteaPluginURI'     => 'Gitea Plugin URI',
+			'GitHubPluginURI'    => 'GitHub Plugin URI',
+			'GitLabPluginURI'    => 'GitLab Plugin URI',
+		);
+
+		$plugin_data = get_file_data( $plugin_main_file, $restricted_headers, 'plugin' );
+
+		$found_headers = array();
+
+		foreach ( $restricted_headers as $restricted_key => $restricted_label ) {
+			if ( array_key_exists( $restricted_key, $plugin_data ) && ! empty( $plugin_data[ $restricted_key ] ) ) {
+				$found_headers[ $restricted_key ] = $restricted_label;
+			}
+		}
+
+		if ( ! empty( $found_headers ) ) {
+			$this->add_result_error_for_file(
+				$result,
+				sprintf(
+					/* translators: %s: header fields */
+					__( 'Restricted plugin header field(s) found: %s', 'plugin-check' ),
+					"'" . implode( "', '", array_values( $found_headers ) ) . "'"
+				),
+				'plugin_header_restricted_fields',
+				$plugin_main_file,
+				0,
+				0,
+				'',
+				7
+			);
+		}
+
 		if ( ! $result->plugin()->is_single_file_plugin() ) {
 			if ( ! empty( $plugin_header['TextDomain'] ) ) {
 				$plugin_slug = $result->plugin()->slug();
