@@ -17,7 +17,7 @@ class Use_Minimal_Theme_Preparation_Tests extends WP_UnitTestCase {
 
 		$this->theme_name = 'WP Empty Theme';
 		$this->theme_slug = 'wp-empty-theme';
-		$this->theme_dir  = TESTS_PLUGIN_DIR . '/test-content/themes';
+		$this->theme_dir  = TESTS_PLUGIN_DIR . '/runtime-content/themes';
 	}
 
 	public function test_get_theme_slug() {

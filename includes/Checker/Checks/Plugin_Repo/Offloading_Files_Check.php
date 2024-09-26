@@ -1,39 +1,46 @@
 <?php
 /**
- * Class I18n_Usage_Check.
+ * Class Offloading_Files.
  *
  * @package plugin-check
  */
 
-namespace WordPress\Plugin_Check\Checker\Checks\General;
+namespace WordPress\Plugin_Check\Checker\Checks\Plugin_Repo;
 
 use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Checks\Abstract_PHP_CodeSniffer_Check;
+use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 
 /**
- * Check for running WordPress internationalization sniffs.
+ * Check to detect loading files from external sites.
  *
- * @since 1.0.0
+ * @since n.e.x.t.
  */
-class I18n_Usage_Check extends Abstract_PHP_CodeSniffer_Check {
+class Offloading_Files_Check extends Abstract_PHP_CodeSniffer_Check {
 
+	use Amend_Check_Result;
 	use Stable_Check;
+
+	/**
+	 * Bitwise flags to control check behavior.
+	 *
+	 * @since n.e.x.t.
+	 * @var int
+	 */
+	protected $flags = 0;
 
 	/**
 	 * Gets the categories for the check.
 	 *
 	 * Every check must have at least one category.
 	 *
-	 * @since 1.0.0
+	 * @since n.e.x.t.
 	 *
 	 * @return array The categories for the check.
 	 */
 	public function get_categories() {
-		return array(
-			Check_Categories::CATEGORY_GENERAL,
-			Check_Categories::CATEGORY_PLUGIN_REPO,
-		);
+		return array( Check_Categories::CATEGORY_PLUGIN_REPO );
 	}
 
 	/**
@@ -46,8 +53,8 @@ class I18n_Usage_Check extends Abstract_PHP_CodeSniffer_Check {
 	protected function get_args() {
 		return array(
 			'extensions' => 'php',
-			'standard'   => 'WordPress',
-			'sniffs'     => 'WordPress.WP.I18n',
+			'standard'   => 'PluginCheck',
+			'sniffs'     => 'PluginCheck.CodeAnalysis.EnqueuedResourceOffloading,PluginCheck.CodeAnalysis.Offloading',
 		);
 	}
 
@@ -56,12 +63,12 @@ class I18n_Usage_Check extends Abstract_PHP_CodeSniffer_Check {
 	 *
 	 * Every check must have a short description explaining what the check does.
 	 *
-	 * @since 1.1.0
+	 * @since n.e.x.t.
 	 *
 	 * @return string Description.
 	 */
 	public function get_description(): string {
-		return __( 'Checks for various internationalization best practices.', 'plugin-check' );
+		return __( 'Prevents using remote services that are not necessary.', 'plugin-check' );
 	}
 
 	/**
@@ -69,11 +76,11 @@ class I18n_Usage_Check extends Abstract_PHP_CodeSniffer_Check {
 	 *
 	 * Every check must have a URL with further information about the check.
 	 *
-	 * @since 1.1.0
+	 * @since n.e.x.t.
 	 *
 	 * @return string The documentation URL.
 	 */
 	public function get_documentation_url(): string {
-		return __( 'https://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/', 'plugin-check' );
+		return __( 'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#calling-files-remotely', 'plugin-check' );
 	}
 }

@@ -1,16 +1,17 @@
 {
   "name": "wordpress/plugin-check",
   "description": "Plugin Check is a WordPress.org tool which provides checks to help plugins meet the directory requirements and follow various best practices.",
-  "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",
+  "type": "wordpress-plugin",
   "require": {
     "php": ">=7.2.24",
+    "ext-json": "*",
+    "afragen/wordpress-plugin-readme-parser": "dev-master#67fba498d0b112acf84386b95e4905c539a33f0b",
+    "automattic/vipwpcs": "^3.0.0",
     "composer/installers": "^2.2",
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0.0",
-    "wp-coding-standards/wpcs": "^3.1.0",
-    "automattic/vipwpcs": "^3.0.0",
-    "afragen/wordpress-plugin-readme-parser": "dev-master#67fba498d0b112acf84386b95e4905c539a33f0b",
-    "ext-json": "*"
+    "plugin-check/phpcs-sniffs": "@dev",
+    "wp-coding-standards/wpcs": "^3.1.0"
   },
   "require-dev": {
     "phpcompatibility/php-compatibility": "^9.3",
@@ -21,39 +22,17 @@
     "szepeviktor/phpstan-wordpress": "^1.1",
     "wp-cli/extension-command": "^2.1",
     "wp-cli/wp-cli": "^2.8",
-    "wp-cli/wp-cli-tests": "^v4.2.9"
+    "wp-cli/wp-cli-tests": "^4.2.9"
   },
-  "scripts": {
-    "behat": "BEHAT_FEATURES_FOLDER=tests/behat/features run-behat-tests",
-    "behat-rerun": "BEHAT_FEATURES_FOLDER=tests/behat/features rerun-behat-tests",
-    "prepare-behat-tests": "install-package-tests",
-    "format": "phpcbf --standard=phpcs.xml.dist",
-    "lint": "phpcs --standard=phpcs.xml.dist",
-    "phpmd": "phpmd . text phpmd.xml",
-    "phpstan": "phpstan analyse --memory-limit=2048M",
-    "test": "phpunit"
-  },
-  "scripts-descriptions": {
-    "lint": "Detect coding standards issues",
-    "format": "Detect and automatically fix most coding standards issues",
-    "test": "Run unit tests",
-    "phpmd": "Run PHP mess detector",
-    "phpstan": "Run static analysis",
-    "behat": "Run functional tests",
-    "behat-rerun": "Re-run failed functional tests",
-    "prepare-behat-tests": "Prepare functional tests"
-  },
-  "config": {
-    "allow-plugins": {
-      "dealerdirect/phpcodesniffer-composer-installer": true,
-      "composer/installers": true,
-      "phpstan/extension-installer": true,
-      "cweagans/composer-patches": false
-    },
-    "platform": {
-      "php": "7.2.24"
+  "repositories": [
+    {
+      "type": "path",
+      "url": "./phpcs-sniffs",
+      "options": {
+        "symlink": false
+      }
     }
-  },
+  ],
   "autoload": {
     "psr-4": {
       "WordPress\\Plugin_Check\\": "includes/"
@@ -61,9 +40,40 @@
   },
   "autoload-dev": {
     "psr-4": {
+      "WordPress\\Plugin_Check\\Behat_Utils\\": "tests/behat/includes",
       "WordPress\\Plugin_Check\\Test_Data\\": "tests/phpunit/testdata/Checks",
-      "WordPress\\Plugin_Check\\Test_Utils\\": "tests/phpunit/utils",
-      "WordPress\\Plugin_Check\\Behat_Utils\\": "tests/behat/includes"
+      "WordPress\\Plugin_Check\\Test_Utils\\": "tests/phpunit/utils"
     }
+  },
+  "config": {
+    "allow-plugins": {
+      "composer/installers": true,
+      "cweagans/composer-patches": false,
+      "dealerdirect/phpcodesniffer-composer-installer": true,
+      "phpstan/extension-installer": true
+    },
+    "platform": {
+      "php": "7.2.24"
+    }
+  },
+  "scripts": {
+    "behat": "BEHAT_FEATURES_FOLDER=tests/behat/features run-behat-tests",
+    "behat-rerun": "BEHAT_FEATURES_FOLDER=tests/behat/features rerun-behat-tests",
+    "format": "phpcbf --standard=phpcs.xml.dist",
+    "lint": "phpcs --standard=phpcs.xml.dist",
+    "phpmd": "phpmd . text phpmd.xml",
+    "phpstan": "phpstan analyse --memory-limit=2048M",
+    "prepare-behat-tests": "install-package-tests",
+    "test": "phpunit"
+  },
+  "scripts-descriptions": {
+    "behat": "Run functional tests",
+    "behat-rerun": "Re-run failed functional tests",
+    "format": "Detect and automatically fix most coding standards issues",
+    "lint": "Detect coding standards issues",
+    "phpmd": "Run PHP mess detector",
+    "phpstan": "Run static analysis",
+    "prepare-behat-tests": "Prepare functional tests",
+    "test": "Run unit tests"
   }
 }

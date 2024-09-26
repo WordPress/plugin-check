@@ -48,8 +48,7 @@
 
 	<!-- Sanitized Input rules -->
 	<rule ref="WordPress.Security.ValidatedSanitizedInput">
-		<type>error</type>
-		<severity>7</severity>
+		<type>warning</type>
 	</rule>
 
 	<!-- Prohibit the use of the backtick operator. -->
@@ -59,6 +58,11 @@
 	<rule ref="Generic.PHP.DiscourageGoto.Found">
 		<type>error</type>
 		<message>The "goto" language construct should not be used.</message>
+	</rule>
+
+	<!-- Check for error logs in plugin -->
+	<rule ref="WordPress.PHP.DevelopmentFunctions">
+		<type>warning</type>
 	</rule>
 
 	<!-- No PHP short open tags allowed. -->
