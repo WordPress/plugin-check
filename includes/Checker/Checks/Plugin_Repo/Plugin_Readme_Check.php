@@ -474,7 +474,11 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		) {
 			$this->add_result_error_for_file(
 				$result,
-				__( "<strong>The Stable Tag in your readme file does not match the version in your main plugin file.</strong><br>Your Stable Tag is meant to be the stable version of your plugin, not of WordPress. For your plugin to be properly downloaded from WordPress.org, those values need to be the same. If they're out of sync, your users won't get the right version of your code.", 'plugin-check' ),
+				sprintf(
+					/* translators: %s: versions comparison */
+					__( "<strong>Mismatched Stable Tag: %s.</strong><br>The Stable Tag in your readme file does not match the version in your main plugin file. Your Stable Tag is meant to be the stable version of your plugin, not of WordPress. For your plugin to be properly downloaded from WordPress.org, those values need to be the same. If they're out of sync, your users won't get the right version of your code.", 'plugin-check' ),
+					esc_html( $stable_tag ) . ' != ' . esc_html( $plugin_data['Version'] )
+				),
 				'stable_tag_mismatch',
 				$readme_file,
 				0,
