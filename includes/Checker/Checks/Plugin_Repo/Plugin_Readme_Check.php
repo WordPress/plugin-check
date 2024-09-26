@@ -463,6 +463,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incorrect-stable-tag',
 				9
 			);
+
+			return;
 		}
 
 		// Check the readme file Stable tag against the plugin's main file version.
