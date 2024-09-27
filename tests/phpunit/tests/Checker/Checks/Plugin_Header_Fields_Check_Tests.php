@@ -32,6 +32,7 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 		$this->assertCount( 1, wp_list_filter( $warnings['load.php'][0][0], array( 'code' => 'plugin_header_invalid_requires_php' ) ) );
 		$this->assertCount( 1, wp_list_filter( $warnings['load.php'][0][0], array( 'code' => 'textdomain_mismatch' ) ) );
 		$this->assertCount( 1, wp_list_filter( $warnings['load.php'][0][0], array( 'code' => 'plugin_header_nonexistent_domain_path' ) ) );
+		$this->assertCount( 1, wp_list_filter( $warnings['load.php'][0][0], array( 'code' => 'plugin_header_invalid_network' ) ) );
 
 		if ( is_wp_version_compatible( '6.5' ) ) {
 			$this->assertCount( 1, wp_list_filter( $warnings['load.php'][0][0], array( 'code' => 'plugin_header_invalid_requires_plugins' ) ) );

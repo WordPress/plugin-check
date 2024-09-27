@@ -12,6 +12,7 @@
  * License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  * Text Domain: test-mismathed-textdomain-here
  * Domain Path: /nonexistent-folder
+ * Network: random-value
  * GitHub Plugin URI: johndoe/package
  * Requires Plugins: Example Plugin, OtherPlugin
  *
