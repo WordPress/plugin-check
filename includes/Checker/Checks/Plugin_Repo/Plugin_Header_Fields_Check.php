@@ -174,6 +174,25 @@ class Plugin_Header_Fields_Check implements Static_Check {
 			}
 		}
 
+		if ( ! empty( $plugin_header['Network'] ) ) {
+			if ( 'true' !== strtolower( $plugin_header['Network'] ) ) {
+				$this->add_result_warning_for_file(
+					$result,
+					sprintf(
+						/* translators: %s: plugin header field */
+						__( 'The "%s" header in the plugin file is not valid. Can only be set to true, and should be left out when not needed.', 'plugin-check' ),
+						esc_html( $labels['Network'] )
+					),
+					'plugin_header_invalid_network',
+					$plugin_main_file,
+					0,
+					0,
+					'https://developer.wordpress.org/plugins/plugin-basics/header-requirements/#header-fields',
+					6
+				);
+			}
+		}
+
 		if ( ! empty( $plugin_header['RequiresWP'] ) ) {
 			if ( ! preg_match( '!^\d+\.\d(\.\d+)?$!', $plugin_header['RequiresWP'] ) ) {
 				$this->add_result_warning_for_file(
