@@ -136,6 +136,8 @@ final class Runtime_Environment_Setup {
 	 *
 	 * @since 1.0.0
 	 *
+	 * @global WP_Filesystem_Base $wp_filesystem WordPress filesystem subclass.
+	 *
 	 * @return bool Returns true if the runtime environment can be set up, false if not.
 	 */
 	public function can_set_up() {
