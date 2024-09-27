@@ -119,8 +119,8 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 0, $errors['readme.txt'][0] );
 		$this->assertCount( 1, wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'trunk_stable_tag' ) ) );
 
-		// Check for stable tag mismatch file error.
-		$this->assertCount( 1, wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'stable_tag_mismatch' ) ) );
+		// Check for stable tag mismatch file error. This should NOT be triggered as there is already 'trunk_stable_tag' error.
+		$this->assertCount( 0, wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'stable_tag_mismatch' ) ) );
 	}
 
 	public function test_run_with_errors_no_stable_tag() {
@@ -212,7 +212,6 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'readme.md', $errors );
 
 		$this->assertCount( 1, wp_list_filter( $errors['readme.md'][0][0], array( 'code' => 'trunk_stable_tag' ) ) );
-		$this->assertCount( 1, wp_list_filter( $errors['readme.md'][0][0], array( 'code' => 'stable_tag_mismatch' ) ) );
 		$this->assertCount( 1, wp_list_filter( $errors['readme.md'][0][0], array( 'code' => 'outdated_tested_upto_header' ) ) );
 
 		$this->assertNotEmpty( $warnings );
