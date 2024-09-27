@@ -195,7 +195,7 @@ class Plugin_Header_Fields_Check implements Static_Check {
 
 		if ( ! empty( $plugin_header['RequiresWP'] ) ) {
 			if ( ! preg_match( '!^\d+\.\d(\.\d+)?$!', $plugin_header['RequiresWP'] ) ) {
-				$this->add_result_warning_for_file(
+				$this->add_result_error_for_file(
 					$result,
 					sprintf(
 						/* translators: 1: plugin header field; 2: Example version 6.5.1. 3: Example version 6.6. */
@@ -209,13 +209,13 @@ class Plugin_Header_Fields_Check implements Static_Check {
 					0,
 					0,
 					'',
-					6
+					7
 				);
 			}
 		}
 		if ( ! empty( $plugin_header['RequiresPHP'] ) ) {
 			if ( ! preg_match( '!^\d+(\.\d+){1,2}$!', $plugin_header['RequiresPHP'] ) ) {
-				$this->add_result_warning_for_file(
+				$this->add_result_error_for_file(
 					$result,
 					sprintf(
 						/* translators: 1: plugin header field; 2: Example version 5.2.4. 3: Example version 7.0. */
@@ -229,7 +229,7 @@ class Plugin_Header_Fields_Check implements Static_Check {
 					0,
 					0,
 					'',
-					6
+					7
 				);
 			}
 		}
