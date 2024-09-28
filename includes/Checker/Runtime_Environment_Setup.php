@@ -96,7 +96,7 @@ final class Runtime_Environment_Setup {
 	 * @since 1.0.0
 	 *
 	 * @global wpdb $wpdb WordPress database abstraction object.
-	 * @global string $table_prefix  The database table prefix.
+	 * @global string $table_prefix The database table prefix.
 	 * @global WP_Filesystem_Base $wp_filesystem WordPress filesystem subclass.
 	 */
 	public function clean_up() {
