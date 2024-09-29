@@ -1,5 +1,5 @@
 /* Responsive table */
-@media only screen and (max-width: 40em) {
+@media screen and (max-width: 782px) {
 	#plugin-check__submit {
 		margin-top: 1em;
 	}
