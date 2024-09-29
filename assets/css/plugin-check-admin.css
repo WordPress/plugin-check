@@ -43,8 +43,15 @@
     content: attr(data-label);
     float: left;
     font-weight: bold;
-    text-transform: uppercase;
   }
+
+	.rtl table.plugin-check__results-table td {
+		text-align: left;
+	}
+
+	.rtl table.plugin-check__results-table td::before {
+		float: right;
+	}
   
   table.plugin-check__results-table td:last-child {
     border-bottom: 0;
