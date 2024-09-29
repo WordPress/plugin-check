@@ -42,6 +42,8 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	 *
 	 * @since 1.0.0
 	 *
+	 * @param Check_Result $result The check result to amend, including the plugin context to check.
+	 *
 	 * @return array {
 	 *    An associative array of PHPCS CLI arguments. Can include one or more of the following options.
 	 *
@@ -51,7 +53,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	 *    @type string $exclude    A comma separated list of sniff codes to exclude from checks.
 	 * }
 	 */
-	abstract protected function get_args();
+	abstract protected function get_args( Check_Result $result );
 
 	/**
 	 * Amends the given result by running the check on the associated plugin.
@@ -84,7 +86,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		$defaults = $this->get_argv_defaults( $result );
 
 		// Set the check arguments for PHPCS.
-		$_SERVER['argv'] = $this->parse_argv( $this->get_args(), $defaults );
+		$_SERVER['argv'] = $this->parse_argv( $this->get_args( $result ), $defaults );
 
 		// Reset PHP_CodeSniffer config.
 		$this->reset_php_codesniffer_config();
