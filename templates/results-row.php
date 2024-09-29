@@ -1,17 +1,17 @@
 <tr class="plugin-check__results-row">
-	<td data-label="<?php esc_html_e( 'Line', 'plugin-check' ); ?>">
+	<td data-label="<?php esc_attr_e( 'Line', 'plugin-check' ); ?>">
 		{{data.line}}
 	</td>
-	<td data-label="<?php esc_html_e( 'Column', 'plugin-check' ); ?>">
+	<td data-label="<?php esc_attr_e( 'Column', 'plugin-check' ); ?>">
 		{{data.column}}
 	</td>
-	<td data-label="<?php esc_html_e( 'Type', 'plugin-check' ); ?>">
+	<td data-label="<?php esc_attr_e( 'Type', 'plugin-check' ); ?>">
 		{{data.type}}
 	</td>
-	<td data-label="<?php esc_html_e( 'Code', 'plugin-check' ); ?>">
+	<td data-label="<?php esc_attr_e( 'Code', 'plugin-check' ); ?>">
 		{{data.code}}
 	</td>
-	<td data-label="<?php esc_html_e( 'Message', 'plugin-check' ); ?>">
+	<td data-label="<?php esc_attr_e( 'Message', 'plugin-check' ); ?>">
 		{{{data.message}}}
 		<# if ( data.docs ) { #>
 			<br>
