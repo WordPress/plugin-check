@@ -75,7 +75,7 @@ class Trademarks_Check_Tests extends WP_UnitTestCase {
 				'load.php',
 				'The plugin name includes a restricted term. Your chosen plugin name - "WooCommerce Example String" - contains the restricted term "woocommerce" which cannot be used within in your plugin name, unless your plugin name ends with "for woocommerce". The term must still not appear anywhere else in your name.',
 			),
-			'Plugin headers - WP Example String' => array(
+			'Plugin headers - WP Example String'          => array(
 				Trademarks_Check::TYPE_NAME,
 				'test-trademarks-plugin-header-acronym/load.php',
 				'load.php',
