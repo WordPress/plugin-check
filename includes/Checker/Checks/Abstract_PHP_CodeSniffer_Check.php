@@ -43,7 +43,6 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	 * @since 1.0.0
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
-	 *
 	 * @return array {
 	 *    An associative array of PHPCS CLI arguments. Can include one or more of the following options.
 	 *

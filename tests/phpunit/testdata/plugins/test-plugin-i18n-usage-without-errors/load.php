@@ -10,7 +10,7 @@
  * Author URI: https://make.wordpress.org/performance/
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- * Text Domain: test-plugin-check
+ * Text Domain: test-plugin-i18n-usage-without-errors
  *
  * @package test-plugin-check
  */
@@ -22,8 +22,8 @@ $city = 'Surat';
 
 sprintf(
 	/* translators: %s: Name of a city */
-	__( 'Your city is %s.', 'test-plugin-check' ),
+	__( 'Your city is %s.', 'test-plugin-i18n-usage-without-errors' ),
 	$city
 );
 
-esc_html__( 'Hello World!', 'test-plugin-check' );
+esc_html__( 'Hello World!', 'test-plugin-i18n-usage-without-errors' );
