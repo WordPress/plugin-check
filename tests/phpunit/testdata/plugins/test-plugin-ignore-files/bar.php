@@ -4,4 +4,4 @@
  */
 
 $city = 'Kathmandu';
-sprintf( __( 'Your city is %s.', 'test-plugin-check-errors' ), $city ); // This will trigger WordPress.WP.I18n.MissingTranslatorsComment error.
+sprintf( __( 'Your city is %s.', 'test-plugin-ignore-files' ), $city ); // This will trigger WordPress.WP.I18n.MissingTranslatorsComment error.

@@ -10,7 +10,7 @@
  * Author URI: https://make.wordpress.org/performance/
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- * Text Domain: test-plugin-check-errors
+ * Text Domain: test-plugin-ignore-directories
  *
- * @package test-plugin-check-errors
+ * @package test-plugin-ignore-directories
  */

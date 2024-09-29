@@ -8,6 +8,7 @@
 namespace WordPress\Plugin_Check\Checker\Checks\Performance;
 
 use WordPress\Plugin_Check\Checker\Check_Categories;
+use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Checks\Abstract_PHP_CodeSniffer_Check;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 
@@ -38,9 +39,10 @@ class Performant_WP_Query_Params_Check extends Abstract_PHP_CodeSniffer_Check {
 	 *
 	 * @since 1.0.0
 	 *
+	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 * @return array An associative array of PHPCS CLI arguments.
 	 */
-	protected function get_args() {
+	protected function get_args( Check_Result $result ) {
 		return array(
 			'extensions' => 'php',
 			'standard'   => 'WordPress,WordPressVIPMinimum',
