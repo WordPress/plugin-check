@@ -12,7 +12,7 @@ use InvalidArgumentException;
 /**
  * Class for an exception thrown when an invalid check slug is provided.
  *
- * @since n.e.x.t
+ * @since 1.2.0
  */
 class Invalid_Check_Slug_Exception extends InvalidArgumentException {
 
