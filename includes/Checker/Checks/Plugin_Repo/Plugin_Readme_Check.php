@@ -691,7 +691,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		$valid = true;
 
 		foreach ( $usernames as $username ) {
-			if ( 1 !== preg_match( '/^[a-z0-9\s_.\-@]+$/', $username ) ) {
+			if ( 1 !== preg_match( '/^[a-z0-9_.\-@ ]+$/i', $username ) ) {
 				$valid = false;
 				break;
 			}
