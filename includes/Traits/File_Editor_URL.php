@@ -31,7 +31,7 @@ trait File_Editor_URL {
 		$edit_url = null;
 
 		$plugin_path = $result->plugin()->path( '/' );
-		$plugin_slug = basename( $plugin_path );
+		$plugin_slug = $result->plugin()->slug();
 		$filename    = str_replace( $plugin_path, '', $filename );
 		/**
 		 * Filters the template for the URL for linking to an external editor to open a file for editing.
@@ -99,17 +99,27 @@ trait File_Editor_URL {
 
 		// Fall back to using the plugin editor if no external editor is offered.
 		if ( ! $edit_url && current_user_can( 'edit_plugins' ) ) {
-			$query_args = array(
-				'plugin' => rawurlencode( $result->plugin()->basename() ),
-				'file'   => rawurlencode( $result->plugin()->is_single_file_plugin() ? $filename : $plugin_slug . '/' . $filename ),
-			);
-			if ( $line ) {
-				$query_args['line'] = $line;
+			$file = '';
+
+			if ( $result->plugin()->is_single_file_plugin() ) {
+				$file = $filename;
+			} elseif ( $result->plugin()->is_file_editable( $filename ) ) {
+				$file = $plugin_slug . '/' . $filename;
 			}
-			return add_query_arg(
-				$query_args,
-				admin_url( 'plugin-editor.php' )
-			);
+
+			if ( ! empty( $file ) ) {
+				$query_args = array(
+					'plugin' => rawurlencode( $result->plugin()->basename() ),
+					'file'   => rawurlencode( $file ),
+				);
+				if ( $line ) {
+					$query_args['line'] = $line;
+				}
+				return add_query_arg(
+					$query_args,
+					admin_url( 'plugin-editor.php' )
+				);
+			}
 		}
 		return $edit_url;
 	}

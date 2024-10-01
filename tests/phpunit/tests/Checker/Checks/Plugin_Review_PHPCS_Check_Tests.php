@@ -7,7 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
-use WordPress\Plugin_Check\Checker\Checks\Plugin_Review_PHPCS_Check;
+use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\Plugin_Review_PHPCS_Check;
 
 class Plugin_Review_PHPCS_Check_Tests extends WP_UnitTestCase {
 
@@ -18,11 +18,13 @@ class Plugin_Review_PHPCS_Check_Tests extends WP_UnitTestCase {
 
 		$plugin_review_phpcs_check->run( $check_result );
 
-		$errors = $check_result->get_errors();
+		$errors   = $check_result->get_errors();
+		$warnings = $check_result->get_warnings();
 
 		$this->assertNotEmpty( $errors );
 		$this->assertArrayHasKey( 'load.php', $errors );
-		$this->assertEquals( 2, $check_result->get_error_count() );
+		$this->assertNotEmpty( $warnings );
+		$this->assertArrayHasKey( 'load.php', $warnings );
 
 		// Check for Generic.PHP.DisallowShortOpenTag.Found error on Line no 6 and column no at 1.
 		$this->assertArrayHasKey( 6, $errors['load.php'] );
@@ -35,6 +37,29 @@ class Plugin_Review_PHPCS_Check_Tests extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 5, $errors['load.php'][12] );
 		$this->assertArrayHasKey( 'code', $errors['load.php'][12][5][0] );
 		$this->assertEquals( 'WordPress.WP.DeprecatedFunctions.the_author_emailFound', $errors['load.php'][12][5][0]['code'] );
+
+		// Check for WordPress.Security.ValidatedSanitizedInput warnings on Line no 15 and column no at 27.
+		$this->assertCount( 1, wp_list_filter( $warnings['load.php'][15][27], array( 'code' => 'WordPress.Security.ValidatedSanitizedInput.InputNotValidated' ) ) );
+		$this->assertCount( 1, wp_list_filter( $warnings['load.php'][15][27], array( 'code' => 'WordPress.Security.ValidatedSanitizedInput.MissingUnslash' ) ) );
+		$this->assertCount( 1, wp_list_filter( $warnings['load.php'][15][27], array( 'code' => 'WordPress.Security.ValidatedSanitizedInput.InputNotSanitized' ) ) );
+
+		// Check for Squiz.PHP.DiscouragedFunctions.Discouraged warning on Line no 17 and column no at 1.
+		$this->assertSame( 'Squiz.PHP.DiscouragedFunctions.Discouraged', $warnings['load.php'][17][1][0]['code'] );
+
+		// Check for Squiz.PHP.DiscouragedFunctions.Discouraged warning on Line no 18 and column no at 1.
+		$this->assertSame( 'Squiz.PHP.DiscouragedFunctions.Discouraged', $warnings['load.php'][18][1][0]['code'] );
+
+		// Check for Squiz.PHP.DiscouragedFunctions.Discouraged warning on Line no 19 and column no at 1.
+		$this->assertSame( 'Squiz.PHP.DiscouragedFunctions.Discouraged', $warnings['load.php'][19][1][0]['code'] );
+
+		// Check for Squiz.PHP.DiscouragedFunctions.Discouraged warning on Line no 20 and column no at 1.
+		$this->assertSame( 'Squiz.PHP.DiscouragedFunctions.Discouraged', $warnings['load.php'][20][1][0]['code'] );
+
+		// Check for WordPress.PHP.DevelopmentFunctions.error_log_var_dump warning on Line no 22 and column no at 1.
+		$this->assertSame( 'WordPress.PHP.DevelopmentFunctions.error_log_var_dump', $warnings['load.php'][22][1][0]['code'] );
+
+		// Check for WordPress.PHP.DevelopmentFunctions.error_log_error_log warning on Line no 23 and column no at 1.
+		$this->assertSame( 'WordPress.PHP.DevelopmentFunctions.error_log_error_log', $warnings['load.php'][23][1][0]['code'] );
 	}
 
 	public function test_run_without_errors() {

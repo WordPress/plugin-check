@@ -7,7 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
-use WordPress\Plugin_Check\Checker\Checks\Performant_WP_Query_Params_Check;
+use WordPress\Plugin_Check\Checker\Checks\Performance\Performant_WP_Query_Params_Check;
 
 class Performant_WP_Query_Params_Check_Tests extends WP_UnitTestCase {
 

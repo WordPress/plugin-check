@@ -7,12 +7,17 @@
 
 namespace WordPress\Plugin_Check\Admin;
 
+use WordPress\Plugin_Check\Checker\Check;
 use WordPress\Plugin_Check\Checker\Check_Categories;
+use WordPress\Plugin_Check\Checker\Check_Repository;
+use WordPress\Plugin_Check\Checker\Default_Check_Repository;
 
 /**
  * Class is handling admin tools page functionality.
  *
  * @since 1.0.0
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 final class Admin_Page {
 
@@ -89,6 +94,78 @@ final class Admin_Page {
 	public function initialize_page() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'admin_footer', array( $this, 'admin_footer' ) );
+
+		$this->add_help_tab();
+	}
+
+	/**
+	 * Adds the plugin help tab.
+	 *
+	 * @since 1.1.0
+	 */
+	public function add_help_tab() {
+		$screen = get_current_screen();
+
+		if ( ! $screen ) {
+			return;
+		}
+
+		$screen->add_help_tab(
+			array(
+				'id'       => 'plugin-check',
+				'title'    => __( 'Checks', 'plugin-check' ),
+				'content'  => '',
+				'callback' => array( $this, 'render_help_tab' ),
+			)
+		);
+	}
+
+	/**
+	 * Renders the plugin help tab.
+	 *
+	 * @since 1.1.0
+	 */
+	public function render_help_tab() {
+		$check_repo = new Default_Check_Repository();
+		$collection = $check_repo->get_checks( Check_Repository::TYPE_ALL );
+
+		if ( empty( $collection ) ) {
+			return;
+		}
+
+		$category_labels = Check_Categories::get_categories();
+
+		echo '<dl>';
+
+		/**
+		 * All checks to list.
+		 *
+		 * @var Check $check
+		 */
+		foreach ( $collection as $key => $check ) {
+			$categories = array_map(
+				static function ( $category ) use ( $category_labels ) {
+					return $category_labels[ $category ] ?? $category;
+				},
+				$check->get_categories()
+			);
+			$categories = join( ', ', $categories );
+			?>
+			<dt>
+				<code><?php echo esc_html( $key ); ?></code>
+				(<?php echo esc_html( $categories ); ?>)
+			</dt>
+			<dd>
+				<?php echo wp_kses( $check->get_description(), array( 'code' => array() ) ); ?>
+				<br>
+				<a href="<?php echo esc_url( $check->get_documentation_url() ); ?>">
+					<?php esc_html_e( 'Learn more', 'plugin-check' ); ?>
+				</a>
+			</dd>
+			<?php
+		}
+
+		echo '</dl>';
 	}
 
 	/**
@@ -194,10 +271,10 @@ final class Admin_Page {
 
 		$selected_plugin_basename = filter_input( INPUT_GET, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
-		$category_labels = Check_Categories::get_category_labels();
+		$categories = Check_Categories::get_categories();
 
-		// Get user settings for category preferences and set a default value to check plugin_repo by default.
-		$user_enabled_categories = get_user_setting( 'plugin_check_category_preferences', 'plugin_repo' );
+		// Get user settings for category preferences.
+		$user_enabled_categories = get_user_setting( 'plugin_check_category_preferences', implode( '__', $this->get_default_check_categories_to_be_selected() ) );
 		$user_enabled_categories = explode( '__', $user_enabled_categories );
 
 		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'templates/admin-page.php';
@@ -299,5 +376,29 @@ final class Admin_Page {
 	 */
 	public function get_hook_suffix() {
 		return $this->hook_suffix;
+	}
+
+	/**
+	 * Gets default check categories to be selected.
+	 *
+	 * @since 1.0.2
+	 *
+	 * @return string[] An array of category slugs.
+	 */
+	private function get_default_check_categories_to_be_selected() {
+		$default_check_categories = array(
+			'plugin_repo',
+		);
+
+		/**
+		 * Filters the default check categories to be selected.
+		 *
+		 * @since 1.0.2
+		 *
+		 * @param string[] $default_check_categories An array of category slugs.
+		 */
+		$default_categories = (array) apply_filters( 'wp_plugin_check_default_categories', $default_check_categories );
+
+		return $default_categories;
 	}
 }

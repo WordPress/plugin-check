@@ -174,6 +174,42 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 		$this->assertEmpty( $action_links );
 	}
 
+	public function test_filter_default_check_categories() {
+		$custom_categories = array(
+			'general',
+			'plugin_repo',
+		);
+
+		$filter_name = 'wp_plugin_check_default_categories';
+
+		// Create a mock filter that will return our custom categories.
+		add_filter(
+			$filter_name,
+			static function () use ( $custom_categories ) {
+				return $custom_categories;
+			}
+		);
+
+		// Render the admin page.
+		ob_start();
+		$this->admin_page->render_page();
+		$output = ob_get_contents();
+		ob_end_clean();
+
+		foreach ( $custom_categories as $category ) {
+			$this->assertStringContainsString( '<input type="checkbox" id="' . $category . '" name="categories" value="' . $category . '"  checked=\'checked\' />', $output );
+
+		}
+
+		// Remove the filter to avoid interfering with other tests.
+		remove_filter(
+			$filter_name,
+			static function () use ( $custom_categories ) {
+				return $custom_categories;
+			}
+		);
+	}
+
 	/**
 	 * @dataProvider data_status_mustuse_and_dropins
 	 */

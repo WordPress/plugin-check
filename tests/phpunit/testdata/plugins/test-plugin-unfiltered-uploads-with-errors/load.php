@@ -11,6 +11,7 @@
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  * Text Domain: test-plugin-unfiltered-uploads-errors
+ * Requires Plugins: woocommerce, contact-form-7
  *
  * @package test-plugin-unfiltered-uploads-errors
  */

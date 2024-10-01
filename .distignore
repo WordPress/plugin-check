@@ -8,6 +8,8 @@ build-phpunit
 docs
 node_modules
 patches
+# Distributed via vendor/plugin-check/phpcs-sniffs instead
+/phpcs-sniffs/
 tests
 
 *.DS_Store
@@ -23,7 +25,6 @@ tests
 .wp-env.override.json
 behat.yml
 codecov.yml
-composer.json
 composer.lock
 CONTRIBUTING.md
 package.json

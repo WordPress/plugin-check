@@ -1,9 +1,8 @@
 === Plugin Check (PCP) ===
 
 Contributors:      wordpressdotorg
-Requires at least: 6.3
-Tested up to:      6.5
-Stable tag:        1.0.1
+Tested up to:      6.6
+Stable tag:        1.1.0
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 Tags:              plugin best practices, testing, accessibility, performance, security
@@ -21,6 +20,7 @@ The checks can be run either using the WP Admin user interface or WP-CLI:
 * To check a plugin using WP Admin, please navigate to the _Tools > Plugin Check_ menu. You need to be able to manage plugins on your site in order to access that screen.
 * To check a plugin using WP-CLI, please use the `wp plugin check` command. For example, to check the "Hello Dolly" plugin: `wp plugin check hello.php`
     * Note that by default when using WP-CLI, only static checks can be executed. In order to also include runtime checks, a workaround is currently necessary using the `--require` argument of WP-CLI, to manually load the `cli.php` file within the plugin checker directory before WordPress is loaded. For example: `wp plugin check hello.php --require=./wp-content/plugins/plugin-check/cli.php`
+    * You could use arbitrary path or URL to check a plugin. For example, to check a plugin from a URL: `wp plugin check https://example.com/plugin.zip` or to check a plugin from a path: `wp plugin check /path/to/plugin`
 
 The checks are grouped into several categories, so that you can customize which kinds of checks you would like to run on a plugin.
 
@@ -68,9 +68,26 @@ In any case, passing the checks in this tool likely helps to achieve a smooth pl
 
 == Changelog ==
 
+= 1.1.0 =
+
+* Feature - New `Non_Blocking_Scripts_Check` (`non_blocking_scripts`) runtime check to warn about enqueued scripts that use neither `defer` nor `async`.
+* Enhancement - Changed the namespace of included checks.
+* Enhancement - Introduced severity levels for all errors and warnings.
+* Enhancement - CLI: Support checking a plugin from a path or URL.
+* Enhancement - Added short descriptions and URLs for each check.
+* Enhancement - Improved messaging in check results.
+* Enhancement - Updated code obfuscation check with more accurate results.
+* Enhancement - Updated plugin review check to flag missing input sanitization (`WordPress.Security.ValidatedSanitizedInput`).
+* Fix - Improve readme checks to exclude invalid files.
+* Fix - Only show edit link if files are actually editable.
+
 = 1.0.2 =
 
 * Enhancement - Show a warning if a non-existent check if passed to the WP CLI --checks argument. (issue 348)
+* Feature - New `Enqueued_Scripts_Scope_Check` (`enqueued_scripts_scope`), `Enqueued_Styles_Size_Check` (`enqueued_styles_size`) and `Enqueued_Resources_Check` (`enqueued_resources`) performance checks.
+* Enhancement - Improved readme check and added a new `wp_plugin_check_ignored_readme_warnings` filter.
+* Enhancement - New `wp_plugin_check_default_categories` filter to change the categories which are selected by default.
+* Enhancement - New `wp_plugin_check_ignore_files` filter to allow ignoring specific files.
 * Fix - Correct detection of readme files in Windows by normalizing file paths.
 
 = 1.0.1 =

@@ -30,10 +30,11 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	 * @var array
 	 */
 	protected $allowed_args = array(
-		'standard'   => true,
-		'extensions' => true,
-		'sniffs'     => true,
-		'exclude'    => true, //phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
+		'standard'    => true,
+		'extensions'  => true,
+		'sniffs'      => true,
+		'runtime-set' => true,
+		'exclude'     => true, //phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
 	);
 
 	/**
@@ -41,6 +42,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	 *
 	 * @since 1.0.0
 	 *
+	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 * @return array {
 	 *    An associative array of PHPCS CLI arguments. Can include one or more of the following options.
 	 *
@@ -50,7 +52,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	 *    @type string $exclude    A comma separated list of sniff codes to exclude from checks.
 	 * }
 	 */
-	abstract protected function get_args();
+	abstract protected function get_args( Check_Result $result );
 
 	/**
 	 * Amends the given result by running the check on the associated plugin.
@@ -83,7 +85,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		$defaults = $this->get_argv_defaults( $result );
 
 		// Set the check arguments for PHPCS.
-		$_SERVER['argv'] = $this->parse_argv( $this->get_args(), $defaults );
+		$_SERVER['argv'] = $this->parse_argv( $this->get_args( $result ), $defaults );
 
 		// Reset PHP_CodeSniffer config.
 		$this->reset_php_codesniffer_config();
@@ -122,7 +124,9 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 					$file_message['source'],
 					$file_name,
 					$file_message['line'],
-					$file_message['column']
+					$file_message['column'],
+					'',
+					$file_message['severity']
 				);
 			}
 		}
@@ -143,7 +147,15 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 
 		// Format check arguments for PHPCS.
 		foreach ( $check_args as $key => $value ) {
-			$defaults[] = "--{$key}=$value";
+			if ( 'runtime-set' === $key ) {
+				if ( is_array( $value ) ) {
+					foreach ( $value as $item_key => $item_value ) {
+						$defaults = array_merge( $defaults, array( "--{$key}", $item_key, $item_value ) );
+					}
+				}
+			} else {
+				$defaults[] = "--{$key}=$value";
+			}
 		}
 
 		return $defaults;
@@ -165,9 +177,23 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 			'--report-width=9999',
 		);
 
+		$ignore_patterns = array();
+
 		$directories_to_ignore = Plugin_Request_Utility::get_directories_to_ignore();
+		$files_to_ignore       = Plugin_Request_Utility::get_files_to_ignore();
+
+		// Ignore directories.
 		if ( ! empty( $directories_to_ignore ) ) {
-			$defaults[] = '--ignore=*/' . implode( '/*,*/', $directories_to_ignore ) . '/*';
+			$ignore_patterns[] = '*/' . implode( '/*,*/', $directories_to_ignore ) . '/*';
+		}
+
+		// Ignore files.
+		if ( ! empty( $files_to_ignore ) ) {
+			$ignore_patterns[] = '/' . implode( ',/', $files_to_ignore );
+		}
+
+		if ( ! empty( $ignore_patterns ) ) {
+			$defaults[] = '--ignore=' . implode( ',', $ignore_patterns );
 		}
 
 		// Set the Minimum WP version supported for the plugin.

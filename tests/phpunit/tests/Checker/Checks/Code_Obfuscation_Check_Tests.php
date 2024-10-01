@@ -7,14 +7,14 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
-use WordPress\Plugin_Check\Checker\Checks\Code_Obfuscation_Check;
+use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\Code_Obfuscation_Check;
 
 class Code_Obfuscation_Check_Tests extends WP_UnitTestCase {
 
 	/**
 	 * @dataProvider data_obfuscation_services
 	 */
-	public function test_run_with_obfuscation_errors( $type_flag, $plugin_basename, $expected_file ) {
+	public function test_run_with_obfuscation_errors( $type_flag, $plugin_basename, $expected_file, $line, $column ) {
 		// Test given plugin with relevant obfuscation.
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . $plugin_basename );
 		$check_result  = new Check_Result( $check_context );
@@ -28,8 +28,8 @@ class Code_Obfuscation_Check_Tests extends WP_UnitTestCase {
 		$this->assertArrayHasKey( $expected_file, $errors );
 		$this->assertSame( 1, $check_result->get_error_count() );
 
-		$this->assertTrue( isset( $errors[ $expected_file ][0][0][0] ) );
-		$this->assertSame( 'obfuscated_code_detected', $errors[ $expected_file ][0][0][0]['code'] );
+		$this->assertTrue( isset( $errors[ $expected_file ][ $line ][ $column ][0] ) );
+		$this->assertSame( 'obfuscated_code_detected', $errors[ $expected_file ][ $line ][ $column ][0]['code'] );
 	}
 
 	public function data_obfuscation_services() {
@@ -38,16 +38,22 @@ class Code_Obfuscation_Check_Tests extends WP_UnitTestCase {
 				Code_Obfuscation_Check::TYPE_ZEND,
 				'test-plugin-code-obfuscation-zendguard-errors/load.php',
 				'obfuscated.php',
+				1,
+				1,
 			),
 			'Source Guardian' => array(
 				Code_Obfuscation_Check::TYPE_SOURCEGUARDIAN,
 				'test-plugin-code-obfuscation-sourceguardian-errors/load.php',
 				'obfuscated.php',
+				2,
+				4,
 			),
 			'ionCube'         => array(
 				Code_Obfuscation_Check::TYPE_IONCUBE,
 				'test-plugin-code-obfuscation-ioncube-errors/load.php',
 				'load.php',
+				16,
+				19,
 			),
 		);
 	}

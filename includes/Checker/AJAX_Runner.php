@@ -120,4 +120,15 @@ class AJAX_Runner extends Abstract_Check_Runner {
 
 		return $categories;
 	}
+
+	/**
+	 * Returns plugin slug parameter.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return string Plugin slug parameter.
+	 */
+	protected function get_slug_param() {
+		return '';
+	}
 }

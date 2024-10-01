@@ -18,6 +18,10 @@ final class Runtime_Environment_Setup {
 	 * Sets up the WordPress environment for runtime checks
 	 *
 	 * @since 1.0.0
+	 *
+	 * @global wpdb               $wpdb          WordPress database abstraction object.
+	 * @global string             $table_prefix  The database table prefix.
+	 * @global WP_Filesystem_Base $wp_filesystem WordPress filesystem subclass.
 	 */
 	public function set_up() {
 		global $wpdb, $table_prefix, $wp_filesystem;
@@ -47,6 +51,11 @@ final class Runtime_Environment_Setup {
 					add_option( 'permalink_structure', $permalink_structure );
 				}
 			);
+
+			if ( ! isset( $_SERVER['HTTP_HOST'] ) ) {
+				$site_url             = get_option( 'siteurl' );
+				$_SERVER['HTTP_HOST'] = preg_replace( '#^https?://#', '', rtrim( $site_url, '/' ) );
+			}
 
 			// Do not send post-install notification email, see https://github.com/WordPress/plugin-check/issues/424.
 			add_filter( 'pre_wp_mail', '__return_false' );
@@ -85,6 +94,10 @@ final class Runtime_Environment_Setup {
 	 * Cleans up the runtime environment setup.
 	 *
 	 * @since 1.0.0
+	 *
+	 * @global wpdb               $wpdb          WordPress database abstraction object.
+	 * @global string             $table_prefix  The database table prefix.
+	 * @global WP_Filesystem_Base $wp_filesystem WordPress filesystem subclass.
 	 */
 	public function clean_up() {
 		global $wpdb, $table_prefix, $wp_filesystem;
@@ -126,6 +139,8 @@ final class Runtime_Environment_Setup {
 	 * Checks if the WordPress Environment can be set up for runtime checks.
 	 *
 	 * @since 1.0.0
+	 *
+	 * @global WP_Filesystem_Base $wp_filesystem WordPress filesystem subclass.
 	 *
 	 * @return bool Returns true if the runtime environment can be set up, false if not.
 	 */

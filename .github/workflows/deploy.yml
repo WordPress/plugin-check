@@ -12,12 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install PHP dependencies
-        uses: ramsey/composer-install@83af392bf5f031813d25e6fe4cd626cdba9a2df6
+        uses: ramsey/composer-install@57532f8be5bda426838819c5ee9afb8af389d51a
         with:
-          composer-options: '--prefer-dist --no-progress --no-interaction --no-dev'
+          composer-options: '--prefer-dist --no-dev'
 
       - name: WordPress Plugin Deploy
         id: deploy

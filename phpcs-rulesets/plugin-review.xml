@@ -46,6 +46,11 @@
 		<type>warning</type>
 	</rule>
 
+	<!-- Sanitized Input rules -->
+	<rule ref="WordPress.Security.ValidatedSanitizedInput">
+		<type>warning</type>
+	</rule>
+
 	<!-- Prohibit the use of the backtick operator. -->
 	<rule ref="Generic.PHP.BacktickOperator"/>
 
@@ -53,6 +58,11 @@
 	<rule ref="Generic.PHP.DiscourageGoto.Found">
 		<type>error</type>
 		<message>The "goto" language construct should not be used.</message>
+	</rule>
+
+	<!-- Check for error logs in plugin -->
+	<rule ref="WordPress.PHP.DevelopmentFunctions">
+		<type>warning</type>
 	</rule>
 
 	<!-- No PHP short open tags allowed. -->
@@ -84,6 +94,19 @@
 				<element key="create_function" value="null"/>
 				<element key="eval" value="null"/>
 				<element key="str_rot13" value="null"/>
+			</property>
+		</properties>
+		<type>error</type>
+		<severity>7</severity>
+	</rule>
+
+	<rule ref="Squiz.PHP.DiscouragedFunctions">
+		<properties>
+			<property name="forbiddenFunctions" type="array">
+				<element key="set_time_limit" value="null"/>
+				<element key="ini_set" value="null"/>
+				<element key="ini_alter" value="null"/>
+				<element key="dl" value="null"/>
 			</property>
 		</properties>
 	</rule>

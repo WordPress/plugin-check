@@ -8,6 +8,7 @@
 namespace WordPress\Plugin_Check\Checker;
 
 use Exception;
+use WordPress\Plugin_Check\Checker\Exception\Invalid_Check_Slug_Exception;
 use WordPress\Plugin_Check\Checker\Preparations\Universal_Runtime_Preparation;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 
@@ -17,6 +18,7 @@ use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
  * @since 1.0.0
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 abstract class Abstract_Check_Runner implements Check_Runner {
 
@@ -35,6 +37,14 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @var array
 	 */
 	protected $check_slugs;
+
+	/**
+	 * The plugin slug.
+	 *
+	 * @since 1.2.0
+	 * @var string
+	 */
+	protected $slug;
 
 	/**
 	 * The check slugs to exclude.
@@ -67,6 +77,16 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @var string
 	 */
 	protected $plugin_basename;
+
+	/**
+	 * Whether to delete the plugin folder during cleanup.
+	 *
+	 * Used when downloading a plugin from a URL.
+	 *
+	 * @since 1.1.0
+	 * @var bool
+	 */
+	private $delete_plugin_folder = false;
 
 	/**
 	 * An instance of the Check_Repository.
@@ -144,6 +164,15 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @return array An array of categories.
 	 */
 	abstract protected function get_categories_param();
+
+	/**
+	 * Returns plugin slug parameter.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return string Plugin slug.
+	 */
+	abstract protected function get_slug_param();
 
 	/**
 	 * Sets whether the runner class was initialized early.
@@ -281,18 +310,58 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @throws Exception Thrown exception when preparation fails.
 	 */
 	final public function prepare() {
-		if ( $this->has_runtime_check( $this->get_checks_to_run() ) ) {
-			$preparation = new Universal_Runtime_Preparation( $this->get_check_context() );
-			return $preparation->prepare();
+		$cleanup_functions = array();
+
+		if ( $this->initialized_early ) {
+			/*
+			 * When initialized early, plugins are not loaded yet when this method is called.
+			 * Therefore it could be that check slugs provided refer to addon checks that are not loaded yet.
+			 * In that case, the only reliable option is to assume that it refers to an addon check and that the addon
+			 * check is a runtime check. We don't know, but better to have the runtime preparations initialize
+			 * unnecessarily rather than not having them when needed.
+			 *
+			 * The actual checks to run are retrieved later (once plugins are loaded), so if one of the provided slugs
+			 * is actually invalid, the exception will still be thrown at that point.
+			 */
+			try {
+				$checks             = $this->get_checks_to_run();
+				$initialize_runtime = $this->has_runtime_check( $checks );
+			} catch ( Invalid_Check_Slug_Exception $e ) {
+				$initialize_runtime = true;
+			}
+		} else {
+			// When not initialized early, all checks are loaded, so we can simply see if there are runtime checks.
+			$initialize_runtime = $this->has_runtime_check( $this->get_checks_to_run() );
 		}
 
-		return function () {};
+		if ( $initialize_runtime ) {
+			$preparation         = new Universal_Runtime_Preparation( $this->get_check_context() );
+			$cleanup_functions[] = $preparation->prepare();
+		}
+
+		if ( $this->delete_plugin_folder ) {
+			$cleanup_functions = function () {
+				// It must be a directory at this point, but double check just in case.
+				if ( is_dir( $this->plugin_basename ) ) {
+					rmdir( $this->plugin_basename );
+				}
+			};
+		}
+
+		return function () use ( $cleanup_functions ) {
+			foreach ( $cleanup_functions as $cleanup_function ) {
+				$cleanup_function();
+			}
+		};
 	}
 
 	/**
 	 * Runs the checks against the plugin.
 	 *
 	 * @since 1.0.0
+	 *
+	 * @global wpdb   $wpdb         WordPress database abstraction object.
+	 * @global string $table_prefix The database table prefix.
 	 *
 	 * @return Check_Result An object containing all check results.
 	 */
@@ -391,15 +460,12 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @throws Exception Thrown when invalid flag is passed, or Check slug does not exist.
 	 */
 	final public function get_checks_to_run() {
-		// Include file to use is_plugin_active() in CLI context.
-		require_once ABSPATH . 'wp-admin/includes/plugin.php';
-
 		$check_slugs = $this->get_check_slugs();
 		$check_slugs = $this->return_valid_check_slugs( $check_slugs );
 		$check_flags = Check_Repository::TYPE_STATIC;
 
 		// Check if conditions are met in order to perform Runtime Checks.
-		if ( ( $this->initialized_early || $this->runtime_environment->can_set_up() ) && is_plugin_active( $this->get_plugin_basename() ) ) {
+		if ( $this->allow_runtime_checks() ) {
 			$check_flags = Check_Repository::TYPE_ALL;
 		}
 
@@ -446,6 +512,20 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		}
 
 		return $check_slugs;
+  }
+  
+	 * Checks whether the current environment allows for runtime checks to be used.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return bool True if runtime checks are allowed, false otherwise.
+	 */
+	protected function allow_runtime_checks(): bool {
+		// Ensure that is_plugin_active() is available.
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+
+		return ( $this->initialized_early || $this->runtime_environment->can_set_up() )
+			&& is_plugin_active( $this->get_plugin_basename() );
 	}
 
 	/**
@@ -506,8 +586,17 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 */
 	final public function get_plugin_basename() {
 		if ( null === $this->plugin_basename ) {
-			$plugin                = null !== $this->plugin ? $this->plugin : $this->get_plugin_param();
-			$this->plugin_basename = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin );
+			$plugin = null !== $this->plugin ? $this->plugin : $this->get_plugin_param();
+
+			if ( filter_var( $plugin, FILTER_VALIDATE_URL ) ) {
+				$this->plugin_basename = Plugin_Request_Utility::download_plugin( $plugin );
+
+				$this->delete_plugin_folder = true;
+			} elseif ( Plugin_Request_Utility::is_directory_valid_plugin( $plugin ) ) {
+				$this->plugin_basename = $plugin;
+			} else {
+				$this->plugin_basename = Plugin_Request_Utility::get_plugin_basename_from_input( $plugin );
+			}
 		}
 
 		return $this->plugin_basename;
@@ -543,6 +632,21 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		return $this->get_categories_param();
 	}
 
+	/**
+	 * Returns plugin slug.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return string Plugin slug.
+	 */
+	final protected function get_slug() {
+		if ( null !== $this->slug ) {
+			return $this->slug;
+		}
+
+		return $this->get_slug_param();
+	}
+
 	/** Gets the Check_Context for the plugin.
 	 *
 	 * @since 1.0.0
@@ -550,7 +654,26 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @return Check_Context The check context for the plugin file.
 	 */
 	private function get_check_context() {
-		return new Check_Context( WP_PLUGIN_DIR . '/' . $this->get_plugin_basename() );
+		$plugin_basename = $this->get_plugin_basename();
+		$plugin_path     = is_dir( $plugin_basename ) ? $plugin_basename : WP_PLUGIN_DIR . '/' . $plugin_basename;
+		return new Check_Context( $plugin_path, $this->get_slug() );
+	}
+
+	/**
+	 * Sets the plugin slug.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param string $slug Plugin slug.
+	 */
+	final public function set_slug( $slug ) {
+		if ( ! empty( $slug ) ) {
+			$this->slug = $slug;
+		} else {
+			$basename = $this->get_plugin_basename();
+
+			$this->slug = ( '.' === pathinfo( $basename, PATHINFO_DIRNAME ) ) ? $basename : dirname( $basename );
+		}
 	}
 
 	/**

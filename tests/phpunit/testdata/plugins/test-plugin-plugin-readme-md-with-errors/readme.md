@@ -1,7 +1,7 @@
 
 === Plugin Check ===
 
-Contributors:      wordpressdotorg
+Contributors:      https://johndoe.com
 Requires at least: 6.0
 Tested up to:      6.1
 Requires PHP:      5.6

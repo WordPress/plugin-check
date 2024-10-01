@@ -7,7 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
-use WordPress\Plugin_Check\Checker\Checks\Trademarks_Check;
+use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\Trademarks_Check;
 
 class Trademarks_Check_Tests extends WP_UnitTestCase {
 
@@ -38,15 +38,15 @@ class Trademarks_Check_Tests extends WP_UnitTestCase {
 		$check = new Trademarks_Check( $type_flag );
 		$check->run( $check_result );
 
-		$errors = $check_result->get_errors();
+		$warnings = $check_result->get_warnings();
 
-		$this->assertNotEmpty( $errors );
-		$this->assertArrayHasKey( $expected_file, $errors );
-		$this->assertSame( 1, $check_result->get_error_count() );
+		$this->assertNotEmpty( $warnings );
+		$this->assertArrayHasKey( $expected_file, $warnings );
+		$this->assertSame( 1, $check_result->get_warning_count() );
 
-		$this->assertTrue( isset( $errors[ $expected_file ][0][0][0] ) );
-		$this->assertSame( 'trademarked_term', $errors[ $expected_file ][0][0][0]['code'] );
-		$this->assertSame( $expected_error, $errors[ $expected_file ][0][0][0]['message'] );
+		$this->assertTrue( isset( $warnings[ $expected_file ][0][0][0] ) );
+		$this->assertSame( 'trademarked_term', $warnings[ $expected_file ][0][0][0]['code'] );
+		$this->assertSame( $expected_error, $warnings[ $expected_file ][0][0][0]['message'] );
 	}
 
 	public function data_trademarks_check() {
@@ -103,10 +103,10 @@ class Trademarks_Check_Tests extends WP_UnitTestCase {
 		$check = new Trademarks_Check( Trademarks_Check::TYPE_NAME );
 		$check->run( $check_result );
 
-		$errors = $check_result->get_errors();
+		$warnings = $check_result->get_warnings();
 
-		$this->assertEmpty( $errors );
-		$this->assertSame( 0, $check_result->get_error_count() );
+		$this->assertEmpty( $warnings );
+		$this->assertSame( 0, $check_result->get_warning_count() );
 	}
 
 	public function test_single_file_plugin_without_error_for_trademarks() {
