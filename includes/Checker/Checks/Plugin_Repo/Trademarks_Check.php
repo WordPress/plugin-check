@@ -426,7 +426,7 @@ class Trademarks_Check extends Abstract_File_Check {
 			// Trademarks that are allowed to use with Acronym.
 			$message = sprintf(
 				/* translators: 1: plugin slug, 2: found trademarked term */
-				__( 'The plugin slug includes a restricted term. Your plugin slug - "%1$s" - contains the restricted term "%2$s" which can be used within in your plugin slug, unless your plugin name will not change to the full name. For example: You can use WP but not WordPress.', 'plugin-check' ),
+				__( 'The plugin slug includes a restricted term. Your plugin slug - "%1$s" - contains the restricted term "%2$s" which can be used within the plugin slug, as long as you don\'t use the full name in the plugin name. For example: You can use WP but not WordPress.', 'plugin-check' ),
 				esc_html( $plugin_slug ),
 				esc_html( trim( $check, '-' ) )
 			);
