@@ -31,11 +31,15 @@
     border-bottom: 3px solid #ddd;
     display: block;
   }
+
+	table.plugin-check__results-table td, 
+	table.plugin-check__results-table code {
+		font-size: .9em;
+	}
   
   table.plugin-check__results-table td {
     border-bottom: 1px solid #ddd;
     display: block;
-    font-size: .8em;
     text-align: right;
   }
   
