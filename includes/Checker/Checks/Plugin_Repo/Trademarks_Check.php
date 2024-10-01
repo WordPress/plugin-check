@@ -154,7 +154,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	 *
 	 * @var string[]
 	 */
-	const FOR_USE_ACRONYM = array(
+	const ALLOWED_ACRONYMS = array(
 		'wp',
 		'wc',
 	);
@@ -363,7 +363,7 @@ class Trademarks_Check extends Abstract_File_Check {
 			);
 		} elseif (
 			trim( $check, '-' ) === $check
-			&& in_array( $check, self::FOR_USE_ACRONYM, true )
+			&& in_array( $check, self::ALLOWED_ACRONYMS, true )
 		) {
 			// Trademarks that are allowed to use as an acronym.
 			$message = sprintf(
@@ -421,7 +421,7 @@ class Trademarks_Check extends Abstract_File_Check {
 			);
 		} elseif (
 			trim( $check, '-' ) === $check
-			&& in_array( $check, self::FOR_USE_ACRONYM, true )
+			&& in_array( $check, self::ALLOWED_ACRONYMS, true )
 		) {
 			// Trademarks that are allowed to use with Acronym.
 			$message = sprintf(
