@@ -22,11 +22,11 @@
 					</label>
 				</h2>
 
-				<p>
-					<?php esc_html_e( 'Select a plugin to check it for best practices in several categories.', 'plugin-check' ); ?>
+				<p id="plugin-check__description">
+					<?php esc_html_e( 'Select a plugin to check best practices in several categories and security issues.', 'plugin-check' ); ?>
 				</p>
 
-				<select id="plugin-check__plugins-dropdown" name="plugin_check_plugins">
+				<select id="plugin-check__plugins-dropdown" name="plugin_check_plugins" aria-describedby="plugin-check__description">
 					<?php if ( 1 !== count( $available_plugins ) ) { ?>
 						<option value=""><?php esc_html_e( 'Select Plugin', 'plugin-check' ); ?></option>
 					<?php } ?>
