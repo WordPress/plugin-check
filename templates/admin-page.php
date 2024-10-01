@@ -23,7 +23,7 @@
 				</h2>
 
 				<p>
-					<?php esc_html_e( 'Select a plugin to check best practices in several categories and security issues.', 'plugin-check' ); ?>
+					<?php esc_html_e( 'Select a plugin to check it for best practices in several categories.', 'plugin-check' ); ?>
 				</p>
 
 				<select id="plugin-check__plugins-dropdown" name="plugin_check_plugins">
