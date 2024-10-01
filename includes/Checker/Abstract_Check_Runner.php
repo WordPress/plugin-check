@@ -512,7 +512,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		}
 
 		return $check_slugs;
-  }
+    }
 	
   	/**
 	 * Checks whether the current environment allows for runtime checks to be used.
