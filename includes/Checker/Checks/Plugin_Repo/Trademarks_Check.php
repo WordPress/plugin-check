@@ -148,7 +148,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	);
 
 	/**
-	 * Lists of trademarks that are allowed but shows in acronym.
+	 * Lists of allowed acronyms of trademarks.
 	 *
 	 * @since 1.2.0
 	 *
