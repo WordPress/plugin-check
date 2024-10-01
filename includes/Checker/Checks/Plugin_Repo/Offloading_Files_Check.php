@@ -16,7 +16,7 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
 /**
  * Check to detect loading files from external sites.
  *
- * @since n.e.x.t.
+ * @since 1.2.0.
  */
 class Offloading_Files_Check extends Abstract_PHP_CodeSniffer_Check {
 
@@ -26,7 +26,7 @@ class Offloading_Files_Check extends Abstract_PHP_CodeSniffer_Check {
 	/**
 	 * Bitwise flags to control check behavior.
 	 *
-	 * @since n.e.x.t.
+	 * @since 1.2.0.
 	 * @var int
 	 */
 	protected $flags = 0;
@@ -36,7 +36,7 @@ class Offloading_Files_Check extends Abstract_PHP_CodeSniffer_Check {
 	 *
 	 * Every check must have at least one category.
 	 *
-	 * @since n.e.x.t.
+	 * @since 1.2.0.
 	 *
 	 * @return array The categories for the check.
 	 */
@@ -65,7 +65,7 @@ class Offloading_Files_Check extends Abstract_PHP_CodeSniffer_Check {
 	 *
 	 * Every check must have a short description explaining what the check does.
 	 *
-	 * @since n.e.x.t.
+	 * @since 1.2.0.
 	 *
 	 * @return string Description.
 	 */
@@ -78,7 +78,7 @@ class Offloading_Files_Check extends Abstract_PHP_CodeSniffer_Check {
 	 *
 	 * Every check must have a URL with further information about the check.
 	 *
-	 * @since n.e.x.t.
+	 * @since 1.2.0.
 	 *
 	 * @return string The documentation URL.
 	 */
