@@ -54,7 +54,7 @@ final class Admin_Page {
 	 * @since 1.0.0
 	 */
 	public function add_hooks() {
-		$admin_menu_hook = is_multisite() ? 'network_admin_menu' : 'admin_menu';
+		$admin_menu_hook         = is_multisite() ? 'network_admin_menu' : 'admin_menu';
 		$plugin_action_link_hook = is_multisite() ? 'network_admin_plugin_action_links' : 'plugin_action_links';
 
 		add_action( $admin_menu_hook, array( $this, 'add_and_initialize_page' ) );
@@ -322,7 +322,13 @@ final class Admin_Page {
 			return $actions;
 		}
 
-		if ( ( is_multisite() && current_user_can( 'manage_network_plugins' ) ) || current_user_can( 'activate_plugins' ) ) {
+		if ( is_multisite() && current_user_can( 'manage_network_plugins' ) ) {
+			$actions[] = sprintf(
+				'<a href="%1$s">%2$s</a>',
+				esc_url( network_admin_url( "settings.php?page=plugin-check&plugin={$plugin_file}" ) ),
+				esc_html__( 'Check this plugin', 'plugin-check' )
+			);
+		} elseif ( current_user_can( 'activate_plugins' ) ) {
 			$actions[] = sprintf(
 				'<a href="%1$s">%2$s</a>',
 				esc_url( admin_url( "tools.php?page=plugin-check&plugin={$plugin_file}" ) ),
