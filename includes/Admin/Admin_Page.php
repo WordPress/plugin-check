@@ -54,8 +54,11 @@ final class Admin_Page {
 	 * @since 1.0.0
 	 */
 	public function add_hooks() {
-		add_action( 'admin_menu', array( $this, 'add_and_initialize_page' ) );
-		add_filter( 'plugin_action_links', array( $this, 'filter_plugin_action_links' ), 10, 4 );
+		$admin_menu_hook = is_multisite() ? 'network_admin_menu' : 'admin_menu';
+		$plugin_action_link_hook = is_multisite() ? 'network_admin_plugin_action_links' : 'plugin_action_links';
+
+		add_action( $admin_menu_hook, array( $this, 'add_and_initialize_page' ) );
+		add_filter( $plugin_action_link_hook, array( $this, 'filter_plugin_action_links' ), 10, 4 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'add_jump_to_line_code_editor' ) );
 
 		$this->admin_ajax->add_hooks();
@@ -64,16 +67,28 @@ final class Admin_Page {
 	/**
 	 * Adds the admin page under the tools menu.
 	 *
+	 * @since n.e.x.t Added multisite support.
 	 * @since 1.0.0
 	 */
 	public function add_page() {
-		$this->hook_suffix = add_management_page(
-			__( 'Plugin Check', 'plugin-check' ),
-			__( 'Plugin Check', 'plugin-check' ),
-			'activate_plugins',
-			'plugin-check',
-			array( $this, 'render_page' )
-		);
+		if ( is_multisite() ) {
+			$this->hook_suffix = add_submenu_page(
+				'settings.php',
+				__( 'Plugin Check', 'plugin-check' ),
+				__( 'Plugin Check', 'plugin-check' ),
+				'manage_network_plugins',
+				'plugin-check',
+				array( $this, 'render_page' )
+			);
+		} else {
+			$this->hook_suffix = add_management_page(
+				__( 'Plugin Check', 'plugin-check' ),
+				__( 'Plugin Check', 'plugin-check' ),
+				'activate_plugins',
+				'plugin-check',
+				array( $this, 'render_page' )
+			);
+		}
 	}
 
 	/**
@@ -307,7 +322,7 @@ final class Admin_Page {
 			return $actions;
 		}
 
-		if ( current_user_can( 'activate_plugins' ) ) {
+		if ( ( is_multisite() && current_user_can( 'manage_network_plugins' ) ) || current_user_can( 'activate_plugins' ) ) {
 			$actions[] = sprintf(
 				'<a href="%1$s">%2$s</a>',
 				esc_url( admin_url( "tools.php?page=plugin-check&plugin={$plugin_file}" ) ),
