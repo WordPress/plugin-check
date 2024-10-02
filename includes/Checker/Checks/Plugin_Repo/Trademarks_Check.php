@@ -308,7 +308,7 @@ class Trademarks_Check extends Abstract_File_Check {
 			return;
 		}
 
-		$plugin_slug = basename( $result->plugin()->path() );
+		$plugin_slug = $result->plugin()->slug();
 
 		try {
 			$this->validate_slug_has_no_trademarks( $plugin_slug );
@@ -433,7 +433,7 @@ class Trademarks_Check extends Abstract_File_Check {
 		$has_trademarked_slug = false;
 
 		foreach ( self::TRADEMARK_SLUGS as $trademark ) {
-			if ( '-' === $trademark[-1] ) {
+			if ( str_ends_with( $trademark, '-' ) ) {
 				// Trademarks ending in "-" indicate slug cannot begin with that term.
 				if ( 0 === strpos( $slug, $trademark ) ) {
 					$has_trademarked_slug = $trademark;

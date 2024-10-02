@@ -159,9 +159,29 @@ class CLI_Runner extends Abstract_Check_Runner {
 	}
 
 	/**
+	 * Returns plugin slug parameter.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return string Plugin slug parameter.
+	 */
+	protected function get_slug_param() {
+		$slug = '';
+
+		foreach ( $_SERVER['argv'] as $value ) {
+			if ( false !== strpos( $value, '--slug=' ) ) {
+				$slug = str_replace( '--slug=', '', $value );
+				break;
+			}
+		}
+
+		return $slug;
+	}
+
+	/**
 	 * Checks whether the current environment allows for runtime checks to be used.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.2.0
 	 *
 	 * @return bool True if runtime checks are allowed, false otherwise.
 	 */

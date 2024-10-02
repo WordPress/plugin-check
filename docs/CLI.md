@@ -56,6 +56,9 @@ By default, `.git`, `vendor` and `node_modules` directories are excluded.
 
 [--warning-severity=<warning-severity>]
 : Warning severity level.
+
+[--slug=<slug>]
+: Slug to override the default.
 ```
 ## EXAMPLES
 ```

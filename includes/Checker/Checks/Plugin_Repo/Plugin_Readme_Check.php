@@ -101,6 +101,9 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 		// Check the readme file for warnings.
 		$this->check_for_warnings( $result, $readme_file, $parser );
+
+		// Check the readme file for contributors.
+		$this->check_for_contributors( $result, $readme_file );
 	}
 
 	/**
@@ -146,14 +149,17 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		} else {
 			$plugin_data = get_plugin_data( $result->plugin()->main_file() );
 
-			if ( $parser->name !== $plugin_data['Name'] ) {
+			$plugin_readme_name = html_entity_decode( $parser->name, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401 );
+			$plugin_header_name = html_entity_decode( $plugin_data['Name'], ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401 );
+
+			if ( $plugin_readme_name !== $plugin_header_name ) {
 				$this->add_result_warning_for_file(
 					$result,
 					sprintf(
 						/* translators: 1: Plugin name, 2: Name in plugin header */
 						__( 'Plugin name "%1$s" is different from the name declared in plugin header "%2$s".', 'plugin-check' ),
-						$parser->name,
-						$plugin_data['Name']
+						$plugin_readme_name,
+						$plugin_header_name
 					),
 					'mismatched_plugin_name',
 					$readme_file,
@@ -457,6 +463,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incorrect-stable-tag',
 				9
 			);
+
+			return;
 		}
 
 		// Check the readme file Stable tag against the plugin's main file version.
@@ -468,7 +476,11 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		) {
 			$this->add_result_error_for_file(
 				$result,
-				__( "<strong>The Stable Tag in your readme file does not match the version in your main plugin file.</strong><br>Your Stable Tag is meant to be the stable version of your plugin, not of WordPress. For your plugin to be properly downloaded from WordPress.org, those values need to be the same. If they're out of sync, your users won't get the right version of your code.", 'plugin-check' ),
+				sprintf(
+					/* translators: %s: versions comparison */
+					__( "<strong>Mismatched Stable Tag: %s.</strong><br>The Stable Tag in your readme file does not match the version in your main plugin file. Your Stable Tag is meant to be the stable version of your plugin, not of WordPress. For your plugin to be properly downloaded from WordPress.org, those values need to be the same. If they're out of sync, your users won't get the right version of your code.", 'plugin-check' ),
+					esc_html( $stable_tag ) . ' != ' . esc_html( $plugin_data['Version'] )
+				),
 				'stable_tag_mismatch',
 				$readme_file,
 				0,
@@ -649,6 +661,57 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 					isset( $warning_details[ $warning ]['severity'] ) ? $warning_details[ $warning ]['severity'] : 5
 				);
 			}
+		}
+	}
+
+	/**
+	 * Checks the readme file for contributors.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param Check_Result $result      The Check Result to amend.
+	 * @param string       $readme_file Readme file.
+	 */
+	private function check_for_contributors( Check_Result $result, string $readme_file ) {
+		$regex = '/Contributors\s?:(.*?)\R/';
+
+		$matches = array();
+
+		self::file_preg_match( $regex, array( $readme_file ), $matches );
+
+		// Bail if no "Contributors" found.
+		if ( empty( $matches ) ) {
+			return;
+		}
+
+		$usernames = explode( ',', $matches[1] );
+
+		$usernames = array_map( 'trim', $usernames );
+
+		$valid = true;
+
+		foreach ( $usernames as $username ) {
+			if ( 1 !== preg_match( '/^[a-z0-9_.\-@ ]+$/i', $username ) ) {
+				$valid = false;
+				break;
+			}
+		}
+
+		if ( ! $valid ) {
+			$this->add_result_warning_for_file(
+				$result,
+				sprintf(
+					/* translators: %s: plugin header field */
+					__( 'The "%s" header in the readme file must be a comma-separated list of WordPress.org-formatted usernames.', 'plugin-check' ),
+					'Contributors'
+				),
+				'readme_invalid_contributors',
+				$readme_file,
+				0,
+				0,
+				'',
+				6
+			);
 		}
 	}
 

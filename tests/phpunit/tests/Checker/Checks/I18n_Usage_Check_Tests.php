@@ -22,19 +22,15 @@ class I18n_Usage_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertNotEmpty( $errors );
 		$this->assertArrayHasKey( 'load.php', $errors );
-		$this->assertEquals( 2, $check_result->get_error_count() );
 
 		// Check for WordPress.WP.I18n.MissingTranslatorsComment error on Line no 26 and column no at 5.
-		$this->assertArrayHasKey( 26, $errors['load.php'] );
-		$this->assertArrayHasKey( 5, $errors['load.php'][26] );
-		$this->assertArrayHasKey( 'code', $errors['load.php'][26][5][0] );
-		$this->assertEquals( 'WordPress.WP.I18n.MissingTranslatorsComment', $errors['load.php'][26][5][0]['code'] );
+		$this->assertCount( 1, wp_list_filter( $errors['load.php'][26][5], array( 'code' => 'WordPress.WP.I18n.MissingTranslatorsComment' ) ) );
+
+		// Check for WordPress.WP.I18n.TextDomainMismatch error on Line no 26 and column no at 29.
+		$this->assertCount( 1, wp_list_filter( $errors['load.php'][26][29], array( 'code' => 'WordPress.WP.I18n.TextDomainMismatch' ) ) );
 
 		// Check for WordPress.WP.I18n.NonSingularStringLiteralDomain error on Line no 33 and column no at 29.
-		$this->assertArrayHasKey( 33, $errors['load.php'] );
-		$this->assertArrayHasKey( 29, $errors['load.php'][33] );
-		$this->assertArrayHasKey( 'code', $errors['load.php'][33][29][0] );
-		$this->assertEquals( 'WordPress.WP.I18n.NonSingularStringLiteralDomain', $errors['load.php'][33][29][0]['code'] );
+		$this->assertCount( 1, wp_list_filter( $errors['load.php'][33][29], array( 'code' => 'WordPress.WP.I18n.NonSingularStringLiteralDomain' ) ) );
 	}
 
 	public function test_run_without_errors() {

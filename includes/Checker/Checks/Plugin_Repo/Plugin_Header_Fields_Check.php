@@ -51,12 +51,7 @@ class Plugin_Header_Fields_Check implements Static_Check {
 	 * @SuppressWarnings(PHPMD.NPathComplexity)
 	 */
 	public function run( Check_Result $result ) {
-		if ( ! function_exists( 'get_plugin_data' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/plugin.php';
-		}
-
 		$plugin_main_file = $result->plugin()->main_file();
-		$plugin_header    = get_plugin_data( $plugin_main_file );
 
 		$labels = array(
 			'Name'            => 'Plugin Name',
@@ -73,6 +68,16 @@ class Plugin_Header_Fields_Check implements Static_Check {
 			'UpdateURI'       => 'Update URI',
 			'RequiresPlugins' => 'Requires Plugins',
 		);
+
+		$restricted_labels = array(
+			'BitbucketPluginURI' => 'Bitbucket Plugin URI',
+			'GistPluginURI'      => 'Gist Plugin URI',
+			'GiteaPluginURI'     => 'Gitea Plugin URI',
+			'GitHubPluginURI'    => 'GitHub Plugin URI',
+			'GitLabPluginURI'    => 'GitLab Plugin URI',
+		);
+
+		$plugin_header = $this->get_plugin_data( $plugin_main_file, array_merge( $labels, $restricted_labels ) );
 
 		if ( ! empty( $plugin_header['Name'] ) ) {
 			if ( in_array( $plugin_header['Name'], array( 'Plugin Name', 'My Basics Plugin' ), true ) ) {
@@ -169,9 +174,28 @@ class Plugin_Header_Fields_Check implements Static_Check {
 			}
 		}
 
+		if ( ! empty( $plugin_header['Network'] ) ) {
+			if ( 'true' !== strtolower( $plugin_header['Network'] ) ) {
+				$this->add_result_warning_for_file(
+					$result,
+					sprintf(
+						/* translators: %s: plugin header field */
+						__( 'The "%s" header in the plugin file is not valid. Can only be set to true, and should be left out when not needed.', 'plugin-check' ),
+						esc_html( $labels['Network'] )
+					),
+					'plugin_header_invalid_network',
+					$plugin_main_file,
+					0,
+					0,
+					'https://developer.wordpress.org/plugins/plugin-basics/header-requirements/#header-fields',
+					6
+				);
+			}
+		}
+
 		if ( ! empty( $plugin_header['RequiresWP'] ) ) {
 			if ( ! preg_match( '!^\d+\.\d(\.\d+)?$!', $plugin_header['RequiresWP'] ) ) {
-				$this->add_result_warning_for_file(
+				$this->add_result_error_for_file(
 					$result,
 					sprintf(
 						/* translators: 1: plugin header field; 2: Example version 6.5.1. 3: Example version 6.6. */
@@ -185,13 +209,13 @@ class Plugin_Header_Fields_Check implements Static_Check {
 					0,
 					0,
 					'',
-					6
+					7
 				);
 			}
 		}
 		if ( ! empty( $plugin_header['RequiresPHP'] ) ) {
 			if ( ! preg_match( '!^\d+(\.\d+){1,2}$!', $plugin_header['RequiresPHP'] ) ) {
-				$this->add_result_warning_for_file(
+				$this->add_result_error_for_file(
 					$result,
 					sprintf(
 						/* translators: 1: plugin header field; 2: Example version 5.2.4. 3: Example version 7.0. */
@@ -205,13 +229,13 @@ class Plugin_Header_Fields_Check implements Static_Check {
 					0,
 					0,
 					'',
-					6
+					7
 				);
 			}
 		}
 
 		if ( ! empty( $plugin_header['RequiresPlugins'] ) ) {
-			if ( ! preg_match( '/^[a-z0-9-]+(?:,[a-z0-9-]+)*$/', $plugin_header['RequiresPlugins'] ) ) {
+			if ( ! preg_match( '/^[a-z0-9-]+(?:,\s*[a-z0-9-]+)*$/', $plugin_header['RequiresPlugins'] ) ) {
 				$this->add_result_warning_for_file(
 					$result,
 					sprintf(
@@ -229,11 +253,36 @@ class Plugin_Header_Fields_Check implements Static_Check {
 			}
 		}
 
+		$found_headers = array();
+
+		foreach ( $restricted_labels as $restricted_key => $restricted_label ) {
+			if ( array_key_exists( $restricted_key, $plugin_header ) && ! empty( $plugin_header[ $restricted_key ] ) ) {
+				$found_headers[ $restricted_key ] = $restricted_label;
+			}
+		}
+
+		if ( ! empty( $found_headers ) ) {
+			$this->add_result_error_for_file(
+				$result,
+				sprintf(
+					/* translators: %s: header fields */
+					__( 'Restricted plugin header field(s) found: %s', 'plugin-check' ),
+					"'" . implode( "', '", array_values( $found_headers ) ) . "'"
+				),
+				'plugin_header_restricted_fields',
+				$plugin_main_file,
+				0,
+				0,
+				'',
+				7
+			);
+		}
+
 		if ( ! $result->plugin()->is_single_file_plugin() ) {
 			if ( ! empty( $plugin_header['TextDomain'] ) ) {
-				$plugin_slug = basename( $result->plugin()->path() );
+				$plugin_slug = $result->plugin()->slug();
 
-				if ( ! empty( $plugin_slug ) && $plugin_slug !== $plugin_header['TextDomain'] ) {
+				if ( $plugin_slug !== $plugin_header['TextDomain'] ) {
 					$this->add_result_warning_for_file(
 						$result,
 						sprintf(
@@ -306,6 +355,30 @@ class Plugin_Header_Fields_Check implements Static_Check {
 	 */
 	private function is_valid_url( $url ) {
 		return filter_var( $url, FILTER_VALIDATE_URL ) === $url && str_starts_with( $url, 'http' );
+	}
+
+	/**
+	 * Parses the plugin contents to retrieve plugin's metadata.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param string $plugin_file     Absolute path to the main plugin file.
+	 * @param array  $default_headers List of headers, in the format `array( 'HeaderKey' => 'Header Name' )`.
+	 * @return string[] Array of file header values keyed by header name.
+	 */
+	private function get_plugin_data( $plugin_file, $default_headers ) {
+		$plugin_data = get_file_data( $plugin_file, $default_headers, 'plugin' );
+
+		// If no text domain is defined fall back to the plugin slug.
+		if ( ! $plugin_data['TextDomain'] ) {
+			$plugin_slug = dirname( plugin_basename( $plugin_file ) );
+
+			if ( '.' !== $plugin_slug && ! str_contains( $plugin_slug, '/' ) ) {
+				$plugin_data['TextDomain'] = $plugin_slug;
+			}
+		}
+
+		return $plugin_data;
 	}
 
 	/**

@@ -31,5 +31,5 @@ comment: false
 # See https://docs.codecov.com/docs/ignoring-paths
 ignore:
 - drop-ins
-- test-content
+- runtime-content
 - tests

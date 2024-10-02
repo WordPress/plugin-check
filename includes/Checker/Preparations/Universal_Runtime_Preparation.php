@@ -56,9 +56,9 @@ class Universal_Runtime_Preparation implements Preparation {
 
 		if ( ! defined( 'WP_PLUGIN_CHECK_PLUGIN_DIR_PATH' ) ) {
 			$plugins_dir  = defined( 'WP_PLUGIN_DIR' ) ? WP_PLUGIN_DIR : WP_CONTENT_DIR . '/plugins';
-			$theme_folder = $plugins_dir . '/plugin-check/test-content/themes';
+			$theme_folder = $plugins_dir . '/plugin-check/runtime-content/themes';
 		} else {
-			$theme_folder = WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'test-content/themes';
+			$theme_folder = WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'runtime-content/themes';
 		}
 
 		$use_minimal_theme_preparation = new Use_Minimal_Theme_Preparation( 'wp-empty-theme', $theme_folder );
