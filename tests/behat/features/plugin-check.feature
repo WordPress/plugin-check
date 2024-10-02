@@ -601,3 +601,33 @@ Feature: Test that the WP-CLI command works.
 #      """
 #      ExampleRuntimeCheck.ForbiddenScript,WARNING
 #      """
+
+  Scenario: Check custom single file plugin that has no errors or warnings
+    Given a WP install with the Plugin Check plugin
+    And a wp-content/plugins/foo-single.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Single
+       * Plugin URI: https://foo-single.com
+       * Description: Custom plugin.
+       * Version: 0.1.0
+       * Author: WordPress Performance Team
+       * Author URI: https://make.wordpress.org/performance/
+       * License: GPL-2.0+
+       * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+       */
+
+      add_action(
+        'init',
+        function () {
+          echo esc_html( 'this is a test.' );
+        }
+      );
+      """
+
+    When I run the WP-CLI command `plugin check foo-single.php`
+    Then STDOUT should contain:
+	  """
+	  Success: Checks complete. No errors found.
+	  """
