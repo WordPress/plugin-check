@@ -71,24 +71,17 @@ final class Admin_Page {
 	 * @since 1.0.0
 	 */
 	public function add_page() {
-		if ( is_multisite() ) {
-			$this->hook_suffix = add_submenu_page(
-				'settings.php',
-				__( 'Plugin Check', 'plugin-check' ),
-				__( 'Plugin Check', 'plugin-check' ),
-				'manage_network_plugins',
-				'plugin-check',
-				array( $this, 'render_page' )
-			);
-		} else {
-			$this->hook_suffix = add_management_page(
-				__( 'Plugin Check', 'plugin-check' ),
-				__( 'Plugin Check', 'plugin-check' ),
-				'activate_plugins',
-				'plugin-check',
-				array( $this, 'render_page' )
-			);
-		}
+		$admin_parent_page = is_multisite() ? 'settings.php' : 'tools.php';
+		$capabilities      = is_multisite() ? 'manage_network_plugins' : 'activate_plugins';
+
+		$this->hook_suffix = add_submenu_page(
+			$admin_parent_page,
+			__( 'Plugin Check', 'plugin-check' ),
+			__( 'Plugin Check', 'plugin-check' ),
+			$capabilities,
+			'plugin-check',
+			array( $this, 'render_page' )
+		);
 	}
 
 	/**
