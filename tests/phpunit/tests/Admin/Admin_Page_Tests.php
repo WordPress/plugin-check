@@ -35,8 +35,10 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 
 		$admin_user = self::factory()->user->create( array( 'role' => 'administrator' ) );
 
+		$expected_parent_page = 'tools.php';
 		if ( is_multisite() ) {
 			grant_super_admin( $admin_user );
+			$expected_parent_page = 'settings.php';
 		}
 
 		wp_set_current_user( $admin_user );
@@ -50,7 +52,7 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 		set_current_screen( $current_screen );
 
 		$this->assertArrayHasKey( 'plugin-check', $parent_pages );
-		$this->assertEquals( 'tools.php', $parent_pages['plugin-check'] );
+		$this->assertEquals( $expected_parent_page, $parent_pages['plugin-check'] );
 		$this->assertNotFalse( has_action( "load-{$page_hook}", array( $this->admin_page, 'initialize_page' ) ) );
 	}
 
