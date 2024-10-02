@@ -244,7 +244,7 @@ final class Plugin_Check_Command {
 		}
 
 		if ( empty( $errors ) && empty( $warnings ) ) {
-			WP_CLI::success( 'Checks complete. No errors found.' );
+			WP_CLI::success( __( 'Checks complete. No errors found.', 'plugin-check' ) );
 
 			return;
 		}
