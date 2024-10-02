@@ -23,8 +23,11 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 
 	public function test_add_hooks() {
 		$this->admin_page->add_hooks();
-		$this->assertEquals( 10, has_action( 'admin_menu', array( $this->admin_page, 'add_and_initialize_page' ) ) );
-		$this->assertEquals( 10, has_filter( 'plugin_action_links', array( $this->admin_page, 'filter_plugin_action_links' ) ) );
+		$admin_menu_hook         = is_multisite() ? 'network_admin_menu' : 'admin_menu';
+		$plugin_action_link_hook = is_multisite() ? 'network_admin_plugin_action_links' : 'plugin_action_links';
+
+		$this->assertEquals( 10, has_action( $admin_menu_hook, array( $this->admin_page, 'add_and_initialize_page' ) ) );
+		$this->assertEquals( 10, has_filter( $plugin_action_link_hook, array( $this->admin_page, 'filter_plugin_action_links' ) ) );
 	}
 
 	public function test_add_and_initialize_page() {
