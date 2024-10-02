@@ -73,7 +73,10 @@ Feature: Test that the WP-CLI command works.
       """
 
     When I run the WP-CLI command `plugin check foo-single.php --ignore-errors`
-    Then STDOUT should be empty
+    Then STDOUT should contain:
+      """
+      Success: Checks complete. No errors found.
+      """
 
     When I run the WP-CLI command `plugin check foo-single.php --ignore-warnings`
     Then STDOUT should not be empty
