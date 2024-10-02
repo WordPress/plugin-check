@@ -39,7 +39,7 @@
 				<?php
 				if ( ! empty( $categories ) ) {
 				?>
-				<table>
+				<table id="plugin-check__categories">
 				<?php
 				foreach ( $categories as $category => $label ) { ?>
 					<tr>
