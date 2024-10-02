@@ -10,6 +10,9 @@ namespace {
 
 		public static function warning( $text ) {
 		}
+
+		public static function success( $text ) {
+		}
 	}
 }
 
