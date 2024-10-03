@@ -304,7 +304,7 @@ abstract class Abstract_File_Check implements Static_Check {
 				$files_to_ignore = Plugin_Request_Utility::get_files_to_ignore();
 
 				foreach ( $files_to_ignore as $ignore_file ) {
-					if ( str_ends_with( $file, "/$ignore_file" ) ) {
+					if ( str_ends_with( $file_path, "/$ignore_file" ) ) {
 						$include_file = false;
 						break;
 					}
