@@ -123,7 +123,7 @@ Feature: Test that the severity level in plugin check works.
       """
       obfuscated_code_detected,ERROR,6
       """
-    And STDOUT should not contain:
+    And STDOUT should contain:
       """
       WordPress.WP.AlternativeFunctions.rand_mt_rand,WARNING,5
       """
@@ -149,7 +149,7 @@ Feature: Test that the severity level in plugin check works.
       """
       obfuscated_code_detected,ERROR,6
       """
-    And STDOUT should not contain:
+    And STDOUT should contain:
       """
       WordPress.WP.AlternativeFunctions.rand_mt_rand,WARNING,5
       """
@@ -209,7 +209,7 @@ Feature: Test that the severity level in plugin check works.
       """
       outdated_tested_upto_header,WARNING,7
       """
-    And STDOUT should contain:
+    And STDOUT should not contain:
       """
       default_readme_text,WARNING,7
       """
