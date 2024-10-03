@@ -678,6 +678,22 @@ final class Plugin_Check_Command {
 			}
 		);
 
+		// Converts errors to warnings if severity is less than the error severity level.
+		$errors_warning = array_filter(
+			$results,
+			function ( $item ) use ( $error_severity ) {
+				return ( 'ERROR' === $item['type'] && $item['severity'] < $error_severity );
+			}
+		);
+
+		$errors_warning = array_map(
+			function ( $item ) {
+				$item['type'] = 'WARNING';
+				return $item;
+			},
+			$errors_warning
+		);
+
 		$warnings = array_filter(
 			$results,
 			function ( $item ) use ( $warning_severity ) {
@@ -685,6 +701,6 @@ final class Plugin_Check_Command {
 			}
 		);
 
-		return array_merge( $errors, $warnings );
+		return array_merge( $errors, $errors_warning, $warnings );
 	}
 }
