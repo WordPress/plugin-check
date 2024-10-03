@@ -23,7 +23,7 @@
 				</h2>
 
 				<p id="plugin-check__description">
-					<?php esc_html_e( 'Select a plugin to check it for best practices in several categories and security issues.', 'plugin-check' ); ?>
+					<?php esc_html_e( 'Select a plugin to check it for best practices in several categories and security issues. For more information about the checks, use the Help tab at the top of this page.', 'plugin-check' ); ?>
 				</p>
 
 				<select id="plugin-check__plugins-dropdown" name="plugin_check_plugins" aria-describedby="plugin-check__description">
