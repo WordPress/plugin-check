@@ -31,7 +31,10 @@ class Direct_DB_Queries_Check extends Abstract_PHP_CodeSniffer_Check {
 	 * @return array The categories for the check.
 	 */
 	public function get_categories() {
-		return array( Check_Categories::CATEGORY_SECURITY );
+		return array(
+			Check_Categories::CATEGORY_SECURITY,
+			Check_Categories::CATEGORY_PLUGIN_REPO,
+		);
 	}
 
 	/**
