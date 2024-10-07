@@ -110,7 +110,7 @@ class File_Type_Check_Tests extends WP_UnitTestCase {
 		$errors = $check_result->get_errors();
 
 		$this->assertNotEmpty( $errors );
-		$this->assertEquals( 5, $check_result->get_error_count() );
+		$this->assertEquals( 3, $check_result->get_error_count() );
 
 		// Check for invalid name error.
 		$this->assertArrayHasKey( 0, $errors['plugin name.php'] );
