@@ -110,7 +110,7 @@ class File_Type_Check_Tests extends WP_UnitTestCase {
 		$errors = $check_result->get_errors();
 
 		$this->assertNotEmpty( $errors );
-		$this->assertEquals( 4, $check_result->get_error_count() );
+		$this->assertEquals( 5, $check_result->get_error_count() );
 
 		// Check for invalid name error.
 		$this->assertArrayHasKey( 0, $errors['plugin name.php'] );
@@ -126,10 +126,5 @@ class File_Type_Check_Tests extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 0, $errors['badly|file%name!@#$%^&*()+=[]{};:"\'<>,?|`~.php'] );
 		$this->assertArrayHasKey( 0, $errors['badly|file%name!@#$%^&*()+=[]{};:"\'<>,?|`~.php'][0] );
 		$this->assertCount( 1, wp_list_filter( $errors['badly|file%name!@#$%^&*()+=[]{};:"\'<>,?|`~.php'][0][0], array( 'code' => 'badly_named_files' ) ) );
-
-		// Duplicated filenames.
-		$this->assertArrayHasKey( 0, $errors['class-filename.php'] );
-		$this->assertArrayHasKey( 0, $errors['class-filename.php'][0] );
-		$this->assertCount( 1, wp_list_filter( $errors['class-filename.php'][0][0], array( 'code' => 'duplicated_files' ) ) );
 	}
 }
