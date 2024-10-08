@@ -104,7 +104,7 @@ class File_Type_Check_Tests extends WP_UnitTestCase {
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-file-type-badly-named-files-errors/load.php' );
 		$check_result  = new Check_Result( $check_context );
 
-		$check = new File_Type_Check();
+		$check = new File_Type_Check( File_Type_Check::TYPE_BADLY_NAMED );
 		$check->run( $check_result );
 
 		$errors = $check_result->get_errors();

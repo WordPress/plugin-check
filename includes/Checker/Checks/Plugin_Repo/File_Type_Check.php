@@ -29,7 +29,8 @@ class File_Type_Check extends Abstract_File_Check {
 	const TYPE_VCS         = 4;
 	const TYPE_HIDDEN      = 8;
 	const TYPE_APPLICATION = 16;
-	const TYPE_ALL         = 31; // Same as all of the above with bitwise OR.
+	const TYPE_BADLY_NAMED = 32;
+	const TYPE_ALL         = 63; // Same as all of the above with bitwise OR.
 
 	/**
 	 * Bitwise flags to control check behavior.
@@ -90,9 +91,10 @@ class File_Type_Check extends Abstract_File_Check {
 		if ( $this->flags & self::TYPE_APPLICATION ) {
 			$this->look_for_application_files( $result, $files );
 		}
-
-		// Check for badly named files.
-		$this->look_for_badly_named_files( $result, $files );
+		if ( $this->flags & self::TYPE_BADLY_NAMED ) {
+			// Check for badly named files.
+			$this->look_for_badly_named_files( $result, $files );
+		}
 	}
 
 	/**
