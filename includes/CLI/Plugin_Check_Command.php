@@ -243,6 +243,12 @@ final class Plugin_Check_Command {
 			$warnings = $result->get_warnings();
 		}
 
+		if ( empty( $errors ) && empty( $warnings ) ) {
+			WP_CLI::success( __( 'Checks complete. No errors found.', 'plugin-check' ) );
+
+			return;
+		}
+
 		// Default fields.
 		$default_fields = $this->get_check_default_fields( $assoc_args );
 
