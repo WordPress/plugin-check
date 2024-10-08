@@ -70,7 +70,6 @@ In any case, passing the checks in this tool likely helps to achieve a smooth pl
 
 = 1.2.0 =
 
-- The Plugin Check is now part of the automatic checks for plugin submissions on WordPress.org.
 * Enhancement - Increased severity for `BacktickOperator`, `DisallowShortOpenTag`, `DisallowAlternativePHPTags`, `RestrictedClasses`, and `RestrictedFunctions`.
 * Enhancement - Added security checks to the Plugin repository category.
 * Enhancement - Allowed `runtime-set` in code sniffer checks.
