@@ -252,7 +252,7 @@ class File_Type_Check extends Abstract_File_Check {
 	/**
 	 * Looks for application files and amends the given result with an error if found.
 	 *
-	 * @since 1.0.0
+	 * @since 1.2.0
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 * @param array        $files  List of absolute file paths.
