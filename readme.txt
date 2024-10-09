@@ -70,7 +70,7 @@ In any case, passing the checks in this tool likely helps to achieve a smooth pl
 
 = 1.2.0 =
 
-* Enhacement - Added a check for badly used names in files.
+* Enhancement - Added a check for badly used names in files.
 * Enhancement - Increased severity for `BacktickOperator`, `DisallowShortOpenTag`, `DisallowAlternativePHPTags`, `RestrictedClasses`, and `RestrictedFunctions`.
 * Enhancement - Added security checks to the Plugin repository category.
 * Enhancement - Allowed `runtime-set` in code sniffer checks.
