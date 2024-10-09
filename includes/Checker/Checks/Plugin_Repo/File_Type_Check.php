@@ -29,7 +29,8 @@ class File_Type_Check extends Abstract_File_Check {
 	const TYPE_VCS         = 4;
 	const TYPE_HIDDEN      = 8;
 	const TYPE_APPLICATION = 16;
-	const TYPE_ALL         = 31; // Same as all of the above with bitwise OR.
+	const TYPE_BADLY_NAMED = 32;
+	const TYPE_ALL         = 63; // Same as all of the above with bitwise OR.
 
 	/**
 	 * Bitwise flags to control check behavior.
@@ -89,6 +90,10 @@ class File_Type_Check extends Abstract_File_Check {
 		}
 		if ( $this->flags & self::TYPE_APPLICATION ) {
 			$this->look_for_application_files( $result, $files );
+		}
+		if ( $this->flags & self::TYPE_BADLY_NAMED ) {
+			// Check for badly named files.
+			$this->look_for_badly_named_files( $result, $files );
 		}
 	}
 
@@ -245,6 +250,42 @@ class File_Type_Check extends Abstract_File_Check {
 	}
 
 	/**
+	 * Looks for application files and amends the given result with an error if found.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param Check_Result $result The check result to amend, including the plugin context to check.
+	 * @param array        $files  List of absolute file paths.
+	 */
+	protected function look_for_badly_named_files( Check_Result $result, array $files ) {
+		$conflict_chars = '!@#$%^&*()+=[]{};:"\'<>,?/\\|`~';
+
+		foreach ( $files as $file ) {
+			$badly_name = false;
+			if ( preg_match( '/\s/', $file ) ) {
+				$badly_name = true;
+			}
+
+			if ( preg_match( '/[' . preg_quote( $conflict_chars, '/' ) . ']/', basename( $file ) ) ) {
+				$badly_name = true;
+			}
+
+			if ( $badly_name ) {
+				$this->add_result_error_for_file(
+					$result,
+					__( 'Badly named files are not permitted.', 'plugin-check' ),
+					'badly_named_files',
+					$file,
+					0,
+					0,
+					'',
+					8
+				);
+			}
+		}
+	}
+
+	/**
 	 * Gets the description for the check.
 	 *
 	 * Every check must have a short description explaining what the check does.
@@ -254,7 +295,7 @@ class File_Type_Check extends Abstract_File_Check {
 	 * @return string Description.
 	 */
 	public function get_description(): string {
-		return __( 'Detects the usage of hidden and compressed files, VCS directories, and application files.', 'plugin-check' );
+		return __( 'Detects the usage of hidden and compressed files, VCS directories, application files and badly named files.', 'plugin-check' );
 	}
 
 	/**
