@@ -283,6 +283,24 @@ class File_Type_Check extends Abstract_File_Check {
 				);
 			}
 		}
+
+		// Duplicated names.
+		$files            = array_map( 'basename', $files );
+		$files            = array_map( 'strtolower', $files );
+		$duplicated_files = array_unique( array_diff_assoc( $files, array_unique( $files ) ) );
+
+		if ( ! empty( $duplicated_files ) ) {
+			$this->add_result_error_for_file(
+				$result,
+				__( 'Duplicated file names are not permitted.', 'plugin-check' ),
+				'duplicated_files',
+				implode( ', ', $duplicated_files ),
+				0,
+				0,
+				'',
+				8
+			);
+		}
 	}
 
 	/**
