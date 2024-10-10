@@ -673,6 +673,7 @@ final class Plugin_Check_Command {
 	 * @param array $results          Check results.
 	 * @param int   $error_severity   Error severity level.
 	 * @param int   $warning_severity Warning severity level.
+	 * @param bool  $show_error_severity Show error severity as warning.
 	 * @return array Filtered results.
 	 */
 	private function get_filtered_results_by_severity( $results, $error_severity, $warning_severity, $show_error_severity = false ) {
@@ -692,7 +693,7 @@ final class Plugin_Check_Command {
 					return ( 'ERROR' === $item['type'] && $item['severity'] < $error_severity );
 				}
 			);
-	
+
 			$errors_warning = array_map(
 				function ( $item ) {
 					$item['type'] = 'WARNING';
