@@ -35,5 +35,5 @@ Feature: Test that the WP-CLI plugin list checks command works.
       """
     And STDOUT should contain:
       """
-      late_escaping,security,stable
+      late_escaping,"security, plugin_repo",stable
       """

@@ -98,4 +98,33 @@ class File_Type_Check_Tests extends WP_UnitTestCase {
 		$this->assertEmpty( $errors );
 		$this->assertSame( 0, $check_result->get_error_count() );
 	}
+
+	public function test_run_with_badly_named_errors() {
+		// Test plugin without any forbidden file types.
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-file-type-badly-named-files-errors/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check = new File_Type_Check( File_Type_Check::TYPE_BADLY_NAMED );
+		$check->run( $check_result );
+
+		$errors = $check_result->get_errors();
+
+		$this->assertNotEmpty( $errors );
+		$this->assertEquals( 3, $check_result->get_error_count() );
+
+		// Check for invalid name error.
+		$this->assertArrayHasKey( 0, $errors['plugin name.php'] );
+		$this->assertArrayHasKey( 0, $errors['plugin name.php'][0] );
+		$this->assertCount( 1, wp_list_filter( $errors['plugin name.php'][0][0], array( 'code' => 'badly_named_files' ) ) );
+
+		// Badly named directory check.
+		$this->assertArrayHasKey( 0, $errors['badly directory/file.php'] );
+		$this->assertArrayHasKey( 0, $errors['badly directory/file.php'][0] );
+		$this->assertCount( 1, wp_list_filter( $errors['badly directory/file.php'][0][0], array( 'code' => 'badly_named_files' ) ) );
+
+		// Badly named file with special chars.
+		$this->assertArrayHasKey( 0, $errors['badly|file%name!@#$%^&*()+=[]{};:"\'<>,?|`~.php'] );
+		$this->assertArrayHasKey( 0, $errors['badly|file%name!@#$%^&*()+=[]{};:"\'<>,?|`~.php'][0] );
+		$this->assertCount( 1, wp_list_filter( $errors['badly|file%name!@#$%^&*()+=[]{};:"\'<>,?|`~.php'][0][0], array( 'code' => 'badly_named_files' ) ) );
+	}
 }
