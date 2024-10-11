@@ -264,7 +264,7 @@ class File_Type_Check extends Abstract_File_Check {
 
 		$files = array_map(
 			function ( $file ) use ( $plugin_path ) {
-				return substr( $file, strlen( $plugin_path ) );
+				return str_replace( $plugin_path, '', $file );
 			},
 			$files
 		);
