@@ -260,6 +260,15 @@ class File_Type_Check extends Abstract_File_Check {
 	protected function look_for_badly_named_files( Check_Result $result, array $files ) {
 		$conflict_chars = '!@#$%^&*()+=[]{};:"\'<>,?/\\|`~';
 
+		$plugin_path = $result->plugin()->path();
+
+		$files = array_map(
+			function ( $file ) use ( $plugin_path ) {
+				return substr( $file, strlen( $plugin_path ) );
+			},
+			$files
+		);
+
 		foreach ( $files as $file ) {
 			$badly_name = false;
 			if ( preg_match( '/\s/', $file ) ) {
