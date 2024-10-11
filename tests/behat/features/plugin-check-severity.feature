@@ -192,5 +192,19 @@ Feature: Test that the severity level in plugin check works.
       upgrade_notice_limit,WARNING,5
       """
 
+    When I run the WP-CLI command `plugin check foo-bar-wp --format=csv --fields=code,type,severity --error-severity=7 --include-error-severity`
+    Then STDOUT should contain:
+      """
+      allow_unfiltered_uploads_detected,ERROR,7
+      """
+    And STDOUT should contain:
+      """
+      default_readme_text,WARNING,7
+      """
+    And STDOUT should contain:
+      """
+      upgrade_notice_limit,WARNING,5
+      """
+
     When I run the WP-CLI command `plugin check foo-bar-wp --format=csv --fields=code,type,severity --severity=10`
     Then STDOUT should be empty
