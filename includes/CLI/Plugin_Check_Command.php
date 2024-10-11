@@ -696,17 +696,17 @@ final class Plugin_Check_Command {
 	 */
 	private function get_filtered_results_by_severity( $results, $error_severity, $warning_severity ) {
 		$errors = array_filter(
-				$results,
-				function ( $item ) use ( $error_severity ) {
-						return ( 'ERROR' === $item['type'] && $item['severity'] >= $error_severity );
-				}
+			$results,
+			function ( $item ) use ( $error_severity ) {
+					return ( 'ERROR' === $item['type'] && $item['severity'] >= $error_severity );
+			}
 		);
 
 		$warnings = array_filter(
-				$results,
-				function ( $item ) use ( $warning_severity ) {
-						return ( 'WARNING' === $item['type'] && $item['severity'] >= $warning_severity );
-				}
+			$results,
+			function ( $item ) use ( $warning_severity ) {
+					return ( 'WARNING' === $item['type'] && $item['severity'] >= $warning_severity );
+			}
 		);
 
 		return array_merge( $errors, $warnings );
@@ -720,19 +720,18 @@ final class Plugin_Check_Command {
 	 */
 	private function convert_errors_to_warnings( $results, $error_severity ) {
 		$errors_warning = array_filter(
-				$results,
-				function ( $item ) use ( $error_severity ) {
-						return ( 'ERROR' === $item['type'] && $item['severity'] < $error_severity );
-				}
+			$results,
+			function ( $item ) use ( $error_severity ) {
+					return ( 'ERROR' === $item['type'] && $item['severity'] < $error_severity );
+			}
 		);
 
 		return array_map(
-				function ( $item ) {
-						$item['type'] = 'WARNING';
-						return $item;
-				},
-				$errors_warning
+			function ( $item ) {
+					$item['type'] = 'WARNING';
+					return $item;
+			},
+			$errors_warning
 		);
 	}
-
 }
