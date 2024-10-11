@@ -31,10 +31,7 @@ final class LibrariesCoreSniff extends Sniff {
 	 * @return array
 	 */
 	public function register() {
-		$targets   = Collections::textStringStartTokens();
-		$targets[] = \T_INLINE_HTML;
-
-		return $targets;
+		return [T_STRING, T_CONSTANT_ENCAPSED_STRING];
 	}
 
 	/**
