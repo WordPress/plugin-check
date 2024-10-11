@@ -18,7 +18,7 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
  *
  * @since 1.2.0.
  */
-class Libraries_Check extends Abstract_PHP_CodeSniffer_Check {
+class Libraries_Core_Check extends Abstract_PHP_CodeSniffer_Check {
 
 	use Amend_Check_Result;
 	use Stable_Check;
