@@ -704,7 +704,6 @@ final class Plugin_Check_Command {
 	 *
 	 * @param array $results          Check results.
 	 * @param int   $error_severity   Error severity level.
-	 * @param int   $warning_severity Warning severity level.
 	 * @return array Filtered results.
 	 */
 	private function convert_filtered_errors_by_severity( $results, $error_severity ) {
