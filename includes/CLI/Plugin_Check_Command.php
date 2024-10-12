@@ -275,7 +275,11 @@ final class Plugin_Check_Command {
 			$file_results = $this->flatten_file_results( $file_errors, $file_warnings );
 
 			if ( '' !== $error_severity || '' !== $warning_severity ) {
-				$file_results = $this->get_filtered_results( $file_results, intval( $error_severity ), intval( $warning_severity ), $show_error_severity );
+				$file_results = $this->get_filtered_results_by_severity( $file_results, intval( $error_severity ), intval( $warning_severity ) );
+				if ( $show_error_severity ) {
+					$file_warning_results = $this->convert_filtered_errors_by_severity( $file_results, intval( $error_severity ) );
+					$file_results         = array_merge( $file_results, $file_warning_results );
+				}
 			}
 
 			if ( ! empty( $file_results ) ) {
@@ -288,7 +292,7 @@ final class Plugin_Check_Command {
 			$file_results = $this->flatten_file_results( array(), $file_warnings );
 
 			if ( '' !== $error_severity || '' !== $warning_severity ) {
-				$file_results = $this->get_filtered_results( $file_results, intval( $error_severity ), intval( $warning_severity ) );
+				$file_results = $this->get_filtered_results_by_severity( $file_results, intval( $error_severity ), intval( $warning_severity ) );
 			}
 
 			if ( ! empty( $file_results ) ) {
@@ -666,28 +670,9 @@ final class Plugin_Check_Command {
 	}
 
 	/**
-	 * Returns check results filtered by severity level, with optional error-to-warning conversion.
-	 *
-	 * @param array $results          Check results.
-	 * @param int   $error_severity   Error severity level.
-	 * @param int   $warning_severity Warning severity level.
-	 * @param bool  $show_error_severity Show error severity as warning.
-	 * @return array Filtered results.
-	 */
-	private function get_filtered_results( $results, $error_severity, $warning_severity, $show_error_severity = false ) {
-		// First, get the filtered errors and warnings.
-		$filtered_results = $this->get_filtered_results_by_severity( $results, $error_severity, $warning_severity );
-
-		// If requested, convert certain errors to warnings.
-		if ( $show_error_severity ) {
-				$errors_as_warnings = $this->convert_errors_to_warnings( $results, $error_severity );
-				return array_merge( $filtered_results, $errors_as_warnings );
-		}
-
-		return $filtered_results;
-	}
-	/**
 	 * Returns check results filtered by severity level.
+	 *
+	 * @since 1.1.0
 	 *
 	 * @param array $results          Check results.
 	 * @param int   $error_severity   Error severity level.
@@ -698,40 +683,46 @@ final class Plugin_Check_Command {
 		$errors = array_filter(
 			$results,
 			function ( $item ) use ( $error_severity ) {
-					return ( 'ERROR' === $item['type'] && $item['severity'] >= $error_severity );
+				return ( 'ERROR' === $item['type'] && $item['severity'] >= $error_severity );
 			}
 		);
 
 		$warnings = array_filter(
 			$results,
 			function ( $item ) use ( $warning_severity ) {
-					return ( 'WARNING' === $item['type'] && $item['severity'] >= $warning_severity );
+				return ( 'WARNING' === $item['type'] && $item['severity'] >= $warning_severity );
 			}
 		);
 
 		return array_merge( $errors, $warnings );
 	}
+
 	/**
-	 * Converts errors below the severity threshold to warnings.
+	 * Returns check results filtered by severity level.
 	 *
-	 * @param array $results        Check results.
-	 * @param int   $error_severity Error severity level threshold.
-	 * @return array Converted results where applicable.
+	 * @since 1.1.0
+	 *
+	 * @param array $results          Check results.
+	 * @param int   $error_severity   Error severity level.
+	 * @param int   $warning_severity Warning severity level.
+	 * @return array Filtered results.
 	 */
-	private function convert_errors_to_warnings( $results, $error_severity ) {
+	private function convert_filtered_errors_by_severity( $results, $error_severity ) {
 		$errors_warning = array_filter(
 			$results,
 			function ( $item ) use ( $error_severity ) {
-					return ( 'ERROR' === $item['type'] && $item['severity'] < $error_severity );
+				return ( 'ERROR' === $item['type'] && $item['severity'] < $error_severity );
 			}
 		);
 
-		return array_map(
+		$errors_warning = array_map(
 			function ( $item ) {
-					$item['type'] = 'WARNING';
-					return $item;
+				$item['type'] = 'WARNING';
+				return $item;
 			},
 			$errors_warning
 		);
+
+		return $errors_warning;
 	}
 }
