@@ -22,7 +22,11 @@
 					</label>
 				</h2>
 
-				<select id="plugin-check__plugins-dropdown" name="plugin_check_plugins">
+				<p id="plugin-check__description">
+					<?php esc_html_e( 'Select a plugin to check it for best practices in several categories and security issues. For more information about the checks, use the Help tab at the top of this page.', 'plugin-check' ); ?>
+				</p>
+
+				<select id="plugin-check__plugins-dropdown" name="plugin_check_plugins" aria-describedby="plugin-check__description">
 					<?php if ( 1 !== count( $available_plugins ) ) { ?>
 						<option value=""><?php esc_html_e( 'Select Plugin', 'plugin-check' ); ?></option>
 					<?php } ?>
@@ -39,7 +43,7 @@
 				<?php
 				if ( ! empty( $categories ) ) {
 				?>
-				<table>
+				<table id="plugin-check__categories">
 				<?php
 				foreach ( $categories as $category => $label ) { ?>
 					<tr>

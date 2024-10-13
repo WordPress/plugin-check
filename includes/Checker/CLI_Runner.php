@@ -181,7 +181,7 @@ class CLI_Runner extends Abstract_Check_Runner {
 	/**
 	 * Checks whether the current environment allows for runtime checks to be used.
 	 *
-	 * @since n.e.x.t
+	 * @since 1.2.0
 	 *
 	 * @return bool True if runtime checks are allowed, false otherwise.
 	 */

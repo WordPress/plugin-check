@@ -184,6 +184,13 @@ final class Admin_Page {
 			true
 		);
 
+		wp_enqueue_style(
+			'plugin-check-admin',
+			WP_PLUGIN_CHECK_PLUGIN_DIR_URL . 'assets/css/plugin-check-admin.css',
+			array(),
+			WP_PLUGIN_CHECK_VERSION
+		);
+
 		wp_add_inline_script(
 			'plugin-check-admin',
 			'const PLUGIN_CHECK = ' . json_encode(
