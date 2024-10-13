@@ -354,7 +354,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		}
 
 		// Checks for a valid license in Plugin Header.
-		if ( ! empty( $plugin_license ) && ! preg_match( '/GPL|GNU|MIT|FreeBSD|New BSD|BSD-3-Clause|BSD 3 Clause|OpenLDAP|Expat/im', $plugin_license ) ) {
+		if ( ! empty( $plugin_license ) && ! preg_match( '/GPL|GNU|MIT|FreeBSD|New BSD|BSD-3-Clause|BSD 3 Clause|OpenLDAP|Expat|Apache/im', $plugin_license ) ) {
 			$this->add_result_error_for_file(
 				$result,
 				__( '<strong>Your plugin has an invalid license declared in Plugin Header.</strong><br>Please update your readme with a valid GPL license identifier. It is necessary to declare the license of this plugin. You can do this by using the fields available both in the plugin readme and in the plugin headers.', 'plugin-check' ),
@@ -419,6 +419,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		$license = str_replace( '-', '', $license );
 		$license = str_replace( 'GNU General Public License (GPL)', 'GPL', $license );
 		$license = str_replace( 'GNU General Public License', 'GPL', $license );
+		$license = str_replace( ' version ', 'v', $license );
 		$license = preg_replace( '/GPL\s*[-|\.]*\s*[v]?([0-9])(\.[0])?/i', 'GPL$1', $license, 1 );
 		$license = str_replace( '.', '', $license );
 
