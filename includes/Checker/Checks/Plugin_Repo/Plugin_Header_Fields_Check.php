@@ -69,7 +69,9 @@ class Plugin_Header_Fields_Check implements Static_Check {
 			'RequiresPlugins' => 'Requires Plugins',
 		);
 
-		$restricted_labels = array(); // Reserved for future use.
+		$restricted_labels = array(
+			'RestrictedLabel' => 'Restricted Label',
+		); // Reserved for future use.
 
 		$plugin_header = $this->get_plugin_data( $plugin_main_file, array_merge( $labels, $restricted_labels ) );
 
