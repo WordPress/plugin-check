@@ -151,7 +151,7 @@ final class Plugin_Check_Command {
 				'severity'                    => '',
 				'error-severity'              => '',
 				'warning-severity'            => '',
-				'include-low-severity-errors' => '',
+				'include-low-severity-errors' => false,
 				'slug'                        => '',
 			)
 		);
@@ -670,32 +670,29 @@ final class Plugin_Check_Command {
 	 *
 	 * @since 1.1.0
 	 *
-	 * @param array $results          Check results.
-	 * @param int   $error_severity   Error severity level.
-	 * @param int   $warning_severity Warning severity level.
+	 * @param array $results                     Check results.
+	 * @param int   $error_severity              Error severity level.
+	 * @param int   $warning_severity            Warning severity level.
 	 * @param bool  $include_low_severity_errors Include less level of severity issues as warning.
-	 * 
+	 *
 	 * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
 	 * @return array Filtered results.
 	 */
 	private function get_filtered_results_by_severity( $results, $error_severity, $warning_severity, $include_low_severity_errors = false ) {
-		$errors = array();
+		$errors   = array();
+		$warnings = array();
+
 		foreach ( $results as $item ) {
 			if ( 'ERROR' === $item['type'] && $item['severity'] >= $error_severity ) {
 				$errors[] = $item;
 			} elseif ( $include_low_severity_errors && $item['severity'] < $error_severity ) {
 				$item['type']     = 'WARNING';
 				$item['severity'] = 10;
-				$errors[]         = $item;
+				$warnings[]       = $item;
+			} elseif ( 'WARNING' === $item['type'] && $item['severity'] >= $warning_severity ) {
+				$warnings[] = $item;
 			}
 		}
-
-		$warnings = array_filter(
-			$results,
-			function ( $item ) use ( $warning_severity ) {
-				return ( 'WARNING' === $item['type'] && $item['severity'] >= $warning_severity );
-			}
-		);
 
 		return array_merge( $errors, $warnings );
 	}
