@@ -23,8 +23,11 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 
 	public function test_add_hooks() {
 		$this->admin_page->add_hooks();
-		$this->assertEquals( 10, has_action( 'admin_menu', array( $this->admin_page, 'add_and_initialize_page' ) ) );
-		$this->assertEquals( 10, has_filter( 'plugin_action_links', array( $this->admin_page, 'filter_plugin_action_links' ) ) );
+		$admin_menu_hook         = is_multisite() ? 'network_admin_menu' : 'admin_menu';
+		$plugin_action_link_hook = is_multisite() ? 'network_admin_plugin_action_links' : 'plugin_action_links';
+
+		$this->assertEquals( 10, has_action( $admin_menu_hook, array( $this->admin_page, 'add_and_initialize_page' ) ) );
+		$this->assertEquals( 10, has_filter( $plugin_action_link_hook, array( $this->admin_page, 'filter_plugin_action_links' ) ) );
 	}
 
 	public function test_add_and_initialize_page() {
@@ -35,8 +38,10 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 
 		$admin_user = self::factory()->user->create( array( 'role' => 'administrator' ) );
 
+		$expected_parent_page = 'tools.php';
 		if ( is_multisite() ) {
 			grant_super_admin( $admin_user );
+			$expected_parent_page = 'settings.php';
 		}
 
 		wp_set_current_user( $admin_user );
@@ -50,7 +55,7 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 		set_current_screen( $current_screen );
 
 		$this->assertArrayHasKey( 'plugin-check', $parent_pages );
-		$this->assertEquals( 'tools.php', $parent_pages['plugin-check'] );
+		$this->assertEquals( $expected_parent_page, $parent_pages['plugin-check'] );
 		$this->assertNotFalse( has_action( "load-{$page_hook}", array( $this->admin_page, 'initialize_page' ) ) );
 	}
 
