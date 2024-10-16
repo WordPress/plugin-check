@@ -674,6 +674,8 @@ final class Plugin_Check_Command {
 	 * @param int   $error_severity   Error severity level.
 	 * @param int   $warning_severity Warning severity level.
 	 * @param bool  $include_low_severity_errors Include less level of severity issues as warning.
+	 * 
+	 * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
 	 * @return array Filtered results.
 	 */
 	private function get_filtered_results_by_severity( $results, $error_severity, $warning_severity, $include_low_severity_errors = false ) {
