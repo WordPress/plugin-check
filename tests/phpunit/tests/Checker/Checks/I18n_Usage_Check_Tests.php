@@ -48,4 +48,18 @@ class I18n_Usage_Check_Tests extends WP_UnitTestCase {
 		$this->assertEquals( 0, $check_result->get_error_count() );
 		$this->assertEquals( 0, $check_result->get_warning_count() );
 	}
+
+	public function test_run_without_default_textdomain() {
+		$i18n_usage_check = new I18n_Usage_Check();
+		$check_context    = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-i18n-usage-with-default/load.php' );
+		$check_result     = new Check_Result( $check_context );
+
+		$i18n_usage_check->run( $check_result );
+
+		// Explicitly using the 'default' text domain is a warning, omitting a text domain is an error.
+		$this->assertNotEmpty( $check_result->get_errors() );
+		$this->assertNotEmpty( $check_result->get_warnings() );
+		$this->assertEquals( 1, $check_result->get_error_count() );
+		$this->assertEquals( 1, $check_result->get_warning_count() );
+	}
 }

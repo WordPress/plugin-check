@@ -81,4 +81,28 @@ class I18n_Usage_Check extends Abstract_PHP_CodeSniffer_Check {
 	public function get_documentation_url(): string {
 		return __( 'https://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/', 'plugin-check' );
 	}
+
+	/**
+	 * Amends the given result with a message for the specified file, including error information.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @param Check_Result $result   The check result to amend, including the plugin context to check.
+	 * @param bool         $error    Whether it is an error or notice.
+	 * @param string       $message  Error message.
+	 * @param string       $code     Error code.
+	 * @param string       $file     Absolute path to the file where the issue was found.
+	 * @param int          $line     The line on which the message occurred. Default is 0 (unknown line).
+	 * @param int          $column   The column on which the message occurred. Default is 0 (unknown column).
+	 * @param string       $docs     URL for further information about the message.
+	 * @param int          $severity Severity level. Default is 5.
+	 */
+	protected function add_result_message_for_file( Check_Result $result, $error, $message, $code, $file, $line = 0, $column = 0, string $docs = '', $severity = 5 ) {
+		// Downgrade errors about usage of the 'default' text domain from WordPress Core to warnings.
+		if ( $error && str_ends_with( $message, " but got 'default'." ) ) {
+			$error = false;
+		}
+
+		parent::add_result_message_for_file( $result, $error, $message, $code, $file, $line, $column, $docs, $severity );
+	}
 }
