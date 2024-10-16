@@ -108,6 +108,15 @@
 		for ( let i = 0; i < categoriesList.length; i++ ) {
 			categoriesList[ i ].disabled = false;
 		}
+
+		// Adding Open All/Collapse All button
+		if ( resultsContainer.innerHTML !== '' ) {
+			resultsContainer.innerHTML =
+				'<div><button style="margin-top:1.33em;" class="button button-primary collapse-all" data-state="open">' +
+				PLUGIN_CHECK.collapseAll +
+				'</button></div>' +
+				resultsContainer.innerHTML;
+		}
 	}
 
 	/**
@@ -469,4 +478,61 @@
 		const template = templates[ templateSlug ];
 		return template( data );
 	}
+
+	/**
+	 * Manage collapse/open tables click event
+	 */
+	document.addEventListener( 'click', function ( e ) {
+		const button = e.target;
+		// Manage Collapse/Open All tables separately.
+		if ( button.classList.contains( 'collapse-btn' ) ) {
+			const dataIndex = button
+				.closest( '.plugin-check__results-heading' )
+				.getAttribute( 'data-index' );
+			const tableContainer = document.querySelector(
+				'#plugin-check__results-table-' + dataIndex
+			);
+
+			// Toggle the visibility of the table container.
+			if ( tableContainer.style.display === 'none' ) {
+				tableContainer.style.display = 'table';
+				button.innerHTML = PLUGIN_CHECK.collapse;
+			} else {
+				tableContainer.style.display = 'none';
+				button.innerHTML = PLUGIN_CHECK.open;
+			}
+		}
+
+		// Manage Collapse/Open All tables together.
+		if ( button.classList.contains( 'collapse-all' ) ) {
+			const tableContainers = document.querySelectorAll(
+				'.plugin-check__results-table'
+			);
+			const buttons = document.querySelectorAll( '.collapse-btn' );
+			const state = button.getAttribute( 'data-state' );
+			const isVisible = state && state === 'open';
+
+			// Collapase/Open All tables.
+			tableContainers.forEach( function ( tableContainer ) {
+				tableContainer.style.display = isVisible ? 'none' : 'table';
+			} );
+
+			// Change All buttons text.
+			buttons.forEach( function ( _button ) {
+				_button.innerHTML = isVisible ? 'Open' : 'Collapse';
+				_button.setAttribute(
+					'data-state',
+					isVisible ? 'closed' : 'open'
+				);
+			} );
+
+			// Change Collapse All/Open All Button text.
+			button.innerHTML = isVisible
+				? PLUGIN_CHECK.openAll
+				: PLUGIN_CHECK.collapseAll;
+
+			// Change Collapse All/Open All Button attribute.
+			button.setAttribute( 'data-state', isVisible ? 'closed' : 'open' );
+		}
+	} );
 } )( PLUGIN_CHECK ); /* global PLUGIN_CHECK */
