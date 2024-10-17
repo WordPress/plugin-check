@@ -685,7 +685,7 @@ final class Plugin_Check_Command {
 		foreach ( $results as $item ) {
 			if ( 'ERROR' === $item['type'] && $item['severity'] >= $error_severity ) {
 				$errors[] = $item;
-			} elseif ( $include_low_severity_errors && $item['severity'] < $error_severity ) {
+			} elseif ( $include_low_severity_errors && 'ERROR' === $item['type'] && $item['severity'] < $error_severity ) {
 				$item['type']     = 'WARNING';
 				$item['severity'] = 10;
 				$warnings[]       = $item;
