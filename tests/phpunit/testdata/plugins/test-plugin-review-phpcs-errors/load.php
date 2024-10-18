@@ -21,3 +21,6 @@ dl( 'plugin-check.so' );
 
 var_dump( $custom_var );
 error_log( 'Error occurred.');
+
+query_posts( 'cat=3' );
+wp_reset_query();
