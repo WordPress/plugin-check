@@ -143,15 +143,16 @@ final class Plugin_Check_Command {
 		$options = $this->get_options(
 			$assoc_args,
 			array(
-				'checks'               => '',
-				'format'               => 'table',
-				'ignore-warnings'      => false,
-				'ignore-errors'        => false,
-				'include-experimental' => false,
-				'severity'             => '',
-				'error-severity'       => '',
-				'warning-severity'     => '',
-				'slug'                 => '',
+				'checks'                      => '',
+				'format'                      => 'table',
+				'ignore-warnings'             => false,
+				'ignore-errors'               => false,
+				'include-experimental'        => false,
+				'severity'                    => '',
+				'error-severity'              => '',
+				'warning-severity'            => '',
+				'include-low-severity-errors' => false,
+				'slug'                        => '',
 			)
 		);
 
@@ -262,6 +263,9 @@ final class Plugin_Check_Command {
 		$error_severity   = ! empty( $options['error-severity'] ) ? $options['error-severity'] : $options['severity'];
 		$warning_severity = ! empty( $options['warning-severity'] ) ? $options['warning-severity'] : $options['severity'];
 
+		// Low severity errors.
+		$include_low_severity_errors = ! empty( $options['include-low-severity-errors'] ) ? $options['include-low-severity-errors'] : false;
+
 		// Print the formatted results.
 		// Go over all files with errors first and print them, combined with any warnings in the same file.
 		foreach ( $errors as $file_name => $file_errors ) {
@@ -273,7 +277,15 @@ final class Plugin_Check_Command {
 			$file_results = $this->flatten_file_results( $file_errors, $file_warnings );
 
 			if ( '' !== $error_severity || '' !== $warning_severity ) {
+				$original_results = $file_results;
+
 				$file_results = $this->get_filtered_results_by_severity( $file_results, intval( $error_severity ), intval( $warning_severity ) );
+
+				if ( absint( $error_severity ) > 0 && true === $include_low_severity_errors ) {
+					$low_severity_errors = $this->get_low_severity_errors( $original_results, absint( $error_severity ) );
+
+					$file_results = array_merge( $file_results, $low_severity_errors );
+				}
 			}
 
 			if ( ! empty( $file_results ) ) {
@@ -689,5 +701,25 @@ final class Plugin_Check_Command {
 		);
 
 		return array_merge( $errors, $warnings );
+	}
+
+	private function get_low_severity_errors( $file_results, $error_severity ) {
+		$low_severity_errors = array_filter(
+			$file_results,
+			function ( $item ) use ( $error_severity ) {
+				return ( 'ERROR' === $item['type'] && $item['severity'] < $error_severity );
+			}
+		);
+
+		$low_severity_errors = array_map(
+			function ( $item ) {
+				$item['type'] = 'ERROR_EXTRA';
+
+				return $item;
+			},
+			$low_severity_errors
+		);
+
+		return $low_severity_errors;
 	}
 }
