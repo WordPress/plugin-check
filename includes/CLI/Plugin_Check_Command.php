@@ -703,23 +703,29 @@ final class Plugin_Check_Command {
 		return array_merge( $errors, $warnings );
 	}
 
-	private function get_low_severity_errors( $file_results, $error_severity ) {
+	/**
+	 * Returns low severity errors.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @param array $results        Check results.
+	 * @param int   $error_severity Error severity level.
+	 * @return array Filtered low severity errors.
+	 */
+	private function get_low_severity_errors( $results, $error_severity ) {
 		$low_severity_errors = array_filter(
-			$file_results,
+			$results,
 			function ( $item ) use ( $error_severity ) {
 				return ( 'ERROR' === $item['type'] && $item['severity'] < $error_severity );
 			}
 		);
 
-		$low_severity_errors = array_map(
+		return array_map(
 			function ( $item ) {
 				$item['type'] = 'ERROR_EXTRA';
-
 				return $item;
 			},
 			$low_severity_errors
 		);
-
-		return $low_severity_errors;
 	}
 }
