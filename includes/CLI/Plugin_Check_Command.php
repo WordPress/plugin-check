@@ -113,6 +113,9 @@ final class Plugin_Check_Command {
 	 * [--warning-severity=<warning-severity>]
 	 * : Warning severity level.
 	 *
+	 * [--include-low-severity-errors]
+	 * : Include errors with lower severity than the threshold.
+	 *
 	 * [--slug=<slug>]
 	 * : Slug to override the default.
 	 *
