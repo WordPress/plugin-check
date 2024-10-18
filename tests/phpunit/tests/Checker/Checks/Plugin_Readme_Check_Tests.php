@@ -180,6 +180,45 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertCount( 1, wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'no_license' ) ) );
 	}
 
+	public function test_run_with_no_errors_license_mpl() {
+		$readme_check  = new Plugin_Readme_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-no-errors-license-mpl/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$readme_check->run( $check_result );
+
+		$errors = $check_result->get_errors();
+
+		$this->assertNotEmpty( $errors );
+		$this->assertArrayHasKey( 'readme.txt', $errors );
+
+		// Check for no license.
+		$this->assertArrayHasKey( 0, $errors['readme.txt'] );
+		$this->assertArrayHasKey( 0, $errors['readme.txt'][0] );
+		$this->assertCount( 1, wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'no_license' ) ) );
+	}
+
+	public function test_run_with_errors_license_mpl() {
+		$readme_check  = new Plugin_Readme_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-license-mpl/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$readme_check->run( $check_result );
+
+		$errors = $check_result->get_errors();
+
+		var_dump($errors);
+		ob_flush();
+
+		$this->assertNotEmpty( $errors );
+		$this->assertArrayHasKey( 'readme.txt', $errors );
+
+		// Check for no license.
+		$this->assertArrayHasKey( 0, $errors['readme.txt'] );
+		$this->assertArrayHasKey( 0, $errors['readme.txt'][0] );
+		$this->assertCount( 1, wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'no_license' ) ) );
+	}
+
 	public function test_run_with_errors_tested_upto() {
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-tested-upto/load.php' );
