@@ -33,6 +33,7 @@ final class GenericNamesSniff extends Sniff {
 	public function register() {
 		$targets   = Collections::textStringStartTokens();
 		$targets[] = \T_FUNCTION;
+		$targets[] = \T_CLASS;
 
 		return $targets;
 	}
