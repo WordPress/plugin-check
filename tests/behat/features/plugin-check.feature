@@ -332,7 +332,7 @@ Feature: Test that the WP-CLI command works.
       """
     And STDOUT should contain:
       """
-      no_plugin_readme,WARNING
+      no_plugin_readme,ERROR
       """
 
   Scenario: Check a plugin from external location
@@ -395,7 +395,7 @@ Feature: Test that the WP-CLI command works.
       """
     And STDOUT should contain:
       """
-      no_plugin_readme,WARNING
+      no_plugin_readme,ERROR
       """
 
     When I run the WP-CLI command `plugin check {RUN_DIR}/external-folder/pxzvccv345nhg/ --format=csv --fields=code,type --slug=foo-sample`
@@ -406,7 +406,7 @@ Feature: Test that the WP-CLI command works.
       """
     And STDOUT should contain:
       """
-      no_plugin_readme,WARNING
+      no_plugin_readme,ERROR
       """
 
   Scenario: Check a plugin from external location but with invalid plugin
