@@ -46,7 +46,13 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		Plugin_Request_Utility::get_plugin_basename_from_input( 'invalid' );
 	}
 
+	/**
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
 	public function test_initialize_runner_with_cli() {
+		define( 'WP_CLI', true );
+
 		$_SERVER['argv'] = array(
 			'wp',
 			'plugin',
@@ -79,7 +85,13 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		$this->assertInstanceOf( AJAX_Runner::class, $runner );
 	}
 
+	/**
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
 	public function test_destroy_runner_with_cli() {
+		define( 'WP_CLI', true );
+
 		global $wpdb, $table_prefix, $wp_actions;
 
 		$this->set_up_mock_filesystem();

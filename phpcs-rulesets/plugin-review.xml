@@ -46,28 +46,56 @@
 		<type>warning</type>
 	</rule>
 
+	<!-- Sanitized Input rules -->
+	<rule ref="WordPress.Security.ValidatedSanitizedInput">
+		<type>warning</type>
+	</rule>
+
 	<!-- Prohibit the use of the backtick operator. -->
-	<rule ref="Generic.PHP.BacktickOperator"/>
+	<rule ref="Generic.PHP.BacktickOperator">
+		<severity>7</severity>
+	</rule>
 
 	<!-- Prohibit the use of the `goto` PHP language construct. -->
 	<rule ref="Generic.PHP.DiscourageGoto.Found">
 		<type>error</type>
+		<severity>7</severity>
 		<message>The "goto" language construct should not be used.</message>
+	</rule>
+
+	<!-- Check for error logs in plugin -->
+	<rule ref="WordPress.PHP.DevelopmentFunctions">
+		<type>warning</type>
 	</rule>
 
 	<!-- No PHP short open tags allowed. -->
 	<rule ref="Generic.PHP.DisallowShortOpenTag"/>
+	<rule ref="Generic.PHP.DisallowShortOpenTag.Found">
+		<severity>7</severity>
+	</rule>
+	<rule ref="Generic.PHP.DisallowShortOpenTag.EchoFound">
+		<severity>7</severity>
+	</rule>
 
 	<!-- Alternative PHP open tags not allowed. -->
-	<rule ref="Generic.PHP.DisallowAlternativePHPTags"/>
+	<rule ref="Generic.PHP.DisallowAlternativePHPTags">
+		<severity>7</severity>
+	</rule>
 
 	<!-- Prevent path disclosure when using add_theme_page(). -->
-	<rule ref="WordPress.Security.PluginMenuSlug"/>
+	<rule ref="WordPress.Security.PluginMenuSlug">
+		<severity>6</severity>
+	</rule>
 
 	<!-- While most plugins shouldn't query the database directly, if they do, it should be done correctly. -->
 	<!-- Don't use the PHP database functions and classes, use the WP abstraction layer instead. -->
-	<rule ref="WordPress.DB.RestrictedClasses"/>
-	<rule ref="WordPress.DB.RestrictedFunctions"/>
+	<rule ref="WordPress.DB.RestrictedClasses">
+		<severity>7</severity>
+	</rule>
+
+	<rule ref="WordPress.DB.RestrictedFunctions">
+		<severity>7</severity>
+	</rule>
 
 	<!-- Check for code WP does better -->
 	<rule ref="WordPress.WP.AlternativeFunctions">
@@ -86,6 +114,19 @@
 				<element key="str_rot13" value="null"/>
 			</property>
 		</properties>
+		<type>error</type>
+		<severity>7</severity>
+	</rule>
+
+	<rule ref="Squiz.PHP.DiscouragedFunctions">
+		<properties>
+			<property name="forbiddenFunctions" type="array">
+				<element key="set_time_limit" value="null"/>
+				<element key="ini_set" value="null"/>
+				<element key="ini_alter" value="null"/>
+				<element key="dl" value="null"/>
+			</property>
+		</properties>
 	</rule>
 
 	<!-- Check for use of deprecated WordPress classes, functions and function parameters. -->
@@ -97,9 +138,12 @@
 	<!-- Check for deprecated WordPress constants. -->
 	<rule ref="WordPress.WP.DiscouragedConstants">
 		<type>error</type>
+		<severity>7</severity>
 	</rule>
 
 	<!-- Check for usage of deprecated parameter values in WP functions and provide alternative based on the parameter passed. -->
-	<rule ref="WordPress.WP.DeprecatedParameterValues"/>
+	<rule ref="WordPress.WP.DeprecatedParameterValues">
+		<severity>7</severity>
+	</rule>
 
 </ruleset>

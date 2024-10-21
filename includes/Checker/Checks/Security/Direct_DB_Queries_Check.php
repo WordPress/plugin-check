@@ -8,6 +8,7 @@
 namespace WordPress\Plugin_Check\Checker\Checks\Security;
 
 use WordPress\Plugin_Check\Checker\Check_Categories;
+use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Checks\Abstract_PHP_CodeSniffer_Check;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 
@@ -30,7 +31,10 @@ class Direct_DB_Queries_Check extends Abstract_PHP_CodeSniffer_Check {
 	 * @return array The categories for the check.
 	 */
 	public function get_categories() {
-		return array( Check_Categories::CATEGORY_SECURITY );
+		return array(
+			Check_Categories::CATEGORY_SECURITY,
+			Check_Categories::CATEGORY_PLUGIN_REPO,
+		);
 	}
 
 	/**
@@ -38,9 +42,10 @@ class Direct_DB_Queries_Check extends Abstract_PHP_CodeSniffer_Check {
 	 *
 	 * @since 1.0.0
 	 *
+	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 * @return array An associative array of PHPCS CLI arguments.
 	 */
-	protected function get_args() {
+	protected function get_args( Check_Result $result ) {
 		return array(
 			'extensions' => 'php',
 			'standard'   => 'WordPress',

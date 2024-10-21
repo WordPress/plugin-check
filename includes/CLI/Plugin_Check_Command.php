@@ -113,6 +113,9 @@ final class Plugin_Check_Command {
 	 * [--warning-severity=<warning-severity>]
 	 * : Warning severity level.
 	 *
+	 * [--slug=<slug>]
+	 * : Slug to override the default.
+	 *
 	 * ## EXAMPLES
 	 *
 	 *   wp plugin check akismet
@@ -145,6 +148,7 @@ final class Plugin_Check_Command {
 				'severity'             => '',
 				'error-severity'       => '',
 				'warning-severity'     => '',
+				'slug'                 => '',
 			)
 		);
 
@@ -194,6 +198,7 @@ final class Plugin_Check_Command {
 			$runner->set_check_slugs( $checks );
 			$runner->set_plugin( $plugin );
 			$runner->set_categories( $categories );
+			$runner->set_slug( $options['slug'] );
 
 			$checks_to_run = $runner->get_checks_to_run();
 		} catch ( Exception $error ) {
@@ -236,6 +241,12 @@ final class Plugin_Check_Command {
 		$warnings = array();
 		if ( $result && empty( $assoc_args['ignore-warnings'] ) ) {
 			$warnings = $result->get_warnings();
+		}
+
+		if ( empty( $errors ) && empty( $warnings ) ) {
+			WP_CLI::success( __( 'Checks complete. No errors found.', 'plugin-check' ) );
+
+			return;
 		}
 
 		// Default fields.

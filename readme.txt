@@ -2,7 +2,7 @@
 
 Contributors:      wordpressdotorg
 Tested up to:      6.6
-Stable tag:        1.0.2
+Stable tag:        1.2.0
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 Tags:              plugin best practices, testing, accessibility, performance, security
@@ -20,6 +20,7 @@ The checks can be run either using the WP Admin user interface or WP-CLI:
 * To check a plugin using WP Admin, please navigate to the _Tools > Plugin Check_ menu. You need to be able to manage plugins on your site in order to access that screen.
 * To check a plugin using WP-CLI, please use the `wp plugin check` command. For example, to check the "Hello Dolly" plugin: `wp plugin check hello.php`
     * Note that by default when using WP-CLI, only static checks can be executed. In order to also include runtime checks, a workaround is currently necessary using the `--require` argument of WP-CLI, to manually load the `cli.php` file within the plugin checker directory before WordPress is loaded. For example: `wp plugin check hello.php --require=./wp-content/plugins/plugin-check/cli.php`
+    * You could use arbitrary path or URL to check a plugin. For example, to check a plugin from a URL: `wp plugin check https://example.com/plugin.zip` or to check a plugin from a path: `wp plugin check /path/to/plugin`
 
 The checks are grouped into several categories, so that you can customize which kinds of checks you would like to run on a plugin.
 
@@ -67,9 +68,41 @@ In any case, passing the checks in this tool likely helps to achieve a smooth pl
 
 == Changelog ==
 
+= 1.2.0 =
+
+* Enhancement - Added a check for badly used names in files.
+* Enhancement - Increased severity for `BacktickOperator`, `DisallowShortOpenTag`, `DisallowAlternativePHPTags`, `RestrictedClasses`, and `RestrictedFunctions`.
+* Enhancement - Added security checks to the Plugin repository category.
+* Enhancement - Allowed `runtime-set` in code sniffer checks.
+* Enhancement - Changed warnings to errors in plugin header checks.
+* Enhancement - Detect forbidden plugin headers such as repository URIs in the Directory.
+* Enhancement - Added a new check for development functions that are not allowed in final plugins.
+* Enhancement - Created new images and icons for the plugin.
+* Enhancement - Introduced a slug argument in the CLI.
+* Enhancement - Added a check for discouraged PHP functions.
+* Enhancement - Added validation for Contributors in the readme file.
+* Enhancement - Added a warning for mismatched plugin names in the plugin header and readme file.
+* Enhancement - Checked for validation of Plugin Header fields: Name, Plugin URI, Description, Author URI, Requires at least, Requires PHP, and Requires Plugins.
+* Enhancement - Added a warning if the "Tested up to" value in the readme file exceeds the released version of WordPress.
+* Fix - Display a success message if no errors or warnings are found.
+* Fix - Made table results responsive.
+* Fix - Prevent proceeding to the next check if the Stable Tag value is set to `trunk`.
+* Fix - Allow runtime initialization even when only add-on checks are requested.
+* Fix - Fixed an SPDX warning for the `GPL version 3` license.
+* Fix - Prevent runtime checks in the CLI context when they cannot be used.
+
 = 1.1.0 =
 
+* Feature - New `Non_Blocking_Scripts_Check` (`non_blocking_scripts`) runtime check to warn about enqueued scripts that use neither `defer` nor `async`.
 * Enhancement - Changed the namespace of included checks.
+* Enhancement - Introduced severity levels for all errors and warnings.
+* Enhancement - CLI: Support checking a plugin from a path or URL.
+* Enhancement - Added short descriptions and URLs for each check.
+* Enhancement - Improved messaging in check results.
+* Enhancement - Updated code obfuscation check with more accurate results.
+* Enhancement - Updated plugin review check to flag missing input sanitization (`WordPress.Security.ValidatedSanitizedInput`).
+* Fix - Improve readme checks to exclude invalid files.
+* Fix - Only show edit link if files are actually editable.
 
 = 1.0.2 =
 

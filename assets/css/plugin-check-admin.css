@@ -1,0 +1,63 @@
+/* Responsive table */
+@media screen and (max-width: 782px) {
+	#plugin-check__submit {
+		margin-top: 1em;
+	}
+
+	table#plugin-check__categories td {
+		padding-bottom: .5em;
+	}
+
+  table.plugin-check__results-table {
+    border: 0;
+  }
+
+  table.plugin-check__results-table caption {
+    font-size: 1.3em;
+  }
+  
+  table.plugin-check__results-table thead {
+    border: none;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+  }
+  
+  table.plugin-check__results-table tr {
+    border-bottom: 3px solid #ddd;
+    display: block;
+  }
+
+	table.plugin-check__results-table td, 
+	table.plugin-check__results-table code {
+		font-size: .9em;
+	}
+  
+  table.plugin-check__results-table td {
+    border-bottom: 1px solid #ddd;
+    display: block;
+    text-align: right;
+  }
+  
+  table.plugin-check__results-table td::before {
+    content: attr(data-label);
+    float: left;
+    font-weight: bold;
+  }
+
+	.rtl table.plugin-check__results-table td {
+		text-align: left;
+	}
+
+	.rtl table.plugin-check__results-table td::before {
+		float: right;
+	}
+  
+  table.plugin-check__results-table td:last-child {
+    border-bottom: 0;
+  }
+}

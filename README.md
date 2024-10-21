@@ -31,6 +31,7 @@ After having the plugin activated, you can analyze any other plugin installed on
 * To check a plugin using WP Admin, please navigate to the _Tools > Plugin Check_ menu. You need to be able to manage plugins on your site in order to access that screen.
 * To check a plugin using WP-CLI, please use the `wp plugin check` command. For example, to check the "Hello Dolly" plugin: `wp plugin check hello.php`
     * Note that by default when using WP-CLI, only static checks can be executed. In order to also include runtime checks, a workaround is currently necessary using the `--require` argument of WP-CLI, to manually load the `cli.php` file within the plugin checker directory before WordPress is loaded. For example: `wp plugin check hello.php --require=./wp-content/plugins/plugin-check/cli.php`
+    * You could use arbitrary path or URL to check a plugin. For example, to check a plugin from a URL: `wp plugin check https://example.com/plugin.zip` or to check a plugin from a path: `wp plugin check /path/to/plugin`
 
 <img alt="WordPress plugin checker UI in WP Admin" src="https://github.com/WordPress/plugin-check/assets/3531426/19d0c1ce-8c37-4efd-b8c6-d252e6ce29c9">
 <em>Screenshot of the plugin checker's UI in WP Admin</em>

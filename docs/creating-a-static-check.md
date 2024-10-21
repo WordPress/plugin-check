@@ -17,7 +17,7 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
 class My_Custom_Check implements Static_Check {
 
   use Stable_Check;
-  
+
   public function get_categories() {
     // Return an array of check categories.
     // See the `WordPress\Plugin_Check\Checker\Check_Categories` class for available categories.
@@ -45,7 +45,7 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
  * Check for detecting incorrect casing of the word "WordPress" using PHP CodeSniffer.
  */
 class My_Custom_Check extends Abstract_PHP_CodeSniffer_Check {
-  
+
   use Stable_Check;
 
   /**
@@ -64,9 +64,10 @@ class My_Custom_Check extends Abstract_PHP_CodeSniffer_Check {
   /**
    * Returns an associative array of arguments to pass to PHPCS.
    *
+   * @param Check_Result $result The check result to amend, including the plugin context to check.
    * @return array An associative array of PHPCS CLI arguments.
    */
-  protected function get_args() {
+  protected function get_args( Check_Result $result ) {
     return array(
       'extensions' => 'php',
       'standard'   => 'WordPress',
@@ -173,8 +174,8 @@ public function run( Check_Result $result ) {
 
   // When an issue is found add a warning.
   $result->add_message(
-    false, 
-    'Warning message content.', 
+    false,
+    'Warning message content.',
     array(
       'code'   => 'warning_code',
       'file'   => $plugin_file,
