@@ -1,6 +1,6 @@
 <?php
 /**
- * Class Prefix_All_Globals_Check.php.
+ * Class Generic_Names_Check.php.
  *
  * @package plugin-check
  */
@@ -8,24 +8,35 @@
 namespace WordPress\Plugin_Check\Checker\Checks\Plugin_Repo;
 
 use WordPress\Plugin_Check\Checker\Check_Categories;
+use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Checks\Abstract_PHP_CodeSniffer_Check;
+use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 
 /**
- * Check for running WordPress enqueued resources sniffs.
+ * Check for running WordPress generic names sniffs.
  *
- * @since 1.0.2
+ * @since 1.3.0
  */
-class Prefix_All_Globals_Check extends Abstract_PHP_CodeSniffer_Check {
+class Generic_Names_Check extends Abstract_PHP_CodeSniffer_Check {
 
+	use Amend_Check_Result;
 	use Stable_Check;
+
+	/**
+	 * Bitwise flags to control check behavior.
+	 *
+	 * @since 1.2.0.
+	 * @var int
+	 */
+	protected $flags = 0;
 
 	/**
 	 * Gets the categories for the check.
 	 *
 	 * Every check must have at least one category.
 	 *
-	 * @since 1.0.2
+	 * @since 1.3.0
 	 *
 	 * @return array The categories for the check.
 	 */
@@ -36,15 +47,16 @@ class Prefix_All_Globals_Check extends Abstract_PHP_CodeSniffer_Check {
 	/**
 	 * Returns an associative array of arguments to pass to PHPCS.
 	 *
-	 * @since 1.0.2
+	 * @since 1.0.0
 	 *
+	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 * @return array An associative array of PHPCS CLI arguments.
 	 */
-	protected function get_args() {
+	protected function get_args( Check_Result $result ) {
 		return array(
 			'extensions' => 'php',
-			'standard'   => 'WordPress',
-			'sniffs'     => 'WordPress.NamingConventions.PrefixAllGlobals',
+			'standard'   => 'PluginCheck',
+			'sniffs'     => 'PluginCheck.CodeAnalysis.GenericNames',
 		);
 	}
 
@@ -53,12 +65,12 @@ class Prefix_All_Globals_Check extends Abstract_PHP_CodeSniffer_Check {
 	 *
 	 * Every check must have a short description explaining what the check does.
 	 *
-	 * @since 1.1.0
+	 * @since 1.3.0
 	 *
 	 * @return string Description.
 	 */
 	public function get_description(): string {
-		return __( 'Checks the use of prefixes in all globals.', 'plugin-check' );
+		return __( 'Checks the use of prefixes in all generic functions and globals.', 'plugin-check' );
 	}
 
 	/**
