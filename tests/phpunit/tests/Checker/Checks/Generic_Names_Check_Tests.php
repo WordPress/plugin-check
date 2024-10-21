@@ -1,19 +1,19 @@
 <?php
 /**
- * Tests for the Prefix_All_Globals_Check class.
+ * Tests for the Generic_Names_Check class.
  *
  * @package plugin-check
  */
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
-use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\Prefix_All_Globals_Check;
+use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\Generic_Names_Check;
 
-class Prefix_All_Globals_Check_Tests extends WP_UnitTestCase {
+class Generic_Names_Check_Tests extends WP_UnitTestCase {
 
 	public function test_run_with_errors() {
-		$check         = new Prefix_All_Globals_Check();
-		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-prefix-all-globals-with-errors/load.php' );
+		$check         = new Generic_Names_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-generic-names-with-errors/load.php' );
 		$check_result  = new Check_Result( $check_context );
 
 		$check->run( $check_result );
@@ -26,8 +26,8 @@ class Prefix_All_Globals_Check_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_run_without_errors() {
-		$check         = new Prefix_All_Globals_Check();
-		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-prefix-all-globals-without-errors/load.php' );
+		$check         = new Generic_Names_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-generic-names-without-errors/load.php' );
 		$check_result  = new Check_Result( $check_context );
 
 		$check->run( $check_result );
