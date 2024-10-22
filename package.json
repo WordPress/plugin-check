@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "@wordpress/env": "^10.10.0",
-    "@wordpress/scripts": "^30.1.0",
+    "@wordpress/scripts": "^30.3.0",
     "patch-package": "^8.0.0"
   },
   "scripts": {
