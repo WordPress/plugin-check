@@ -81,7 +81,7 @@ Feature: Test that the severity level in plugin check works.
       """
     And STDOUT should contain:
       """
-      default_readme_text,WARNING,7
+      default_readme_text,ERROR,7
       """
     And STDOUT should contain:
       """
@@ -107,7 +107,7 @@ Feature: Test that the severity level in plugin check works.
       """
     And STDOUT should contain:
       """
-      default_readme_text,WARNING,7
+      default_readme_text,ERROR,7
       """
     And STDOUT should not contain:
       """
@@ -133,7 +133,7 @@ Feature: Test that the severity level in plugin check works.
       """
     And STDOUT should contain:
       """
-      default_readme_text,WARNING,7
+      default_readme_text,ERROR,7
       """
     And STDOUT should not contain:
       """
@@ -159,7 +159,7 @@ Feature: Test that the severity level in plugin check works.
       """
     And STDOUT should contain:
       """
-      default_readme_text,WARNING,7
+      default_readme_text,ERROR,7
       """
     And STDOUT should contain:
       """
@@ -185,7 +185,7 @@ Feature: Test that the severity level in plugin check works.
       """
     And STDOUT should contain:
       """
-      default_readme_text,WARNING,7
+      default_readme_text,ERROR,7
       """
     And STDOUT should not contain:
       """

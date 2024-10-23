@@ -61,9 +61,9 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		// Filter the readme files.
 		$readme = $this->filter_files_for_readme( $files, $plugin_relative_path );
 
-		// If the readme file does not exist, add a warning and skip other tests.
+		// If the readme file does not exist, add an error and skip other tests.
 		if ( empty( $readme ) ) {
-			$this->add_result_warning_for_file(
+			$this->add_result_error_for_file(
 				$result,
 				__( 'The plugin readme.txt does not exist.', 'plugin-check' ),
 				'no_plugin_readme',
@@ -277,7 +277,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 			|| str_contains( $short_description, 'Here is a short description of the plugin.' )
 			|| str_contains( $donate_link, '//example.com/' )
 		) {
-			$this->add_result_warning_for_file(
+			$this->add_result_error_for_file(
 				$result,
 				__( '<strong>The readme appears to contain default text.</strong><br>This means your readme has to have headers as well as a proper description and documentation as to how it works and how one can use it.', 'plugin-check' ),
 				'default_readme_text',
