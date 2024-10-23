@@ -11,9 +11,10 @@ Follow these steps:
 2. Bump `WP_PLUGIN_CHECK_VERSION` in the same file.
 3. Bump the `Stable tag` field in the `readme.txt` file.
 4. Update the changelog in `readme.txt`.
-5. Commit this to the default branch.
-6. On GitHub, go to "Releases" and create a new release.
-7. Once published, this release will be automatically deployed to the plugin directory.
+5. Update the checks lists in `docs/checks.md`.
+6. Commit this to the default branch.
+7. On GitHub, go to "Releases" and create a new release.
+8. Once published, this release will be automatically deployed to the plugin directory.
 
 ## Building the Plugin
 
