@@ -127,4 +127,22 @@ class File_Type_Check_Tests extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 0, $errors['badly|file%name!@#$%^&*()+=[]{};:"\'<>,?|`~.php'][0] );
 		$this->assertCount( 1, wp_list_filter( $errors['badly|file%name!@#$%^&*()+=[]{};:"\'<>,?|`~.php'][0][0], array( 'code' => 'badly_named_files' ) ) );
 	}
+
+	public function test_run_with_library_core_errors() {
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-file-type-library-core-errors/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check = new File_Type_Check( File_Type_Check::TYPE_LIBRARY_CORE );
+		$check->run( $check_result );
+
+		$errors = $check_result->get_errors();
+
+		$this->assertNotEmpty( $errors );
+		$this->assertEquals( 1, $check_result->get_error_count() );
+
+		// Check for core PHPMailer.
+		$this->assertArrayHasKey( 0, $errors['PHPMailer.php'] );
+		$this->assertArrayHasKey( 0, $errors['PHPMailer.php'][0] );
+		$this->assertCount( 1, wp_list_filter( $errors['PHPMailer.php'][0][0], array( 'code' => 'library_core_files' ) ) );
+	}
 }
