@@ -70,7 +70,7 @@ class Libraries_Core_Check extends Abstract_PHP_CodeSniffer_Check {
 	 * @return string Description.
 	 */
 	public function get_description(): string {
-		return __( 'Prevents using remote services that are not necessary.', 'plugin-check' );
+		return __( 'Prevents using libraries that are already in the WordPress core.', 'plugin-check' );
 	}
 
 	/**
@@ -83,6 +83,6 @@ class Libraries_Core_Check extends Abstract_PHP_CodeSniffer_Check {
 	 * @return string The documentation URL.
 	 */
 	public function get_documentation_url(): string {
-		return __( 'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#calling-files-remotely', 'plugin-check' );
+		return __( 'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#including-libraries-already-in-core', 'plugin-check' );
 	}
 }
