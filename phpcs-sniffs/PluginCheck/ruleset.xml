@@ -6,5 +6,6 @@
 	<rule ref="PluginCheck.CodeAnalysis.EnqueuedResourceOffloading" />
 	<rule ref="PluginCheck.CodeAnalysis.Offloading" />
 	<rule ref="PluginCheck.CodeAnalysis.LibrariesCore" />
+	<rule ref="PluginCheck.CodeAnalysis.ImageFunctions" />
 
 </ruleset>

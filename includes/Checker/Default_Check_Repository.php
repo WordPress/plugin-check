@@ -61,6 +61,7 @@ class Default_Check_Repository extends Empty_Check_Repository {
 				'non_blocking_scripts'       => new Checks\Performance\Non_Blocking_Scripts_Check(),
 				'offloading_files'           => new Checks\Plugin_Repo\Offloading_Files_Check(),
 				'libraries_core'             => new Checks\Plugin_Repo\Libraries_Core_Check(),
+				'image_functions'            => new Checks\Performance\Image_Functions_Check(),
 			)
 		);
 

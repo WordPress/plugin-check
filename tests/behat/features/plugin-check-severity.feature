@@ -69,7 +69,7 @@ Feature: Test that the severity level in plugin check works.
       """
     And STDOUT should contain:
       """
-      obfuscated_code_detected,ERROR,6
+      obfuscated_code_detected,ERROR,7
       """
     And STDOUT should contain:
       """
@@ -81,7 +81,7 @@ Feature: Test that the severity level in plugin check works.
       """
     And STDOUT should contain:
       """
-      default_readme_text,WARNING,7
+      default_readme_text,ERROR,7
       """
     And STDOUT should contain:
       """
@@ -93,9 +93,9 @@ Feature: Test that the severity level in plugin check works.
       """
       allow_unfiltered_uploads_detected,ERROR,7
       """
-    And STDOUT should not contain:
+    And STDOUT should contain:
       """
-      obfuscated_code_detected,ERROR,6
+      obfuscated_code_detected,ERROR,7
       """
     And STDOUT should not contain:
       """
@@ -107,7 +107,7 @@ Feature: Test that the severity level in plugin check works.
       """
     And STDOUT should contain:
       """
-      default_readme_text,WARNING,7
+      default_readme_text,ERROR,7
       """
     And STDOUT should not contain:
       """
@@ -121,7 +121,7 @@ Feature: Test that the severity level in plugin check works.
       """
     And STDOUT should contain:
       """
-      obfuscated_code_detected,ERROR,6
+      obfuscated_code_detected,ERROR,7
       """
     And STDOUT should not contain:
       """
@@ -133,7 +133,7 @@ Feature: Test that the severity level in plugin check works.
       """
     And STDOUT should contain:
       """
-      default_readme_text,WARNING,7
+      default_readme_text,ERROR,7
       """
     And STDOUT should not contain:
       """
@@ -147,7 +147,7 @@ Feature: Test that the severity level in plugin check works.
       """
     And STDOUT should contain:
       """
-      obfuscated_code_detected,ERROR,6
+      obfuscated_code_detected,ERROR,7
       """
     And STDOUT should not contain:
       """
@@ -159,7 +159,7 @@ Feature: Test that the severity level in plugin check works.
       """
     And STDOUT should contain:
       """
-      default_readme_text,WARNING,7
+      default_readme_text,ERROR,7
       """
     And STDOUT should contain:
       """
@@ -173,7 +173,7 @@ Feature: Test that the severity level in plugin check works.
       """
     And STDOUT should contain:
       """
-      obfuscated_code_detected,ERROR,6
+      obfuscated_code_detected,ERROR,7
       """
     And STDOUT should contain:
       """
@@ -185,7 +185,7 @@ Feature: Test that the severity level in plugin check works.
       """
     And STDOUT should contain:
       """
-      default_readme_text,WARNING,7
+      default_readme_text,ERROR,7
       """
     And STDOUT should not contain:
       """
