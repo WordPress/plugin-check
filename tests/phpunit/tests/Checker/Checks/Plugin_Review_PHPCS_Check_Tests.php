@@ -60,6 +60,12 @@ class Plugin_Review_PHPCS_Check_Tests extends WP_UnitTestCase {
 
 		// Check for WordPress.PHP.DevelopmentFunctions.error_log_error_log warning on Line no 23 and column no at 1.
 		$this->assertSame( 'WordPress.PHP.DevelopmentFunctions.error_log_error_log', $warnings['load.php'][23][1][0]['code'] );
+
+		// Check for WordPress.WP.DiscouragedFunctions.query_posts_query_posts warning on Line no 25 and column no at 1.
+		$this->assertSame( 'WordPress.WP.DiscouragedFunctions.query_posts_query_posts', $warnings['load.php'][25][1][0]['code'] );
+
+		// Check for WordPress.WP.DiscouragedFunctions.wp_reset_query_wp_reset_query warning on Line no 26 and column no at 1.
+		$this->assertSame( 'WordPress.WP.DiscouragedFunctions.wp_reset_query_wp_reset_query', $warnings['load.php'][26][1][0]['code'] );
 	}
 
 	public function test_run_without_errors() {

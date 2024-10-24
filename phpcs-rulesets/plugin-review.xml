@@ -141,6 +141,11 @@
 		<severity>7</severity>
 	</rule>
 
+    <!-- Check for discouraged WordPress functions. -->
+	<rule ref="WordPress.WP.DiscouragedFunctions">
+		<severity>6</severity>
+	</rule>
+
 	<!-- Check for usage of deprecated parameter values in WP functions and provide alternative based on the parameter passed. -->
 	<rule ref="WordPress.WP.DeprecatedParameterValues">
 		<severity>7</severity>
