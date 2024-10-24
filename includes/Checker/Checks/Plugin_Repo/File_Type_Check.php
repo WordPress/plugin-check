@@ -24,13 +24,14 @@ class File_Type_Check extends Abstract_File_Check {
 	use Amend_Check_Result;
 	use Stable_Check;
 
-	const TYPE_COMPRESSED  = 1;
-	const TYPE_PHAR        = 2;
-	const TYPE_VCS         = 4;
-	const TYPE_HIDDEN      = 8;
-	const TYPE_APPLICATION = 16;
-	const TYPE_BADLY_NAMED = 32;
-	const TYPE_ALL         = 63; // Same as all of the above with bitwise OR.
+	const TYPE_COMPRESSED   = 1;
+	const TYPE_PHAR         = 2;
+	const TYPE_VCS          = 4;
+	const TYPE_HIDDEN       = 8;
+	const TYPE_APPLICATION  = 16;
+	const TYPE_BADLY_NAMED  = 32;
+	const TYPE_LIBRARY_CORE = 64;
+	const TYPE_ALL          = 127; // Same as all of the above with bitwise OR.
 
 	/**
 	 * Bitwise flags to control check behavior.
@@ -94,6 +95,9 @@ class File_Type_Check extends Abstract_File_Check {
 		if ( $this->flags & self::TYPE_BADLY_NAMED ) {
 			// Check for badly named files.
 			$this->look_for_badly_named_files( $result, $files );
+		}
+		if ( $this->flags & self::TYPE_LIBRARY_CORE ) {
+			$this->look_for_library_core_files( $result, $files );
 		}
 	}
 
@@ -295,6 +299,79 @@ class File_Type_Check extends Abstract_File_Check {
 	}
 
 	/**
+	 * Looks for library core files and amends the given result with an error if found.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param Check_Result $result The check result to amend, including the plugin context to check.
+	 * @param array        $files  List of absolute file paths.
+	 */
+	protected function look_for_library_core_files( Check_Result $result, array $files ) {
+		// Known libraries that are part of WordPress core.
+		// https://meta.trac.wordpress.org/browser/sites/trunk/api.wordpress.org/public_html/core/credits/wp-59.php#L739
+		$look_known_LibrariesCore_services = array(
+			'(?<![\.|-])jquery(-[0-9|\.]*)?(\.slim)?(\.min)?\.js(?!\/)',
+			'jquery-ui(-[0-9|\.]*)?(\.slim)?(\.min)?\.js(?!\/)',
+			'jquery.color(\.slim)?(\.min)?\.js(?!\/)',
+			'jquery.ui.touch-punch(?!\/)',
+			'jquery.hoverintent(?!\/)',
+			'jquery.imgareaselect(?!\/)',
+			'jquery.hotkeys(?!\/)',
+			'jquery.ba-serializeobject(?!\/)',
+			'jquery.query-object(?!\/)',
+			'jquery.suggest(?!\/)',
+			'polyfill(\.min)?\.js(?!\/)',
+			'iris(\.min)?\.js(?!\/)',
+			'backbone(\.min)?\.js(?!\/)',
+			'clipboard(\.min)?\.js(?!\/)',
+			'closest(\.min)?\.js(?!\/)',
+			'codemirror(\.min)?\.js(?!\/)',
+			'formdata(\.min)?\.js(?!\/)',
+			'json2(\.min)?\.js(?!\/)',
+			'lodash(\.min)?\.js(?!\/)',
+			'masonry(\.pkgd)(\.min)?\.js(?!\/)',
+			'mediaelement-and-player(\.min)?\.js(?!\/)',
+			'moment(\.min)?\.js(?!\/)',
+			'plupload(\.full)(\.min)?\.js(?!\/)',
+			'thickbox(\.min)?\.js(?!\/)',
+			'twemoji(\.min)?\.js(?!\/)',
+			'underscore([\.|-]min)?\.js(?!\/)',
+			'moxie(\.min)?\.js(?!\/)',
+			'zxcvbn(\.min)?\.js(?!\/)',
+			'getid3\.php(?!\/)',
+			'pclzip\.lib\.php(?!\/)',
+			'PasswordHash\.php(?!\/)',
+			'PHPMailer\.php(?!\/)',
+			'SimplePie\.php(?!\/)',
+		);
+		$combined_pattern = '/(' . implode(')|(', $look_known_LibrariesCore_services ) . ')/i';
+
+		$plugin_path = $result->plugin()->path();
+
+		$files = array_map(
+			function ( $file ) use ( $plugin_path ) {
+				return str_replace( $plugin_path, '', $file );
+			},
+			$files
+		);
+
+		foreach ( $files as $file ) {
+			if ( preg_match( $combined_pattern, $file ) ) {
+				$this->add_result_error_for_file(
+					$result,
+					__( 'Library files that are already in the WordPress core are not permitted.', 'plugin-check' ),
+					'library_core_files',
+					$file,
+					0,
+					0,
+					'',
+					8
+				);
+			}
+		}
+	}
+
+	/**
 	 * Gets the description for the check.
 	 *
 	 * Every check must have a short description explaining what the check does.
@@ -304,7 +381,7 @@ class File_Type_Check extends Abstract_File_Check {
 	 * @return string Description.
 	 */
 	public function get_description(): string {
-		return __( 'Detects the usage of hidden and compressed files, VCS directories, application files and badly named files.', 'plugin-check' );
+		return __( 'Detects the usage of hidden and compressed files, VCS directories, application files,badly named files and library core files.', 'plugin-check' );
 	}
 
 	/**
