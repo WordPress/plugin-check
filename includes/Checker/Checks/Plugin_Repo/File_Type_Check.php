@@ -308,8 +308,8 @@ class File_Type_Check extends Abstract_File_Check {
 	 */
 	protected function look_for_library_core_files( Check_Result $result, array $files ) {
 		// Known libraries that are part of WordPress core.
-		// https://meta.trac.wordpress.org/browser/sites/trunk/api.wordpress.org/public_html/core/credits/wp-59.php#L739
-		$look_known_LibrariesCore_services = array(
+		// https://meta.trac.wordpress.org/browser/sites/trunk/api.wordpress.org/public_html/core/credits/wp-59.php#L739 .
+		$look_known_libraries_core_services = array(
 			'(?<![\.|-])jquery(-[0-9|\.]*)?(\.slim)?(\.min)?\.js(?!\/)',
 			'jquery-ui(-[0-9|\.]*)?(\.slim)?(\.min)?\.js(?!\/)',
 			'jquery.color(\.slim)?(\.min)?\.js(?!\/)',
@@ -317,7 +317,7 @@ class File_Type_Check extends Abstract_File_Check {
 			'jquery.hoverintent(?!\/)',
 			'jquery.imgareaselect(?!\/)',
 			'jquery.hotkeys(?!\/)',
-			'jquery.ba-serializeobject(?!\/)',
+			'jquery.ba-serializeobject(?!\/)', // spellchecker:disable-line
 			'jquery.query-object(?!\/)',
 			'jquery.suggest(?!\/)',
 			'polyfill(\.min)?\.js(?!\/)',
@@ -344,7 +344,8 @@ class File_Type_Check extends Abstract_File_Check {
 			'PHPMailer\.php(?!\/)',
 			'SimplePie\.php(?!\/)',
 		);
-		$combined_pattern = '/(' . implode(')|(', $look_known_LibrariesCore_services ) . ')/i';
+
+		$combined_pattern = '/(' . implode( ')|(', $look_known_libraries_core_services ) . ')/i';
 
 		$plugin_path = $result->plugin()->path();
 
