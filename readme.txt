@@ -106,6 +106,7 @@ In any case, passing the checks in this tool likely helps to achieve a smooth pl
 
 = 1.0.2 =
 
+* Enhancement - Show a warning if a non-existent check if passed to the WP CLI --checks argument. (issue 348)
 * Feature - New `Enqueued_Scripts_Scope_Check` (`enqueued_scripts_scope`), `Enqueued_Styles_Size_Check` (`enqueued_styles_size`) and `Enqueued_Resources_Check` (`enqueued_resources`) performance checks.
 * Enhancement - Improved readme check and added a new `wp_plugin_check_ignored_readme_warnings` filter.
 * Enhancement - New `wp_plugin_check_default_categories` filter to change the categories which are selected by default.

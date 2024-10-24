@@ -461,6 +461,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 */
 	final public function get_checks_to_run() {
 		$check_slugs = $this->get_check_slugs();
+		$check_slugs = $this->return_valid_check_slugs( $check_slugs );
 		$check_flags = Check_Repository::TYPE_STATIC;
 
 		// Check if conditions are met in order to perform Runtime Checks.
@@ -487,6 +488,30 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		}
 
 		return $collection->to_map();
+	}
+
+	/**
+	 * Returns an array of valid check slugs.
+	 *
+	 * @since 1.0.1
+	 *
+	 * @param array $check_slugs An array of check slugs to be run.
+	 *
+	 * @return array An array of valid check slugs.
+	 */
+	protected function return_valid_check_slugs( array $check_slugs ) {
+
+		$available_checks_slugs = array_keys( $this->check_repository->get_checks( Check_Repository::TYPE_ALL )->to_map() );
+
+		foreach ( $check_slugs as $slug ) {
+			if ( ! in_array( $slug, $available_checks_slugs, true ) ) {
+				echo 'Warning: Check with the slug "' . $slug . '" does not exist.' . PHP_EOL;
+				$key = array_search( $slug, $check_slugs, true );
+				unset( $check_slugs[ $key ] );
+			}
+		}
+
+		return $check_slugs;
 	}
 
 	/**
