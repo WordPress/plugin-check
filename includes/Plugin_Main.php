@@ -51,6 +51,8 @@ class Plugin_Main {
 	 * Registers WordPress hooks for the plugin.
 	 *
 	 * @since 1.0.0
+	 *
+	 * @global Plugin_Context $context The plugin context instance.
 	 */
 	public function add_hooks() {
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
