@@ -18,7 +18,7 @@ use WordPressCS\WordPress\Sniff;
  *
  * @link https://developer.wordpress.org/plugins/wordpress-org/detailed-plugin-guidelines/
  *
- * @since 1.1.0
+ * @since 1.3.0
  */
 final class LocalhostSniff extends Sniff {
 
