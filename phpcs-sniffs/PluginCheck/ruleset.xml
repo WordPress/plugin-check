@@ -4,7 +4,8 @@
 	<description>Plugin Check Sniffs</description>
 
 	<rule ref="PluginCheck.CodeAnalysis.EnqueuedResourceOffloading" />
-	<rule ref="PluginCheck.CodeAnalysis.Offloading" />
 	<rule ref="PluginCheck.CodeAnalysis.ImageFunctions" />
+	<rule ref="PluginCheck.CodeAnalysis.Localhost" />
+	<rule ref="PluginCheck.CodeAnalysis.Offloading" />
 
 </ruleset>
