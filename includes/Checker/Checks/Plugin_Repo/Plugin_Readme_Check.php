@@ -673,7 +673,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		$files_ext          = $this->filter_files_for_external( $files, $result->plugin()->path() );
 
 		foreach( $files_ext as $file ) {
-			$lines = file( $file );
+			
 		}
 
 		

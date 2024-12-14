@@ -122,7 +122,7 @@ trait External_Utils {
 									$domain = end( $parts ) . '.' . $domain_tld;
 
 									//Find domain
-									$key = $this->getKeyDomainMentionedInReadme( $domain );
+									$key = $this->get_key_domain_mentioned_in_readme( $domain );
 									if ( false !== $key ) {
 										// If found, just add URL
 										$domains_mentioned[ $key ]['urls'][] = $url;
@@ -132,7 +132,7 @@ trait External_Utils {
 									} else {
 										//Not found, create it.
 										$domain_mentioned = array(
-											'domains' => $this->addDomainsOfSameService( $domain ),
+											'domains' => $this->add_domains_of_same_service( $domain ),
 											'urls'    => array( $url ),
 											'paths'   => array(),
 										);
@@ -159,7 +159,15 @@ trait External_Utils {
 		return $domains_mentioned;
 	}
 
-	function getKeyDomainMentionedInReadme( $string ) {
+	/**
+	 * Get key domain mentioned in readme file.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @param string $string String.
+	 * @return string|bool Key of domain mentioned in readme file, or false if not found.
+	 */
+	function get_key_domain_mentioned_in_readme( $string ) {
 		if ( ! empty( $this->domainsMentionedReadme ) ) {
 			foreach ( $this->domainsMentionedReadme as $key => $domains ) {
 				if ( ! empty( $domains['domains'] ) ) {
@@ -175,7 +183,15 @@ trait External_Utils {
 		return false;
 	}
 
-	function addDomainsOfSameService( $domain ) {
+	/**
+	 * Add domains of the same service.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @param string $domain Domain.
+	 * @return array An array containing domains of the same service.
+	 */
+	protected function add_domains_of_same_service( $domain ) {
 		$domains                 = array( $domain );
 		$domainsOfTheSameService = array(
 			'paypal.com'    => [ 'paypal.com', 'paypalobjects.com' ],
@@ -198,8 +214,16 @@ trait External_Utils {
 		return $domains;
 	}
 
-	function isDomainMentionedInReadme( $domain ) {
-		$key = $this->getKeyDomainMentionedInReadme( $domain );
+	/**
+	 * Check if domain is mentioned in readme file.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @param string $domain Domain.
+	 * @return bool True if domain is mentioned in readme file, false otherwise.
+	 */
+	protected function is_domain_mentioned_in_readme( $domain ) {
+		$key = $this->get_key_domain_mentioned_in_readme( $domain );
 		if ( false !== $key ) {
 			return true;
 		}
@@ -207,8 +231,16 @@ trait External_Utils {
 		return false;
 	}
 
-	function isDomainDocumentedReadme( $domain ) {
-		$key     = $this->getKeyDomainMentionedInReadme( $domain );
+	/**
+	 * Check if domain is documented in readme file.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @param string $domain Domain.
+	 * @return bool True if domain is documented in readme file, false otherwise.
+	 */
+	protected function is_domain_documented_readme( $domain ) {
+		$key     = $this->get_key_domain_mentioned_in_readme( $domain );
 		$privacy = false;
 		$terms   = false;
 
