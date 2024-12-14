@@ -12,6 +12,8 @@ use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Checks\Abstract_File_Check;
 use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Traits\Find_Readme;
+use WordPress\Plugin_Check\Traits\TLD_Names;
+use WordPress\Plugin_Check\Traits\External_Utils;
 use WordPress\Plugin_Check\Traits\License_Utils;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 use WordPressdotorg\Plugin_Directory\Readme\Parser;
@@ -27,6 +29,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 	use Amend_Check_Result;
 	use Find_Readme;
+	use TLD_Names;
+	use External_Utils;
 	use Stable_Check;
 	use License_Utils;
 
@@ -108,7 +112,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		$this->check_for_contributors( $result, $readme_file );
 
 		// Check for third parties privacy notes.
-		$this->check_for_privacy_notes( $result, $readme_file, $parser );
+		$this->check_for_privacy_notes( $result, $readme_file, $parser, $files );
 	}
 
 	/**
@@ -656,14 +660,22 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	}
 
 	/**
-	 * Checks the readme file for contributors.
+	 * Checks the readme file for external privacy notes.
 	 *
-	 * @since 1.3.0
+	 * @since 1.4.0
 	 *
 	 * @param Check_Result $result      The Check Result to amend.
 	 * @param string       $readme_file Readme file.
 	 */
-	private function check_for_privacy_notes( Check_Result $result, string $readme_file, Parser $parser ) {
+	private function check_for_privacy_notes( Check_Result $result, string $readme_file, Parser $parser, array $files ) {
+		$existing_tld_names = $this->get_tld_names();
+		$domains            = $this->load_domains_mentioned_in_readme( $readme_file, $existing_tld_names );
+		$files_ext          = $this->filter_files_for_external( $files, $result->plugin()->path() );
+
+		foreach( $files_ext as $file ) {
+			$lines = file( $file );
+		}
+
 		
 	}
 
