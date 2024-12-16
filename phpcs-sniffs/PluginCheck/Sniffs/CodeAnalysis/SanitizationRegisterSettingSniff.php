@@ -34,6 +34,8 @@ final class SanitizationRegisterSettingSniff extends Sniff {
 		$targets   = Collections::textStringStartTokens();
 		$targets[] = \T_STRING;
 		$targets[] = \T_INLINE_HTML;
+		$targets[] = \T_CONSTANT_ENCAPSED_STRING;
+		$targets[] = \T_VARIABLE;
 
 		return $targets;
 	}
