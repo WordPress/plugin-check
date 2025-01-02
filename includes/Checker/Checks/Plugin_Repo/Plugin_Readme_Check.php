@@ -670,9 +670,10 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	private function check_for_privacy_notes( Check_Result $result, string $readme_file, Parser $parser, array $files ) {
 		$existing_tld_names = $this->get_tld_names();
 		$domains            = $this->load_domains_mentioned_in_readme( $readme_file, $existing_tld_names );
-		$files_ext          = $this->filter_files_for_external( $files, $result->plugin()->path() );
+		$files_ext          = self::filter_files_by_extensions( $files, array( 'php', 'css', 'js' ) );
 
 		foreach( $files_ext as $file ) {
+			$result = $this->find_external_calls( $file );
 			
 		}
 

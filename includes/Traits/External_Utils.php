@@ -14,31 +14,6 @@ namespace WordPress\Plugin_Check\Traits;
  */
 trait External_Utils {
 	/**
-	 * Filter the given array of files for php,js,css files.
-	 *
-	 * @since 1.4.0
-	 *
-	 * @param array  $files                Array of file files to be filtered.
-	 * @param string $plugin_relative_path Plugin relative path.
-	 * @return array An array containing php,js.css files, or an empty array if none are found.
-	 */
-	protected function filter_files_for_external( array $files, $plugin_relative_path ) {
-		// Find the readme file.
-		$ext_list = preg_grep( '/\.(php|js|css)$/i', $files );
-
-		// Filter the readme files located at root.
-		$potential_ext_files = array_filter(
-			$ext_list,
-			function ( $file ) use ( $plugin_relative_path ) {
-				$file = str_replace( $plugin_relative_path, '', $file );
-				return ! str_contains( $file, '/' );
-			}
-		);
-
-		return ! empty( $potential_ext_files ) ? $potential_ext_files : array();
-	}
-
-	/**
 	 * Load domains mentioned in readme file.
 	 *
 	 * @since 1.4.0
@@ -271,19 +246,178 @@ trait External_Utils {
 	protected function find_external_calls( $file ) {
 		$lines = file( $file );
 		$this->find_functions();
-		$this->regexKnownUrls( $lines );
-		$this->findClasses();
-		$this->regexEstructures( $lines );
-		$this->findDeclarations( $lines );
+		$this->find_classes();
+		$this->regex_estructures( $lines );
+		$this->find_declarations( $lines );
+		
 	}
 
-	/**
-	 * Find functions in the file.
-	 *
-	 * @since 1.4.0
-	 */
-	protected function find_functions() {
+	//Check PHP function calls loading URLs.
+	function find_functions() {
+		if ( ! empty( $this->stmts ) ) {
+			$funcCalls = $this->nodeFinder->findInstanceOf( $this->stmts, Node\Expr\FuncCall::class );
+			if ( ! empty( $funcCalls ) ) {
+				foreach ( $funcCalls as $funccall ) {
+					$foundInSameLine = true;
+					$lastFoundExprArray = [];
+					if ( $this->hasFunctionName( $funccall ) ) {
+						$log          = '';
+						$functionName = $this->getCallName($funccall);
 
+						//Enqueue functions
+						if ( in_array( $functionName, [
+							'wp_register_script',
+							'wp_enqueue_script',
+							'wp_register_style',
+							'wp_enqueue_style'
+						] ) ) {
+							// Look for second parameter of this PHP functions.
+							if ( isset( $funccall->args[1] ) ) {
+								$argValue = $funccall->args[1]->value;
+								if ( ! empty( $argValue ) ) {
+									$log = $this->checkArgGetLog( $argValue, $foundInSameLine, $lastFoundExprArray );
+								}
+							}
+						}
+
+						// External calls
+						if ( in_array( $functionName, [
+							'wp_remote_request',
+							'wp_safe_remote_request',
+							'wp_remote_get',
+							'wp_safe_remote_get',
+							'wp_remote_post',
+							'wp_safe_remote_post',
+							'wp_remote_head',
+							'wp_safe_remote_head',
+							'wp_remote_fopen',
+							'file_get_contents',
+							'download_url',
+							'fopen',
+							'file'
+						] ) ) {
+							// Look for first parameter of this PHP functions.
+							if ( isset( $funccall->args[0] ) ) {
+								$argValue = $funccall->args[0]->value;
+								if ( ! empty( $argValue ) ) {
+									$log = $this->checkArgGetLog( $argValue, $foundInSameLine, $lastFoundExprArray );
+								}
+							}
+						}
+
+						if ( ! empty( $log ) ) {
+							if ( ! $this->isAlreadyLogged( $funccall->getStartLine() ) ) {
+								$this->logCallExpr( $funccall, 1, $log, true );
+								if(!$foundInSameLine && !empty($lastFoundExprArray)){
+									foreach ($lastFoundExprArray as $expr) {
+										$this->saveLog( 0, '# ↳ Found: ' . $this->prettyPrinter->prettyPrint( [ $expr ] ), $this->getLogPostContextId( $log, $this->getLogLineID( $funccall->getStartLine() ) ) );
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	//Check PHP class calls loading URLs.
+	function find_classes() {
+		if ( ! empty( $this->stmts ) ) {
+			$classNews = $this->nodeFinder->findInstanceOf( $this->stmts, Node\Expr\New_::class );
+			if ( ! empty( $classNews ) ) {
+				foreach ( $classNews as $classNew ) {
+					$foundInSameLine = true;
+					$lastFoundExprArray = [];
+					if ( $this->hasClassNewName( $classNew ) ) {
+						$log       = '';
+						$className = $classNew->class->toString();
+						if ( in_array( $className, [
+							'SoapClient',
+							'nusoap_client',
+						] ) ) {
+							if ( isset( $classNew->args[0] ) ) {
+								$argValue = $classNew->args[0]->value;
+								if ( ! empty( $argValue ) ) {
+									$log = $this->checkArgGetLog( $argValue, $foundInSameLine, $lastFoundExprArray );
+								}
+							}
+						}
+
+						if ( ! empty( $log ) ) {
+							if ( ! $this->isAlreadyLogged( $classNew->getStartLine() ) ) {
+								$this->saveLinesNodeDetailLog( $classNew, $log, true );
+								if(!$foundInSameLine && !empty($lastFoundExprArray)){
+									foreach ($lastFoundExprArray as $expr) {
+										$this->saveLog( 0, '# ↳ Found: ' . $this->prettyPrinter->prettyPrint( [ $expr ] ), $this->getLogPostContextId( $log, $this->getLogLineID( $classNew->getStartLine() ) ) );
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// Regex over typical code structures cointaining URLs
+	function regex_estructures( $lines ) {
+		$regexArray = [
+			'src-simple'       => '/src\s*=\s*\\\?\'((.*?(<\?.+?\?>)?.*?)+?)\\\?\'/',
+			'src-double'       => '/src\s*=\s*\\\?"((.*?(<\?.+?\?>)?.*?)+?)\\\?"/',
+			'css-simple'       => '/[:|\\s]\s*url\s*\(\s*\'((.*?(<\?.+?\?>)?.*?)+?)\'\s*\)/',
+			//We are not covering the case of doing url(https://example.com) as without ' or " this is hard to find.
+			'css-double'       => '/[:|\\s]\s*url\s*\(\s*"((.*?(<\?.+?\?>)?.*?)+?)"\s*\)/',
+			//'css' => '[:|\\s]url\s*\(\s*["|\']?(.+?)["|\']?\)',
+			'jsImport'         => '/@import\s*["|\'|`]((.*?(<\?.+?\?>)?.*?)+?)["|\'|`]/',
+			'jsImportScripts'  => '/importScripts\s*\(\s*["|\'|`]((.*?(<\?.+?\?>)?.*?)+?)["|\'|`]\s*\)/',
+			'jsSetAttribute'   => '/setAttribute\s*\(\s*["|\'|`]src["|\'|`]\s*,\s*["|\'|`](.+?)["|\'|`]\s*\)/',
+			'jsAjax-simple'    => '/\s*url\s*:\s*\'((.*?(<\?.+?\?>)?.*?)+?)\'\s*/',
+			'jsAjax-double'    => '/\s*url\s*:\s*"((.*?(<\?.+?\?>)?.*?)+?)"\s*/',
+			'jsAjax-inverted'  => '/\s*url\s*:\s*`((.*?(<\?.+?\?>)?.*?)+?)`\s*/',
+			'jsFetch-simple'   => '/\s*fetch\s*\(\s*\'((.*?(<\?.+?\?>)?.*?)+?)\'\s*/',
+			'jsFetch-double'   => '/\s*fetch\s*\(\s*"((.*?(<\?.+?\?>)?.*?)+?)"\s*/',
+			'jsFetch-inverted' => '/\s*fetch\s*\(\s*`((.*?(<\?.+?\?>)?.*?)+?)`\s*/',
+		];
+
+		foreach ( $regexArray as $regex ) {
+			$this->logRegexIncidences( $lines, $regex, '', false );
+		}
+	}
+
+	// Look for any PHP / JS variable declaration and guess if that looks like a external service.
+	// TODO this function consumes too much time because of getStringsFromAssignsExpr, find ways to optimize it.
+	function find_declarations( $lines ) {
+		// Find all the assings in PHP
+		if ( ! empty( $this->stmts ) ) {
+			$assigns = $this->nodeFinder->findInstanceOf( $this->stmts, Node\Expr\Assign::class );
+			if ( ! empty( $assigns ) ) {
+				foreach ( $assigns as $assign ) {
+					if ( ! empty( $assign->expr ) ) {
+						$foundInSameLine = true;
+						$stringsArray = $this->getStringsFromAssignsExpr( $assign->expr, $foundInSameLine );
+						if ( ! empty( $stringsArray ) ) {
+							foreach ( $stringsArray as $string ) {
+								$log = $this->checkStringGetLog( $string, true );
+								if ( ! empty( $log ) ) {
+									if ( ! $this->isAlreadyLogged( $assign->getStartLine() ) ) {
+										$this->saveLinesNodeDetailLog( $assign, $log, true );
+										if(!$foundInSameLine){
+											$this->saveLog( 0, '# ↳ Detected: ' . $string, $this->getLogPostContextId( $log, $this->getLogLineID( $assign->getStartLine() ) ) );
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		// Find anything else that looks like an assign (mostly for JS but will also catch PHP and HTML)
+		// Regex: anything looking like a URL preceded by "XXXX =" except for href.
+		$regex = '/[a-zA-Z_$][a-zA-Z_$0-9]*(?<!href)\s*=\s*["|\'](https?:\/\/[www\.]?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)["|\']/';
+		$this->logRegexIncidences( $lines, $regex, '', true );
 	}
 
 }
