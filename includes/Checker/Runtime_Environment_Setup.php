@@ -102,11 +102,11 @@ final class Runtime_Environment_Setup {
 	 * @global WP_Filesystem_Base $wp_filesystem WordPress filesystem subclass.
 	 */
 	public function clean_up() {
-		global $wpdb, $table_prefix, $wp_filesystem;
+		global $wpdb, $base_prefix, $wp_filesystem;
 
 		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 
-		$old_prefix = $wpdb->set_prefix( $table_prefix . 'pc_' );
+		$old_prefix = $wpdb->set_prefix( $base_prefix . 'pc_' );
 		$tables     = $wpdb->tables();
 
 		foreach ( $tables as $table ) {
