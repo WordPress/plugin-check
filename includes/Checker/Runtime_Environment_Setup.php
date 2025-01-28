@@ -7,12 +7,15 @@
 
 namespace WordPress\Plugin_Check\Checker;
 
+use WordPress\Plugin_Check\Traits\Amend_DB_Base_Prefix;
+
 /**
  * Class to setup the Runtime Environment for Runtime checks.
  *
  * @since 1.0.0
  */
 final class Runtime_Environment_Setup {
+	use Amend_DB_Base_Prefix;
 
 	/**
 	 * Sets up the WordPress environment for runtime checks
@@ -20,11 +23,10 @@ final class Runtime_Environment_Setup {
 	 * @since 1.0.0
 	 *
 	 * @global wpdb               $wpdb          WordPress database abstraction object.
-	 * @global string             $table_prefix  The database table prefix.
 	 * @global WP_Filesystem_Base $wp_filesystem WordPress filesystem subclass.
 	 */
 	public function set_up() {
-		global $wpdb, $table_prefix, $wp_filesystem;
+		global $wpdb, $wp_filesystem;
 
 		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 
@@ -41,7 +43,7 @@ final class Runtime_Environment_Setup {
 		$permalink_structure = get_option( 'permalink_structure' );
 
 		// Set the new prefix.
-		$old_prefix = $wpdb->set_prefix( $table_prefix . 'pc_' );
+		$prefix_cleanup = $this->amend_db_base_prefix();
 
 		// Create and populate the test database tables if they do not exist.
 		if ( $wpdb->posts !== $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->posts ) ) ) {
@@ -76,7 +78,7 @@ final class Runtime_Environment_Setup {
 		}
 
 		// Restore the old prefix.
-		$wpdb->set_prefix( $old_prefix );
+		$prefix_cleanup();
 
 		// Return early if the plugin check object cache already exists.
 		if ( defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) && WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION ) {
@@ -98,23 +100,22 @@ final class Runtime_Environment_Setup {
 	 * @since 1.0.0
 	 *
 	 * @global wpdb               $wpdb          WordPress database abstraction object.
-	 * @global string             $table_prefix  The database table prefix.
 	 * @global WP_Filesystem_Base $wp_filesystem WordPress filesystem subclass.
 	 */
 	public function clean_up() {
-		global $wpdb, $table_prefix, $wp_filesystem;
+		global $wpdb, $wp_filesystem;
 
 		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 
-		$old_prefix = $wpdb->set_prefix( $table_prefix . 'pc_' );
-		$tables     = $wpdb->tables();
+		$prefix_cleanup = $this->amend_db_base_prefix();
+		$tables         = $wpdb->tables();
 
 		foreach ( $tables as $table ) {
 			$wpdb->query( "DROP TABLE IF EXISTS `$table`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		}
 
 		// Restore the old prefix.
-		$wpdb->set_prefix( $old_prefix );
+		$prefix_cleanup();
 
 		// Return early if the plugin check object cache does not exist.
 		if ( ! defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) || ! WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION ) {
@@ -145,25 +146,24 @@ final class Runtime_Environment_Setup {
 	 *
 	 * @since 1.3.0
 	 *
-	 * @global wpdb   $wpdb         WordPress database abstraction object.
-	 * @global string $table_prefix The database table prefix.
+	 * @global wpdb $wpdb WordPress database abstraction object.
 	 *
 	 * @return bool True if the runtime environment is set up, false if not.
 	 */
 	public function is_set_up() {
-		global $wpdb, $table_prefix;
+		global $wpdb;
 
 		if ( defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) ) {
 			return true;
 		}
 
 		// Set the custom prefix to check for the runtime environment tables.
-		$old_prefix = $wpdb->set_prefix( $table_prefix . 'pc_' );
+		$prefix_cleanup = $this->amend_db_base_prefix();
 
 		$tables_present = $wpdb->posts === $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->posts ) );
 
 		// Restore the old prefix.
-		$wpdb->set_prefix( $old_prefix );
+		$prefix_cleanup();
 
 		return $tables_present;
 	}
