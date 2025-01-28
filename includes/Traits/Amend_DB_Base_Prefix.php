@@ -7,6 +7,9 @@
 
 namespace WordPress\Plugin_Check\Traits;
 
+use RuntimeException;
+use wpdb;
+
 /**
  * Trait for amending the database table base prefix.
  *
@@ -30,17 +33,25 @@ trait Amend_DB_Base_Prefix {
 	 *
 	 * @param string $base_prefix_suffix Optional. Suffix to append to the base prefix. Default 'pc_'.
 	 * @return callable Closure to revert the database table prefix to its previous value.
+	 *
+	 * @throws RuntimeException Thrown if the WordPress database object is not initialized.
 	 */
 	protected function amend_db_base_prefix( string $base_prefix_suffix = 'pc_' ) {
-		global $wpdb, $table_prefix;
+		global $wpdb;
 
 		/*
-		 * On Multisite, the `$table_prefix` global is overwritten to contain the blog specific prefix after the
-		 * `$wpdb->base_prefix` property has been set. Therefore we need to rely on `$wpdb->base_prefix` if set.
+		 * On a single WordPress site, we could in theory use the `$table_prefix` global. On Multisite however, the
+		 * `$table_prefix` global is overwritten to contain the blog specific prefix after the `$wpdb->base_prefix`
+		 * property has been set. Therefore we need to rely on `$wpdb->base_prefix`, which should always be already
+		 * set, even when PCP is initializing early.
 		 */
-		$current_base_prefix = isset( $wpdb->base_prefix ) ? $wpdb->base_prefix : $table_prefix;
+		if ( ! isset( $wpdb->base_prefix ) ) {
+			throw new RuntimeException(
+				esc_html__( 'Cannot amend database table prefix as wpdb appears to not be initialized yet.', 'plugin-check' )
+			);
+		}
 
-		$old_prefix = $wpdb->set_prefix( $current_base_prefix . $base_prefix_suffix );
+		$old_prefix = $wpdb->set_prefix( $wpdb->base_prefix . $base_prefix_suffix );
 
 		return function () use ( $old_prefix ) {
 			global $wpdb;
