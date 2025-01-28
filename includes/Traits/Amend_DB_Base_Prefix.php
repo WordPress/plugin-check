@@ -37,6 +37,11 @@ trait Amend_DB_Base_Prefix {
 	 * @throws RuntimeException Thrown if the WordPress database object is not initialized.
 	 */
 	protected function amend_db_base_prefix( string $base_prefix_suffix = 'pc_' ) {
+		/**
+		 * WordPress database abstraction object.
+		 *
+		 * @var wpdb $wpdb
+		 */
 		global $wpdb;
 
 		/*
@@ -45,6 +50,7 @@ trait Amend_DB_Base_Prefix {
 		 * property has been set. Therefore we need to rely on `$wpdb->base_prefix`, which should always be already
 		 * set, even when PCP is initializing early.
 		 */
+		// @phpstan-ignore-next-line isset.property
 		if ( ! isset( $wpdb->base_prefix ) ) {
 			throw new RuntimeException(
 				esc_html__( 'Cannot amend database table prefix as wpdb appears to not be initialized yet.', 'plugin-check' )
