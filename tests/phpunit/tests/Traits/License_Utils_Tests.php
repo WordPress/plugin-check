@@ -66,6 +66,13 @@ class License_Utils_Tests extends WP_UnitTestCase {
 			array( 'GPL version 3', 'GPL3' ),
 			array( 'GPL version 3 or later', 'GPL3' ),
 
+			array( 'Apache License, Version 2.0', 'Apache2' ),
+			array( 'Apache License 2.0', 'Apache2' ),
+			array( 'Apache License 2', 'Apache2' ),
+			array( 'Apache 2.0', 'Apache2' ),
+			array( 'Apache-2.0', 'Apache2' ),
+			array( 'Apache 2', 'Apache2' ),
+
 			array( 'MPL-1.0', 'MPL10' ),
 			array( 'MPL-2.0', 'MPL20' ),
 		);
@@ -97,7 +104,7 @@ class License_Utils_Tests extends WP_UnitTestCase {
 			array( 'GPL3', true ),
 			array( 'MPL20', true ),
 			array( 'MIT', true ),
-			array( 'Apache', true ),
+			array( 'Apache2', true ),
 			array( 'FreeBSD', true ),
 			array( 'New BSD', true ),
 			array( 'BSD-3-Clause', true ),
