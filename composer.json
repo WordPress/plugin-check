@@ -28,8 +28,7 @@
     "wp-cli/entity-command": "^2.8",
     "wp-phpunit/wp-phpunit": "^6.3",
     "yoast/phpunit-polyfills": "^1.0",
-    "bamarni/composer-bin-plugin": "^1.8",
-    "sniccowp/php-scoper-wordpress-excludes": "^6.7"
+    "bamarni/composer-bin-plugin": "^1.8"
   },
   "repositories": [
     {
