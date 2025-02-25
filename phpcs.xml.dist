@@ -21,6 +21,8 @@
 	<file>./tests/phpunit</file>
 
 	<exclude-pattern>*/tests/phpunit/testdata/plugins/*</exclude-pattern>
+	<exclude-pattern>*/includes/vendor/*</exclude-pattern>
+	<exclude-pattern>*/vendor-prefixed/*</exclude-pattern>
 
 	<!-- Do not require docblocks for unit tests -->
 	<rule ref="Squiz.Commenting.FunctionComment.Missing">

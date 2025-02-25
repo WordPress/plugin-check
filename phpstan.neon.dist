@@ -10,6 +10,9 @@ parameters:
     - tests/phpstan/stubs/wp-cli.php
     - tests/phpstan/stubs/exitexception.php
     - tests/phpstan/stubs/formatter.php
+    - tests/phpstan/stubs/readme-parser.php
+  scanDirectories:
+  	- vendor-prefixed
   dynamicConstantNames:
     - WP_PLUGIN_CHECK_PLUGIN_DIR_URL
   treatPhpDocTypesAsCertain: false

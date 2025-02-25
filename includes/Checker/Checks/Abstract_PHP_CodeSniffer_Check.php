@@ -8,12 +8,12 @@
 namespace WordPress\Plugin_Check\Checker\Checks;
 
 use Exception;
-use PHP_CodeSniffer\Config;
-use PHP_CodeSniffer\Runner;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Static_Check;
 use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
+use WordPress\Plugin_Check\Vendor\PHP_CodeSniffer\Config;
+use WordPress\Plugin_Check\Vendor\PHP_CodeSniffer\Runner;
 
 /**
  * Check for running one or more PHP CodeSniffer sniffs.
@@ -69,7 +69,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	 */
 	final public function run( Check_Result $result ) {
 		// Include the PHPCS autoloader.
-		$autoloader = WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'vendor/squizlabs/php_codesniffer/autoload.php';
+		$autoloader = WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'vendor_prefixed/squizlabs/php_codesniffer/autoload.php';
 
 		if ( file_exists( $autoloader ) ) {
 			include_once $autoloader;

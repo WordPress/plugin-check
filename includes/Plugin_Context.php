@@ -9,7 +9,8 @@ namespace WordPress\Plugin_Check;
 
 use Exception;
 use WordPress\Plugin_Check\Traits\Find_Readme;
-use WordPressdotorg\Plugin_Directory\Readme\Parser;
+use WordPress\Plugin_Check\Vendor\WordPressdotorg\Plugin_Directory\Readme\Parser as PrefixedParser;
+use WordPressdotorg\Plugin_Directory\Readme\Parser as DotorgParser;
 use function WP_CLI\Utils\normalize_path;
 
 /**
@@ -200,7 +201,7 @@ class Plugin_Context {
 			$readme_files = $this->filter_files_for_readme( $readme_files, $this->path() );
 			$readme_file  = reset( $readme_files );
 			if ( $readme_file ) {
-				$parser = new Parser( $readme_file );
+				$parser = class_exists( DotorgParser::class ) ? new DotorgParser( $readme_file ) : new PrefixedParser( $readme_file );
 
 				if ( ! empty( $parser->requires ) ) {
 					$this->minimum_supported_wp = $parser->requires;

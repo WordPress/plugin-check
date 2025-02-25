@@ -9,6 +9,7 @@ patches
 # Distributed via vendor/plugin-check/phpcs-sniffs instead
 /phpcs-sniffs/
 tests
+/vendor
 
 *.DS_Store
 .DS_Store
@@ -40,3 +41,4 @@ phpunit.xml.dist
 plugin-check.iml
 README.md
 SECURITY.md
+scoper.inc.php
