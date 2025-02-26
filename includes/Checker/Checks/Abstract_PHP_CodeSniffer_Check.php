@@ -71,9 +71,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		// Include the PHPCS autoloader.
 		$autoloader = WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'vendor-prefixed/vendor/squizlabs/php_codesniffer/autoload.php';
 
-		if ( file_exists( $autoloader ) ) {
-			include_once $autoloader;
-		}
+		include_once $autoloader;
 
 		if ( ! class_exists( Runner::class ) ) {
 			throw new Exception(
