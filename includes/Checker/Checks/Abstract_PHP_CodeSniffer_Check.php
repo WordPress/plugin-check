@@ -204,7 +204,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		$defaults = array(
 			'',
 			$result->plugin()->location(),
-			'--report=Json',
+			'--report=WordPress\Plugin_Check\Vendor\PHP_CodeSniffer\Reports\Json',
 			'--report-width=9999',
 		);
 
