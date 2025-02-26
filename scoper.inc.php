@@ -15,12 +15,19 @@ return array(
 
 	// See: https://github.com/humbug/php-scoper#finders-and-paths.
 	'finders' => array(
-		// PHP_CodeSniffer
+		// PHP_CodeSniffer.
 		Finder::create()
 				->files()
 				->ignoreVCS( true )
 				->ignoreDotFiles( true )
-				->name( '*.php' )
+			->name(
+				array(
+					'*.php',
+					'ruleset.xml',
+					'CodeSniffer.conf',
+					'composer.json',
+				)
+			)
 				->exclude(
 					array(
 						'bin',
@@ -31,13 +38,31 @@ return array(
 					array(
 						'vendor/squizlabs/php_codesniffer',
 					)
-				)
-				->append(
-					array(
-						'vendor/squizlabs/php_codesniffer/CodeSniffer.conf',
-						'vendor/squizlabs/php_codesniffer/composer.json',
-					)
 				),
+
+		// PHPCS Utils required by other sniffs.
+		Finder::create()
+			->files()
+			->ignoreVCS( true )
+			->ignoreDotFiles( true )
+			->name(
+				array(
+					'*.php',
+					'ruleset.xml',
+					'composer.json',
+				)
+			)
+			->exclude(
+				array(
+					'bin',
+					'tests',
+				)
+			)
+			->in(
+				array(
+					'vendor/phpcsstandards',
+				)
+			),
 
 		// WordPress coding standards.
 		Finder::create()
@@ -47,11 +72,11 @@ return array(
 			->name(
 				array(
 					'*.php',
-					'ruleset.xml'
+					'ruleset.xml',
+					'composer.json',
 				)
 			)
-			->in( 'vendor/wp-coding-standards/wpcs' )
-			->append( array( 'vendor/wp-coding-standards/wpcs/composer.json' ) ),
+			->in( 'vendor/wp-coding-standards/wpcs' ),
 
 		// VIP coding standards.
 		Finder::create()
@@ -61,19 +86,24 @@ return array(
 			->name(
 				array(
 					'*.php',
-					'ruleset.xml'
+					'ruleset.xml',
+					'composer.json',
 				)
 			)
 			->notName( '*-test.php' )
-			->in( 'vendor/automattic/vipwpcs' )
-			->append( array( 'vendor/automattic/vipwpcs/composer.json' ) ),
+			->in( 'vendor/automattic/vipwpcs' ),
 
 		// Plugin Check custom PHPCS sniffs.
 		Finder::create()
 				->files()
 				->ignoreVCS( true )
 				->ignoreDotFiles( true )
-				->name( '*.php' )
+				->name(
+					array(
+						'*.php',
+						'composer.json',
+					)
+				)
 				->exclude(
 					array(
 						'build',
@@ -81,17 +111,20 @@ return array(
 						'vendor',
 					)
 				)
-				->in( 'vendor/plugin-check/phpcs-sniffs' )
-				->append( array( 'vendor/plugin-check/phpcs-sniffs/composer.json' ) ),
+				->in( 'vendor/plugin-check/phpcs-sniffs' ),
 
 		// WordPress plugin readme parser.
 		Finder::create()
 				->files()
 				->ignoreVCS( true )
 				->ignoreDotFiles( true )
-				->name( '*.php' )
-				->in( 'vendor/afragen/wordpress-plugin-readme-parser' )
-				->append( array( 'vendor/afragen/wordpress-plugin-readme-parser/composer.json' ) ),
+			->name(
+				array(
+					'*.php',
+					'composer.json',
+				)
+			)
+				->in( 'vendor/afragen/wordpress-plugin-readme-parser' ),
 
 		// Main composer.json file so that we can build a classmap.
 		Finder::create()
