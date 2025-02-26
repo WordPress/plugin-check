@@ -68,6 +68,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup PHP for PHP-Scoper
+        uses: shivammathur/setup-php@v2
+        with:
+          tools: composer
+          php-version: 8.4
+          coverage: none
+
+      - name: Install PHP-Scoper
+        uses: ramsey/composer-install@57532f8be5bda426838819c5ee9afb8af389d51a
+        with:
+          working-directory: "vendor-bin/php-scoper"
+          composer-options: '--prefer-dist'
+
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
@@ -76,6 +89,10 @@ jobs:
         uses: ramsey/composer-install@57532f8be5bda426838819c5ee9afb8af389d51a
         with:
           composer-options: '--prefer-dist'
+
+      - name: Prefix Composer dependencies
+        run: |
+          composer prefix-dependencies
 
       - name: Setup Node.js (.nvmrc)
         uses: actions/setup-node@v4

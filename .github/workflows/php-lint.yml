@@ -48,10 +48,21 @@ jobs:
       - name: Validate Composer configuration
         run: composer validate
 
+      - name: Install PHP-Scoper
+        uses: ramsey/composer-install@57532f8be5bda426838819c5ee9afb8af389d51a
+        with:
+          working-directory: "vendor-bin/php-scoper"
+          composer-options: '--prefer-dist'
+
+
       - name: Install PHP dependencies
         uses: ramsey/composer-install@57532f8be5bda426838819c5ee9afb8af389d51a
         with:
           composer-options: '--prefer-dist'
+
+      - name: Prefix Composer dependencies
+        run: |
+          composer prefix-dependencies
 
       - name: PHP Lint
         run: composer lint

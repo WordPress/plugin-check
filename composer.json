@@ -67,7 +67,7 @@
     "bamarni-bin": {
       "bin-links": false,
       "target-directory": "vendor-bin",
-      "forward-command": true
+      "forward-command": false
     }
   },
   "scripts": {
@@ -79,12 +79,6 @@
     "phpstan": "phpstan analyse --memory-limit=2048M",
     "prepare-behat-tests": "install-package-tests",
     "test": "phpunit",
-    "post-install-cmd": [
-      "@prefix-dependencies"
-    ],
-    "post-update-cmd": [
-      "@prefix-dependencies"
-    ],
     "prefix-dependencies": [
       "vendor-bin/php-scoper/vendor/bin/php-scoper add-prefix --output-dir=./vendor-prefixed --force --quiet",
       "echo '{ \"autoload\": { \"classmap\": [\"\"] } }' > ./vendor-prefixed/composer.json",
