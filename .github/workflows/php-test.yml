@@ -77,6 +77,10 @@ jobs:
         with:
           composer-options: '--prefer-dist'
 
+      - name: Setup PHP Scoper
+        working-directory: ./vendor-bin
+        run: composer install
+
       - name: Setup Node.js (.nvmrc)
         uses: actions/setup-node@v4
         with:
