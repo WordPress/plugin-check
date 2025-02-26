@@ -6,7 +6,7 @@
   "require": {
     "php": ">=7.4",
     "ext-json": "*",
-    "afragen/wordpress-plugin-readme-parser": "dev-master#c3758599348148be684b3c4ad1105d09b6230d51",
+    "afragen/wordpress-plugin-readme-parser": "dev-master",
     "automattic/vipwpcs": "^3.0.0",
     "composer/installers": "^2.2",
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0.0",

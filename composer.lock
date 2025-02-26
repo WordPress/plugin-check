@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7428c7ad97bb5b76d3415105df70ec89",
+    "content-hash": "5c23db7d9c2ddd1c421122f8b4311f00",
     "packages": [
         {
             "name": "afragen/wordpress-plugin-readme-parser",
@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/afragen/wordpress-plugin-readme-parser.git",
-                "reference": "c3758599348148be684b3c4ad1105d09b6230d51"
+                "reference": "803ccfc442d956aa04d69f4b234eda5d7f03afc4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/afragen/wordpress-plugin-readme-parser/zipball/c3758599348148be684b3c4ad1105d09b6230d51",
-                "reference": "c3758599348148be684b3c4ad1105d09b6230d51",
+                "url": "https://api.github.com/repos/afragen/wordpress-plugin-readme-parser/zipball/803ccfc442d956aa04d69f4b234eda5d7f03afc4",
+                "reference": "803ccfc442d956aa04d69f4b234eda5d7f03afc4",
                 "shasum": ""
             },
             "require": {
