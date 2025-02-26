@@ -51,9 +51,8 @@ jobs:
       - name: Install PHP-Scoper
         uses: ramsey/composer-install@57532f8be5bda426838819c5ee9afb8af389d51a
         with:
-          working-directory: "vendor-bin/php-scoper"
+          working-directory: 'vendor-bin/php-scoper'
           composer-options: '--prefer-dist'
-
 
       - name: Install PHP dependencies
         uses: ramsey/composer-install@57532f8be5bda426838819c5ee9afb8af389d51a
