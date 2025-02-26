@@ -64,7 +64,7 @@ class Parser {
 	 */
 	public $faq = array();
 	/**
-	 * Warning flags which indicate specific parsing failures have occured.
+	 * Warning flags which indicate specific parsing failures have occurred.
 	 *
 	 * @var array
 	 */
