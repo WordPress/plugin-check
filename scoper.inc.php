@@ -39,6 +39,35 @@ return array(
 					)
 				),
 
+		// WordPress coding standards.
+		Finder::create()
+			->files()
+			->ignoreVCS( true )
+			->ignoreDotFiles( true )
+			->name(
+				array(
+					'*.php',
+					'ruleset.xml'
+				)
+			)
+			->in( 'vendor/wp-coding-standards/wpcs' )
+			->append( array( 'vendor/wp-coding-standards/wpcs/composer.json' ) ),
+
+		// VIP coding standards.
+		Finder::create()
+			->files()
+			->ignoreVCS( true )
+			->ignoreDotFiles( true )
+			->name(
+				array(
+					'*.php',
+					'ruleset.xml'
+				)
+			)
+			->notName( '*-test.php' )
+			->in( 'vendor/automattic/vipwpcs' )
+			->append( array( 'vendor/automattic/vipwpcs/composer.json' ) ),
+
 		// Plugin Check custom PHPCS sniffs.
 		Finder::create()
 				->files()
