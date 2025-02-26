@@ -48,10 +48,13 @@ jobs:
       fail-fast: true
       matrix:
         php:
+        - '7.4'
+        - '8.0'
+        - '8.1'
         - '8.2'
         wordpress: [ 'latest' ]
         include:
-          - php: '8.2'
+          - php: '7.4'
             wordpress: '6.3'
           - php: '8.3'
             wordpress: 'latest'
@@ -75,7 +78,7 @@ jobs:
           composer-options: '--prefer-dist'
 
       - name: Setup PHP Scoper
-        working-directory: ./vendor-bin/php-scoper
+        working-directory: ./vendor-bin
         run: composer install
 
       - name: Setup Node.js (.nvmrc)
