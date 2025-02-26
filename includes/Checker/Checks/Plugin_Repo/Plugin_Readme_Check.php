@@ -859,7 +859,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since 1.0.2
 	 *
-	 * @param Parser $parser The Parser object.
+	 * @param DotorgParser|PrefixedParser $parser The Parser object.
 	 * @return array Ignored warnings.
 	 */
 	private function get_ignored_warnings( $parser ) {
@@ -872,8 +872,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		 *
 		 * @since 1.0.2
 		 *
-		 * @param array  $ignored_warnings Array of ignored warning keys.
-		 * @param Parser $parser           The Parser object.
+		 * @param array                       $ignored_warnings Array of ignored warning keys.
+		 * @param DotorgParser|PrefixedParser $parser           The Parser object.
 		 */
 		$ignored_warnings = (array) apply_filters( 'wp_plugin_check_ignored_readme_warnings', $ignored_warnings, $parser );
 
