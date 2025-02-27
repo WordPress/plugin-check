@@ -71,6 +71,8 @@ final class FeatureContext extends WP_CLI_FeatureContext {
 	 */
 	public function given_a_wp_installation_with_plugin_check() {
 		$this->install_wp();
+		$this->proc( 'wp config set WP_DEBUG true --raw' )->run_check();
+		$this->proc( 'wp config set WP_DEBUG_DISPLAY true --raw' )->run_check();
 
 		// Symlink the current project folder into the WP folder as a plugin.
 		$project_dir = realpath( self::get_vendor_dir() . '/../' );
