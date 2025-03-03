@@ -153,7 +153,7 @@ jobs:
 
       - name: Upload code coverage report
         if: ${{ matrix.coverage }}
-        uses: codecov/codecov-action@v5.3.1
+        uses: codecov/codecov-action@v5.4.0
         with:
           files: ${{ steps.coverage_files.outputs.files }}
           flags: feature
