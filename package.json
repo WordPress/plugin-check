@@ -10,7 +10,7 @@
     "npm": ">=10.2.3"
   },
   "devDependencies": {
-    "@wordpress/env": "^10.18.0",
+    "@wordpress/env": "^10.19.0",
     "@wordpress/scripts": "^30.10.0",
     "gherkin-lint": "^4.2.4",
     "patch-package": "^8.0.0"
