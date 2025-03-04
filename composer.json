@@ -6,7 +6,7 @@
   "require": {
     "php": ">=7.4",
     "ext-json": "*",
-    "afragen/wordpress-plugin-readme-parser": "dev-master#c3758599348148be684b3c4ad1105d09b6230d51",
+    "afragen/wordpress-plugin-readme-parser": "dev-master",
     "automattic/vipwpcs": "^3.0.0",
     "composer/installers": "^2.2",
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0.0",
@@ -27,7 +27,8 @@
     "wp-cli/i18n-command": "^2.6",
     "wp-cli/entity-command": "^2.8",
     "wp-phpunit/wp-phpunit": "^6.3",
-    "yoast/phpunit-polyfills": "^1.0"
+    "yoast/phpunit-polyfills": "^1.0",
+    "bamarni/composer-bin-plugin": "^1.8"
   },
   "repositories": [
     {
@@ -55,10 +56,18 @@
       "composer/installers": true,
       "cweagans/composer-patches": false,
       "dealerdirect/phpcodesniffer-composer-installer": true,
-      "phpstan/extension-installer": true
+      "phpstan/extension-installer": true,
+      "bamarni/composer-bin-plugin": true
     },
     "platform": {
       "php": "7.4"
+    }
+  },
+  "extra": {
+    "bamarni-bin": {
+      "bin-links": false,
+      "target-directory": "vendor-bin",
+      "forward-command": false
     }
   },
   "scripts": {
@@ -69,7 +78,17 @@
     "phpmd": "phpmd . text phpmd.xml",
     "phpstan": "phpstan analyse --memory-limit=2048M",
     "prepare-behat-tests": "install-package-tests",
-    "test": "phpunit"
+    "test": "phpunit",
+    "prefix-dependencies": [
+      "vendor-bin/php-scoper/vendor/bin/php-scoper add-prefix --output-dir=./vendor-prefixed --force --quiet",
+      "echo '{ \"autoload\": { \"classmap\": [\"\"], \"exclude-from-classmap\": [\"vendor\\/squizlabs//\", \"vendor\\/automattic//\"] } }' > ./vendor-prefixed/composer.json",
+      "@composer dump-autoload --working-dir ./vendor-prefixed --no-dev --classmap-authoritative",
+      "sed -i'.bak' -e 's/Composer\\\\Autoload/Plugin_Check_Composer\\\\Autoload/' vendor-prefixed/vendor/composer/*.php",
+      "rm -rf vendor-prefixed/vendor/composer/*.php.bak",
+      "echo '{ \"autoload\": { \"classmap\": [\"\"] } }' > ./includes/composer.json",
+      "@composer dump-autoload --working-dir ./includes --no-dev --classmap-authoritative",
+      "sed -i'.bak' -e 's/Composer\\\\Autoload/Plugin_Check_Composer\\\\Autoload/' includes/vendor/composer/*.php && rm -rf includes/vendor/composer/*.php.bak"
+    ]
   },
   "scripts-descriptions": {
     "behat": "Run functional tests",

@@ -84,11 +84,8 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          extensions: mysql
           tools: composer
           php-version: ${{ matrix.php }}
-          coverage: ${{ matrix.coverage && 'xdebug' || 'none' }}
-          ini-values: pcov.directory=.,pcov.exclude=~(vendor|tests)~
 
       - name: Install PHP dependencies
         uses: ramsey/composer-install@57532f8be5bda426838819c5ee9afb8af389d51a
@@ -98,6 +95,31 @@ jobs:
       - name: Make Composer packages available globally
         run: |
           echo "${PWD}/vendor/bin" >> $GITHUB_PATH
+
+      - name: Setup PHP for PHP-Scoper
+        uses: shivammathur/setup-php@v2
+        with:
+          tools: composer
+          php-version: latest
+
+      - name: Install PHP-Scoper
+        uses: ramsey/composer-install@57532f8be5bda426838819c5ee9afb8af389d51a
+        with:
+          working-directory: 'vendor-bin/php-scoper'
+          composer-options: '--prefer-dist'
+
+      - name: Prefix Composer dependencies
+        run: |
+          composer prefix-dependencies
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          extensions: mysql
+          tools: composer
+          php-version: ${{ matrix.php }}
+          coverage: ${{ matrix.coverage && 'xdebug' || 'none' }}
+          ini-values: pcov.directory=.,pcov.exclude=~(vendor|tests)~
 
       - name: Install WP-CLI
         run: |

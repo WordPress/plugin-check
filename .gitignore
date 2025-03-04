@@ -29,6 +29,10 @@ build
 
 node_modules/
 /vendor/
+/vendor-bin/**/vendor/
+/vendor-prefixed/
+/includes/vendor/
+/includes/composer.json
 
 ############
 ## OSes

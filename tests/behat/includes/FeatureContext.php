@@ -71,6 +71,12 @@ final class FeatureContext extends WP_CLI_FeatureContext {
 	 */
 	public function given_a_wp_installation_with_plugin_check() {
 		$this->install_wp();
+		$this->proc( 'wp config set WP_DEBUG true --raw' )->run_check();
+		$this->proc( 'wp config set WP_DEBUG_DISPLAY true --raw' )->run_check();
+
+		$wp_content        = $this->variables['RUN_DIR'] . '/wp-content';
+		$php_error_drop_in = __DIR__ . '/php-error.php';
+		$this->proc( "ln -s {$php_error_drop_in} {$wp_content}/php-error.php" )->run_check();
 
 		// Symlink the current project folder into the WP folder as a plugin.
 		$project_dir = realpath( self::get_vendor_dir() . '/../' );
@@ -81,6 +87,7 @@ final class FeatureContext extends WP_CLI_FeatureContext {
 		// Activate the plugin.
 		$this->proc( 'wp plugin activate plugin-check' )->run_check();
 	}
+
 	/**
 	 * @Given a Plugin Check add-on being installed
 	 */

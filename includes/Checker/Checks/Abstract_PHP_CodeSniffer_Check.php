@@ -8,12 +8,12 @@
 namespace WordPress\Plugin_Check\Checker\Checks;
 
 use Exception;
-use PHP_CodeSniffer\Config;
-use PHP_CodeSniffer\Runner;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Static_Check;
 use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
+use WordPress\Plugin_Check\Vendor\PHP_CodeSniffer\Config;
+use WordPress\Plugin_Check\Vendor\PHP_CodeSniffer\Runner;
 
 /**
  * Check for running one or more PHP CodeSniffer sniffs.
@@ -69,11 +69,9 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	 */
 	final public function run( Check_Result $result ) {
 		// Include the PHPCS autoloader.
-		$autoloader = WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'vendor/squizlabs/php_codesniffer/autoload.php';
+		$autoloader = WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'vendor-prefixed/vendor/squizlabs/php_codesniffer/autoload.php';
 
-		if ( file_exists( $autoloader ) ) {
-			include_once $autoloader;
-		}
+		include_once $autoloader;
 
 		if ( ! class_exists( Runner::class ) ) {
 			throw new Exception(
@@ -114,7 +112,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 			ob_start();
 			$runner = new Runner();
 			$runner->runPHPCS();
-			$reports = ob_get_clean();
+			$output = ob_get_clean();
 		} catch ( Exception $e ) {
 			$_SERVER['argv'] = $orig_cmd_args;
 			throw $e;
@@ -127,7 +125,18 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		$_SERVER['argv'] = $orig_cmd_args;
 
 		// Parse the reports into data to add to the overall $result.
-		$reports = json_decode( trim( $reports ), true );
+		$reports = json_decode( trim( $output ), true );
+
+		// Make debugging a bit easier.
+		if ( null === $reports ) {
+			throw new Exception(
+				sprintf(
+					/* translators: %s: PHPCS output. */
+					__( 'Unexpected output by PHPCS: %s', 'plugin-check' ),
+					$output
+				)
+			);
+		}
 
 		if ( empty( $reports['files'] ) ) {
 			return;
@@ -195,7 +204,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		$defaults = array(
 			'',
 			$result->plugin()->location(),
-			'--report=Json',
+			'--report=WordPress\Plugin_Check\Vendor\PHP_CodeSniffer\Reports\Json',
 			'--report-width=9999',
 		);
 

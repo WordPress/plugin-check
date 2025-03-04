@@ -35,13 +35,16 @@ function wp_plugin_check_load() {
 	}
 
 	// Check Composer autoloader exists.
-	if ( ! file_exists( WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'vendor/autoload.php' ) ) {
+	if ( ! file_exists( WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'vendor-prefixed/vendor/scoper-autoload.php' ) ) {
 		add_action( 'admin_notices', 'wp_plugin_check_display_composer_autoload_notice' );
 		return;
 	}
 
-	// Load the Composer autoloader.
-	require_once WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'vendor/autoload.php';
+	// Autoloader for dependencies.
+	require_once WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'vendor-prefixed/vendor/scoper-autoload.php';
+
+	// Autoloader for plugin itself.
+	require_once WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'includes/vendor/autoload.php';
 
 	// Setup the plugin.
 	$instance = new Plugin_Main( WP_PLUGIN_CHECK_MAIN_FILE );

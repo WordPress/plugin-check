@@ -15,7 +15,8 @@ use WordPress\Plugin_Check\Traits\Find_Readme;
 use WordPress\Plugin_Check\Traits\License_Utils;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 use WordPress\Plugin_Check\Traits\Version_Utils;
-use WordPressdotorg\Plugin_Directory\Readme\Parser;
+use WordPress\Plugin_Check\Vendor\WordPressdotorg\Plugin_Directory\Readme\Parser as PrefixedParser;
+use WordPressdotorg\Plugin_Directory\Readme\Parser as DotorgParser;
 
 /**
  * Check the plugins readme file and contents.
@@ -83,7 +84,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 		$readme_file = reset( $readme );
 
-		$parser = new Parser( $readme_file );
+		$parser = class_exists( DotorgParser::class ) ? new DotorgParser( $readme_file ) : new PrefixedParser( $readme_file );
 
 		// Check the readme file for plugin name.
 		$this->check_name( $result, $readme_file, $parser );
@@ -121,11 +122,11 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param Check_Result $result      The Check Result to amend.
-	 * @param string       $readme_file Readme file.
-	 * @param Parser       $parser      The Parser object.
+	 * @param Check_Result                $result      The Check Result to amend.
+	 * @param string                      $readme_file Readme file.
+	 * @param DotorgParser|PrefixedParser $parser      The Parser object.
 	 */
-	private function check_name( Check_Result $result, string $readme_file, Parser $parser ) {
+	private function check_name( Check_Result $result, string $readme_file, $parser ) {
 		if ( isset( $parser->warnings['invalid_plugin_name_header'] ) && false === $parser->name ) {
 			$this->add_result_error_for_file(
 				$result,
@@ -188,11 +189,11 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since 1.0.2
 	 *
-	 * @param Check_Result $result      The Check Result to amend.
-	 * @param string       $readme_file Readme file.
-	 * @param Parser       $parser      The Parser object.
+	 * @param Check_Result                $result      The Check Result to amend.
+	 * @param string                      $readme_file Readme file.
+	 * @param DotorgParser|PrefixedParser $parser      The Parser object.
 	 */
-	private function check_headers( Check_Result $result, string $readme_file, Parser $parser ) {
+	private function check_headers( Check_Result $result, string $readme_file, $parser ) {
 		$ignored_warnings = $this->get_ignored_warnings( $parser );
 
 		$fields = array(
@@ -279,11 +280,11 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param Check_Result $result      The Check Result to amend.
-	 * @param string       $readme_file Readme file.
-	 * @param Parser       $parser      The Parser object.
+	 * @param Check_Result                $result      The Check Result to amend.
+	 * @param string                      $readme_file Readme file.
+	 * @param DotorgParser|PrefixedParser $parser      The Parser object.
 	 */
-	private function check_default_text( Check_Result $result, string $readme_file, Parser $parser ) {
+	private function check_default_text( Check_Result $result, string $readme_file, $parser ) {
 		$short_description = $parser->short_description;
 		$tags              = $parser->tags;
 		$donate_link       = $parser->donate_link;
@@ -311,11 +312,11 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param Check_Result $result      The Check Result to amend.
-	 * @param string       $readme_file Readme file.
-	 * @param Parser       $parser      The Parser object.
+	 * @param Check_Result                $result      The Check Result to amend.
+	 * @param string                      $readme_file Readme file.
+	 * @param DotorgParser|PrefixedParser $parser      The Parser object.
 	 */
-	private function check_license( Check_Result $result, string $readme_file, Parser $parser ) {
+	private function check_license( Check_Result $result, string $readme_file, $parser ) {
 		$license          = $parser->license;
 		$matches_license  = array();
 		$plugin_main_file = $result->plugin()->main_file();
@@ -385,11 +386,11 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param Check_Result $result      The Check Result to amend.
-	 * @param string       $readme_file Readme file.
-	 * @param Parser       $parser      The Parser object.
+	 * @param Check_Result                $result      The Check Result to amend.
+	 * @param string                      $readme_file Readme file.
+	 * @param DotorgParser|PrefixedParser $parser      The Parser object.
 	 */
-	private function check_stable_tag( Check_Result $result, string $readme_file, Parser $parser ) {
+	private function check_stable_tag( Check_Result $result, string $readme_file, $parser ) {
 		$stable_tag = $parser->stable_tag;
 
 		if ( empty( $stable_tag ) ) {
@@ -464,11 +465,11 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since 1.0.2
 	 *
-	 * @param Check_Result $result      The Check Result to amend.
-	 * @param string       $readme_file Readme file.
-	 * @param Parser       $parser      The Parser object.
+	 * @param Check_Result                $result      The Check Result to amend.
+	 * @param string                      $readme_file Readme file.
+	 * @param DotorgParser|PrefixedParser $parser      The Parser object.
 	 */
-	private function check_upgrade_notice( Check_Result $result, string $readme_file, Parser $parser ) {
+	private function check_upgrade_notice( Check_Result $result, string $readme_file, $parser ) {
 		$notices = $parser->upgrade_notice;
 
 		$maximum_characters = 300;
@@ -498,13 +499,13 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param Check_Result $result      The Check Result to amend.
-	 * @param string       $readme_file Readme file.
-	 * @param Parser       $parser      The Parser object.
+	 * @param Check_Result                $result      The Check Result to amend.
+	 * @param string                      $readme_file Readme file.
+	 * @param DotorgParser|PrefixedParser $parser      The Parser object.
 	 *
 	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
 	 */
-	private function check_for_warnings( Check_Result $result, string $readme_file, Parser $parser ) {
+	private function check_for_warnings( Check_Result $result, string $readme_file, $parser ) {
 		$warnings = $parser->warnings ? $parser->warnings : array();
 
 		// This should be ERROR rather than WARNING. So ignoring here to handle separately.
@@ -642,11 +643,11 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since 1.3.0
 	 *
-	 * @param Check_Result $result      The Check Result to amend.
-	 * @param string       $readme_file Readme file.
-	 * @param Parser       $parser      The Parser object.
+	 * @param Check_Result                $result      The Check Result to amend.
+	 * @param string                      $readme_file Readme file.
+	 * @param DotorgParser|PrefixedParser $parser      The Parser object.
 	 */
-	private function check_for_donate_link( Check_Result $result, string $readme_file, Parser $parser ) {
+	private function check_for_donate_link( Check_Result $result, string $readme_file, $parser ) {
 		$donate_link = $parser->donate_link;
 
 		// Bail if empty donate link.
@@ -796,11 +797,11 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since 1.5.0
 	 *
-	 * @param Check_Result $result      The Check Result to amend.
-	 * @param string       $readme_file Readme file.
-	 * @param Parser       $parser      The Parser object.
+	 * @param Check_Result                $result      The Check Result to amend.
+	 * @param string                      $readme_file Readme file.
+	 * @param DotorgParser|PrefixedParser $parser      The Parser object.
 	 */
-	private function check_requires_headers( Check_Result $result, string $readme_file, Parser $parser ) {
+	private function check_requires_headers( Check_Result $result, string $readme_file, $parser ) {
 		$ignored_warnings = $this->get_ignored_warnings( $parser );
 
 		$found_warnings = $parser->warnings ? $parser->warnings : array();
@@ -858,10 +859,10 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since 1.0.2
 	 *
-	 * @param Parser $parser The Parser object.
+	 * @param DotorgParser|PrefixedParser $parser The Parser object.
 	 * @return array Ignored warnings.
 	 */
-	private function get_ignored_warnings( Parser $parser ) {
+	private function get_ignored_warnings( $parser ) {
 		$ignored_warnings = array(
 			'contributor_ignored',
 		);
@@ -871,8 +872,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		 *
 		 * @since 1.0.2
 		 *
-		 * @param array  $ignored_warnings Array of ignored warning keys.
-		 * @param Parser $parser           The Parser object.
+		 * @param array                       $ignored_warnings Array of ignored warning keys.
+		 * @param DotorgParser|PrefixedParser $parser           The Parser object.
 		 */
 		$ignored_warnings = (array) apply_filters( 'wp_plugin_check_ignored_readme_warnings', $ignored_warnings, $parser );
 
