@@ -23,7 +23,7 @@ Feature: Test that the WP-CLI plugin check command works with remote ZIP url.
        add_filter( 'unzip_file', function() {
           return new WP_Error( 'custom_unzip_error', 'Something bad happened while extracting the zip file.' );
        } );
-       """
+      """
 
     When I try the WP-CLI command `plugin check https://github.com/WordPress/plugin-check/raw/trunk/tests/behat/testdata/foo-bar-wp.zip`
     Then STDERR should be:

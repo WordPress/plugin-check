@@ -658,9 +658,9 @@ Feature: Test that the WP-CLI command works.
 
     When I run the WP-CLI command `plugin check foo-single.php`
     Then STDOUT should contain:
-	  """
-	  Success: Checks complete. No errors found.
-	  """
+      """
+      Success: Checks complete. No errors found.
+      """
 
   Scenario: Check for mismatched plugin name in non-English language setup
     Given a WP install with the Plugin Check plugin
@@ -727,9 +727,9 @@ Feature: Test that the WP-CLI command works.
 
     When I run the WP-CLI command `plugin check foo-sample`
     Then STDOUT should not contain:
-	    """
-	    mismatched_plugin_name
-	    """
+      """
+      mismatched_plugin_name
+      """
 
   Scenario: Check Contributors value in readme in markdown format
     Given a WP install with the Plugin Check plugin
@@ -766,9 +766,9 @@ Feature: Test that the WP-CLI command works.
 
     When I run the WP-CLI command `plugin check foo-sample`
     Then STDOUT should not contain:
-	    """
-	    readme_invalid_contributors
-	    """
+      """
+      readme_invalid_contributors
+      """
 
   Scenario: Check duplicated error messages for hidden files and application files
     Given a WP install with the Plugin Check plugin
@@ -793,13 +793,13 @@ Feature: Test that the WP-CLI command works.
 
     When I run the WP-CLI command `plugin check foo-sample --checks=file_type`
     Then STDOUT should contain:
-	    """
-	    hidden_files
-	    """
+      """
+      hidden_files
+      """
     And STDOUT should not contain:
-	    """
-	    application_detected
-	    """
+      """
+      application_detected
+      """
 
   Scenario: Check for i18n severity
     Given a WP install with the Plugin Check plugin
@@ -827,29 +827,29 @@ Feature: Test that the WP-CLI command works.
 
     When I run the WP-CLI command `plugin check foo-sample --checks=i18n_usage --fields=line,type,code,severity --format=csv`
     Then STDOUT should contain:
-	    """
-	    13,ERROR,WordPress.WP.I18n.InterpolatedVariableDomain,7
-	    """
+      """
+      13,ERROR,WordPress.WP.I18n.InterpolatedVariableDomain,7
+      """
     And STDOUT should contain:
-	    """
-	    14,ERROR,WordPress.WP.I18n.MissingArgText,7
-	    """
+      """
+      14,ERROR,WordPress.WP.I18n.MissingArgText,7
+      """
     And STDOUT should contain:
-	    """
-	    15,ERROR,WordPress.WP.I18n.NoEmptyStrings,7
-	    """
+      """
+      15,ERROR,WordPress.WP.I18n.NoEmptyStrings,7
+      """
     And STDOUT should contain:
-	    """
-	    16,ERROR,WordPress.WP.I18n.NonSingularStringLiteralContext,7
-	    """
+      """
+      16,ERROR,WordPress.WP.I18n.NonSingularStringLiteralContext,7
+      """
     And STDOUT should contain:
-	    """
-	    17,ERROR,WordPress.WP.I18n.NonSingularStringLiteralDomain,7
-	    """
+      """
+      17,ERROR,WordPress.WP.I18n.NonSingularStringLiteralDomain,7
+      """
     And STDOUT should contain:
-	    """
-	    18,ERROR,WordPress.WP.I18n.TooManyFunctionArgs,7
-	    """
+      """
+      18,ERROR,WordPress.WP.I18n.TooManyFunctionArgs,7
+      """
 
   Scenario: Check unsupported plugin name in plugin header field
     Given a WP install with the Plugin Check plugin
@@ -871,6 +871,6 @@ Feature: Test that the WP-CLI command works.
 
     When I run the WP-CLI command `plugin check foo-sample`
     Then STDOUT should contain:
-	    """
-	    plugin_header_unsupported_plugin_name
-	    """
+      """
+      plugin_header_unsupported_plugin_name
+      """
