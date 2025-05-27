@@ -452,7 +452,7 @@
         },
         {
             "name": "plugin-check/phpcs-sniffs",
-            "version": "dev-readme-parser-package",
+            "version": "dev-dependabot/composer/slevomat/coding-standard-8.18.1",
             "dist": {
                 "type": "path",
                 "url": "./phpcs-sniffs",
@@ -6772,9 +6772,9 @@
         "php": ">=7.4",
         "ext-json": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "platform-overrides": {
         "php": "7.4"
     },
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.6.0"
 }
