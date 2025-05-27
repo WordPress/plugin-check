@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "18347aa552b31eca39da8d48e1ffb14a",
+    "content-hash": "dbc61e877b067e1a52e1b7c106ce0b70",
     "packages": [
         {
             "name": "automattic/vipwpcs",
@@ -456,7 +456,7 @@
             "dist": {
                 "type": "path",
                 "url": "./phpcs-sniffs",
-                "reference": "38a3177de31ea90867b4a1bcdc968b4424252a85"
+                "reference": "c6669d88fb407d12d752b573f83272da7c1bec17"
             },
             "require": {
                 "ext-libxml": "*",
@@ -513,7 +513,7 @@
                 "static analysis"
             ],
             "transport-options": {
-                "symlink": false,
+                "symlink": true,
                 "relative": true
             }
         },
