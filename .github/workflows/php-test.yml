@@ -15,6 +15,7 @@ on:
       - 'phpunit.xml.dist'
       - 'composer.json'
       - 'composer.lock'
+      - 'phpcs-rulesets/plugin-review.xml'
   pull_request:
     branches:
       - trunk
@@ -30,6 +31,7 @@ on:
       - 'phpunit.xml.dist'
       - 'composer.json'
       - 'composer.lock'
+      - 'phpcs-rulesets/plugin-review.xml'
     types:
       - opened
       - reopened
