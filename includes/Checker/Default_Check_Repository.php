@@ -79,6 +79,7 @@ class Default_Check_Repository extends Empty_Check_Repository {
 				'plugin_header_fields'       => new Checks\Plugin_Repo\Plugin_Header_Fields_Check(),
 				'late_escaping'              => new Checks\Security\Late_Escaping_Check(),
 				'plugin_updater'             => new Checks\Plugin_Repo\Plugin_Updater_Check(),
+				'plugin_uninstall'           => new Checks\Plugin_Repo\Plugin_Uninstall_Check(),
 				'plugin_review_phpcs'        => new Checks\Plugin_Repo\Plugin_Review_PHPCS_Check(),
 				'direct_db_queries'          => new Checks\Security\Direct_DB_Queries_Check(),
 				'performant_wp_query_params' => new Checks\Performance\Performant_WP_Query_Params_Check(),

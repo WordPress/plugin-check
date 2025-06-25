@@ -30,11 +30,11 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 		$this->assertCount( 1, wp_list_filter( $errors['load.php'][0][0], array( 'code' => 'plugin_header_no_license' ) ) );
 		$this->assertCount( 1, wp_list_filter( $errors['load.php'][0][0], array( 'code' => 'plugin_header_missing_plugin_version' ) ) );
 		$this->assertCount( 1, wp_list_filter( $errors['load.php'][0][0], array( 'code' => 'plugin_header_invalid_author_uri' ) ) );
-		$this->assertCount( 1, wp_list_filter( $warnings['load.php'][0][0], array( 'code' => 'plugin_header_invalid_plugin_uri_domain' ) ) );
-		$this->assertCount( 1, wp_list_filter( $warnings['load.php'][0][0], array( 'code' => 'plugin_header_invalid_plugin_description' ) ) );
+		$this->assertCount( 1, wp_list_filter( $errors['load.php'][0][0], array( 'code' => 'plugin_header_invalid_plugin_uri_domain' ) ) );
+		$this->assertCount( 1, wp_list_filter( $errors['load.php'][0][0], array( 'code' => 'plugin_header_invalid_plugin_description' ) ) );
+		$this->assertCount( 1, wp_list_filter( $errors['load.php'][0][0], array( 'code' => 'plugin_header_invalid_network' ) ) );
 		$this->assertCount( 1, wp_list_filter( $warnings['load.php'][0][0], array( 'code' => 'textdomain_mismatch' ) ) );
 		$this->assertCount( 1, wp_list_filter( $warnings['load.php'][0][0], array( 'code' => 'plugin_header_nonexistent_domain_path' ) ) );
-		$this->assertCount( 1, wp_list_filter( $warnings['load.php'][0][0], array( 'code' => 'plugin_header_invalid_network' ) ) );
 
 		if ( is_wp_version_compatible( '6.5' ) ) {
 			$this->assertCount( 1, wp_list_filter( $errors['load.php'][0][0], array( 'code' => 'plugin_header_invalid_requires_plugins' ) ) );
@@ -179,9 +179,10 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 		$errors = $check_result->get_errors();
 
 		$filtered_items = wp_list_filter( $errors['load.php'][0][0], array( 'code' => 'plugin_header_invalid_author_uri' ) );
+		$filtered_items = array_values( $filtered_items );
 
 		$this->assertCount( 1, $filtered_items );
-		$this->assertStringContainsString( 'Author URI', $filtered_items[1]['message'] );
-		$this->assertStringContainsString( 'is not valid', $filtered_items[1]['message'] );
+		$this->assertStringContainsString( 'Author URI', $filtered_items[0]['message'] );
+		$this->assertStringContainsString( 'is not valid', $filtered_items[0]['message'] );
 	}
 }

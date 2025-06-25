@@ -83,7 +83,7 @@ class Plugin_Header_Fields_Check implements Static_Check {
 
 		if ( ! empty( $plugin_header['Name'] ) ) {
 			if ( in_array( $plugin_header['Name'], array( 'Plugin Name', 'My Basics Plugin' ), true ) ) {
-				$this->add_result_warning_for_file(
+				$this->add_result_error_for_file(
 					$result,
 					sprintf(
 						/* translators: %s: plugin header field */
@@ -95,7 +95,7 @@ class Plugin_Header_Fields_Check implements Static_Check {
 					0,
 					0,
 					'',
-					6
+					7
 				);
 			} else {
 				$valid_chars_count = preg_match_all( '/[a-z0-9]/i', $plugin_header['Name'] );
@@ -121,7 +121,7 @@ class Plugin_Header_Fields_Check implements Static_Check {
 
 		if ( ! empty( $plugin_header['PluginURI'] ) ) {
 			if ( true !== $this->is_valid_url( $plugin_header['PluginURI'] ) ) {
-				$this->add_result_warning_for_file(
+				$this->add_result_error_for_file(
 					$result,
 					sprintf(
 						/* translators: %s: plugin header field */
@@ -132,11 +132,11 @@ class Plugin_Header_Fields_Check implements Static_Check {
 					$plugin_main_file,
 					0,
 					0,
-					'',
-					6
+					'https://developer.wordpress.org/plugins/plugin-basics/header-requirements/#header-fields',
+					7
 				);
 			} elseif ( preg_match( '/\/\/(example\.com|example\.net|example\.org)\//', $plugin_header['PluginURI'], $matches ) ) {
-				$this->add_result_warning_for_file(
+				$this->add_result_error_for_file(
 					$result,
 					sprintf(
 						/* translators: 1: plugin header field, 2: domain */
@@ -149,7 +149,7 @@ class Plugin_Header_Fields_Check implements Static_Check {
 					0,
 					0,
 					'https://developer.wordpress.org/plugins/plugin-basics/header-requirements/#header-fields',
-					6
+					7
 				);
 			}
 		}
@@ -175,7 +175,7 @@ class Plugin_Header_Fields_Check implements Static_Check {
 				|| str_contains( $plugin_header['Description'], 'Here is a short description of the plugin' )
 				|| str_contains( $plugin_header['Description'], 'Handle the basics with this plugin' )
 				) {
-				$this->add_result_warning_for_file(
+				$this->add_result_error_for_file(
 					$result,
 					sprintf(
 						/* translators: %s: plugin header field */
@@ -186,8 +186,8 @@ class Plugin_Header_Fields_Check implements Static_Check {
 					$plugin_main_file,
 					0,
 					0,
-					'',
-					6
+					'https://developer.wordpress.org/plugins/plugin-basics/header-requirements/#header-fields',
+					7
 				);
 			}
 		}
@@ -239,7 +239,7 @@ class Plugin_Header_Fields_Check implements Static_Check {
 					$plugin_main_file,
 					0,
 					0,
-					'',
+					'https://developer.wordpress.org/plugins/plugin-basics/header-requirements/#header-fields',
 					7
 				);
 			}
@@ -247,7 +247,7 @@ class Plugin_Header_Fields_Check implements Static_Check {
 
 		if ( ! empty( $plugin_header['Network'] ) ) {
 			if ( 'true' !== strtolower( $plugin_header['Network'] ) ) {
-				$this->add_result_warning_for_file(
+				$this->add_result_error_for_file(
 					$result,
 					sprintf(
 						/* translators: %s: plugin header field */
@@ -259,7 +259,7 @@ class Plugin_Header_Fields_Check implements Static_Check {
 					0,
 					0,
 					'https://developer.wordpress.org/plugins/plugin-basics/header-requirements/#header-fields',
-					6
+					7
 				);
 			}
 		}

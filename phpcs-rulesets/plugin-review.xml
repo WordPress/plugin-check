@@ -163,11 +163,6 @@
 		<severity>7</severity>
 	</rule>
 
-	<!-- Call-time pass-by-reference has been deprecated since PHP 5.3 and should not be used. -->
-	<rule ref="Generic.Functions.CallTimePassByReference">
-		<severity>7</severity>
-	</rule>
-
 	<!-- Check for missing required function parameters. -->
 	<rule ref="PluginCheck.CodeAnalysis.RequiredFunctionParameters">
 		<severity>7</severity>

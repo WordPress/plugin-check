@@ -35,8 +35,6 @@ parse_str( 'first=value&arr[]=foo+bar&arr[]=baz' );
 
 $encoded_value = json_encode( array( 'key' => 'value' ) );
 
-custom_function(&$myvar);
-
 file_get_contents( $url );
 file_put_contents();
 

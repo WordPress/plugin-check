@@ -112,6 +112,9 @@ class License_Utils_Tests extends WP_UnitTestCase {
 			array( 'OpenLDAP', true ),
 			array( 'Expat', true ),
 			array( 'ISC', true ),
+			array( 'CC0', true ),
+			array( 'CC0-1.0', true ),
+			array( 'CC0 1.0 Universal', true ),
 
 			array( 'EPL', false ),
 			array( 'EUPL', false ),
