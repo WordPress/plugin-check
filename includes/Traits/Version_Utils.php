@@ -27,7 +27,7 @@ trait Version_Utils {
 		// Strip off any -alpha, -RC, -beta suffixes.
 		list( $version, ) = explode( '-', $version );
 
-		if ( preg_match( '#^\d.\d#', $version, $matches ) ) {
+		if ( preg_match( '#^\d+\.\d#', $version, $matches ) ) {
 			$version = $matches[0];
 		}
 
@@ -57,13 +57,39 @@ trait Version_Utils {
 	 * @return string Relative WordPress major version.
 	 */
 	protected function get_wordpress_relative_major_version( string $version, int $steps = 1 ): string {
+
 		if ( 0 === $steps ) {
 			return $version;
 		}
 
-		$new_version = floatval( $version ) + ( 0.1 * $steps );
+		$parts        = explode( '.', $version );
+		$major        = (int) ( $parts[0] ?? 0 );
+		$minor        = (int) ( $parts[1] ?? 0 );
+		$minor_digits = isset( $parts[1] ) ? strlen( $parts[1] ) : 1;
 
-		return (string) number_format( $new_version, 1 );
+		// Convert to total "version units" (each major version = 10 minor units)
+		$total_units = $major * 10 + $minor;
+		$new_total   = $total_units + $steps;
+
+		// Calculate new major and minor versions
+		$new_major = (int) ( $new_total / 10 );
+		$new_minor = $new_total % 10;
+
+		// Special case: When crossing from x.9 to (x+1).0
+		if ( $steps > 0 && $minor + $steps >= 10 ) {
+			$new_major = $major + floor( ( $minor + $steps ) / 10 );
+			$new_minor = ( $minor + $steps ) % 10;
+		}
+		// Special case: When crossing downward from x.0 to (x-1).9
+		elseif ( $steps < 0 && $minor + $steps < 0 ) {
+			$new_major = $major + ceil( ( $minor + $steps ) / 10 ) - 1;
+			$new_minor = 10 + ( ( $minor + $steps ) % 10 );
+		}
+
+		// Format minor version to maintain at least 1 digit
+		$formatted_minor = (string) $new_minor;
+
+		return $new_major . '.' . $formatted_minor;
 	}
 
 	/**
