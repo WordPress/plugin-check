@@ -13,6 +13,7 @@ on:
       - 'behat.yml'
       - 'composer.json'
       - 'composer.lock'
+      - 'phpcs-rulesets/*.xml'
   pull_request:
     branches:
       - trunk
@@ -26,6 +27,7 @@ on:
       - 'behat.yml'
       - 'composer.json'
       - 'composer.lock'
+      - 'phpcs-rulesets/*.xml'
     types:
       - opened
       - reopened
