@@ -15,6 +15,7 @@ use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Traits\Find_Readme;
 use WordPress\Plugin_Check\Traits\License_Utils;
 use WordPress\Plugin_Check\Traits\Stable_Check;
+use WordPress\Plugin_Check\Traits\URL_Utils;
 use WordPress\Plugin_Check\Traits\Version_Utils;
 use WordPressdotorg\Plugin_Directory\Readme\Parser as DotorgParser;
 
@@ -31,6 +32,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	use Find_Readme;
 	use Stable_Check;
 	use License_Utils;
+	use URL_Utils;
 	use Version_Utils;
 
 	/**
@@ -678,7 +680,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 			return;
 		}
 
-		if ( ! ( filter_var( $donate_link, FILTER_VALIDATE_URL ) === $donate_link && str_starts_with( $donate_link, 'http' ) ) ) {
+		if ( ! $this->is_valid_url( $donate_link ) ) {
 			$this->add_result_warning_for_file(
 				$result,
 				sprintf(

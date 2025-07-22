@@ -14,6 +14,7 @@ use WordPress\Plugin_Check\Checker\Static_Check;
 use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Traits\License_Utils;
 use WordPress\Plugin_Check\Traits\Stable_Check;
+use WordPress\Plugin_Check\Traits\URL_Utils;
 use WordPress\Plugin_Check\Traits\Version_Utils;
 
 /**
@@ -26,6 +27,7 @@ class Plugin_Header_Fields_Check implements Static_Check {
 	use Amend_Check_Result;
 	use License_Utils;
 	use Stable_Check;
+	use URL_Utils;
 	use Version_Utils;
 
 	/**
@@ -135,22 +137,25 @@ class Plugin_Header_Fields_Check implements Static_Check {
 					'https://developer.wordpress.org/plugins/plugin-basics/header-requirements/#header-fields',
 					7
 				);
-			} elseif ( preg_match( '/\/\/(example\.com|example\.net|example\.org)\//', $plugin_header['PluginURI'], $matches ) ) {
-				$this->add_result_error_for_file(
-					$result,
-					sprintf(
-						/* translators: 1: plugin header field, 2: domain */
-						__( 'The "%1$s" header in the plugin file is not valid. Discouraged domain "%2$s" found. This is the homepage of the plugin, which should be a unique URL, preferably on your own website. ', 'plugin-check' ),
-						esc_html( $labels['PluginURI'] ),
-						esc_html( $matches[1] ),
-					),
-					'plugin_header_invalid_plugin_uri_domain',
-					$plugin_main_file,
-					0,
-					0,
-					'https://developer.wordpress.org/plugins/plugin-basics/header-requirements/#header-fields',
-					7
-				);
+			} else {
+				$matched_domain = $this->find_discouraged_domain( $plugin_header['PluginURI'] );
+				if ( $matched_domain ) {
+					$this->add_result_error_for_file(
+						$result,
+						sprintf(
+							/* translators: 1: plugin header field, 2: domain */
+							__( 'The "%1$s" header in the plugin file is not valid. Discouraged domain "%2$s" found. This is the homepage of the plugin, which should be a unique URL, preferably on your own website.', 'plugin-check' ),
+							esc_html( $labels['PluginURI'] ),
+							esc_html( $matched_domain )
+						),
+						'plugin_header_invalid_plugin_uri_domain',
+						$plugin_main_file,
+						0,
+						0,
+						'https://developer.wordpress.org/plugins/plugin-basics/header-requirements/#header-fields',
+						7
+					);
+				}
 			}
 		}
 
@@ -242,6 +247,25 @@ class Plugin_Header_Fields_Check implements Static_Check {
 					'https://developer.wordpress.org/plugins/plugin-basics/header-requirements/#header-fields',
 					7
 				);
+			} else {
+				$matched_domain = $this->find_discouraged_domain( $plugin_header['AuthorURI'] );
+				if ( $matched_domain ) {
+					$this->add_result_error_for_file(
+						$result,
+						sprintf(
+							/* translators: 1: plugin header field, 2: domain */
+							__( 'The "%1$s" header in the plugin file is not valid. Discouraged domain "%2$s" found. This is the author\'s website or profile on another website.', 'plugin-check' ),
+							esc_html( $labels['AuthorURI'] ),
+							esc_html( $matched_domain )
+						),
+						'plugin_header_invalid_author_uri_domain',
+						$plugin_main_file,
+						0,
+						0,
+						'https://developer.wordpress.org/plugins/plugin-basics/header-requirements/#header-fields',
+						7
+					);
+				}
 			}
 		}
 
@@ -492,28 +516,6 @@ class Plugin_Header_Fields_Check implements Static_Check {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Checks if URL is valid.
-	 *
-	 * @since 1.2.0
-	 *
-	 * @param string $url URL.
-	 * @return bool true if the URL is valid, otherwise false.
-	 */
-	private function is_valid_url( $url ) {
-		if ( filter_var( $url, FILTER_VALIDATE_URL ) !== $url || ! str_starts_with( $url, 'http' ) ) {
-			return false;
-		}
-
-		// Detect duplicated protocol (e.g., "https://http://example.com/").
-		$parsed_url = wp_parse_url( $url );
-		if ( isset( $parsed_url['scheme'] ) && str_contains( substr( $url, strlen( $parsed_url['scheme'] ) + 3 ), '://' ) ) {
-			return false;
-		}
-
-		return true;
 	}
 
 	/**

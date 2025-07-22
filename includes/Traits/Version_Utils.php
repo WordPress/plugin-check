@@ -27,7 +27,7 @@ trait Version_Utils {
 		// Strip off any -alpha, -RC, -beta suffixes.
 		list( $version, ) = explode( '-', $version );
 
-		if ( preg_match( '#^\d.\d#', $version, $matches ) ) {
+		if ( preg_match( '#^\d+\.\d#', $version, $matches ) ) {
 			$version = $matches[0];
 		}
 

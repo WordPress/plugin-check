@@ -13,39 +13,20 @@ class Version_Utils_Tests extends WP_UnitTestCase {
 
 	protected $info_transient_key = 'wp_plugin_check_latest_version_info';
 
-	public function set_up() {
-		parent::set_up();
-
-		$info_data = array(
-			'response'        => 'upgrade',
-			'download'        => 'https://downloads.wordpress.org/release/wordpress-6.7.1.zip',
-			'locale'          => 'en_US',
-			'packages'        => array(
-				'full'        => 'https://downloads.wordpress.org/release/wordpress-6.7.1.zip',
-				'no_content'  => 'https://downloads.wordpress.org/release/wordpress-6.7.1-no-content.zip',
-				'new_bundled' => 'https://downloads.wordpress.org/release/wordpress-6.7.1-new-bundled.zip',
-				'partial'     => false,
-				'rollback'    => false,
-			),
-			'current'         => '6.7.1',
-			'version'         => '6.7.1',
-			'php_version'     => '7.2.24',
-			'mysql_version'   => '5.5.5',
-			'new_bundled'     => '6.7',
-			'partial_version' => false,
-		);
-
-		set_transient( $this->info_transient_key, $info_data );
+	/**
+	 * @dataProvider data_version_test_cases
+	 */
+	public function test_wordpress_latest_version( $full_version, $expected_major ) {
+		$this->set_test_version_data( $full_version );
+		$this->assertSame( $full_version, $this->get_wordpress_latest_version() );
 	}
 
-	public function test_wordpress_latest_version() {
-		$version = $this->get_wordpress_latest_version();
-		$this->assertSame( '6.7.1', $version );
-	}
-
-	public function test_wordpress_stable_version() {
-		$version = $this->get_wordpress_stable_version();
-		$this->assertSame( '6.7', $version );
+	/**
+	 * @dataProvider data_version_test_cases
+	 */
+	public function test_wordpress_stable_version( $full_version, $expected_major ) {
+		$this->set_test_version_data( $full_version );
+		$this->assertSame( $expected_major, $this->get_wordpress_stable_version() );
 	}
 
 	/**
@@ -56,9 +37,35 @@ class Version_Utils_Tests extends WP_UnitTestCase {
 		$this->assertSame( $new_version, $result );
 	}
 
-	public function tear_down() {
-		delete_transient( $this->info_transient_key );
-		parent::tear_down();
+	protected function set_test_version_data( $version ) {
+		$major_version = substr( $version, 0, strrpos( $version, '.' ) );
+
+		set_transient(
+			$this->info_transient_key,
+			array(
+				'version'       => $version,
+				'new_bundled'   => $major_version,
+				'current'       => $version,
+				'response'      => 'upgrade',
+				'download'      => "https://downloads.wordpress.org/release/wordpress-{$version}.zip",
+				'php_version'   => '7.2.24',
+				'mysql_version' => '5.5.5',
+				'packages'      => array(
+					'full'        => "https://downloads.wordpress.org/release/wordpress-{$version}.zip",
+					'no_content'  => "https://downloads.wordpress.org/release/wordpress-{$version}-no-content.zip",
+					'new_bundled' => "https://downloads.wordpress.org/release/wordpress-{$version}-new-bundled.zip",
+					'partial'     => false,
+					'rollback'    => false,
+				),
+			)
+		);
+	}
+
+	public function data_version_test_cases() {
+		return array(
+			'single-digit-version' => array( '6.7.1', '6.7' ),
+			'double-digit-version' => array( '11.8.3', '11.8' ),
+		);
 	}
 
 	public function data_wordpress_version_items() {
@@ -73,6 +80,19 @@ class Version_Utils_Tests extends WP_UnitTestCase {
 			array( '6.0', -2, '5.8' ),
 			array( '5.8', 2, '6.0' ),
 			array( '6.1', -2, '5.9' ),
+			array( '11.2', 1, '11.3' ),
+			array( '11.2', -1, '11.1' ),
+			array( '10.9', 1, '11.0' ),
+			array( '11.0', -1, '10.9' ),
+			array( '0.9', 1, '1.0' ),
+			array( '1.0', -1, '0.9' ),
+			array( '99.9', 1, '100.0' ),
+			array( '100.0', -1, '99.9' ),
 		);
+	}
+
+	public function tear_down() {
+		delete_transient( $this->info_transient_key );
+		parent::tear_down();
 	}
 }
