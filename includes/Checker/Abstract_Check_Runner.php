@@ -121,6 +121,14 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	protected $check_categories;
 
 	/**
+	 * The check mode.
+	 *
+	 * @since 1.7.0
+	 * @var string
+	 */
+	protected $mode;
+
+	/**
 	 * Returns the plugin parameter based on the request.
 	 *
 	 * @since 1.0.0
@@ -173,6 +181,15 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @return string Plugin slug.
 	 */
 	abstract protected function get_slug_param();
+
+	/**
+	 * Returns check mode parameter.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return string Check mode.
+	 */
+	abstract protected function get_mode_param();
 
 	/**
 	 * Sets whether the runner class was initialized early.
@@ -618,6 +635,21 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		return $this->get_slug_param();
 	}
 
+	/**
+	 * Returns check mode.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return string Check mode.
+	 */
+	final protected function get_mode() {
+		if ( null !== $this->mode ) {
+			return $this->mode;
+		}
+
+		return $this->get_mode_param();
+	}
+
 	/** Gets the Check_Context for the plugin.
 	 *
 	 * @since 1.0.0
@@ -644,6 +676,19 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			$basename = $this->get_plugin_basename();
 
 			$this->slug = ( '.' === pathinfo( $basename, PATHINFO_DIRNAME ) ) ? $basename : dirname( $basename );
+		}
+	}
+
+	/**
+	 * Sets the mode.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param string $mode Check mode.
+	 */
+	final public function set_mode( $mode = 'new' ) {
+		if ( ! empty( $mode ) ) {
+			$this->mode = $mode;
 		}
 	}
 

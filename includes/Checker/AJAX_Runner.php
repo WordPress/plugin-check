@@ -132,4 +132,15 @@ class AJAX_Runner extends Abstract_Check_Runner {
 	protected function get_slug_param() {
 		return '';
 	}
+
+	/**
+	 * Returns check mode parameter.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return string Check mode parameter.
+	 */
+	protected function get_mode_param() {
+		return 'new';
+	}
 }

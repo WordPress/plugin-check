@@ -129,6 +129,15 @@ final class Plugin_Check_Command {
 	 * [--slug=<slug>]
 	 * : Slug to override the default.
 	 *
+	 * [--mode=<mode>]
+	 * : Check mode. Default is 'new'.
+	 * ---
+	 * default: new
+	 * options:
+	 *   - new
+	 *   - update
+	 * ---
+	 *
 	 * ## EXAMPLES
 	 *
 	 *   wp plugin check akismet
@@ -165,6 +174,7 @@ final class Plugin_Check_Command {
 				'include-low-severity-warnings' => false,
 				'slug'                          => '',
 				'ignore-codes'                  => '',
+				'mode'                          => 'new',
 			)
 		);
 
@@ -217,6 +227,7 @@ final class Plugin_Check_Command {
 			$runner->set_plugin( $plugin );
 			$runner->set_categories( $categories );
 			$runner->set_slug( $options['slug'] );
+			$runner->set_mode( $options['mode'] );
 		} catch ( Exception $error ) {
 			WP_CLI::error( $error->getMessage() );
 		}

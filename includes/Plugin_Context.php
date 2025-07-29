@@ -47,6 +47,14 @@ class Plugin_Context {
 	protected $minimum_supported_wp;
 
 	/**
+	 * The check mode.
+	 *
+	 * @since 1.7.0
+	 * @var string
+	 */
+	protected $mode;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.0.0
@@ -84,6 +92,17 @@ class Plugin_Context {
 		} else {
 			$this->slug = basename( dirname( $this->main_file ) );
 		}
+
+		$mode = '';
+
+		foreach ( $_SERVER['argv'] as $value ) {
+			if ( false !== strpos( $value, '--mode=' ) ) {
+				$mode = str_replace( '--mode=', '', $value );
+				break;
+			}
+		}
+
+		$this->mode = $mode ?? 'new';
 	}
 
 	/**
@@ -117,6 +136,17 @@ class Plugin_Context {
 	 */
 	public function slug() {
 		return $this->slug;
+	}
+
+	/**
+	 * Returns the check mode.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return string Check mode.
+	 */
+	public function mode() {
+		return $this->mode;
 	}
 
 	/**

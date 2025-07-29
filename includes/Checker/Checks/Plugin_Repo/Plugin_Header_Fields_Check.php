@@ -102,14 +102,20 @@ class Plugin_Header_Fields_Check implements Static_Check {
 			} else {
 				$valid_chars_count = preg_match_all( '/[a-z0-9]/i', $plugin_header['Name'] );
 
+				$message = ( 'update' === $result->plugin()->mode() ) ? sprintf(
+					/* translators: %s: plugin header field */
+					__( 'The "%s" header should be in English to ensure broader compatibility and reach. For localized versions, you can leverage WordPress.org\'s translation system.', 'plugin-check' ),
+					esc_html( $labels['Name'] )
+				) : sprintf(
+					/* translators: %s: plugin header field */
+					__( 'The "%s" header in the plugin file is not valid. It needs to contain at least 5 latin letters (a-Z) and/or numbers. This is necessary because the initial plugin slug is generated from the name.', 'plugin-check' ),
+					esc_html( $labels['Name'] )
+				);
+
 				if ( intval( $valid_chars_count ) < 5 ) {
 					$this->add_result_error_for_file(
 						$result,
-						sprintf(
-							/* translators: %s: plugin header field */
-							__( 'The "%s" header in the plugin file is not valid. It needs to contain at least 5 latin letters (a-Z) and/or numbers. This is necessary because the initial plugin slug is generated from the name.', 'plugin-check' ),
-							esc_html( $labels['Name'] )
-						),
+						$message,
 						'plugin_header_unsupported_plugin_name',
 						$plugin_main_file,
 						0,
