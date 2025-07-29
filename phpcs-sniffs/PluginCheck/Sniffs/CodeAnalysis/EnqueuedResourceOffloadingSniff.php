@@ -37,7 +37,7 @@ final class EnqueuedResourceOffloadingSniff extends AbstractFunctionParameterSni
 	protected $group_name = 'Enqueued';
 
 	/**
-	 * List of enqueued functions that need to be checked for use of the in_footer and version arguments.
+	 * List of functions to check.
 	 *
 	 * @since 1.1.0
 	 *
