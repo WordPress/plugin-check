@@ -115,8 +115,7 @@ final class EnqueuedResourceOffloadingSniff extends AbstractFunctionParameterSni
 
 		$src_string = $src_param['clean'];
 
-		$matches = array();
-		if ( preg_match( $pattern, $src_string, $matches, PREG_OFFSET_CAPTURE ) > 0 ) {
+		if ( preg_match( $pattern, $src_string ) > 0 ) {
 			$this->phpcsFile->addError(
 				'Found call to %s() with external resource. Offloading %ss to your servers or any remote service is disallowed.',
 				$error_ptr,
