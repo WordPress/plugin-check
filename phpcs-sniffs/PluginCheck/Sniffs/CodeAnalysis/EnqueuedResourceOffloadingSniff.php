@@ -51,59 +51,6 @@ final class EnqueuedResourceOffloadingSniff extends AbstractFunctionParameterSni
 	);
 
 	/**
-	 * False + the empty tokens array.
-	 *
-	 * This array is enriched with the $emptyTokens array in the register() method.
-	 *
-	 * @var array<int|string, int|string>
-	 */
-	private $false_tokens = array(
-		\T_FALSE => \T_FALSE,
-	);
-
-	/**
-	 * Token codes which are "safe" to accept to determine whether a version would evaluate to `false`.
-	 *
-	 * This array is enriched with the several of the PHPCS token arrays in the register() method.
-	 *
-	 * @var array<int|string, int|string>
-	 */
-	private $safe_tokens = array(
-		\T_NULL                     => \T_NULL,
-		\T_FALSE                    => \T_FALSE,
-		\T_TRUE                     => \T_TRUE,
-		\T_LNUMBER                  => \T_LNUMBER,
-		\T_DNUMBER                  => \T_DNUMBER,
-		\T_CONSTANT_ENCAPSED_STRING => \T_CONSTANT_ENCAPSED_STRING,
-		\T_START_NOWDOC             => \T_START_NOWDOC,
-		\T_NOWDOC                   => \T_NOWDOC,
-		\T_END_NOWDOC               => \T_END_NOWDOC,
-		\T_OPEN_PARENTHESIS         => \T_OPEN_PARENTHESIS,
-		\T_CLOSE_PARENTHESIS        => \T_CLOSE_PARENTHESIS,
-		\T_STRING_CONCAT            => \T_STRING_CONCAT,
-	);
-
-	/**
-	 * Returns an array of tokens this test wants to listen for.
-	 *
-	 * Overloads and calls the parent method to allow for adding additional tokens to the $safe_tokens property.
-	 *
-	 * @return array
-	 */
-	public function register() {
-		$this->false_tokens += Tokens::$emptyTokens;
-
-		$this->safe_tokens += Tokens::$emptyTokens;
-		$this->safe_tokens += Tokens::$assignmentTokens;
-		$this->safe_tokens += Tokens::$comparisonTokens;
-		$this->safe_tokens += Tokens::$operators;
-		$this->safe_tokens += Tokens::$booleanOperators;
-		$this->safe_tokens += Tokens::$castTokens;
-
-		return parent::register();
-	}
-
-	/**
 	 * Process the parameters of a matched function.
 	 *
 	 * @since 1.1.0
