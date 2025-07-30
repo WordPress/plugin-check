@@ -24,7 +24,11 @@ Plugin Check is a WordPress.org tool which provides checks to help plugins meet 
 
 The WordPress plugin checker is a WordPress plugin itself, which can be installed on any WordPress site. While it is implemented in a way that should avoid any disruptions on the site that it is being used on, it is still **advised not to use the plugin checker in a production environment**.
 
-Currently, the only way to install the plugin checker is to download it from this GitHub repository. Please see the [contributing section below](#contributing) for further instructions. Once a first beta version is available, it will be distributed in a standalone ZIP file, e.g. via the wordpress.org plugin repository.
+There are a few ways to install the plugin checker:
+
+- Search for "Plugin Check (PCP)" on the page to install plugins (`/wp-admin/plugin-install.php`) on your WP site.
+- Download it from the WP.org plugins repository: https://wordpress.org/plugins/plugin-check/
+- Clone this repository. See the [contributing section below](#contributing) for further instructions.
 
 After having the plugin activated, you can analyze any other plugin installed on the same site, either using the WP Admin user interface or WP-CLI:
 
