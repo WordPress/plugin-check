@@ -68,7 +68,7 @@ jobs:
         - '8.2'
         wordpress: [ 'latest' ]
         include:
-          - php: '8.3'
+          - php: '8.4'
             wordpress: 'latest'
             coverage: true
           - php: '7.4'
