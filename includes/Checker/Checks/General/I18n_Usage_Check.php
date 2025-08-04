@@ -51,7 +51,7 @@ class I18n_Usage_Check extends Abstract_PHP_CodeSniffer_Check {
 			'standard'    => 'WordPress',
 			'sniffs'      => 'WordPress.WP.I18n',
 			'runtime-set' => array(
-				'text_domain' => $result->plugin()->slug(),
+				'text_domain' => $result->plugin()->slug() . ',default',
 			),
 		);
 	}
@@ -104,6 +104,20 @@ class I18n_Usage_Check extends Abstract_PHP_CodeSniffer_Check {
 		// Downgrade errors about usage of the 'default' text domain from WordPress Core to warnings.
 		if ( $error && str_ends_with( $message, ' but got &#039;default&#039;.' ) ) {
 			$error = false;
+		}
+
+		// Upgrade warnings about missing textdomain to errors.
+		if ( ! $error && 'WordPress.WP.I18n.MissingArgDomainDefault' === $code ) {
+			$error    = true;
+			$severity = 7;
+
+			$param_message = explode( 'If this text string', $message, 2 )[0];
+
+			$message = $param_message . sprintf(
+				/* translators: %s: default domain */
+				esc_html__( 'Use your own text domain for custom translations, or "%s" for core translations.', 'plugin-check' ),
+				'default'
+			);
 		}
 
 		// Add documentation link.
