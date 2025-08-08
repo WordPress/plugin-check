@@ -8,9 +8,9 @@
 namespace PluginCheckCS\PluginCheck\Tests;
 
 use PHP_CodeSniffer\Config;
-use PHP_CodeSniffer\Tests\Standards\AbstractSniffUnitTest as BaseAbstractSniffUnitTest;
 use PHP_CodeSniffer\Ruleset;
 use PHP_CodeSniffer\Sniffs\Sniff;
+use PHP_CodeSniffer\Tests\Standards\AbstractSniffUnitTest as BaseAbstractSniffUnitTest;
 
 /**
  * An abstract test class that contains common methods for all sniff unit tests.

@@ -7,9 +7,9 @@
 
 namespace PluginCheckCS\PluginCheck\Tests\CodeAnalysis;
 
+use PHP_CodeSniffer\Sniffs\Sniff;
 use PluginCheckCS\PluginCheck\Sniffs\CodeAnalysis\RequiredFunctionParametersSniff;
 use PluginCheckCS\PluginCheck\Tests\AbstractSniffUnitTest;
-use PHP_CodeSniffer\Sniffs\Sniff;
 
 /**
  * Unit tests for RequiredFunctionParametersSniff.

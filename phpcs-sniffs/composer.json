@@ -28,7 +28,8 @@
     "php-parallel-lint/php-parallel-lint": "^1.3.2",
     "phpcompatibility/php-compatibility": "^9.0",
     "phpunit/phpunit": "^7.0 || ^8.0 || ^9.0",
-    "wp-coding-standards/wpcs": "^3.0"
+    "wp-coding-standards/wpcs": "^3.0",
+    "slevomat/coding-standard": "^8"
   },
   "suggest": {
     "ext-mbstring": "For improved results"
