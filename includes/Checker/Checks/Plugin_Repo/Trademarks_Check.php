@@ -453,7 +453,6 @@ class Trademarks_Check extends Abstract_File_Check {
 	}
 
 
-	
 	/**
 	 * Whether the plugin name contains a trademarked term.
 	 *
@@ -467,7 +466,7 @@ class Trademarks_Check extends Abstract_File_Check {
 		if ( empty( $name ) ) {
 			return false;
 		}
-		
+
 		$has_trademark = false;
 
 		foreach ( self::TRADEMARK_SLUGS as $trademark ) {
@@ -491,7 +490,7 @@ class Trademarks_Check extends Abstract_File_Check {
 				}
 			}
 		}
-		
+
 		// Check portmanteaus.
 		if ( ! $has_trademark ) {
 			foreach ( self::PORTMANTEAUS as $portmanteau ) {
@@ -518,7 +517,7 @@ class Trademarks_Check extends Abstract_File_Check {
 		if ( empty( $slug ) ) {
 			return false;
 		}
-		
+
 		$has_trademark = false;
 
 		foreach ( self::TRADEMARK_SLUGS as $trademark ) {
