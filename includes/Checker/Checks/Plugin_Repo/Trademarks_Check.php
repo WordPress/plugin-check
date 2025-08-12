@@ -346,7 +346,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	 * @throws Exception Thrown if we found trademarked term in plugin name.
 	 */
 	private function validate_name_has_no_trademarks( $plugin_name ) {
-		$check = $this->has_trademarked_slug( sanitize_title_with_dashes( $plugin_name ) );
+		$check = $this->has_trademark( $plugin_name, true );
 		if ( ! $check ) {
 			return;
 		}
@@ -404,7 +404,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	 * @throws Exception Thrown if we found trademarked term in plugin slug.
 	 */
 	private function validate_slug_has_no_trademarks( $plugin_slug ) {
-		$check = $this->has_trademarked_slug( $plugin_slug );
+		$check = $this->has_trademark( $plugin_slug, false );
 		if ( ! $check ) {
 			return;
 		}
@@ -453,53 +453,88 @@ class Trademarks_Check extends Abstract_File_Check {
 	}
 
 	/**
-	 * Whether the plugin uses a trademark in the slug.
+	 * Whether the text contains a trademark term.
 	 *
-	 * @since 1.0.0
+	 * @since 1.7.0
 	 *
-	 * @param string $slug The plugin slug.
-	 * @return string|false The trademark slug if found, false otherwise.
+	 * @param string $text             The text to check for trademarks.
+	 * @param bool   $use_word_boundary Whether to use word boundaries for checking (true for names, false for slugs).
+	 * @return string|false The trademark term if found, false otherwise.
 	 */
-	private function has_trademarked_slug( $slug ) {
-		// Bail early if the plugin slug not provided.
-		if ( empty( $slug ) ) {
+	private function has_trademark( $text, $use_word_boundary = false ) {
+		// Bail early if the text is not provided.
+		if ( empty( $text ) ) {
 			return false;
 		}
 
-		$has_trademarked_slug = false;
+		$has_trademark = false;
 
 		foreach ( self::TRADEMARK_SLUGS as $trademark ) {
 			if ( str_ends_with( $trademark, '-' ) ) {
-				// Trademarks ending in "-" indicate slug cannot begin with that term.
-				if ( 0 === strpos( $slug, $trademark ) ) {
-					$has_trademarked_slug = $trademark;
+				// Trademarks ending in "-" indicate text cannot begin with that term.
+				if ( 0 === strpos( $text, $trademark ) ) {
+					$has_trademark = $trademark;
 					break;
 				}
-			} elseif ( false !== strpos( $slug, $trademark ) ) {
-				// Otherwise, the term cannot appear anywhere in slug.
-
+			} elseif ( $use_word_boundary ) {
+				// For plugin names, use word boundaries to avoid false positives (like "wc" in "wcag")
+				$pattern = '/\b' . preg_quote( $trademark, '/' ) . '\b/i';
+				if ( preg_match( $pattern, $text ) ) {
+					// check for 'for-TRADEMARK' exceptions.
+					if ( $this->is_valid_for_use_exception( $text, $trademark ) ) {
+						// It is a valid for-use exception, try the next trademark.
+						continue;
+					}
+					$has_trademark = $trademark;
+					break;
+				}
+			} elseif ( false !== strpos( $text, $trademark ) ) {
+				// For slugs, the term cannot appear anywhere as a substring
 				// check for 'for-TRADEMARK' exceptions.
-				if ( $this->is_valid_for_use_exception( $slug, $trademark ) ) {
+				if ( $this->is_valid_for_use_exception( $text, $trademark ) ) {
 					// It is a valid for-use exception, try the next trademark.
 					continue;
 				}
-
-				$has_trademarked_slug = $trademark;
+				$has_trademark = $trademark;
 				break;
 			}
 		}
 
 		// Check portmanteaus.
-		if ( ! $has_trademarked_slug ) {
+		if ( ! $has_trademark ) {
 			foreach ( self::PORTMANTEAUS as $portmanteau ) {
-				if ( 0 === stripos( $slug, $portmanteau ) ) {
-					$has_trademarked_slug = $portmanteau;
+				if ( 0 === stripos( $text, $portmanteau ) ) {
+					$has_trademark = $portmanteau;
 					break;
 				}
 			}
 		}
 
-		return $has_trademarked_slug;
+		return $has_trademark;
+	}
+	
+	/**
+	 * Whether the plugin uses a trademark in the slug.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param string $slug The plugin slug.
+	 * @return string|false The trademark slug if found, false otherwise.
+	 */
+	private function has_trademarked_slug( $slug ) {
+		return $this->has_trademark( $slug, false );
+	}
+	
+	/**
+	 * Whether the plugin name contains a trademarked term.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param string $name The plugin name.
+	 * @return string|false The trademark term if found, false otherwise.
+	 */
+	private function has_trademarked_name( $name ) {
+		return $this->has_trademark( $name, true );
 	}
 
 	/**
