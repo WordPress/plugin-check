@@ -514,30 +514,6 @@ class Trademarks_Check extends Abstract_File_Check {
 	}
 
 	/**
-	 * Whether the plugin uses a trademark in the slug.
-	 *
-	 * @since 1.7.0
-	 *
-	 * @param string $slug The plugin slug.
-	 * @return string|false The trademark slug if found, false otherwise.
-	 */
-	private function has_trademarked_slug( $slug ) {
-		return $this->has_trademark( $slug, false );
-	}
-
-	/**
-	 * Whether the plugin name contains a trademarked term.
-	 *
-	 * @since 1.7.0
-	 *
-	 * @param string $name The plugin name.
-	 * @return string|false The trademark term if found, false otherwise.
-	 */
-	private function has_trademarked_name( $name ) {
-		return $this->has_trademark( $name, true );
-	}
-
-	/**
 	 * Validates whether the trademark is valid with a for-use exception.
 	 *
 	 * @since 1.0.0
