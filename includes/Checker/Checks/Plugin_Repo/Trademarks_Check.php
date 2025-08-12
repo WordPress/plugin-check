@@ -477,7 +477,7 @@ class Trademarks_Check extends Abstract_File_Check {
 					break;
 				}
 			} elseif ( $use_word_boundary ) {
-				// For plugin names, use word boundaries to avoid false positives (like "wc" in "wcag")
+				// For plugin names, use word boundaries to avoid false positives (like "wc" in "wcag").
 				$pattern = '/\b' . preg_quote( $trademark, '/' ) . '\b/i';
 				if ( preg_match( $pattern, $text ) ) {
 					// check for 'for-TRADEMARK' exceptions.
@@ -512,7 +512,7 @@ class Trademarks_Check extends Abstract_File_Check {
 
 		return $has_trademark;
 	}
-	
+
 	/**
 	 * Whether the plugin uses a trademark in the slug.
 	 *
@@ -524,7 +524,7 @@ class Trademarks_Check extends Abstract_File_Check {
 	private function has_trademarked_slug( $slug ) {
 		return $this->has_trademark( $slug, false );
 	}
-	
+
 	/**
 	 * Whether the plugin name contains a trademarked term.
 	 *
