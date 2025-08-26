@@ -6,6 +6,9 @@
 	<file>.</file>
 
 	<!-- Exclude Composer vendor directory. -->
+	<exclude-pattern>*/bin/*</exclude-pattern>
+	<exclude-pattern>*/data/*</exclude-pattern>
+	<exclude-pattern>*/PluginCheck/Vars/*</exclude-pattern>
 	<exclude-pattern>*/vendor/*</exclude-pattern>
 
 	<!-- Only check PHP files. -->

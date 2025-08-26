@@ -5,5 +5,7 @@ extend-ignore-re = [
 
 [files]
 extend-exclude = [
-	"includes/Lib/Readme/*.php"
+	"includes/Lib/Readme/*.php",
+	"phpcs-sniffs/data",
+	"phpcs-sniffs/PluginCheck/Vars"
 ]
