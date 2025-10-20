@@ -9,7 +9,7 @@
     "automattic/vipwpcs": "^3.0.0",
     "composer/installers": "^2.2",
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0.0",
-    "nikic/php-parser": "^4",
+    "nikic/php-parser": "^5",
     "plugin-check/phpcs-sniffs": "@dev",
     "wp-coding-standards/wpcs": "^3.2.0"
   },
