@@ -8,6 +8,7 @@
 use WordPress\Plugin_Check\Checker\AJAX_Runner;
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Check_Types;
 use WordPress\Plugin_Check\Checker\Checks;
 use WordPress\Plugin_Check\Checker\Checks\General\I18n_Usage_Check;
 use WordPress\Plugin_Check\Checker\CLI_Runner;
@@ -365,7 +366,7 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 
 		add_filter( 'wp_plugin_check_ignore_directories', '__return_empty_array' );
 
-		$results = $checks->run_checks( $check_context, $checks_to_run );
+		$results = $checks->run_checks( $check_context, $checks_to_run, null, Check_Types::get_type_slugs() );
 
 		$this->assertInstanceOf( Check_Result::class, $results );
 
@@ -404,7 +405,7 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 			}
 		);
 
-		$results = $checks->run_checks( $check_context, $checks_to_run );
+		$results = $checks->run_checks( $check_context, $checks_to_run, null, Check_Types::get_type_slugs() );
 
 		$this->assertInstanceOf( Check_Result::class, $results );
 
@@ -464,7 +465,7 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 			}
 		);
 
-		$results = $checks->run_checks( $check_context, $checks_to_run );
+		$results = $checks->run_checks( $check_context, $checks_to_run, null, Check_Types::get_type_slugs() );
 
 		// Remove the filter to avoid interfering with other tests.
 		remove_filter(

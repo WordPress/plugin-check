@@ -7,6 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Check_Types;
 use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\Setting_Sanitization_Check;
 
 class Setting_Sanitization_Check_Test extends WP_UnitTestCase {
@@ -14,7 +15,7 @@ class Setting_Sanitization_Check_Test extends WP_UnitTestCase {
 	public function test_run_with_errors() {
 		$check         = new Setting_Sanitization_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-setting-sanitization-check-with-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$check->run( $check_result );
 

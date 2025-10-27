@@ -7,6 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Check_Types;
 use WordPress\Plugin_Check\Checker\Checks\General\I18n_Usage_Check;
 
 class I18n_Usage_Check_Tests extends WP_UnitTestCase {
@@ -14,7 +15,7 @@ class I18n_Usage_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_errors() {
 		$i18n_usage_check = new I18n_Usage_Check();
 		$check_context    = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-i18n-usage-errors/load.php' );
-		$check_result     = new Check_Result( $check_context );
+		$check_result     = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$i18n_usage_check->run( $check_result );
 
@@ -84,7 +85,7 @@ class I18n_Usage_Check_Tests extends WP_UnitTestCase {
 	public function test_run_without_errors() {
 		$i18n_usage_check = new I18n_Usage_Check();
 		$check_context    = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-i18n-usage-without-errors/load.php' );
-		$check_result     = new Check_Result( $check_context );
+		$check_result     = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$i18n_usage_check->run( $check_result );
 
@@ -100,7 +101,7 @@ class I18n_Usage_Check_Tests extends WP_UnitTestCase {
 	public function test_run_without_default_textdomain() {
 		$i18n_usage_check = new I18n_Usage_Check();
 		$check_context    = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-i18n-usage-with-default/load.php' );
-		$check_result     = new Check_Result( $check_context );
+		$check_result     = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$i18n_usage_check->run( $check_result );
 

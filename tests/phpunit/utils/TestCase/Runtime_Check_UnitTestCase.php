@@ -10,6 +10,7 @@ namespace WordPress\Plugin_Check\Test_Utils\TestCase;
 use WordPress\Plugin_Check\Checker\Check;
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Check_Types;
 use WordPress\Plugin_Check\Checker\Preparation;
 use WordPress\Plugin_Check\Checker\Preparations\Universal_Runtime_Preparation;
 use WordPress\Plugin_Check\Checker\Runtime_Check;
@@ -88,7 +89,7 @@ abstract class Runtime_Check_UnitTestCase extends WP_UnitTestCase {
 	 * @return Check_Result An object containing all check results.
 	 */
 	protected function run_check( Check $check, Check_Context $context ) {
-		$results = new Check_Result( $context );
+		$results = new Check_Result( $context, Check_Types::get_type_slugs() );
 		$cleanup = $this->prepare_environment( $check, $context );
 
 		try {

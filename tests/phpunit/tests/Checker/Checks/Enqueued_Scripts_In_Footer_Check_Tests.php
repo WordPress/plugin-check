@@ -7,6 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Check_Types;
 use WordPress\Plugin_Check\Checker\Checks\Performance\Enqueued_Scripts_In_Footer_Check;
 
 class Enqueued_Scripts_In_Footer_Check_Tests extends WP_UnitTestCase {
@@ -14,7 +15,7 @@ class Enqueued_Scripts_In_Footer_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_errors() {
 		$enqueued_scripts_in_footer_check = new Enqueued_Scripts_In_Footer_Check();
 		$check_context                    = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-enqueued-scripts-in-footer-check-with-errors/load.php' );
-		$check_result                     = new Check_Result( $check_context );
+		$check_result                     = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$enqueued_scripts_in_footer_check->run( $check_result );
 
@@ -38,7 +39,7 @@ class Enqueued_Scripts_In_Footer_Check_Tests extends WP_UnitTestCase {
 	public function test_run_without_errors() {
 		$enqueued_scripts_in_footer_check = new Enqueued_Scripts_In_Footer_Check();
 		$check_context                    = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-enqueued-scripts-in-footer-check-without-errors/load.php' );
-		$check_result                     = new Check_Result( $check_context );
+		$check_result                     = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$enqueued_scripts_in_footer_check->run( $check_result );
 

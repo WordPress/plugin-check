@@ -7,6 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Check_Types;
 use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\Trademarks_Check;
 
 class Trademarks_Check_Tests extends WP_UnitTestCase {
@@ -14,7 +15,7 @@ class Trademarks_Check_Tests extends WP_UnitTestCase {
 	public function test_trademarks_without_errors() {
 		$trademarks_check = new Trademarks_Check();
 		$check_context    = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-trademarks-without-errors/load.php' );
-		$check_result     = new Check_Result( $check_context );
+		$check_result     = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$trademarks_check->run( $check_result );
 
@@ -33,7 +34,7 @@ class Trademarks_Check_Tests extends WP_UnitTestCase {
 	 */
 	public function test_trademarks_with_different_scenarios( $type_flag, $plugin_basename, $expected_file, $expected_error ) {
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . $plugin_basename );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$check = new Trademarks_Check( $type_flag );
 		$check->run( $check_result );
@@ -104,7 +105,7 @@ class Trademarks_Check_Tests extends WP_UnitTestCase {
 
 	public function test_trademarks_with_for_woocommerce_exceptions() {
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-trademarks-plugin-header-example-string-for-woocommerce/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$check = new Trademarks_Check( Trademarks_Check::TYPE_NAME );
 		$check->run( $check_result );
@@ -118,7 +119,7 @@ class Trademarks_Check_Tests extends WP_UnitTestCase {
 	public function test_single_file_plugin_without_error_for_trademarks() {
 		$trademarks_check = new Trademarks_Check();
 		$check_context    = new Check_Context( WP_PLUGIN_DIR . '/single-file-plugin.php' );
-		$check_result     = new Check_Result( $check_context );
+		$check_result     = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$trademarks_check->run( $check_result );
 

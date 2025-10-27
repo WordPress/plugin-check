@@ -159,6 +159,18 @@ class CLI_Runner extends Abstract_Check_Runner {
 	}
 
 	/**
+	 * Returns an array of types for filtering the checks.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return array An array of types.
+	 */
+	protected function get_types_param() {
+		// Return all check types since the cli already has arguments to filter results by type.
+		return Check_Types::get_type_slugs();
+	}
+
+	/**
 	 * Returns plugin slug parameter.
 	 *
 	 * @since 1.2.0

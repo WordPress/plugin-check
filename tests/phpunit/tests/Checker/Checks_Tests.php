@@ -7,6 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Check_Types;
 use WordPress\Plugin_Check\Checker\Checks;
 use WordPress\Plugin_Check\Test_Data\Empty_Check;
 use WordPress\Plugin_Check\Test_Data\Error_Check;
@@ -39,7 +40,7 @@ class Checks_Tests extends WP_UnitTestCase {
 			}
 		);
 
-		$results = $this->checks->run_checks( $this->context, $checks_to_run );
+		$results = $this->checks->run_checks( $this->context, $checks_to_run, null, Check_Types::get_type_slugs() );
 
 		$this->assertInstanceOf( Check_Result::class, $results );
 		$this->assertEmpty( $results->get_warnings() );
@@ -63,7 +64,7 @@ class Checks_Tests extends WP_UnitTestCase {
 			}
 		);
 
-		$results = $this->checks->run_checks( $this->context, $checks_to_run );
+		$results = $this->checks->run_checks( $this->context, $checks_to_run, null, Check_Types::get_type_slugs() );
 
 		$this->assertEmpty( $results->get_warnings() );
 		$this->assertNotEmpty( $results->get_errors() );

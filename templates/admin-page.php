@@ -60,6 +60,28 @@
 				<?php } ?>
 				</table>
 				<?php } ?>
+				<span id="plugin-check__spinner" class="spinner" style="float: none;"></span>
+				<h4><?php esc_attr_e( 'Types', 'plugin-check' ); ?></h4>
+				<?php
+				if ( ! empty( $types ) ) {
+				?>
+				<table id="plugin-check__types">
+				<?php
+				foreach ( $types as $type => $label ) { ?>
+					<tr>
+						<td>
+							<fieldset>
+								<legend class="screen-reader-text"><?php echo esc_html( $type ); ?></legend>
+								<label for="<?php echo esc_attr( $type ); ?>">
+									<input type="checkbox" id="<?php echo esc_attr( $type ); ?>" name="types" value="<?php echo esc_attr( $type ); ?>" checked />
+									<?php echo esc_html( $label ); ?>
+								</label>
+							</fieldset>
+						</td>
+					</tr>
+				<?php } ?>
+				</table>
+				<?php } ?>
 
 				<?php if ( $has_experimental_checks ) { ?>
 					<h4><?php esc_attr_e( 'Other Options', 'plugin-check' ); ?></h4>

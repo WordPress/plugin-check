@@ -9,6 +9,7 @@ namespace phpunit\tests\Checker\Checks;
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Check_Types;
 use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\Offloading_Files_Check;
 use WP_UnitTestCase;
 
@@ -17,7 +18,7 @@ class Offloading_Files_Check_Test extends WP_UnitTestCase {
 	public function test_run_with_errors() {
 		$enqueued_scripts_in_footer_check = new Offloading_Files_Check();
 		$check_context                    = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-offloaded-files-check-with-errors/load.php' );
-		$check_result                     = new Check_Result( $check_context );
+		$check_result                     = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$enqueued_scripts_in_footer_check->run( $check_result );
 

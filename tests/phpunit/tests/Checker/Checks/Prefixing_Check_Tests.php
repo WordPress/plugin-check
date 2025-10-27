@@ -7,6 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Check_Types;
 use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\Prefixing_Check;
 
 class Prefixing_Check_Tests extends WP_UnitTestCase {
@@ -14,7 +15,7 @@ class Prefixing_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_errors() {
 		$check         = new Prefixing_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-prefixing-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$check->run( $check_result );
 

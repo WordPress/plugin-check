@@ -7,6 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\AJAX_Runner;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Check_Types;
 use WordPress\Plugin_Check\Checker\Runtime_Environment_Setup;
 use WordPress\Plugin_Check\Test_Data\Empty_Check;
 use WordPress\Plugin_Check\Test_Data\Error_Check;
@@ -195,7 +196,8 @@ class AJAX_Runner_Tests extends WP_UnitTestCase {
 			}
 		);
 
-		$runner           = new AJAX_Runner();
+		$runner = new AJAX_Runner();
+		$runner->set_types( Check_Types::get_type_slugs() );
 		$cleanup          = $runner->prepare();
 		$this->cleanups[] = $cleanup;
 

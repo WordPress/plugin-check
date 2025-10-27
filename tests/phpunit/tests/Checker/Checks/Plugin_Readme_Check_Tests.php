@@ -7,6 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Check_Types;
 use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\Plugin_Readme_Check;
 
 class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
@@ -14,7 +15,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_errors_no_readme() {
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-no-readme/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -34,7 +35,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_errors_invalid_readme_files() {
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-invalid-readme/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -53,7 +54,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_errors_invalid_name() {
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-invalid-name/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -71,7 +72,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_errors_restricted_contributors() {
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-invalid-name/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -93,7 +94,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_errors_empty_name() {
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-empty-name/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -111,7 +112,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_errors_default_text() {
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-default-text/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -127,7 +128,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_errors_stable_tag() {
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-stable-tag/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -148,7 +149,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_errors_no_stable_tag() {
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-no-stable-tag/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -166,7 +167,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_errors_license() {
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-license/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -187,7 +188,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_errors_no_license() {
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-no-license/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -205,7 +206,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_errors_tested_upto() {
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-tested-upto/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -227,7 +228,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-tested-upto-minor/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -251,7 +252,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-tested-upto-minor/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -276,7 +277,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-upgrade-notice/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -301,7 +302,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 	public function test_run_md_with_errors() {
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-md-with-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -328,7 +329,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 	public function test_single_file_plugin_without_error_for_trademarks() {
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( WP_PLUGIN_DIR . '/single-file-plugin.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -344,7 +345,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_errors_parser_warnings() {
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-parser-warnings/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -360,7 +361,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_errors_multiple_parser_warnings() {
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-multiple-parser-warnings/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -393,7 +394,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-parser-warnings/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -418,7 +419,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-multiple-parser-warnings/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -485,7 +486,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-parser-warnings/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -509,7 +510,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_errors_upgrade_notice() {
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-upgrade-notice/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -528,7 +529,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-md-with-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -551,7 +552,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-md-with-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -568,7 +569,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-md-with-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -582,7 +583,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 	public function test_run_without_errors_readme_contributors_warning() {
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-parser-warnings/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -595,7 +596,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_mismatched_requires_headers() {
 		$check         = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-trademarks-plugin-readme-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$check->run( $check_result );
 
@@ -611,7 +612,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_discouraged_donate_link() {
 		$check         = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-default-text/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$check->run( $check_result );
 

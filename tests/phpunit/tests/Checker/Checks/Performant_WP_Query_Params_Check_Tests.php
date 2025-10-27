@@ -7,6 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Check_Types;
 use WordPress\Plugin_Check\Checker\Checks\Performance\Performant_WP_Query_Params_Check;
 
 class Performant_WP_Query_Params_Check_Tests extends WP_UnitTestCase {
@@ -14,7 +15,7 @@ class Performant_WP_Query_Params_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_errors() {
 		$performant_query = new Performant_WP_Query_Params_Check();
 		$check_context    = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-performant-wp-query-params-errors/load.php' );
-		$check_result     = new Check_Result( $check_context );
+		$check_result     = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$performant_query->run( $check_result );
 
@@ -46,7 +47,7 @@ class Performant_WP_Query_Params_Check_Tests extends WP_UnitTestCase {
 	public function test_run_without_errors() {
 		$performant_query = new Performant_WP_Query_Params_Check();
 		$check_context    = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-performant-wp-query-params-without-errors/load.php' );
-		$check_result     = new Check_Result( $check_context );
+		$check_result     = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$performant_query->run( $check_result );
 

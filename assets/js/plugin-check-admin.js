@@ -8,6 +8,7 @@
 	const categoriesList = document.querySelectorAll(
 		'input[name=categories]'
 	);
+	const typesList = document.querySelectorAll( 'input[name=types]' );
 	const templates = {};
 
 	// Return early if the elements cannot be found on the page.
@@ -16,7 +17,8 @@
 		! pluginsList ||
 		! resultsContainer ||
 		! spinner ||
-		! categoriesList.length
+		! categoriesList.length ||
+		! typesList.length
 	) {
 		console.error( 'Missing form elements on page' );
 		return;
@@ -73,6 +75,9 @@
 		for ( let i = 0; i < categoriesList.length; i++ ) {
 			categoriesList[ i ].disabled = true;
 		}
+		for ( let i = 0; i < typesList.length; i++ ) {
+			typesList[ i ].disabled = true;
+		}
 
 		getChecksToRun()
 			.then( setUpEnvironment )
@@ -111,6 +116,9 @@
 		pluginsList.disabled = false;
 		for ( let i = 0; i < categoriesList.length; i++ ) {
 			categoriesList[ i ].disabled = false;
+		}
+		for ( let i = 0; i < typesList.length; i++ ) {
+			typesList[ i ].disabled = false;
 		}
 	}
 
@@ -307,6 +315,12 @@
 			'include-experimental',
 			includeExperimental && includeExperimental.checked ? 1 : 0
 		);
+
+		for ( let i = 0; i < typesList.length; i++ ) {
+			if ( typesList[ i ].checked ) {
+				pluginCheckData.append( 'types[]', typesList[ i ].value );
+			}
+		}
 
 		return fetch( ajaxurl, {
 			method: 'POST',

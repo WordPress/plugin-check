@@ -121,6 +121,14 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	protected $check_categories;
 
 	/**
+	 * Checks types for the filter.
+	 *
+	 * @since 1.7.0
+	 * @var array
+	 */
+	protected $check_types;
+
+	/**
 	 * The mode to run checks in.
 	 *
 	 * @since 1.7.0
@@ -172,6 +180,15 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @return array An array of categories.
 	 */
 	abstract protected function get_categories_param();
+
+	/**
+	 * Returns an array of types for filtering the checks.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return array An array of types.
+	 */
+	abstract protected function get_types_param();
 
 	/**
 	 * Returns plugin slug parameter.
@@ -266,6 +283,30 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		}
 
 		$this->plugin = $plugin;
+	}
+
+	/**
+	 * Sets types for filtering the checks.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param array $types An array of types for filtering.
+	 *
+	 * @throws Exception Thrown if the types do not match the original request parameter.
+	 */
+	final public function set_types( $types ) {
+		if ( $this->initialized_early ) {
+			if ( $types !== $this->get_types_param() ) {
+				throw new Exception(
+					sprintf(
+					/* translators: %s: categories */
+						__( 'Invalid types: The %s value does not match the original request parameter.', 'plugin-check' ),
+						'types'
+					)
+				);
+			}
+		}
+		$this->check_types = $types;
 	}
 
 	/**
@@ -381,6 +422,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		$checks       = $this->get_checks_to_run();
 		$preparations = $this->get_shared_preparations( $checks );
 		$cleanups     = array();
+		$check_types  = $this->get_types();
 
 		// Prepare all shared preparations.
 		foreach ( $preparations as $preparation ) {
@@ -388,7 +430,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			$cleanups[] = $instance->prepare();
 		}
 
-		$results = $this->get_checks_instance()->run_checks( $this->get_check_context(), $checks, $this );
+		$results = $this->get_checks_instance()->run_checks( $this->get_check_context(), $checks, $this, $check_types );
 
 		if ( ! empty( $cleanups ) ) {
 			foreach ( $cleanups as $cleanup ) {
@@ -618,6 +660,21 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		}
 
 		return $this->get_categories_param();
+	}
+
+	/**
+	 * Returns an array of types for filtering the checks.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return array An array of types.
+	 */
+	final protected function get_types() {
+		if ( null !== $this->check_types ) {
+			return $this->check_types;
+		}
+
+		return $this->get_types_param();
 	}
 
 	/**

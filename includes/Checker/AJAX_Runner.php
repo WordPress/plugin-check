@@ -123,6 +123,20 @@ class AJAX_Runner extends Abstract_Check_Runner {
 	}
 
 	/**
+	 * Returns an array of types for filtering the checks.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return array An array of types for filtering the checks.
+	 */
+	protected function get_types_param() {
+		$types = filter_input( INPUT_POST, 'types', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
+		$types = is_null( $types ) ? array() : $types;
+
+		return $types;
+	}
+
+	/**
 	 * Returns plugin slug parameter.
 	 *
 	 * @since 1.2.0

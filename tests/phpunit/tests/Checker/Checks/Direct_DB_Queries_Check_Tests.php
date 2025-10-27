@@ -7,6 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Check_Types;
 use WordPress\Plugin_Check\Checker\Checks\Security\Direct_DB_Queries_Check;
 
 class Direct_DB_Queries_Check_Tests extends WP_UnitTestCase {
@@ -14,7 +15,7 @@ class Direct_DB_Queries_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_errors() {
 		$check         = new Direct_DB_Queries_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-direct-db-queries-with-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$check->run( $check_result );
 
@@ -31,7 +32,7 @@ class Direct_DB_Queries_Check_Tests extends WP_UnitTestCase {
 	public function test_run_without_errors() {
 		$check         = new Direct_DB_Queries_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-direct-db-queries-without-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$check->run( $check_result );
 

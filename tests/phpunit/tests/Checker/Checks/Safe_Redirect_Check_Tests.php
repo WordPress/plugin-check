@@ -8,6 +8,7 @@
 use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Check_Types;
 use WordPress\Plugin_Check\Checker\Checks\Security\Safe_Redirect_Check;
 
 class Safe_Redirect_Check_Tests extends WP_UnitTestCase {
@@ -25,7 +26,7 @@ class Safe_Redirect_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_errors() {
 		$check         = new Safe_Redirect_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-safe-redirect/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$check->run( $check_result );
 

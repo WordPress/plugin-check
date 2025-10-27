@@ -23,6 +23,14 @@ final class Check_Result {
 	protected $check_context;
 
 	/**
+	 * List of types to filter.
+	 *
+	 * @since 1.7.0
+	 * @var array
+	 */
+	protected $check_types = array();
+
+	/**
 	 * List of errors.
 	 *
 	 * @since 1.0.0
@@ -57,12 +65,14 @@ final class Check_Result {
 	/**
 	 * Sets the context for the plugin to check.
 	 *
-	 * @since 1.0.0
-	 *
 	 * @param Check_Context $check_context Check context instance for the plugin.
+	 * @param array         $check_types An array of check types to filter.
+	 *
+	 * @since 1.0.0
 	 */
-	public function __construct( Check_Context $check_context ) {
+	public function __construct( Check_Context $check_context, array $check_types = array() ) {
 		$this->check_context = $check_context;
+		$this->check_types   = $check_types;
 	}
 
 	/**
@@ -118,29 +128,33 @@ final class Check_Result {
 		unset( $data['line'], $data['column'], $data['file'] );
 
 		if ( $error ) {
-			if ( ! isset( $this->errors[ $file ] ) ) {
-				$this->errors[ $file ] = array();
+			if ( in_array( 'error', $this->check_types, true ) ) {
+				if ( ! isset( $this->errors[ $file ] ) ) {
+					$this->errors[ $file ] = array();
+				}
+				if ( ! isset( $this->errors[ $file ][ $line ] ) ) {
+					$this->errors[ $file ][ $line ] = array();
+				}
+				if ( ! isset( $this->errors[ $file ][ $line ][ $column ] ) ) {
+					$this->errors[ $file ][ $line ][ $column ] = array();
+				}
+				$this->errors[ $file ][ $line ][ $column ][] = $data;
+				++$this->error_count;
 			}
-			if ( ! isset( $this->errors[ $file ][ $line ] ) ) {
-				$this->errors[ $file ][ $line ] = array();
-			}
-			if ( ! isset( $this->errors[ $file ][ $line ][ $column ] ) ) {
-				$this->errors[ $file ][ $line ][ $column ] = array();
-			}
-			$this->errors[ $file ][ $line ][ $column ][] = $data;
-			++$this->error_count;
 		} else {
-			if ( ! isset( $this->warnings[ $file ] ) ) {
-				$this->warnings[ $file ] = array();
+			if ( in_array( 'warning', $this->check_types, true ) ) {
+				if ( ! isset( $this->warnings[ $file ] ) ) {
+					$this->warnings[ $file ] = array();
+				}
+				if ( ! isset( $this->warnings[ $file ][ $line ] ) ) {
+					$this->warnings[ $file ][ $line ] = array();
+				}
+				if ( ! isset( $this->warnings[ $file ][ $line ][ $column ] ) ) {
+					$this->warnings[ $file ][ $line ][ $column ] = array();
+				}
+				$this->warnings[ $file ][ $line ][ $column ][] = $data;
+				++$this->warning_count;
 			}
-			if ( ! isset( $this->warnings[ $file ][ $line ] ) ) {
-				$this->warnings[ $file ][ $line ] = array();
-			}
-			if ( ! isset( $this->warnings[ $file ][ $line ][ $column ] ) ) {
-				$this->warnings[ $file ][ $line ][ $column ] = array();
-			}
-			$this->warnings[ $file ][ $line ][ $column ][] = $data;
-			++$this->warning_count;
 		}
 	}
 

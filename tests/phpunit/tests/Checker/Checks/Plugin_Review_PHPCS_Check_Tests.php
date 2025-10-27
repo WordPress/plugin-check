@@ -7,6 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Check_Types;
 use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\Plugin_Review_PHPCS_Check;
 
 class Plugin_Review_PHPCS_Check_Tests extends WP_UnitTestCase {
@@ -14,7 +15,7 @@ class Plugin_Review_PHPCS_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_errors() {
 		$plugin_review_phpcs_check = new Plugin_Review_PHPCS_Check();
 		$check_context             = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-review-phpcs-errors/load.php' );
-		$check_result              = new Check_Result( $check_context );
+		$check_result              = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$plugin_review_phpcs_check->run( $check_result );
 
@@ -139,7 +140,7 @@ class Plugin_Review_PHPCS_Check_Tests extends WP_UnitTestCase {
 	public function test_run_without_errors() {
 		$plugin_review_phpcs_check = new Plugin_Review_PHPCS_Check();
 		$check_context             = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-review-phpcs-without-errors/load.php' );
-		$check_result              = new Check_Result( $check_context );
+		$check_result              = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$plugin_review_phpcs_check->run( $check_result );
 

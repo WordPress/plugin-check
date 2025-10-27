@@ -7,6 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Check_Types;
 use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\Plugin_Header_Fields_Check;
 
 class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
@@ -14,7 +15,7 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_errors() {
 		$check         = new Plugin_Header_Fields_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-header-fields-with-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$check->run( $check_result );
 
@@ -46,7 +47,7 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 
 		$check         = new Plugin_Header_Fields_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-header-fields-with-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$check->run( $check_result );
 
@@ -70,7 +71,7 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 
 		$check         = new Plugin_Header_Fields_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-unfiltered-uploads-with-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$check->run( $check_result );
 
@@ -84,7 +85,7 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_invalid_mpl1_license() {
 		$check         = new Plugin_Header_Fields_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-mpl1-license-with-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$check->run( $check_result );
 
@@ -99,7 +100,7 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_invalid_header_fields() {
 		$check         = new Plugin_Header_Fields_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-late-escaping-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$check->run( $check_result );
 
@@ -118,7 +119,7 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 
 		$readme_check  = new Plugin_Header_Fields_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-localhost-with-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -141,7 +142,7 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 
 		$readme_check  = new Plugin_Header_Fields_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-localhost-with-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -158,7 +159,7 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 
 		$readme_check  = new Plugin_Header_Fields_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-localhost-with-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$readme_check->run( $check_result );
 
@@ -172,7 +173,7 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_unsupported_plugin_name_in_new_mode() {
 		$check         = new Plugin_Header_Fields_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-unsupported-plugin-name/load.php', '', 'new' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$check->run( $check_result );
 
@@ -185,7 +186,7 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_unsupported_plugin_name_in_update_mode() {
 		$check         = new Plugin_Header_Fields_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-unsupported-plugin-name/load.php', '', 'update' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$check->run( $check_result );
 

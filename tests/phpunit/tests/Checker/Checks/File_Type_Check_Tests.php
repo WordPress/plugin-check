@@ -7,6 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Check_Types;
 use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\File_Type_Check;
 
 class File_Type_Check_Tests extends WP_UnitTestCase {
@@ -17,7 +18,7 @@ class File_Type_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_file_type_errors( $type_flag, $plugin_basename, $expected_file, $expected_code ) {
 		// Test given plugin with relevant forbidden file types.
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . $plugin_basename );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$check = new File_Type_Check( $type_flag );
 		$check->run( $check_result );
@@ -64,7 +65,7 @@ class File_Type_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_vcs_dir_errors() {
 		// Test plugin with a .bzr directory which is forbidden.
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-file-type-vcs-hidden-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$check = new File_Type_Check( File_Type_Check::TYPE_VCS );
 		$check->run( $check_result );
@@ -88,7 +89,7 @@ class File_Type_Check_Tests extends WP_UnitTestCase {
 	public function test_run_without_any_file_type_errors() {
 		// Test plugin without any forbidden file types.
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-i18n-usage-without-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$check = new File_Type_Check();
 		$check->run( $check_result );
@@ -104,7 +105,7 @@ class File_Type_Check_Tests extends WP_UnitTestCase {
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-file-type-badly-named-files-folders-errors/load.php' );
 
 		// Create an empty Check_Result instance for this context.
-		$check_result = new Check_Result( $check_context );
+		$check_result = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		// Initialize the File_Type_Check instance.
 		$check = new File_Type_Check( File_Type_Check::TYPE_BADLY_NAMED );
@@ -150,7 +151,7 @@ class File_Type_Check_Tests extends WP_UnitTestCase {
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-file-type-badly-named-files-errors/load.php' );
 
 		// Create an empty Check_Result instance for this context.
-		$check_result = new Check_Result( $check_context );
+		$check_result = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		// Initialize the File_Type_Check instance.
 		$check = new File_Type_Check();
@@ -189,7 +190,7 @@ class File_Type_Check_Tests extends WP_UnitTestCase {
 
 	public function test_run_with_library_core_errors() {
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-file-type-library-core-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$check = new File_Type_Check( File_Type_Check::TYPE_LIBRARY_CORE );
 		$check->run( $check_result );
@@ -212,7 +213,7 @@ class File_Type_Check_Tests extends WP_UnitTestCase {
 
 	public function test_run_with_composer_errors() {
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-file-type-composer-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$check = new File_Type_Check( File_Type_Check::TYPE_COMPOSER );
 		$check->run( $check_result );

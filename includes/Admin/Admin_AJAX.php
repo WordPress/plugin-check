@@ -258,6 +258,8 @@ final class Admin_AJAX {
 
 		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
 		$checks = is_null( $checks ) ? array() : $checks;
+		$types  = filter_input( INPUT_POST, 'types', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
+		$types  = is_null( $types ) ? array() : $types;
 		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		$include_experimental = 1 === filter_input( INPUT_POST, 'include-experimental', FILTER_VALIDATE_INT );
@@ -266,6 +268,7 @@ final class Admin_AJAX {
 			$runner->set_experimental_flag( $include_experimental );
 			$runner->set_check_slugs( $checks );
 			$runner->set_plugin( $plugin );
+			$runner->set_types( $types );
 			$results = $runner->run();
 		} catch ( Exception $error ) {
 			wp_send_json_error(

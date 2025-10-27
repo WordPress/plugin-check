@@ -27,17 +27,15 @@ final class Checks {
 	/**
 	 * Runs checks against the plugin.
 	 *
-	 * @since 1.0.0
-	 *
 	 * @param Check_Context $context The check context for the plugin to be checked.
 	 * @param array         $checks  An array of Check objects to run.
 	 * @param Check_Runner  $runner  The runner instance that created this result.
-	 * @return Check_Result Object containing all check results.
-	 *
+	 * @param array         $check_types An array of check types to filter.
 	 * @throws Exception Thrown when check fails with critical error.
+	 * @since 1.0.0
 	 */
-	public function run_checks( Check_Context $context, array $checks, ?Check_Runner $runner = null ) {
-		$result = new Check_Result( $context );
+	public function run_checks( Check_Context $context, array $checks, ?Check_Runner $runner = null, array $check_types = array() ) {
+		$result = new Check_Result( $context, $check_types );
 
 		// Run the checks.
 		array_walk(

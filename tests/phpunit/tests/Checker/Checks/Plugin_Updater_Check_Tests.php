@@ -7,6 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Check_Types;
 use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\Plugin_Updater_Check;
 
 class Plugin_Updater_Check_Tests extends WP_UnitTestCase {
@@ -16,7 +17,7 @@ class Plugin_Updater_Check_Tests extends WP_UnitTestCase {
 	 */
 	public function test_run_with_plugin_updater_errors( $type_flag, $plugin_basename, $expected_file, $code, $error ) {
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . $plugin_basename );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$check = new Plugin_Updater_Check( $type_flag );
 		$check->run( $check_result );
@@ -92,7 +93,7 @@ class Plugin_Updater_Check_Tests extends WP_UnitTestCase {
 	public function test_run_without_any_errors() {
 		// Test plugin without any plugin updater.
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-i18n-usage-without-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
+		$check_result  = new Check_Result( $check_context, Check_Types::get_type_slugs() );
 
 		$check = new Plugin_Updater_Check();
 		$check->run( $check_result );
