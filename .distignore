@@ -3,8 +3,6 @@
 .idea
 .wordpress-org
 build
-build-cs
-build-phpunit
 docs
 node_modules
 patches

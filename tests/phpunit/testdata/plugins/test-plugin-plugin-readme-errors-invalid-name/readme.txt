@@ -1,6 +1,6 @@
 === Plugin Name ===
 
-Contributors:      plugin-check
+Contributors:      plugin-check, username, wordpressdotorg
 Requires at least: 6.0
 Tested up to:      6.1
 Requires PHP:      5.6

@@ -66,4 +66,23 @@ class Plugin_Context_Tests extends WP_UnitTestCase {
 
 		$this->assertTrue( $context->is_single_file_plugin() );
 	}
+
+	public function test_get_mode_default() {
+		$this->assertSame( 'new', $this->plugin_context->get_mode() );
+	}
+
+	public function test_get_mode_new() {
+		$context = new Plugin_Context( WP_PLUGIN_CHECK_MAIN_FILE, '', 'new' );
+		$this->assertSame( 'new', $context->get_mode() );
+	}
+
+	public function test_get_mode_update() {
+		$context = new Plugin_Context( WP_PLUGIN_CHECK_MAIN_FILE, '', 'update' );
+		$this->assertSame( 'update', $context->get_mode() );
+	}
+
+	public function test_get_mode_invalid() {
+		$context = new Plugin_Context( WP_PLUGIN_CHECK_MAIN_FILE, '', 'invalid' );
+		$this->assertSame( 'new', $context->get_mode() );
+	}
 }

@@ -1,4 +1,15 @@
 [default]
 extend-ignore-re = [
+    "avail_post_stati",
     "ba",
+    "MAGPIE_INITALIZED",
+    "setted_site_transient",
+    "setted_transient",
+    "stati",
+    "wheres",
+]
+
+[files]
+extend-exclude = [
+	"includes/Lib/Readme/*.php"
 ]

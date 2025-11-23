@@ -68,6 +68,28 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertCount( 1, wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'invalid_plugin_name' ) ) );
 	}
 
+	public function test_run_with_errors_restricted_contributors() {
+		$readme_check  = new Plugin_Readme_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-invalid-name/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$readme_check->run( $check_result );
+
+		$errors   = $check_result->get_errors();
+		$warnings = $check_result->get_warnings();
+
+		$this->assertNotEmpty( $errors );
+		$this->assertNotEmpty( $warnings );
+		$this->assertArrayHasKey( 'readme.txt', $errors );
+		$this->assertArrayHasKey( 'readme.txt', $warnings );
+
+		// Check for restricted contributors error.
+		$this->assertCount( 1, wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'readme_restricted_contributors' ) ) );
+
+		// Check for reserved contributors warning.
+		$this->assertCount( 1, wp_list_filter( $warnings['readme.txt'][0][0], array( 'code' => 'readme_reserved_contributors' ) ) );
+	}
+
 	public function test_run_with_errors_empty_name() {
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-empty-name/load.php' );
@@ -180,18 +202,6 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertCount( 1, wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'no_license' ) ) );
 	}
 
-	public function test_run_without_error_mpl2_license() {
-		$readme_check  = new Plugin_Readme_Check();
-		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-mpl2-license-without-errors/load.php' );
-		$check_result  = new Check_Result( $check_context );
-
-		$readme_check->run( $check_result );
-
-		$errors = $check_result->get_errors();
-
-		$this->assertEmpty( $errors );
-	}
-
 	public function test_run_with_errors_tested_upto() {
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-tested-upto/load.php' );
@@ -208,6 +218,84 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 0, $errors['readme.txt'] );
 		$this->assertArrayHasKey( 0, $errors['readme.txt'][0] );
 		$this->assertCount( 1, wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'outdated_tested_upto_header' ) ) );
+	}
+
+	public function test_run_with_errors_tested_upto_minor_same_major_version() {
+		// Target plugin has "6.1.1" is readme.
+		// Current version is set to 6.1.2.
+		set_transient( 'wp_plugin_check_latest_version_info', array( 'current' => '6.1.2' ) );
+
+		$readme_check  = new Plugin_Readme_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-tested-upto-minor/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$readme_check->run( $check_result );
+
+		$errors = $check_result->get_errors();
+
+		delete_transient( 'wp_plugin_check_latest_version_info' );
+
+		$this->assertNotEmpty( $errors );
+		$this->assertArrayHasKey( 'readme.txt', $errors );
+
+		// Check for tested upto minor error.
+		$this->assertArrayHasKey( 0, $errors['readme.txt'] );
+		$this->assertArrayHasKey( 0, $errors['readme.txt'][0] );
+		$this->assertCount( 1, wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'invalid_tested_upto_minor' ) ) );
+	}
+
+	public function test_run_with_errors_tested_upto_minor_different_major_version() {
+		// Target plugin has "6.1.1" is readme.
+		// Current version is set to 6.2.1.
+		set_transient( 'wp_plugin_check_latest_version_info', array( 'current' => '6.2.1' ) );
+
+		$readme_check  = new Plugin_Readme_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-tested-upto-minor/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$readme_check->run( $check_result );
+
+		$errors = $check_result->get_errors();
+
+		delete_transient( 'wp_plugin_check_latest_version_info' );
+
+		$this->assertNotEmpty( $errors );
+		$this->assertArrayHasKey( 'readme.txt', $errors );
+
+		// Check for tested upto minor error.
+		$this->assertArrayHasKey( 0, $errors['readme.txt'] );
+		$this->assertArrayHasKey( 0, $errors['readme.txt'][0] );
+		$this->assertCount( 0, wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'invalid_tested_upto_minor' ) ) );
+
+		// There must be outdated_tested_upto_header error.
+		$this->assertCount( 1, wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'outdated_tested_upto_header' ) ) );
+	}
+
+	public function test_run_with_errors_missing_readme_headers() {
+		add_filter( 'wp_plugin_check_ignored_readme_warnings', '__return_empty_array' );
+
+		$readme_check  = new Plugin_Readme_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-upgrade-notice/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$readme_check->run( $check_result );
+
+		$errors = $check_result->get_errors();
+
+		remove_filter( 'wp_plugin_check_ignored_readme_warnings', '__return_empty_array' );
+
+		$this->assertNotEmpty( $errors );
+		$this->assertArrayHasKey( 'readme.txt', $errors );
+
+		// Check for missing tested upto header.
+		$tested_upto_error = array_values( wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'missing_readme_header_tested' ) ) );
+		$this->assertCount( 1, $tested_upto_error );
+		$this->assertSame( 7, $tested_upto_error[0]['severity'] );
+
+		// Check for missing contributors header.
+		$contributors_error = array_values( wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'missing_readme_header_contributors' ) ) );
+		$this->assertCount( 1, $contributors_error );
+		$this->assertSame( 7, $contributors_error[0]['severity'] );
 	}
 
 	public function test_run_md_with_errors() {
@@ -228,6 +316,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertCount( 1, wp_list_filter( $errors['readme.md'][0][0], array( 'code' => 'default_readme_text' ) ) );
 		$this->assertCount( 1, wp_list_filter( $errors['readme.md'][0][0], array( 'code' => 'invalid_license' ) ) );
 		$this->assertCount( 1, wp_list_filter( $errors['readme.md'][0][0], array( 'code' => 'license_mismatch' ) ) );
+		$this->assertCount( 1, wp_list_filter( $errors['readme.md'][0][0], array( 'code' => 'readme_invalid_donate_link' ) ) );
 
 		$this->assertNotEmpty( $warnings );
 		$this->assertArrayHasKey( 'readme.md', $warnings );
@@ -300,7 +389,7 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 	public function test_run_with_errors_parser_warnings_with_custom_set_transient_version() {
 		$version = '5.0';
 
-		set_transient( 'wp_plugin_check_latest_wp_version', $version );
+		set_transient( 'wp_plugin_check_latest_version_info', array( 'current' => '5.0.1' ) );
 
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-parser-warnings/load.php' );
@@ -309,6 +398,8 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$readme_check->run( $check_result );
 
 		$warnings = $check_result->get_warnings();
+
+		delete_transient( 'wp_plugin_check_latest_version_info' );
 
 		$this->assertNotEmpty( $warnings );
 		$this->assertArrayHasKey( 'readme.txt', $warnings );
@@ -320,8 +411,6 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$filtered_items = array_values( $filtered_items );
 
 		$this->assertStringContainsString( 'The "Tested up to" field was ignored. This field should only contain a valid WordPress version such as "' . $version . '"', $filtered_items[0]['message'] );
-
-		delete_transient( 'wp_plugin_check_latest_wp_version' );
 	}
 
 	public function test_run_with_errors_multiple_parser_warnings_and_empty_ignored_array() {
@@ -336,6 +425,8 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$errors   = $check_result->get_errors();
 		$warnings = $check_result->get_warnings();
 
+		remove_filter( 'wp_plugin_check_ignored_readme_warnings', '__return_empty_array' );
+
 		$this->assertNotEmpty( $warnings );
 		$this->assertArrayHasKey( 'readme.txt', $warnings );
 
@@ -346,8 +437,6 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertEquals( 8, $check_result->get_warning_count() );
 		$this->assertEmpty( $errors );
 		$this->assertEquals( 0, $check_result->get_error_count() );
-
-		remove_filter( 'wp_plugin_check_ignored_readme_warnings', '__return_empty_array' );
 	}
 
 	public function test_filter_readme_warnings_ignored() {
@@ -367,8 +456,6 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$result = apply_filters( $filter_name, array() );
 
-		$this->assertEquals( $custom_ignores, $result );
-
 		// Remove the filter to avoid interfering with other tests.
 		remove_filter(
 			$filter_name,
@@ -376,6 +463,8 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 				return $custom_ignores;
 			}
 		);
+
+		$this->assertEquals( $custom_ignores, $result );
 	}
 
 	public function test_filter_wp_plugin_check_ignored_readme_warnings_will_return_no_error() {
@@ -403,11 +492,6 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$errors   = $check_result->get_errors();
 		$warnings = $check_result->get_warnings();
 
-		$this->assertEmpty( $errors );
-		$this->assertEmpty( $warnings );
-		$this->assertSame( 0, $check_result->get_error_count() );
-		$this->assertSame( 0, $check_result->get_warning_count() );
-
 		// Remove the filter to avoid interfering with other tests.
 		remove_filter(
 			$filter_name,
@@ -415,6 +499,11 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 				return $custom_ignores;
 			}
 		);
+
+		$this->assertEmpty( $errors );
+		$this->assertEmpty( $warnings );
+		$this->assertSame( 0, $check_result->get_error_count() );
+		$this->assertSame( 0, $check_result->get_warning_count() );
 	}
 
 	public function test_run_with_errors_upgrade_notice() {
@@ -434,9 +523,8 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_run_with_errors_tested_up_to_latest_plus_two_version() {
-		$version = '5.9'; // Target plugin has "6.1" is readme.
-
-		set_transient( 'wp_plugin_check_latest_wp_version', $version );
+		// Target plugin has "6.1" is readme.
+		set_transient( 'wp_plugin_check_latest_version_info', array( 'current' => '5.9.1' ) );
 
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-md-with-errors/load.php' );
@@ -446,21 +534,20 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$errors = $check_result->get_errors();
 
+		delete_transient( 'wp_plugin_check_latest_version_info' );
+
 		$this->assertNotEmpty( $errors );
 
-		$filtered_items = wp_list_filter( $errors['readme.md'][0][0], array( 'code' => 'nonexistent_tested_upto_header' ) );
+		$filtered_items = array_values( wp_list_filter( $errors['readme.md'][0][0], array( 'code' => 'nonexistent_tested_upto_header' ) ) );
 
 		$this->assertCount( 1, $filtered_items );
 		$this->assertStringContainsString( 'Tested up to: 6.1', $filtered_items[0]['message'] );
 		$this->assertStringContainsString( 'This version of WordPress does not exist (yet).', $filtered_items[0]['message'] );
-
-		delete_transient( 'wp_plugin_check_latest_wp_version' );
 	}
 
-	public function test_run_with_errors_tested_up_to_latest_plus_one_version() {
-		$version = '6.0'; // Target plugin has "6.1" is readme.
-
-		set_transient( 'wp_plugin_check_latest_wp_version', $version );
+	public function test_run_without_errors_tested_up_to_latest_plus_one_version() {
+		// Target plugin has "6.1" is readme.
+		set_transient( 'wp_plugin_check_latest_version_info', array( 'current' => '6.0.1' ) );
 
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-md-with-errors/load.php' );
@@ -470,15 +557,14 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$errors = $check_result->get_errors();
 
-		$this->assertCount( 0, wp_list_filter( $errors['readme.md'][0][0], array( 'code' => 'nonexistent_tested_upto_header' ) ) );
+		delete_transient( 'wp_plugin_check_latest_version_info' );
 
-		delete_transient( 'wp_plugin_check_latest_wp_version' );
+		$this->assertCount( 0, wp_list_filter( $errors['readme.md'][0][0], array( 'code' => 'nonexistent_tested_upto_header' ) ) );
 	}
 
-	public function test_run_with_errors_tested_up_to_latest_stable_version() {
-		$version = '6.1'; // Target plugin has "6.1" is readme.
-
-		set_transient( 'wp_plugin_check_latest_wp_version', $version );
+	public function test_run_without_errors_tested_up_to_latest_stable_version() {
+		// Target plugin has "6.1" is readme.
+		set_transient( 'wp_plugin_check_latest_version_info', array( 'current' => '6.1.1' ) );
 
 		$readme_check  = new Plugin_Readme_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-md-with-errors/load.php' );
@@ -488,9 +574,9 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$errors = $check_result->get_errors();
 
-		$this->assertCount( 0, wp_list_filter( $errors['readme.md'][0][0], array( 'code' => 'nonexistent_tested_upto_header' ) ) );
+		delete_transient( 'wp_plugin_check_latest_version_info' );
 
-		delete_transient( 'wp_plugin_check_latest_wp_version' );
+		$this->assertCount( 0, wp_list_filter( $errors['readme.md'][0][0], array( 'code' => 'nonexistent_tested_upto_header' ) ) );
 	}
 
 	public function test_run_without_errors_readme_contributors_warning() {
@@ -504,5 +590,36 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		// Should not contain contributors warning.
 		$this->assertCount( 0, wp_list_filter( $warnings['readme.txt'][0][0], array( 'code' => 'readme_invalid_contributors' ) ) );
+	}
+
+	public function test_run_with_mismatched_requires_headers() {
+		$check         = new Plugin_Readme_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-trademarks-plugin-readme-errors/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check->run( $check_result );
+
+		$errors = $check_result->get_errors();
+
+		$this->assertNotEmpty( $errors );
+		$this->assertArrayHasKey( 'readme.txt', $errors );
+
+		$this->assertCount( 1, wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'readme_mismatched_header_requires' ) ) );
+		$this->assertCount( 1, wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'readme_mismatched_header_requires_php' ) ) );
+	}
+
+	public function test_run_with_discouraged_donate_link() {
+		$check         = new Plugin_Readme_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-readme-errors-default-text/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check->run( $check_result );
+
+		$errors = $check_result->get_errors();
+
+		$this->assertNotEmpty( $errors );
+		$this->assertArrayHasKey( 'readme.txt', $errors );
+
+		$this->assertCount( 1, wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'readme_invalid_donate_link_domain' ) ) );
 	}
 }

@@ -10,13 +10,16 @@ namespace WordPress\Plugin_Check\Checker\Checks\Plugin_Repo;
 use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Checks\Abstract_File_Check;
+use WordPress\Plugin_Check\Lib\Readme\Parser as PCPParser;
 use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Traits\Find_Readme;
 use WordPress\Plugin_Check\Traits\TLD_Names;
 use WordPress\Plugin_Check\Traits\External_Utils;
 use WordPress\Plugin_Check\Traits\License_Utils;
 use WordPress\Plugin_Check\Traits\Stable_Check;
-use WordPressdotorg\Plugin_Directory\Readme\Parser;
+use WordPress\Plugin_Check\Traits\URL_Utils;
+use WordPress\Plugin_Check\Traits\Version_Utils;
+use WordPressdotorg\Plugin_Directory\Readme\Parser as DotorgParser;
 
 /**
  * Check the plugins readme file and contents.
@@ -33,6 +36,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	use External_Utils;
 	use Stable_Check;
 	use License_Utils;
+	use URL_Utils;
+	use Version_Utils;
 
 	/**
 	 * Gets the categories for the check.
@@ -85,7 +90,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 		$readme_file = reset( $readme );
 
-		$parser = new Parser( $readme_file );
+		$parser = class_exists( DotorgParser::class ) ? new DotorgParser( $readme_file ) : new PCPParser( $readme_file );
 
 		// Check the readme file for plugin name.
 		$this->check_name( $result, $readme_file, $parser );
@@ -108,11 +113,17 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		// Check the readme file for warnings.
 		$this->check_for_warnings( $result, $readme_file, $parser );
 
+		// Check the readme file for donate link.
+		$this->check_for_donate_link( $result, $readme_file, $parser );
+
 		// Check the readme file for contributors.
 		$this->check_for_contributors( $result, $readme_file );
 
 		// Check for third parties privacy notes.
 		$this->check_for_privacy_notes( $result, $readme_file, $parser, $files );
+
+		// Check the readme file for requires headers.
+		$this->check_requires_headers( $result, $readme_file, $parser );
 	}
 
 	/**
@@ -120,11 +131,11 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param Check_Result $result      The Check Result to amend.
-	 * @param string       $readme_file Readme file.
-	 * @param Parser       $parser      The Parser object.
+	 * @param Check_Result           $result      The Check Result to amend.
+	 * @param string                 $readme_file Readme file.
+	 * @param DotorgParser|PCPParser $parser      The Parser object.
 	 */
-	private function check_name( Check_Result $result, string $readme_file, Parser $parser ) {
+	private function check_name( Check_Result $result, string $readme_file, $parser ) {
 		if ( isset( $parser->warnings['invalid_plugin_name_header'] ) && false === $parser->name ) {
 			$this->add_result_error_for_file(
 				$result,
@@ -187,11 +198,13 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since 1.0.2
 	 *
-	 * @param Check_Result $result      The Check Result to amend.
-	 * @param string       $readme_file Readme file.
-	 * @param Parser       $parser      The Parser object.
+	 * @param Check_Result           $result      The Check Result to amend.
+	 * @param string                 $readme_file Readme file.
+	 * @param DotorgParser|PCPParser $parser      The Parser object.
+	 *
+	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
 	 */
-	private function check_headers( Check_Result $result, string $readme_file, Parser $parser ) {
+	private function check_headers( Check_Result $result, string $readme_file, $parser ) {
 		$ignored_warnings = $this->get_ignored_warnings( $parser );
 
 		$fields = array(
@@ -211,55 +224,85 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 			if ( ! in_array( $field['ignore_key'], $ignored_warnings, true ) && ! isset( $parser_warnings[ $field['ignore_key'] ] ) ) {
 
 				if ( ! empty( $parser->{$field_key} ) && 'tested' === $field_key ) {
+					list( $tested_upto, ) = explode( '-', $parser->{$field_key} );
+
 					$latest_wordpress_version = $this->get_wordpress_stable_version();
-					if ( version_compare( $parser->{$field_key}, $latest_wordpress_version, '<' ) ) {
-						$this->add_result_error_for_file(
-							$result,
-							sprintf(
-								/* translators: 1: currently used version, 2: latest stable WordPress version, 3: 'Tested up to' */
-								__( '<strong>Tested up to: %1$s < %2$s.</strong><br>The "%3$s" value in your plugin is not set to the current version of WordPress. This means your plugin will not show up in searches, as we require plugins to be compatible and documented as tested up to the most recent version of WordPress.', 'plugin-check' ),
-								$parser->{$field_key},
-								$latest_wordpress_version,
-								'Tested up to'
-							),
-							'outdated_tested_upto_header',
-							$readme_file,
-							0,
-							0,
-							'https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/#readme-header-information',
-							7
-						);
-					} elseif ( version_compare( $parser->{$field_key}, number_format( (float) $latest_wordpress_version + 0.1, 1 ), '>' ) ) {
-						$this->add_result_error_for_file(
-							$result,
-							sprintf(
-								/* translators: 1: currently used version, 2: 'Tested up to' */
-								__( '<strong>Tested up to: %1$s.</strong><br>The "%2$s" value in your plugin is not valid. This version of WordPress does not exist (yet).', 'plugin-check' ),
-								$parser->{$field_key},
-								'Tested up to'
-							),
-							'nonexistent_tested_upto_header',
-							$readme_file,
-							0,
-							0,
-							'https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/#readme-header-information',
-							7
-						);
+
+					// Only proceed with WordPress version validation if we got a valid version.
+					if ( ! empty( $latest_wordpress_version ) ) {
+						$tested_upto_major = $tested_upto;
+						if ( preg_match( '#^\d.\d#', $tested_upto, $matches ) ) {
+							$tested_upto_major = $matches[0];
+						}
+
+						if ( $tested_upto_major === $latest_wordpress_version && preg_match( '/^\d+\.\d+\.\d+/', $tested_upto ) ) {
+							$this->add_result_error_for_file(
+								$result,
+								sprintf(
+									/* translators: %s: currently used version */
+									__( '<strong>Tested up to: %1$s</strong><br>The version number should only include major versions %2$s.', 'plugin-check' ),
+									$tested_upto,
+									$tested_upto_major
+								),
+								'invalid_tested_upto_minor',
+								$readme_file,
+								0,
+								0,
+								'https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/#readme-header-information',
+								7
+							);
+						}
+
+						if ( version_compare( $tested_upto_major, $latest_wordpress_version, '<' ) ) {
+							$this->add_result_error_for_file(
+								$result,
+								sprintf(
+									/* translators: 1: currently used version, 2: latest stable WordPress version, 3: 'Tested up to' */
+									__( '<strong>Tested up to: %1$s &lt; %2$s.</strong><br>The "%3$s" value in your plugin is not set to the current version of WordPress. This means your plugin will not show up in searches, as we require plugins to be compatible and documented as tested up to the most recent version of WordPress.', 'plugin-check' ),
+									$tested_upto_major,
+									$latest_wordpress_version,
+									'Tested up to'
+								),
+								'outdated_tested_upto_header',
+								$readme_file,
+								0,
+								0,
+								'https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/#readme-header-information',
+								7
+							);
+						} elseif ( version_compare( $tested_upto_major, number_format( (float) $latest_wordpress_version + 0.1, 1 ), '>' ) ) {
+							$this->add_result_error_for_file(
+								$result,
+								sprintf(
+									/* translators: 1: currently used version, 2: 'Tested up to' */
+									__( '<strong>Tested up to: %1$s.</strong><br>The "%2$s" value in your plugin is not valid. This version of WordPress does not exist (yet).', 'plugin-check' ),
+									$tested_upto_major,
+									'Tested up to'
+								),
+								'nonexistent_tested_upto_header',
+								$readme_file,
+								0,
+								0,
+								'https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/#readme-header-information',
+								7
+							);
+						}
 					}
 				} else {
 					if ( empty( $parser->{$field_key} ) ) {
 						$this->add_result_error_for_file(
 							$result,
 							sprintf(
-								/* translators: %s: plugin header tag */
-								__( '<strong>Your readme is either missing or incomplete.</strong><br>The "%s" field is missing. Your readme has to have headers as well as a proper description and documentation as to how it works and how one can use it.', 'plugin-check' ),
+								/* translators: %s: readme header field */
+								__( 'The "%s" header is missing in the readme file.', 'plugin-check' ),
 								$field['label']
 							),
-							'missing_readme_header',
+							'missing_readme_header_' . $field_key,
 							$readme_file,
 							0,
 							0,
-							'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#incomplete-readme'
+							'https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/#readme-header-information',
+							7
 						);
 					}
 				}
@@ -272,19 +315,17 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param Check_Result $result      The Check Result to amend.
-	 * @param string       $readme_file Readme file.
-	 * @param Parser       $parser      The Parser object.
+	 * @param Check_Result           $result      The Check Result to amend.
+	 * @param string                 $readme_file Readme file.
+	 * @param DotorgParser|PCPParser $parser      The Parser object.
 	 */
-	private function check_default_text( Check_Result $result, string $readme_file, Parser $parser ) {
+	private function check_default_text( Check_Result $result, string $readme_file, $parser ) {
 		$short_description = $parser->short_description;
 		$tags              = $parser->tags;
-		$donate_link       = $parser->donate_link;
 
 		if (
 			in_array( 'tag1', $tags, true )
 			|| str_contains( $short_description, 'Here is a short description of the plugin.' )
-			|| str_contains( $donate_link, '//example.com/' )
 		) {
 			$this->add_result_error_for_file(
 				$result,
@@ -304,11 +345,11 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param Check_Result $result      The Check Result to amend.
-	 * @param string       $readme_file Readme file.
-	 * @param Parser       $parser      The Parser object.
+	 * @param Check_Result           $result      The Check Result to amend.
+	 * @param string                 $readme_file Readme file.
+	 * @param DotorgParser|PCPParser $parser      The Parser object.
 	 */
-	private function check_license( Check_Result $result, string $readme_file, Parser $parser ) {
+	private function check_license( Check_Result $result, string $readme_file, $parser ) {
 		$license          = $parser->license;
 		$matches_license  = array();
 		$plugin_main_file = $result->plugin()->main_file();
@@ -317,7 +358,11 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		if ( empty( $license ) ) {
 			$this->add_result_error_for_file(
 				$result,
-				__( '<strong>Your plugin has no license declared.</strong><br>Please update your readme with a GPLv2 (or later) compatible license. It is necessary to declare the license of this plugin. You can do this by using the fields available both in the plugin readme and in the plugin headers.', 'plugin-check' ),
+				sprintf(
+					/* translators: %s: readme header field */
+					__( '<strong>Missing "%s".</strong><br>Please update your readme with a valid GPLv2 (or later) compatible license.', 'plugin-check' ),
+					'License'
+				),
 				'no_license',
 				$readme_file,
 				0,
@@ -374,17 +419,22 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param Check_Result $result      The Check Result to amend.
-	 * @param string       $readme_file Readme file.
-	 * @param Parser       $parser      The Parser object.
+	 * @param Check_Result           $result      The Check Result to amend.
+	 * @param string                 $readme_file Readme file.
+	 * @param DotorgParser|PCPParser $parser      The Parser object.
 	 */
-	private function check_stable_tag( Check_Result $result, string $readme_file, Parser $parser ) {
+	private function check_stable_tag( Check_Result $result, string $readme_file, $parser ) {
 		$stable_tag = $parser->stable_tag;
 
 		if ( empty( $stable_tag ) ) {
 			$this->add_result_error_for_file(
 				$result,
-				__( "<strong>Incorrect Stable Tag.</strong><br>Your Stable Tag is meant to be the stable version of your plugin, not of WordPress. For your plugin to be properly downloaded from WordPress.org, those values need to be the same. If they're out of sync, your users won't get the right version of your code.", 'plugin-check' ),
+				sprintf(
+					/* translators: 1: readme header tag, 2: plugin header tag */
+					__( '<strong>Invalid or missing %1$s.</strong><br>Your %1$s is meant to be the stable version of your plugin and it needs to be exactly the same with the %2$s in your main plugin file\'s header. Any mismatch can prevent users from downloading the correct plugin files from WordPress.org.', 'plugin-check' ),
+					'Stable Tag',
+					'Version'
+				),
 				'no_stable_tag',
 				$readme_file,
 				0,
@@ -399,7 +449,13 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		if ( 'trunk' === $stable_tag ) {
 			$this->add_result_error_for_file(
 				$result,
-				__( "<strong>Incorrect Stable Tag.</strong><br>It's recommended not to use 'Stable Tag: trunk'. Your Stable Tag is meant to be the stable version of your plugin, not of WordPress. For your plugin to be properly downloaded from WordPress.org, those values need to be the same. If they're out of sync, your users won't get the right version of your code.", 'plugin-check' ),
+				sprintf(
+					/* translators: 1: readme header tag, 2: example tag, 3: plugin header tag */
+					__( '<strong>Incorrect %1$s.</strong><br>It\'s recommended not to use "%2$s". Your %1$s is meant to be the stable version of your plugin and it needs to be exactly the same with the %3$s in your main plugin file\'s header. Any mismatch can prevent users from downloading the correct plugin files from WordPress.org.', 'plugin-check' ),
+					'Stable Tag',
+					'Stable Tag: trunk',
+					'Version'
+				),
 				'trunk_stable_tag',
 				$readme_file,
 				0,
@@ -421,9 +477,11 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 			$this->add_result_error_for_file(
 				$result,
 				sprintf(
-					/* translators: %s: versions comparison */
-					__( "<strong>Mismatched Stable Tag: %s.</strong><br>The Stable Tag in your readme file does not match the version in your main plugin file. Your Stable Tag is meant to be the stable version of your plugin, not of WordPress. For your plugin to be properly downloaded from WordPress.org, those values need to be the same. If they're out of sync, your users won't get the right version of your code.", 'plugin-check' ),
-					esc_html( $stable_tag ) . ' != ' . esc_html( $plugin_data['Version'] )
+					/* translators: 1: readme header tag, 2: versions comparison, 3: plugin header tag */
+					__( '<strong>Mismatched %1$s: %2$s.</strong><br>Your %1$s is meant to be the stable version of your plugin and it needs to be exactly the same with the %3$s in your main plugin file\'s header. Any mismatch can prevent users from downloading the correct plugin files from WordPress.org.', 'plugin-check' ),
+					'Stable Tag',
+					esc_html( $stable_tag ) . ' != ' . esc_html( $plugin_data['Version'] ),
+					'Version'
 				),
 				'stable_tag_mismatch',
 				$readme_file,
@@ -440,11 +498,11 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since 1.0.2
 	 *
-	 * @param Check_Result $result      The Check Result to amend.
-	 * @param string       $readme_file Readme file.
-	 * @param Parser       $parser      The Parser object.
+	 * @param Check_Result           $result      The Check Result to amend.
+	 * @param string                 $readme_file Readme file.
+	 * @param DotorgParser|PCPParser $parser      The Parser object.
 	 */
-	private function check_upgrade_notice( Check_Result $result, string $readme_file, Parser $parser ) {
+	private function check_upgrade_notice( Check_Result $result, string $readme_file, $parser ) {
 		$notices = $parser->upgrade_notice;
 
 		$maximum_characters = 300;
@@ -474,21 +532,27 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param Check_Result $result      The Check Result to amend.
-	 * @param string       $readme_file Readme file.
-	 * @param Parser       $parser      The Parser object.
+	 * @param Check_Result           $result      The Check Result to amend.
+	 * @param string                 $readme_file Readme file.
+	 * @param DotorgParser|PCPParser $parser      The Parser object.
 	 *
 	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+	 * @SuppressWarnings(PHPMD.NPathComplexity)
 	 */
-	private function check_for_warnings( Check_Result $result, string $readme_file, Parser $parser ) {
+	private function check_for_warnings( Check_Result $result, string $readme_file, $parser ) {
 		$warnings = $parser->warnings ? $parser->warnings : array();
 
 		// This should be ERROR rather than WARNING. So ignoring here to handle separately.
 		unset( $warnings['invalid_plugin_name_header'] );
 
+		// We handle license check in our own way.
+		unset( $warnings['license_missing'] );
+		unset( $warnings['invalid_license'] );
+		unset( $warnings['unknown_license'] );
+
 		$warning_keys = array_keys( $warnings );
 
-		$latest_wordpress_version = (float) $this->get_wordpress_stable_version();
+		$latest_wordpress_version = $this->get_wordpress_stable_version();
 
 		$warning_details = array(
 			'contributor_ignored'          => array(
@@ -512,8 +576,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 					/* translators: 1: plugin header tag; 2: Example version 5.0. 3: Example version 5.1. */
 					__( 'The "%1$s" field was ignored. This field should only contain a valid WordPress version such as "%2$s" or "%3$s".', 'plugin-check' ),
 					'Tested up to',
-					number_format( $latest_wordpress_version, 1 ),
-					number_format( $latest_wordpress_version + 0.1, 1 )
+					! empty( $latest_wordpress_version ) ? number_format( (float) $latest_wordpress_version, 1 ) : '5.0',
+					! empty( $latest_wordpress_version ) ? number_format( (float) $latest_wordpress_version + 0.1, 1 ) : '5.1'
 				),
 				'severity' => 7,
 			),
@@ -522,8 +586,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 					/* translators: 1: plugin header tag; 2: Example version 5.0. 3: Example version 4.9. */
 					__( 'The "%1$s" field was ignored. This field should only contain a valid WordPress version such as "%2$s" or "%3$s".', 'plugin-check' ),
 					'Requires at least',
-					number_format( $latest_wordpress_version, 1 ),
-					number_format( $latest_wordpress_version - 0.1, 1 )
+					! empty( $latest_wordpress_version ) ? number_format( (float) $latest_wordpress_version, 1 ) : '5.0',
+					! empty( $latest_wordpress_version ) ? number_format( (float) $latest_wordpress_version - 0.1, 1 ) : '4.9'
 				),
 			),
 			'too_many_tags'                => array(
@@ -609,12 +673,72 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	}
 
 	/**
+	 * Checks the readme file for donate link.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @param Check_Result           $result      The Check Result to amend.
+	 * @param string                 $readme_file Readme file.
+	 * @param DotorgParser|PCPParser $parser      The Parser object.
+	 */
+	private function check_for_donate_link( Check_Result $result, string $readme_file, $parser ) {
+		$donate_link = $parser->donate_link;
+
+		// Bail if empty donate link.
+		if ( empty( $donate_link ) ) {
+			return;
+		}
+
+		if ( ! $this->is_valid_url( $donate_link ) ) {
+			$this->add_result_error_for_file(
+				$result,
+				sprintf(
+					/* translators: %s: readme header field */
+					__( 'The "%s" header in the readme file must be a valid URL.', 'plugin-check' ),
+					'Donate link'
+				),
+				'readme_invalid_donate_link',
+				$readme_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/#readme-header-information',
+				7
+			);
+
+			return;
+		}
+
+		// Check for discouraged domain.
+		$matched_domain = $this->find_discouraged_domain( $donate_link );
+
+		if ( $matched_domain ) {
+			$this->add_result_error_for_file(
+				$result,
+				sprintf(
+					/* translators: 1: readme header field, 2: domain */
+					__( 'The "%1$s" header in the readme file is not valid. Discouraged domain "%2$s" found. This is the URL for users to support plugin author financially.', 'plugin-check' ),
+					'Donate link',
+					esc_html( $matched_domain )
+				),
+				'readme_invalid_donate_link_domain',
+				$readme_file,
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/#readme-header-information',
+				7
+			);
+		}
+	}
+
+	/**
 	 * Checks the readme file for contributors.
 	 *
 	 * @since 1.2.0
 	 *
 	 * @param Check_Result $result      The Check Result to amend.
 	 * @param string       $readme_file Readme file.
+	 *
+	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
 	 */
 	private function check_for_contributors( Check_Result $result, string $readme_file ) {
 		$regex = '/Contributors\s?:(?:\*\*|\s)?(.*?)\R/';
@@ -630,7 +754,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 		$usernames = explode( ',', $matches[1] );
 
-		$usernames = array_map( 'trim', $usernames );
+		$usernames = array_unique( array_map( 'trim', $usernames ) );
 
 		$valid = true;
 
@@ -656,6 +780,72 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 				'',
 				6
 			);
+
+			return;
+		}
+
+		$restricted_contributors = $this->get_restricted_contributors();
+
+		$disallowed_contributors = array_keys(
+			array_filter(
+				$restricted_contributors,
+				function ( $value ) {
+					return 'error' === strtolower( $value );
+				}
+			)
+		);
+
+		if ( ! empty( $disallowed_contributors ) ) {
+			$disallowed_usernames = array_intersect( $usernames, $disallowed_contributors );
+
+			if ( ! empty( $disallowed_usernames ) ) {
+				$this->add_result_error_for_file(
+					$result,
+					sprintf(
+						/* translators: 1: plugin header field, 2: usernames */
+						__( 'The "%1$s" header in the readme file contains restricted username(s). Found: %2$s', 'plugin-check' ),
+						'Contributors',
+						'"' . implode( '", "', $disallowed_usernames ) . '"'
+					),
+					'readme_restricted_contributors',
+					$readme_file,
+					0,
+					0,
+					'https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/#readme-header-information',
+					7
+				);
+			}
+		}
+
+		$reserved_contributors = array_keys(
+			array_filter(
+				$restricted_contributors,
+				function ( $value ) {
+					return 'warning' === strtolower( $value );
+				}
+			)
+		);
+
+		if ( ! empty( $reserved_contributors ) ) {
+			$reserved_usernames = array_intersect( $usernames, $reserved_contributors );
+
+			if ( ! empty( $reserved_usernames ) ) {
+				$this->add_result_warning_for_file(
+					$result,
+					sprintf(
+						/* translators: 1: plugin header field, 2: usernames */
+						__( 'The "%1$s" header in the readme file contains reserved username(s). Found: %2$s', 'plugin-check' ),
+						'Contributors',
+						'"' . implode( '", "', $reserved_usernames ) . '"'
+					),
+					'readme_reserved_contributors',
+					$readme_file,
+					0,
+					0,
+					'https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/#readme-header-information',
+					6
+				);
+			}
 		}
 	}
 
@@ -682,43 +872,65 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 	/**
 	 * Returns current major WordPress version.
+	 * Checks the readme file for requires headers.
 	 *
-	 * @since 1.0.0
+	 * @since 1.5.0
 	 *
-	 * @return string Stable WordPress version.
+	 * @param Check_Result           $result      The Check Result to amend.
+	 * @param string                 $readme_file Readme file.
+	 * @param DotorgParser|PCPParser $parser      The Parser object.
 	 */
-	private function get_wordpress_stable_version() {
-		$version = get_transient( 'wp_plugin_check_latest_wp_version' );
+	private function check_requires_headers( Check_Result $result, string $readme_file, $parser ) {
+		$ignored_warnings = $this->get_ignored_warnings( $parser );
 
-		if ( false === $version ) {
-			$response = wp_remote_get( 'https://api.wordpress.org/core/version-check/1.7/' );
+		$found_warnings = $parser->warnings ? $parser->warnings : array();
 
-			if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
-				$body = json_decode( wp_remote_retrieve_body( $response ), true );
+		$current_warnings = array_diff( array_keys( $found_warnings ), $ignored_warnings );
 
-				if ( isset( $body['offers'] ) && ! empty( $body['offers'] ) ) {
-					$latest_release = reset( $body['offers'] );
+		$requires = array(
+			'requires_header_ignored'     => array(
+				'label'        => 'Requires at least',
+				'key'          => 'requires',
+				'header_field' => 'RequiresWP',
+			),
+			'requires_php_header_ignored' => array(
+				'label'        => 'Requires PHP',
+				'key'          => 'requires_php',
+				'header_field' => 'RequiresPHP',
+			),
+		);
 
-					$version = $latest_release['current'];
+		// Find potential requires keys to check.
+		$potential_requires = array_diff( array_keys( $requires ), $current_warnings );
 
-					set_transient( 'wp_plugin_check_latest_wp_version', $version, DAY_IN_SECONDS );
-				}
+		// Bail if not found.
+		if ( empty( $potential_requires ) ) {
+			return;
+		}
+
+		$plugin_data = get_plugin_data( $result->plugin()->main_file(), false, false );
+
+		foreach ( $potential_requires as $require ) {
+			$readme_value = $parser->{$requires[ $require ]['key']};
+			$plugin_value = $plugin_data[ $requires[ $require ]['header_field'] ];
+
+			if ( ! empty( $readme_value ) && ! empty( $plugin_value ) && $readme_value !== $plugin_value ) {
+				$this->add_result_error_for_file(
+					$result,
+					sprintf(
+						/* translators: 1: readme header tag, 2: versions comparison */
+						__( '<strong>Mismatched %1$s: %2$s.</strong><br>"%1$s" needs to be exactly the same with that in your main plugin file\'s header.', 'plugin-check' ),
+						esc_html( $requires[ $require ]['label'] ),
+						esc_html( $readme_value ) . ' != ' . esc_html( $plugin_value )
+					),
+					'readme_mismatched_header_' . $requires[ $require ]['key'],
+					$readme_file,
+					0,
+					0,
+					'https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/#readme-header-information'
+				);
 			}
 		}
-
-		// If $version is still false at this point, use current installed WordPress version.
-		if ( false === $version ) {
-			$version = get_bloginfo( 'version' );
-
-			// Strip off any -alpha, -RC, -beta suffixes.
-			list( $version, ) = explode( '-', $version );
-		}
-
-		if ( preg_match( '#^\d.\d#', $version, $matches ) ) {
-			$version = $matches[0];
-		}
-
-		return $version;
 	}
 
 	/**
@@ -726,10 +938,10 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since 1.0.2
 	 *
-	 * @param Parser $parser The Parser object.
+	 * @param DotorgParser|PCPParser $parser The Parser object.
 	 * @return array Ignored warnings.
 	 */
-	private function get_ignored_warnings( Parser $parser ) {
+	private function get_ignored_warnings( $parser ) {
 		$ignored_warnings = array(
 			'contributor_ignored',
 		);
@@ -739,12 +951,43 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		 *
 		 * @since 1.0.2
 		 *
-		 * @param array  $ignored_warnings Array of ignored warning keys.
-		 * @param Parser $parser           The Parser object.
+		 * @param array                  $ignored_warnings Array of ignored warning keys.
+		 * @param DotorgParser|PCPParser $parser           The Parser object.
 		 */
 		$ignored_warnings = (array) apply_filters( 'wp_plugin_check_ignored_readme_warnings', $ignored_warnings, $parser );
 
 		return $ignored_warnings;
+	}
+
+	/**
+	 * Returns restricted contributors.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @return array Restricted contributors.
+	 */
+	private function get_restricted_contributors() {
+		$restricted_contributors = array(
+			'username'                => 'error',
+			'your-name'               => 'error',
+			'your-username'           => 'error',
+			'your-wordpress-username' => 'error',
+			'your_wordpress_username' => 'error',
+			'yourusername'            => 'error',
+			'yourwordpressusername'   => 'error',
+			'wordpressdotorg'         => 'warning',
+		);
+
+		/**
+		 * Filter the list of restricted contributors.
+		 *
+		 * @since 1.4.0
+		 *
+		 * @param array $restricted_contributors Array of restricted contributors with error type.
+		 */
+		$restricted_contributors = (array) apply_filters( 'wp_plugin_check_restricted_contributors', $restricted_contributors );
+
+		return $restricted_contributors;
 	}
 
 	/**

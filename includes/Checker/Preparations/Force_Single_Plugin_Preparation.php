@@ -49,20 +49,6 @@ class Force_Single_Plugin_Preparation implements Preparation {
 	 * @throws Exception Thrown when preparation fails.
 	 */
 	public function prepare() {
-		$valid_plugin = validate_plugin( $this->plugin_basename );
-
-		// Check if the plugin exists.
-		if ( is_wp_error( $valid_plugin ) ) {
-
-			throw new Exception(
-				sprintf(
-					/* translators: 1: plugin basename, 2: error message */
-					__( 'Invalid plugin %1$s: %2$s', 'plugin-check' ),
-					$this->plugin_basename,
-					$valid_plugin->get_error_message()
-				)
-			);
-		}
 
 		add_filter( 'option_active_plugins', array( $this, 'filter_active_plugins' ) );
 		add_filter( 'default_option_active_plugins', array( $this, 'filter_active_plugins' ) );

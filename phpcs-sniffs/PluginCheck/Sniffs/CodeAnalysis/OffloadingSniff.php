@@ -14,6 +14,7 @@ use PHP_CodeSniffer\Exceptions\RuntimeException;
 use PHP_CodeSniffer\Util\Tokens;
 use PHPCSUtils\Tokens\Collections;
 use PHPCSUtils\Utils\TextStrings;
+use PluginCheckCS\PluginCheck\Helpers\OffloadingServicesTrait;
 use WordPressCS\WordPress\Sniff;
 
 /**
@@ -24,6 +25,7 @@ use WordPressCS\WordPress\Sniff;
  * @since 1.1.0
  */
 final class OffloadingSniff extends Sniff {
+	use OffloadingServicesTrait;
 
 	/**
 	 * Returns an array of tokens this test wants to listen for.
@@ -76,38 +78,7 @@ final class OffloadingSniff extends Sniff {
 			return;
 		}
 
-		// Known offloading services.
-		$look_known_offloading_services = array(
-			'code\.jquery\.com',
-			'(?<!api\.)cloudflare\.com',
-			'cdn\.jsdelivr\.net',
-			'cdn\.rawgit\.com',
-			'code\.getmdl\.io',
-			'bootstrapcdn',
-			'cl\.ly',
-			'cdn\.datatables\.net',
-			'aspnetcdn\.com',
-			'ajax\.googleapis\.com',
-			'webfonts\.zoho\.com',
-			'raw\.githubusercontent\.com',
-			'github\.com\/.*\/raw',
-			'unpkg\.com',
-			'imgur\.com',
-			'rawgit\.com',
-			'amazonaws\.com',
-			'cdn\.tiny\.cloud',
-			'tiny\.cloud',
-			'tailwindcss\.com',
-			'herokuapp\.com',
-			'(?<!fonts\.)gstatic\.com',
-			'kit\.fontawesome',
-			'use\.fontawesome',
-			'googleusercontent\.com',
-			'placeholder\.com',
-			's\.w\.org',
-		);
-
-		$pattern = '/(' . implode( '|', $look_known_offloading_services ) . ')/i';
+		$pattern = $this->get_offloading_services_pattern();
 
 		$matches = array();
 		if ( preg_match_all( $pattern, $content, $matches, PREG_OFFSET_CAPTURE ) > 0 ) {

@@ -12,6 +12,7 @@ namespace PluginCheckCS\PluginCheck\Sniffs\CodeAnalysis;
 
 use PHP_CodeSniffer\Util\Tokens;
 use PHPCSUtils\Utils\PassedParameters;
+use PluginCheckCS\PluginCheck\Helpers\OffloadingServicesTrait;
 use WordPressCS\WordPress\AbstractFunctionParameterSniff;
 
 /**
@@ -26,6 +27,7 @@ use WordPressCS\WordPress\AbstractFunctionParameterSniff;
  * @since 1.1.0
  */
 final class EnqueuedResourceOffloadingSniff extends AbstractFunctionParameterSniff {
+	use OffloadingServicesTrait;
 
 	/**
 	 * The group name for this group of functions.
@@ -37,7 +39,7 @@ final class EnqueuedResourceOffloadingSniff extends AbstractFunctionParameterSni
 	protected $group_name = 'Enqueued';
 
 	/**
-	 * List of enqueued functions that need to be checked for use of the in_footer and version arguments.
+	 * List of functions to check.
 	 *
 	 * @since 1.1.0
 	 *
@@ -49,59 +51,6 @@ final class EnqueuedResourceOffloadingSniff extends AbstractFunctionParameterSni
 		'wp_register_style'  => true,
 		'wp_enqueue_style'   => true,
 	);
-
-	/**
-	 * False + the empty tokens array.
-	 *
-	 * This array is enriched with the $emptyTokens array in the register() method.
-	 *
-	 * @var array<int|string, int|string>
-	 */
-	private $false_tokens = array(
-		\T_FALSE => \T_FALSE,
-	);
-
-	/**
-	 * Token codes which are "safe" to accept to determine whether a version would evaluate to `false`.
-	 *
-	 * This array is enriched with the several of the PHPCS token arrays in the register() method.
-	 *
-	 * @var array<int|string, int|string>
-	 */
-	private $safe_tokens = array(
-		\T_NULL                     => \T_NULL,
-		\T_FALSE                    => \T_FALSE,
-		\T_TRUE                     => \T_TRUE,
-		\T_LNUMBER                  => \T_LNUMBER,
-		\T_DNUMBER                  => \T_DNUMBER,
-		\T_CONSTANT_ENCAPSED_STRING => \T_CONSTANT_ENCAPSED_STRING,
-		\T_START_NOWDOC             => \T_START_NOWDOC,
-		\T_NOWDOC                   => \T_NOWDOC,
-		\T_END_NOWDOC               => \T_END_NOWDOC,
-		\T_OPEN_PARENTHESIS         => \T_OPEN_PARENTHESIS,
-		\T_CLOSE_PARENTHESIS        => \T_CLOSE_PARENTHESIS,
-		\T_STRING_CONCAT            => \T_STRING_CONCAT,
-	);
-
-	/**
-	 * Returns an array of tokens this test wants to listen for.
-	 *
-	 * Overloads and calls the parent method to allow for adding additional tokens to the $safe_tokens property.
-	 *
-	 * @return array
-	 */
-	public function register() {
-		$this->false_tokens += Tokens::$emptyTokens;
-
-		$this->safe_tokens += Tokens::$emptyTokens;
-		$this->safe_tokens += Tokens::$assignmentTokens;
-		$this->safe_tokens += Tokens::$comparisonTokens;
-		$this->safe_tokens += Tokens::$operators;
-		$this->safe_tokens += Tokens::$booleanOperators;
-		$this->safe_tokens += Tokens::$castTokens;
-
-		return parent::register();
-	}
 
 	/**
 	 * Process the parameters of a matched function.
@@ -119,47 +68,11 @@ final class EnqueuedResourceOffloadingSniff extends AbstractFunctionParameterSni
 	public function process_parameters( $stackPtr, $group_name, $matched_content, $parameters ) {
 		$src_param = PassedParameters::getParameterFromStack( $parameters, 2, 'src' );
 
-		if ( false === $src_param ) {
+		if ( false === $src_param || empty( $src_param['clean'] ) ) {
 			return;
 		}
 
-		// Known offloading services.
-		$look_known_offloading_services = array(
-			'code\.jquery\.com',
-			'(?<!api\.)cloudflare\.com',
-			'cdn\.jsdelivr\.net',
-			'cdn\.rawgit\.com',
-			'code\.getmdl\.io',
-			'bootstrapcdn',
-			'cl\.ly',
-			'cdn\.datatables\.net',
-			'aspnetcdn\.com',
-			'ajax\.googleapis\.com',
-			'webfonts\.zoho\.com',
-			'raw\.githubusercontent\.com',
-			'github\.com\/.*\/raw',
-			'unpkg\.com',
-			'imgur\.com',
-			'rawgit\.com',
-			'amazonaws\.com',
-			'cdn\.tiny\.cloud',
-			'tiny\.cloud',
-			'tailwindcss\.com',
-			'herokuapp\.com',
-			'(?<!fonts\.)gstatic\.com',
-			'kit\.fontawesome',
-			'use\.fontawesome',
-			'googleusercontent\.com',
-			'placeholder\.com',
-			's\.w\.org',
-		);
-
-		$pattern = '/(' . implode( '|', $look_known_offloading_services ) . ')/i';
-
 		$error_ptr = $this->phpcsFile->findNext( Tokens::$emptyTokens, $src_param['start'], ( $src_param['end'] + 1 ), true );
-		if ( false === $error_ptr ) {
-			$error_ptr = $src_param['start'];
-		}
 
 		$type = 'script';
 		if ( strpos( $matched_content, '_style' ) !== false ) {
@@ -168,8 +81,9 @@ final class EnqueuedResourceOffloadingSniff extends AbstractFunctionParameterSni
 
 		$src_string = $src_param['clean'];
 
-		$matches = array();
-		if ( preg_match( $pattern, $src_string, $matches, PREG_OFFSET_CAPTURE ) > 0 ) {
+		$pattern = $this->get_offloading_services_pattern();
+
+		if ( preg_match( $pattern, $src_string ) > 0 ) {
 			$this->phpcsFile->addError(
 				'Found call to %s() with external resource. Offloading %ss to your servers or any remote service is disallowed.',
 				$error_ptr,

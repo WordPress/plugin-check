@@ -8,8 +8,9 @@
 namespace WordPress\Plugin_Check;
 
 use Exception;
+use WordPress\Plugin_Check\Lib\Readme\Parser as PCPParser;
 use WordPress\Plugin_Check\Traits\Find_Readme;
-use WordPressdotorg\Plugin_Directory\Readme\Parser;
+use WordPressdotorg\Plugin_Directory\Readme\Parser as DotorgParser;
 use function WP_CLI\Utils\normalize_path;
 
 /**
@@ -38,6 +39,14 @@ class Plugin_Context {
 	protected $slug;
 
 	/**
+	 * The mode to run checks in.
+	 *
+	 * @since 1.7.0
+	 * @var string
+	 */
+	protected $mode;
+
+	/**
 	 * The minimum supported WordPress version of the plugin.
 	 *
 	 * @since 1.0.0
@@ -50,13 +59,15 @@ class Plugin_Context {
 	 *
 	 * @since 1.0.0
 	 * @since 1.2.0 Second argument $slug was introduced.
+	 * @since 1.7.0 Third argument $mode was introduced.
 	 *
 	 * @param string $main_file The absolute path to the plugin main file.
 	 * @param string $slug      The plugin slug.
+	 * @param string $mode      The mode to run checks in.
 	 *
 	 * @throws Exception Throws exception if not called via regular WP-CLI or WordPress bootstrap order.
 	 */
-	public function __construct( $main_file, $slug = '' ) {
+	public function __construct( $main_file, $slug = '', $mode = 'new' ) {
 		if ( function_exists( 'wp_normalize_path' ) ) {
 			$this->main_file = wp_normalize_path( $main_file );
 		} elseif ( function_exists( '\WP_CLI\Utils\normalize_path' ) ) {
@@ -82,6 +93,13 @@ class Plugin_Context {
 			$this->slug = $slug;
 		} else {
 			$this->slug = basename( dirname( $this->main_file ) );
+		}
+
+		// Validate and set mode.
+		if ( ! empty( $mode ) && in_array( $mode, array( 'new', 'update' ), true ) ) {
+			$this->mode = $mode;
+		} else {
+			$this->mode = 'new';
 		}
 	}
 
@@ -116,6 +134,17 @@ class Plugin_Context {
 	 */
 	public function slug() {
 		return $this->slug;
+	}
+
+	/**
+	 * Returns the mode to run checks in.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return string The mode to run checks in.
+	 */
+	public function get_mode() {
+		return $this->mode;
 	}
 
 	/**
@@ -200,7 +229,7 @@ class Plugin_Context {
 			$readme_files = $this->filter_files_for_readme( $readme_files, $this->path() );
 			$readme_file  = reset( $readme_files );
 			if ( $readme_file ) {
-				$parser = new Parser( $readme_file );
+				$parser = class_exists( DotorgParser::class ) ? new DotorgParser( $readme_file ) : new PCPParser( $readme_file );
 
 				if ( ! empty( $parser->requires ) ) {
 					$this->minimum_supported_wp = $parser->requires;

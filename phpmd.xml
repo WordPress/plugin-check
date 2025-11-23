@@ -47,5 +47,7 @@
 	<exclude-pattern>*/node_modules/*</exclude-pattern>
 	<exclude-pattern>*/tests/*</exclude-pattern>
 	<exclude-pattern>*/vendor/*</exclude-pattern>
-	<exclude-pattern>*/phpcs-sniffs/PluginCheck/Sniffs/*</exclude-pattern>
+	<exclude-pattern>*/phpcs-sniffs/*</exclude-pattern>
+	<exclude-pattern>*/includes/Lib/*</exclude-pattern>
+	<exclude-pattern>*/includes/Scanner/*</exclude-pattern>
 </ruleset>

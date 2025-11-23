@@ -3,8 +3,8 @@
  * Plugin Name: Test Trademarks Plugin Readme Errors
  * Plugin URI: https://github.com/WordPress/plugin-check
  * Description: Test plugin for the Trademarks check.
- * Requires at least: 6.0
- * Requires PHP: 5.6
+ * Requires at least: 5.0
+ * Requires PHP: 7.2
  * Version: 1.0.0
  * Author: WordPress Performance Team
  * Author URI: https://make.wordpress.org/performance/

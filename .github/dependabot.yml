@@ -17,9 +17,3 @@ updates:
       schedule:
           interval: weekly
       open-pull-requests-limit: 10
-
-    - package-ecosystem: composer
-      directory: '/build-phpunit'
-      schedule:
-          interval: weekly
-      open-pull-requests-limit: 10

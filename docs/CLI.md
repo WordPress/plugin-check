@@ -16,14 +16,20 @@ Runs plugin check.
 : Exclude checks provided as an argument in comma-separated values, e.g. i18n_usage, late_escaping.
 Applies after evaluating `--checks`.
 
+[--ignore-codes=<codes>]
+: Ignore error codes provided as an argument in comma-separated values.
+
 [--format=<format>]
-: Format to display the results. Options are table, csv, and json. The default will be a table.
+: Format to display the results. Options are table, csv, json, strict-table, strict-csv, and strict-json. The default will be a table.
 ---
 default: table
 options:
   - table
   - csv
   - json
+  - strict-table
+  - strict-csv
+  - strict-json
 ---
 
 [--categories]
@@ -43,7 +49,7 @@ options:
 
 [--exclude-directories=<directories>]
 : Additional directories to exclude from checks.
-By default, `.git`, `vendor` and `node_modules` directories are excluded.
+By default, `.git`, `vendor`, `vendor_prefixed`, `vendor-prefixed` and `node_modules` directories are excluded.
 
 [--exclude-files=<files>]
 : Additional files to exclude from checks.
@@ -57,14 +63,30 @@ By default, `.git`, `vendor` and `node_modules` directories are excluded.
 [--warning-severity=<warning-severity>]
 : Warning severity level.
 
+[--include-low-severity-errors]
+: Include errors with lower severity than the threshold as other type.
+
+[--include-low-severity-warnings]
+: Include warnings with lower severity than the threshold as other type.
+
 [--slug=<slug>]
 : Slug to override the default.
+
+[--mode=<mode>]
+: Mode to run the checks in. Options are 'new' (default) or 'update'.
+---
+default: new
+options:
+  - new
+  - update
+---
 ```
 ## EXAMPLES
 ```
 wp plugin check akismet
 wp plugin check akismet --checks=late_escaping
 wp plugin check akismet --format=json
+wp plugin check akismet --mode=update
 ```
 
 # wp plugin list-checks

@@ -1,0 +1,49 @@
+<?php
+/**
+ * Common sanitizing functions
+ *
+ * @package plugin-check
+ */
+
+return array(
+	'esc_url_raw',
+	'sanitize_bookmark_field',
+	'sanitize_bookmark',
+	'sanitize_email',
+	'sanitize_file_name',
+	'sanitize_hex_color_no_hash',
+	'sanitize_hex_color',
+	'sanitize_html_class',
+	'sanitize_meta',
+	'sanitize_mime_type',
+	'sanitize_option',
+	'sanitize_sql_orderby',
+	'sanitize_term_field',
+	'sanitize_category',
+	'sanitize_term',
+	'sanitize_text_field',
+	'sanitize_textarea_field',
+	'sanitize_title_for_query',
+	'sanitize_title_with_dashes',
+	'sanitize_title',
+	'sanitize_url',
+	'sanitize_user_field',
+	'sanitize_user',
+	'wp_kses_allowed_html',
+	'wp_kses_data',
+	'wp_kses_one_attr',
+	'wp_kses_post',
+	'wp_kses',
+	'wp_sanitize_redirect',
+	'wp_kses_post_deep',
+	'sanitize_locale_name',
+	'sanitize_post',
+	'sanitize_post_field',
+	'wc_clean',
+	'wc_sanitize_order_id',
+	'rest_sanitize_boolean',
+	'rest_sanitize_array',
+	'rest_sanitize_object',
+	'rest_sanitize_value_from_schema',
+	'wp_parse_id_list',
+);

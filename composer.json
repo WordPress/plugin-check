@@ -6,26 +6,28 @@
   "require": {
     "php": ">=7.4",
     "ext-json": "*",
-    "afragen/wordpress-plugin-readme-parser": "dev-master#67fba498d0b112acf84386b95e4905c539a33f0b",
     "automattic/vipwpcs": "^3.0.0",
     "composer/installers": "^2.2",
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0.0",
+    "nikic/php-parser": "^4",
     "plugin-check/phpcs-sniffs": "@dev",
-    "wp-coding-standards/wpcs": "^3.1.0"
+    "wp-coding-standards/wpcs": "^3.2.0"
   },
   "require-dev": {
-    "phpcompatibility/php-compatibility": "^9.3",
+    "phpcompatibility/php-compatibility": "dev-develop",
     "phpmd/phpmd": "^2.9",
     "phpstan/extension-installer": "^1.2",
     "phpstan/phpstan": "^1.10",
-    "slevomat/coding-standard": "^8.9",
+    "slevomat/coding-standard": "^8.18",
     "szepeviktor/phpstan-wordpress": "^1.1",
     "wp-cli/extension-command": "^2.1",
     "wp-cli/wp-cli": "^2.8",
-    "wp-cli/wp-cli-tests": "^4.2.9",
+    "wp-cli/wp-cli-tests": "^5.0.0",
     "wp-cli/language-command": "^2.0",
     "wp-cli/i18n-command": "^2.6",
-    "wp-cli/entity-command": "^2.8"
+    "wp-cli/entity-command": "^2.8",
+    "wp-phpunit/wp-phpunit": "^6.3",
+    "yoast/phpunit-polyfills": "^4.0.0"
   },
   "repositories": [
     {
@@ -57,7 +59,9 @@
     },
     "platform": {
       "php": "7.4"
-    }
+    },
+    "sort-packages": true,
+    "autoloader-suffix": "Plugin_Check_Plugin"
   },
   "scripts": {
     "behat": "BEHAT_FEATURES_FOLDER=tests/behat/features run-behat-tests",

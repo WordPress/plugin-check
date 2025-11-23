@@ -185,7 +185,7 @@ abstract class Abstract_File_Check implements Static_Check {
 
 			preg_match_all( $pattern, $contents, $matches, PREG_OFFSET_CAPTURE );
 
-			if ( is_array( $matches ) && ! empty( $matches ) ) {
+			if ( ! empty( $matches ) ) {
 				foreach ( $matches[0] as $match ) {
 					$line   = 0;
 					$column = 0;
@@ -281,14 +281,17 @@ abstract class Abstract_File_Check implements Static_Check {
 			self::$file_list_cache[ $location ][] = $location;
 		} else {
 			$iterator = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $location ) );
+
+			$directories_to_ignore = Plugin_Request_Utility::get_directories_to_ignore();
+
+			$files_to_ignore = Plugin_Request_Utility::get_files_to_ignore();
+
 			foreach ( $iterator as $file ) {
 				if ( ! $file->isFile() ) {
 					continue;
 				}
 
 				$file_path = wp_normalize_path( $file->getPathname() );
-
-				$directories_to_ignore = Plugin_Request_Utility::get_directories_to_ignore();
 
 				// Flag to check if the file should be included or not.
 				$include_file = true;
@@ -300,8 +303,6 @@ abstract class Abstract_File_Check implements Static_Check {
 						break; // Skip the file if it matches any ignored directory.
 					}
 				}
-
-				$files_to_ignore = Plugin_Request_Utility::get_files_to_ignore();
 
 				foreach ( $files_to_ignore as $ignore_file ) {
 					if ( str_ends_with( $file_path, "/$ignore_file" ) ) {

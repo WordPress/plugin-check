@@ -5,7 +5,6 @@
  * Description: Here is a short description of the plugin.
  * Requires at least: Recent version
  * Requires PHP: Latest version
- * Version: 1.0.0
  * Author: WordPress Performance Team
  * Author URI: This is not a valid URL
  * Text Domain: test-mismathed-textdomain-here

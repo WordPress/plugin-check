@@ -1,8 +1,8 @@
 === Plugin Check (PCP) ===
 
 Contributors:      wordpressdotorg
-Tested up to:      6.6
-Stable tag:        1.2.0
+Tested up to:      6.9
+Stable tag:        1.7.0
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 Tags:              plugin best practices, testing, accessibility, performance, security
@@ -67,6 +67,119 @@ To be approved in the WordPress.org plugin directory, a plugin must typically pa
 In any case, passing the checks in this tool likely helps to achieve a smooth plugin review process, but is no guarantee that a plugin will be approved in the WordPress.org plugin directory.
 
 == Changelog ==
+
+= 1.7.0 =
+
+* Enhancement - Add Minified File Detection Check to identify and handle minified files in plugins.
+* Enhancement - Implement check for insecure use of wp_verify_nonce() to improve security validation.
+* Enhancement - Add direct database query sniff to detect direct database calls without using WordPress functions.
+* Enhancement - Add prefixing check to ensure proper function and class name prefixing.
+* Enhancement - Update localhost sniff regex to improve detection of localhost URLs including *.local domains.
+* Enhancement - Disallow runtime checks when custom user table constants are defined for better compatibility.
+* Enhancement - Add forbidden functions check to detect usage of disallowed PHP functions.
+* Enhancement - New check for wp_safe_redirect to encourage use of WordPress safe redirect function.
+* Enhancement - Improve mismatched text domain check for better internationalization validation.
+* Enhancement - Detect links that request five-star reviews to enforce plugin directory guidelines.
+* Enhancement - Add The Unlicense to GPL-compatible license check.
+* Enhancement - Improve localhost sniff code for more accurate detection.
+* Fix - Ignore vendor_prefixed and vendor-prefixed folders in checks to prevent false positives.
+* Fix - Handle possible empty element in scanner to prevent PHP warnings.
+* Fix - Hide error output in scanner for cleaner output.
+* Fix - Call ReflectionProperty::setAccessible() only in older PHP versions for better PHP 8.1+ compatibility.
+* Fix - Prevent deletion of custom WordPress tables during cleanup in test environment.
+
+= 1.6.0 =
+
+* Enhancement - Support strict output format for CLI commands.
+* Enhancement - Improve check for donate link in readme.
+* Enhancement - Improve info check in Version utils.
+* Enhancement - Improve URL validation for plugin header fields.
+* Enhancement - Improve ruleset files.
+* Enhancement - Increased severity for invalid plugin uri domain and plugin description checks in plugin header.
+* Enhancement - Remove CallTimePassByReference as it's deprecated rule.
+* Enhancement - Disallow special characters in textdomain.
+* Enhancement - Imported readme parser for preventing conflicts with wordpress.org. Use dotorg readme parser if available.
+* Enhancement - Discourage the use of `load_plugin_textdomain` found in plugins as it's not necessary in wordpress.org.
+* Enhancement - Upgrade severity for missing readme headers.
+* Enhancement - Show tested up to minor check only when it is current major version.
+* Enhancement - Added link in plugins page to run the plugin check.
+* Fix - Dynamic WP Content folder.
+* Fix - Fix test for special chars in file names giving problems to users after clone.
+* Fix - Remove Image_Functions_Check as they were making false positives.
+* Fix - Prevent WordPress version 10+ from being flagged as an error in the "Tested up to" check.
+
+= 1.5.0 =
+
+* Enhancement - Improve url validation to check duplicate protocol.
+* Enhancement - Update severity for incorrect textdomains and i18n error codes.
+* Enhancement - Now issues in URL Author check are ERROR instead of WARNING.
+* Enhancement - New check for minor version in Tested up.
+* Enhancement - Make sure headers are not empty in the requires header check.
+* Enhancement - Include experimental option in admin.
+* Enhancement - Add Behat test for experimental checks from addons.
+* Enhancement - Improve license check for Apache.
+* Enhancement - Warn if requires headers are not same in readme and plugin header.
+* Fix - Remove warning for dynamic callback in register_setting check.
+* Fix - Incorrect database tables being referenced on subsites in Multisite.
+
+= 1.4.0 =
+
+* Enhancement - Allow ISC license in the License check.
+* Enhancement - Added check for use of settings with sanitization callback.
+* Enhancement - Added --ignore-codes in CLI to introduce a mechanism to ignore specific error codes.
+* Enhancement - New utils for fetching necessary version info details.
+* Enhancement - Added check for unsupported plugin name in plugin header field.
+* Enhancement - Segregate the severity of i18n checks. Make sure that is giving errors in the right context.
+* Enhancement - Provide more detailed information about checks when the README does not include a tested version or a list of contributors.
+* Enhancement - Added rules from WPCS to prevent issues with content being sent before headers and warn about the use of Call-time pass-by-reference.
+* Enhancement - Give more context in the error of check wrong named files.
+* Enhancement - Simplified PHPUnit setup. Now it does not depend of running inside a WordPress installation.
+* Enhancement - Added new check for restricted contributors.
+* Fix - Delete transients in unit tests to avoid false positives.
+* Fix - Incorrect Tested up to version comparison will make error for two major versions up.
+* Fix - Excluded the use of functions file_get_contents and file_put_contents in the check to prevent false positives.
+* Fix - Duplicated error message in the check for wrong named files.
+* Fix - Use of Json encode wasn't firing the error message.
+* Fix - Change error type of NonEnqueuedImage in ImageFunctions sniff from ERROR to WARNING.
+
+= 1.3.1 =
+
+* Enhancement - Add version utilities.
+* Fix - Escape error messages.
+* Fix - Renamed error type to ERROR_LOW_SEVERITY and WARNING_LOW_SEVERITY.
+* Fix - Fix PHPCS checks on unwritable filesystems.
+
+= 1.3.0 =
+
+* Enhancement - Update disallowed domains for Plugin URI check.
+* Enhancement - Added new checks for Plugin Header fields: missing plugin description, missing plugin version and invalid plugin version.
+* Enhancement - New check for validation of donate link in the readme file.
+* Enhancement - Increased severity for wrong Plugin Requires.
+* Enhancement - Added check Restrict parse_str() without second argument.
+* Enhancement - New check for Disallow usage of HEREDOC and NOWDOC.
+* Enhancement - Added acronyms allowed in Trademark checks.
+* Enhancement - Added option in CLI to add low severity errors and warnings.
+* Enhancement - Change error type for License check error codes.
+* Enhancement - Always use prefixed tables during runtime check requests.
+* Enhancement - Created a new class for checking licenses.
+* Enhancement - Added support for MPL-2.0 license.
+* Enhancement - Implement gherkin linter in GH action.
+* Enhancement - Update check for Contributors in markdown readme files.
+* Enhancement - CLI: Fix confusing runtime environment setup order.
+* Enhancement - Allow custom checks to provide installed_paths.
+* Enhancement - Improved the use of localhost URLs in the Plugin.
+* Enhancement - Documented checks in the plugin.
+* Enhancement - Increased severity for Code obfuscation checks.
+* Enhancement - Differentiate between non-existent readme and default readme file.
+* Enhancement - Encourage developers to use native functions for loading images in templates.
+* Enhancement - Added a check for not allowing include libraries already in WordPress core.
+* Enhancement - Warning for usage of query_posts() in favor of WP_Query.
+* Fix - Fix for the local environment is set up before testing.
+* Fix - Fix addon checks not being executed when running runtime checks.
+* Fix - Allow `default` as a text domain in the text domain check.
+* Fix - Allow GitHub URLs in the Plugin URI field.
+* Fix - Don't flag Apache license. It's allowed in the WordPress.org plugin repository.
+* Fix - Removes the path before the plugin, so it won't affect to badly named files.
 
 = 1.2.0 =
 

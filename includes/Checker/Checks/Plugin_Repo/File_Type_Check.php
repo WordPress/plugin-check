@@ -31,7 +31,8 @@ class File_Type_Check extends Abstract_File_Check {
 	const TYPE_APPLICATION  = 16;
 	const TYPE_BADLY_NAMED  = 32;
 	const TYPE_LIBRARY_CORE = 64;
-	const TYPE_ALL          = 127; // Same as all of the above with bitwise OR.
+	const TYPE_COMPOSER     = 128;
+	const TYPE_ALL          = 255; // Same as all of the above with bitwise OR.
 
 	/**
 	 * Bitwise flags to control check behavior.
@@ -75,6 +76,8 @@ class File_Type_Check extends Abstract_File_Check {
 	 *
 	 * @throws Exception Thrown when the check fails with a critical error (unrelated to any errors detected as part of
 	 *                   the check).
+	 *
+	 * @SuppressWarnings(PHPMD.NPathComplexity)
 	 */
 	protected function check_files( Check_Result $result, array $files ) {
 		if ( $this->flags & self::TYPE_COMPRESSED ) {
@@ -98,6 +101,9 @@ class File_Type_Check extends Abstract_File_Check {
 		}
 		if ( $this->flags & self::TYPE_LIBRARY_CORE ) {
 			$this->look_for_library_core_files( $result, $files );
+		}
+		if ( $this->flags & self::TYPE_COMPOSER ) {
+			$this->look_for_composer_files( $result, $files );
 		}
 	}
 
@@ -206,8 +212,8 @@ class File_Type_Check extends Abstract_File_Check {
 	 * @param array        $files  List of absolute file paths.
 	 */
 	protected function look_for_hidden_files( Check_Result $result, array $files ) {
-		// Any files outside of 'vendor' or 'node_modules' directories that start with a period.
-		$hidden_files = self::filter_files_by_regex( $files, '/^((?!\/vendor\/|\/node_modules\/).)*\/\.\w+(\.\w+)*$/' );
+		// Any files outside of 'vendor' or 'vendor_prefixed' or 'vendor-prefixed' or 'node_modules' directories that start with a period.
+		$hidden_files = self::filter_files_by_regex( $files, '/^((?!\/vendor\/|\/node_modules\/|\/vendor_prefixed\/|\/vendor-prefixed\/).)*\/\.\w+(\.\w+)*$/' );
 		if ( $hidden_files ) {
 			foreach ( $hidden_files as $file ) {
 				$this->add_result_error_for_file(
@@ -235,7 +241,7 @@ class File_Type_Check extends Abstract_File_Check {
 	protected function look_for_application_files( Check_Result $result, array $files ) {
 		$application_files = self::filter_files_by_extensions(
 			$files,
-			array( 'a', 'bin', 'bpk', 'deploy', 'dist', 'distz', 'dmg', 'dms', 'DS_Store', 'dump', 'elc', 'exe', 'iso', 'lha', 'lrf', 'lzh', 'o', 'obj', 'phar', 'pkg', 'sh', 'so' )
+			array( 'a', 'bin', 'bpk', 'deploy', 'dist', 'distz', 'dmg', 'dms', 'dump', 'elc', 'exe', 'iso', 'lha', 'lrf', 'lzh', 'o', 'obj', 'phar', 'pkg', 'sh', 'so' )
 		);
 		if ( $application_files ) {
 			foreach ( $application_files as $file ) {
@@ -286,7 +292,7 @@ class File_Type_Check extends Abstract_File_Check {
 			if ( $badly_name ) {
 				$this->add_result_error_for_file(
 					$result,
-					__( 'Badly named files are not permitted.', 'plugin-check' ),
+					__( 'File and folder names must not contain spaces or special characters.', 'plugin-check' ),
 					'badly_named_files',
 					$file,
 					0,
@@ -295,6 +301,49 @@ class File_Type_Check extends Abstract_File_Check {
 					8
 				);
 			}
+		}
+
+		// Duplicated names in different folders.
+		$folders = array();
+		foreach ( $files as $file ) {
+			$folder = str_replace( basename( $file ), '', $file );
+			if ( empty( $folder ) ) {
+				continue;
+			}
+			$folders[] = $folder;
+		}
+		$folders                = array_unique( $folders );
+		$folders_lowercase      = array_map( 'strtolower', $folders );
+		$case_sensitive_folders = array_unique( array_diff_assoc( $folders_lowercase, array_unique( $folders_lowercase ) ) );
+
+		if ( ! empty( $case_sensitive_folders ) ) {
+			$this->add_result_error_for_file(
+				$result,
+				__( 'Multiple folders with the same name but different case were found. This can be problematic on certain file systems.', 'plugin-check' ),
+				'case_sensitive_folders',
+				implode( ', ', $case_sensitive_folders ),
+				0,
+				0,
+				'',
+				8
+			);
+		}
+
+		// Duplicated names in same folder.
+		$files_lowercase      = array_map( 'strtolower', $files );
+		$case_sensitive_files = array_unique( array_diff_assoc( $files_lowercase, array_unique( $files_lowercase ) ) );
+
+		if ( ! empty( $case_sensitive_files ) ) {
+			$this->add_result_error_for_file(
+				$result,
+				__( 'Multiple files with the same name but different case were found. This can be problematic on certain file systems.', 'plugin-check' ),
+				'case_sensitive_files',
+				implode( ', ', $case_sensitive_files ),
+				0,
+				0,
+				'',
+				8
+			);
 		}
 	}
 
@@ -369,6 +418,44 @@ class File_Type_Check extends Abstract_File_Check {
 					8
 				);
 			}
+		}
+	}
+
+	/**
+	 * Looks for composer files.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @param Check_Result $result The check result to amend, including the plugin context to check.
+	 * @param array        $files  List of absolute file paths.
+	 */
+	protected function look_for_composer_files( Check_Result $result, array $files ) {
+		if ( $result->plugin()->is_single_file_plugin() ) {
+			return;
+		}
+
+		$plugin_path = $result->plugin()->path();
+
+		if (
+			is_dir( $plugin_path . 'vendor' ) &&
+			file_exists( $plugin_path . 'vendor/autoload.php' ) &&
+			! file_exists( $plugin_path . 'composer.json' )
+		) {
+			$this->add_result_warning_for_file(
+				$result,
+				sprintf(
+					/* translators: 1: directory, 2: filename */
+					esc_html__( 'The "%1$s" directory using composer exists, but "%2$s" file is missing.', 'plugin-check' ),
+					'/vendor',
+					'composer.json'
+				),
+				'missing_composer_json_file',
+				'composer.json',
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#included-unneeded-folders',
+				6
+			);
 		}
 	}
 

@@ -31,11 +31,12 @@ final class Checks {
 	 *
 	 * @param Check_Context $context The check context for the plugin to be checked.
 	 * @param array         $checks  An array of Check objects to run.
+	 * @param Check_Runner  $runner  The runner instance that created this result.
 	 * @return Check_Result Object containing all check results.
 	 *
 	 * @throws Exception Thrown when check fails with critical error.
 	 */
-	public function run_checks( Check_Context $context, array $checks ) {
+	public function run_checks( Check_Context $context, array $checks, ?Check_Runner $runner = null ) {
 		$result = new Check_Result( $context );
 
 		// Run the checks.

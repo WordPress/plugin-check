@@ -3,6 +3,8 @@ parameters:
   paths:
     - plugin.php
     - includes/
+  excludePaths:
+    - includes/Lib/
   bootstrapFiles:
     - tests/phpstan/bootstrap.php
   scanFiles:
@@ -10,6 +12,7 @@ parameters:
     - tests/phpstan/stubs/wp-cli.php
     - tests/phpstan/stubs/exitexception.php
     - tests/phpstan/stubs/formatter.php
+    - tests/phpstan/stubs/readme-parser.php
   dynamicConstantNames:
     - WP_PLUGIN_CHECK_PLUGIN_DIR_URL
   treatPhpDocTypesAsCertain: false
@@ -29,3 +32,21 @@ parameters:
     -
       message: '/^Function str_ends_with not found.$/'
       path: includes/Checker/Checks/Abstract_File_Check.php
+    -
+      message: '/^Access to deprecated property \$parts of class PhpParser\\Node\\Name:/'
+      path: includes/Scanner/PHP_Parser.php
+    -
+      message: '/^Call to function is_object\(\) with object will always evaluate to true\.$/'
+      path: includes/Scanner/PHP_Parser.php
+    -
+      message: '/^Call to function is_object\(\) with PhpParser\\Node\\Expr\\AssignOp\\Concat will always evaluate to true\.$/'
+      path: includes/Scanner/PHP_Parser.php
+    -
+      message: '/^Call to function method_exists\(\) with object and .*getEndLine.* will always evaluate to true\.$/'
+      path: includes/Scanner/PHP_Parser.php
+    -
+      message: '/^Call to function method_exists\(\) with PhpParser\\Node\\Expr\\AssignOp\\Concat and .*getEndLine.* will always evaluate to true\.$/'
+      path: includes/Scanner/PHP_Parser.php
+    -
+      message: '/^Instanceof between PhpParser\\Node\\Expr\\AssignOp\\Concat and PhpParser\\Node\\Expr\\AssignOp will always evaluate to true\.$/'
+      path: includes/Scanner/PHP_Parser.php

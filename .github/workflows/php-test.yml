@@ -12,6 +12,7 @@ on:
       - '.wp-env.json'
       - '**/package.json'
       - 'package-lock.json'
+      - 'phpcs-rulesets/*.xml'
       - 'phpunit.xml.dist'
       - 'composer.json'
       - 'composer.lock'
@@ -27,6 +28,7 @@ on:
       - '.wp-env.json'
       - '**/package.json'
       - 'package-lock.json'
+      - 'phpcs-rulesets/*.xml'
       - 'phpunit.xml.dist'
       - 'composer.json'
       - 'composer.lock'
@@ -51,28 +53,34 @@ jobs:
         - '7.4'
         - '8.0'
         - '8.1'
+        - '8.2'
         wordpress: [ 'latest' ]
         include:
           - php: '7.4'
             wordpress: '6.3'
-          - php: '8.2'
+          - php: '8.3'
             wordpress: 'latest'
             coverage: true
-          - php: '8.3'
+          - php: '8.4'
             wordpress: 'trunk'
             experimental: true
     env:
       WP_ENV_PHP_VERSION: ${{ matrix.php }}
       WP_ENV_CORE: ${{ matrix.wordpress == 'trunk' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', matrix.wordpress ) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
 
+      - name: Install PHP dependencies
+        uses: ramsey/composer-install@3cf229dc2919194e9e36783941438d17239e8520
+        with:
+          composer-options: '--prefer-dist'
+
       - name: Setup Node.js (.nvmrc)
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
           cache: npm
@@ -100,7 +108,7 @@ jobs:
 
       - name: Upload code coverage report
         if: ${{ matrix.coverage }}
-        uses: codecov/codecov-action@5c47607acb93fed5485fdbf7232e8a31425f672a
+        uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7
         with:
           file: build/logs/*.xml
           flags: unit
@@ -123,14 +131,14 @@ jobs:
           - php: '8.3'
             coverage: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
 
       - name: Install PHP dependencies
-        uses: ramsey/composer-install@57532f8be5bda426838819c5ee9afb8af389d51a
+        uses: ramsey/composer-install@3cf229dc2919194e9e36783941438d17239e8520
         with:
           working-directory: "phpcs-sniffs"
 
@@ -146,7 +154,7 @@ jobs:
 
       - name: Upload code coverage report
         if: ${{ matrix.coverage }}
-        uses: codecov/codecov-action@5c47607acb93fed5485fdbf7232e8a31425f672a
+        uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7
         with:
           file: build/logs/*.xml
           flags: phpcs-sniffs

@@ -11,9 +11,46 @@ if ( ! class_exists( 'SebastianBergmann\CodeCoverage\Filter' ) ) {
 	require "{$root_folder}/vendor/autoload.php";
 }
 
+$filtered_items = new CallbackFilterIterator(
+  new DirectoryIterator( $root_folder ),
+  function ( $file ) {
+    if ( $file->isDir() && in_array( $file->getFilename(), [ 'includes' ], true ) ) {
+      return true;
+    }
+
+    if ( $file->isFile() && false !== strpos( $file->getFilename(), 'plugin.php' ) ) {
+      return true;
+    }
+
+    return false;
+  }
+);
+
+$files = [];
+
+foreach ( $filtered_items as $item ) {
+  if ( $item->isDir() ) {
+    foreach (
+      new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator( $item->getPathname(), RecursiveDirectoryIterator::SKIP_DOTS )
+      ) as $file
+    ) {
+      if ( $file->isFile() && $file->getExtension() === 'php' ) {
+        $files[] = $file->getPathname();
+      }
+    }
+  } else {
+    $files[] = $item->getPathname();
+  }
+}
+
 $filter = new Filter();
-$filter->includeDirectory( "{$root_folder}/includes" );
-$filter->includeFiles( array( "{$root_folder}/plugin.php" ) );
+
+if ( method_exists( $filter, 'includeFiles' ) ) {
+	$filter->includeFiles( $files );
+} else {
+	$filter->addFilesToWhitelist( $files );
+}
 
 $coverage = new CodeCoverage(
 	( new Selector() )->forLineCoverage( $filter ),

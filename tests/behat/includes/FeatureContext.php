@@ -41,28 +41,28 @@ final class FeatureContext extends WP_CLI_FeatureContext {
 	/**
 	 * @BeforeFeature
 	 */
-	public static function store_feature( BeforeFeatureScope $scope ) {
+	public static function store_feature( BeforeFeatureScope $scope ): void {
 		self::$feature = $scope->getFeature();
 	}
 
 	/**
 	 * @BeforeScenario
 	 */
-	public function store_scenario( BeforeScenarioScope $scope ) {
+	public function store_scenario( BeforeScenarioScope $scope ): void {
 		$this->scenario = $scope->getScenario();
 	}
 
 	/**
 	 * @AfterScenario
 	 */
-	public function forget_scenario( AfterScenarioScope $scope ) {
+	public function forget_scenario( AfterScenarioScope $scope ): void {
 		$this->scenario = null;
 	}
 
 	/**
 	 * @AfterFeature
 	 */
-	public static function forget_feature( AfterFeatureScope $scope ) {
+	public static function forget_feature( AfterFeatureScope $scope ): void {
 		self::$feature = null;
 	}
 
@@ -121,6 +121,19 @@ final class FeatureContext extends WP_CLI_FeatureContext {
 		);
 
 		list( $this->result->stdout, $this->email_sends ) = $this->wpcli_tests_capture_email_sends( $this->result->stdout );
+	}
+
+	/**
+	 * @Then /^STDOUT should be valid JSON$/
+	 */
+	public function stdout_should_be_valid_json() {
+		$output = $this->result->stdout;
+
+		json_decode( $output );
+
+		if ( JSON_ERROR_NONE !== json_last_error() ) {
+			throw new Exception( 'STDOUT is not valid JSON: ' . json_last_error_msg() );
+		}
 	}
 
 	/**

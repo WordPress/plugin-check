@@ -23,12 +23,14 @@ add_filter(
 	function ( array $checks ) {
 		require_once plugin_dir_path( __FILE__ ) . 'Example_Static_Check.php';
 		require_once plugin_dir_path( __FILE__ ) . 'Example_Runtime_Check.php';
+		require_once plugin_dir_path( __FILE__ ) . 'Example_Experimental_Check.php';
 
 		return array_merge(
 			$checks,
 			array(
-				'example_static'  => new Example_Static_Check(),
-				'example_runtime' => new Example_Runtime_Check(),
+				'example_static'       => new Example_Static_Check(),
+				'example_runtime'      => new Example_Runtime_Check(),
+				'example_experimental' => new Example_Experimental_Check(),
 			)
 		);
 	}

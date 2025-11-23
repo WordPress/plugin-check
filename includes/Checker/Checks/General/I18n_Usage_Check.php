@@ -96,10 +96,13 @@ class I18n_Usage_Check extends Abstract_PHP_CodeSniffer_Check {
 	 * @param int          $column   The column on which the message occurred. Default is 0 (unknown column).
 	 * @param string       $docs     URL for further information about the message.
 	 * @param int          $severity Severity level. Default is 5.
+	 *
+	 * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+	 * @SuppressWarnings(PHPMD.NPathComplexity)
 	 */
 	protected function add_result_message_for_file( Check_Result $result, $error, $message, $code, $file, $line = 0, $column = 0, string $docs = '', $severity = 5 ) {
 		// Downgrade errors about usage of the 'default' text domain from WordPress Core to warnings.
-		if ( $error && str_ends_with( $message, " but got 'default'." ) ) {
+		if ( $error && str_ends_with( $message, ' but got &#039;default&#039;.' ) ) {
 			$error = false;
 		}
 
@@ -128,6 +131,61 @@ class I18n_Usage_Check extends Abstract_PHP_CodeSniffer_Check {
 				break;
 		}
 
+		// Update severity.
+		switch ( $code ) {
+			case 'WordPress.WP.I18n.MissingArgText':
+			case 'WordPress.WP.I18n.NoEmptyStrings':
+			case 'WordPress.WP.I18n.TooManyFunctionArgs':
+				$severity = 7;
+				break;
+
+			default:
+				break;
+		}
+
+		// Update severity for error code variations. Eg: WordPress.WP.I18n.NonSingularStringLiteralXXX.
+		if ( str_starts_with( $code, 'WordPress.WP.I18n.InterpolatedVariable' ) || str_starts_with( $code, 'WordPress.WP.I18n.NonSingularStringLiteral' ) ) {
+			$severity = 7;
+		}
+
+		if ( 'WordPress.WP.I18n.TextDomainMismatch' === $code ) {
+			$restricted_textdomains = $this->get_restricted_textdomains();
+
+			if ( preg_match( '/but\sgot\s&#039;([^&#039;]+)&#039;\.$/', $message, $matches ) ) {
+				$textdomain = $matches[1];
+				if ( preg_match( '/[^a-z0-9-]/', $textdomain ) || in_array( $textdomain, $restricted_textdomains, true ) ) {
+					$severity = 7;
+				}
+			}
+		}
+
 		parent::add_result_message_for_file( $result, $error, $message, $code, $file, $line, $column, $docs, $severity );
+	}
+
+	/**
+	 * Returns restricted textdomains.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @return array Restricted textdomains.
+	 */
+	private function get_restricted_textdomains() {
+		$restricted_textdomains = array(
+			'textdomain',
+			'text-domain',
+			'text_domain',
+			'your-text-domain',
+		);
+
+		/**
+		 * Filter the list of restricted textdomains.
+		 *
+		 * @since 1.5.0
+		 *
+		 * @param array $restricted_textdomains Array of restricted textdomains.
+		 */
+		$restricted_textdomains = (array) apply_filters( 'wp_plugin_check_restricted_textdomains', $restricted_textdomains );
+
+		return $restricted_textdomains;
 	}
 }

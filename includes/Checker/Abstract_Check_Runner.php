@@ -121,6 +121,14 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	protected $check_categories;
 
 	/**
+	 * The mode to run checks in.
+	 *
+	 * @since 1.7.0
+	 * @var string
+	 */
+	protected $mode;
+
+	/**
 	 * Returns the plugin parameter based on the request.
 	 *
 	 * @since 1.0.0
@@ -173,6 +181,15 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @return string Plugin slug.
 	 */
 	abstract protected function get_slug_param();
+
+	/**
+	 * Returns the mode parameter.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return string The mode parameter.
+	 */
+	abstract protected function get_mode_param();
 
 	/**
 	 * Sets whether the runner class was initialized early.
@@ -371,7 +388,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			$cleanups[] = $instance->prepare();
 		}
 
-		$results = $this->get_checks_instance()->run_checks( $this->get_check_context(), $checks );
+		$results = $this->get_checks_instance()->run_checks( $this->get_check_context(), $checks, $this );
 
 		if ( ! empty( $cleanups ) ) {
 			foreach ( $cleanups as $cleanup ) {
@@ -618,6 +635,21 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		return $this->get_slug_param();
 	}
 
+	/**
+	 * Returns the mode to run checks in.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return string The check mode.
+	 */
+	final protected function get_mode() {
+		if ( null !== $this->mode ) {
+			return $this->mode;
+		}
+
+		return $this->get_mode_param();
+	}
+
 	/** Gets the Check_Context for the plugin.
 	 *
 	 * @since 1.0.0
@@ -627,7 +659,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	private function get_check_context() {
 		$plugin_basename = $this->get_plugin_basename();
 		$plugin_path     = is_dir( $plugin_basename ) ? $plugin_basename : WP_PLUGIN_DIR . '/' . $plugin_basename;
-		return new Check_Context( $plugin_path, $this->get_slug() );
+		return new Check_Context( $plugin_path, $this->get_slug(), $this->get_mode() );
 	}
 
 	/**
@@ -656,5 +688,20 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 */
 	final public function set_runtime_environment_setup( $runtime_environment_setup ) {
 		$this->runtime_environment = $runtime_environment_setup;
+	}
+
+	/**
+	 * Sets the mode to run checks in.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param string $mode The mode to run checks in.
+	 */
+	final public function set_mode( $mode ) {
+		if ( ! empty( $mode ) && in_array( $mode, array( 'new', 'update' ), true ) ) {
+			$this->mode = $mode;
+		} else {
+			$this->mode = 'new';
+		}
 	}
 }

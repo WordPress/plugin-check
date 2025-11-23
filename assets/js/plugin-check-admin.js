@@ -1,6 +1,9 @@
 ( function ( pluginCheck ) {
 	const checkItButton = document.getElementById( 'plugin-check__submit' );
 	const resultsContainer = document.getElementById( 'plugin-check__results' );
+	const exportContainer = document.getElementById(
+		'plugin-check__export-controls'
+	);
 	const spinner = document.getElementById( 'plugin-check__spinner' );
 	const pluginsList = document.getElementById(
 		'plugin-check__plugins-dropdown'
@@ -15,12 +18,22 @@
 		! checkItButton ||
 		! pluginsList ||
 		! resultsContainer ||
+		! exportContainer ||
 		! spinner ||
 		! categoriesList.length
 	) {
 		console.error( 'Missing form elements on page' );
 		return;
 	}
+
+	let aggregatedResults = createEmptyAggregatedResults();
+	let checksCompleted = false;
+	exportContainer.classList.add( 'is-hidden' );
+	exportContainer.addEventListener( 'click', onExportContainerClick );
+
+	const includeExperimental = document.getElementById(
+		'plugin-check__include-experimental'
+	);
 
 	// Handle disabling the Check it button when a plugin is not selected.
 	function canRunChecks() {
@@ -94,6 +107,10 @@
 	function resetResults() {
 		// Empty the results container.
 		resultsContainer.innerText = '';
+		exportContainer.innerHTML = '';
+		exportContainer.classList.add( 'is-hidden' );
+		resetAggregatedResults();
+		checksCompleted = false;
 	}
 
 	/**
@@ -110,6 +127,252 @@
 		}
 	}
 
+	function createEmptyAggregatedResults() {
+		return {
+			errors: {},
+			warnings: {},
+		};
+	}
+
+	function resetAggregatedResults() {
+		aggregatedResults = createEmptyAggregatedResults();
+	}
+
+	function mergeAggregatedResults( results ) {
+		if ( results.errors ) {
+			mergeResultTree( aggregatedResults.errors, results.errors );
+		}
+		if ( results.warnings ) {
+			mergeResultTree( aggregatedResults.warnings, results.warnings );
+		}
+	}
+
+	function hasOwn( object, key ) {
+		return Object.prototype.hasOwnProperty.call( object, key );
+	}
+
+	function mergeResultTree( target, source ) {
+		for ( const file of Object.keys( source ) ) {
+			if ( ! hasOwn( target, file ) ) {
+				target[ file ] = {};
+			}
+
+			const sourceFile = source[ file ];
+			const targetFile = target[ file ];
+
+			for ( const line of Object.keys( sourceFile ) ) {
+				if ( ! hasOwn( targetFile, line ) ) {
+					targetFile[ line ] = {};
+				}
+
+				const sourceLine = sourceFile[ line ];
+				const targetLine = targetFile[ line ];
+
+				for ( const column of Object.keys( sourceLine ) ) {
+					if ( ! hasOwn( targetLine, column ) ) {
+						targetLine[ column ] = [];
+					}
+
+					for ( const entry of sourceLine[ column ] ) {
+						targetLine[ column ].push( cloneResultEntry( entry ) );
+					}
+				}
+			}
+		}
+	}
+
+	function cloneResultEntry( entry ) {
+		return { ...entry };
+	}
+
+	function hasAggregatedResults() {
+		return (
+			hasEntries( aggregatedResults.errors ) ||
+			hasEntries( aggregatedResults.warnings )
+		);
+	}
+
+	function hasEntries( tree ) {
+		for ( const file of Object.keys( tree ) ) {
+			const lines = tree[ file ] || {};
+
+			for ( const line of Object.keys( lines ) ) {
+				const columns = lines[ line ] || {};
+
+				for ( const column of Object.keys( columns ) ) {
+					if ( ( columns[ column ] || [] ).length > 0 ) {
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
+	function defaultString( key ) {
+		if (
+			pluginCheck.strings &&
+			Object.prototype.hasOwnProperty.call( pluginCheck.strings, key )
+		) {
+			return pluginCheck.strings[ key ];
+		}
+		// Return empty string if localized string is missing.
+		return '';
+	}
+
+	function renderExportButtons() {
+		exportContainer.innerHTML = '';
+		if ( ! checksCompleted ) {
+			exportContainer.classList.add( 'is-hidden' );
+			return;
+		}
+
+		exportContainer.classList.remove( 'is-hidden' );
+
+		const exportButtonConfigs = [
+			{
+				format: 'csv',
+				label: defaultString( 'exportCsv' ),
+			},
+			{
+				format: 'json',
+				label: defaultString( 'exportJson' ),
+			},
+			{
+				format: 'markdown',
+				label: defaultString( 'exportMarkdown' ),
+			},
+		];
+
+		exportButtonConfigs.forEach( ( item ) => {
+			const button = document.createElement( 'button' );
+			button.type = 'button';
+			button.classList.add(
+				'button',
+				'button-secondary',
+				'plugin-check__export-button'
+			);
+			button.textContent = item.label;
+			button.setAttribute( 'data-export-format', item.format );
+			exportContainer.appendChild( button );
+		} );
+	}
+
+	function announce( message ) {
+		if ( window.wp && window.wp.a11y && window.wp.a11y.speak ) {
+			window.wp.a11y.speak( message );
+			return;
+		}
+
+		console.warn( message );
+	}
+
+	function onExportContainerClick( event ) {
+		const button = event.target.closest( '[data-export-format]' );
+		if ( ! button || button.disabled ) {
+			return;
+		}
+
+		event.preventDefault();
+		handleExport( button );
+	}
+
+	function handleExport( button ) {
+		if ( ! hasAggregatedResults() ) {
+			announce( defaultString( 'noResults' ) );
+			return;
+		}
+
+		const format = button.getAttribute( 'data-export-format' );
+		if ( ! format ) {
+			return;
+		}
+
+		const originalText = button.textContent;
+		button.disabled = true;
+		button.textContent = defaultString( 'exporting' );
+
+		requestExport( format )
+			.then( ( payload ) => {
+				downloadExport( payload );
+			} )
+			.catch( ( error ) => {
+				console.error( error );
+				const failureMessage = defaultString( 'exportError' );
+				announce( failureMessage );
+			} )
+			.finally( () => {
+				button.disabled = false;
+				button.textContent = originalText;
+			} );
+	}
+
+	function requestExport( format ) {
+		const payload = new FormData();
+		payload.append( 'nonce', pluginCheck.nonce );
+		payload.append( 'action', pluginCheck.actionExportResults );
+		payload.append( 'format', format );
+		if ( pluginsList.value ) {
+			payload.append( 'plugin', pluginsList.value );
+		}
+		payload.append( 'plugin_label', getSelectedPluginLabel() );
+		payload.append( 'results', JSON.stringify( aggregatedResults ) );
+
+		return fetch( ajaxurl, {
+			method: 'POST',
+			credentials: 'same-origin',
+			body: payload,
+		} )
+			.then( ( response ) => response.json() )
+			.then( ( responseData ) => {
+				if ( ! responseData ) {
+					throw new Error( 'Response contains no data' );
+				}
+
+				if ( ! responseData.success ) {
+					const defaultExportErrorMessage =
+						defaultString( 'exportError' );
+					let message = defaultExportErrorMessage;
+					if ( responseData.data && responseData.data.message ) {
+						message = responseData.data.message;
+					}
+					throw new Error( message );
+				}
+
+				if (
+					! responseData.data ||
+					! responseData.data.content ||
+					! responseData.data.filename
+				) {
+					throw new Error( 'Export payload is incomplete' );
+				}
+
+				return responseData.data;
+			} );
+	}
+
+	function downloadExport( exportPayload ) {
+		const blob = new Blob( [ exportPayload.content ], {
+			type: exportPayload.mime_type || 'text/plain',
+		} );
+		const downloadLink = document.createElement( 'a' );
+		downloadLink.href = window.URL.createObjectURL( blob );
+		downloadLink.download = exportPayload.filename;
+		document.body.appendChild( downloadLink );
+		downloadLink.click();
+		document.body.removeChild( downloadLink );
+		window.URL.revokeObjectURL( downloadLink.href );
+	}
+
+	function getSelectedPluginLabel() {
+		const selectedIndex = pluginsList.selectedIndex;
+		if ( selectedIndex < 0 ) {
+			return '';
+		}
+		return pluginsList.options[ selectedIndex ].text;
+	}
+
 	/**
 	 * Setup the runtime environment if needed.
 	 *
@@ -124,6 +387,10 @@
 		pluginCheckData.append(
 			'action',
 			pluginCheck.actionSetUpRuntimeEnvironment
+		);
+		pluginCheckData.append(
+			'include-experimental',
+			includeExperimental && includeExperimental.checked ? 1 : 0
 		);
 
 		for ( let i = 0; i < data.checks.length; i++ ) {
@@ -193,6 +460,10 @@
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append( 'plugin', pluginsList.value );
 		pluginCheckData.append( 'action', pluginCheck.actionGetChecksToRun );
+		pluginCheckData.append(
+			'include-experimental',
+			includeExperimental && includeExperimental.checked ? 1 : 0
+		);
 
 		for ( let i = 0; i < categoriesList.length; i++ ) {
 			if ( categoriesList[ i ].checked ) {
@@ -247,6 +518,7 @@
 				) {
 					isSuccessMessage = false;
 				}
+				mergeAggregatedResults( results );
 				renderResults( results );
 			} catch ( e ) {
 				// Ignore for now.
@@ -274,6 +546,9 @@
 				type: messageType,
 				message: messageText,
 			} ) + resultsContainer.innerHTML;
+
+		checksCompleted = true;
+		renderExportButtons();
 	}
 
 	/**
@@ -291,6 +566,10 @@
 		pluginCheckData.append( 'plugin', plugin );
 		pluginCheckData.append( 'checks[]', check );
 		pluginCheckData.append( 'action', pluginCheck.actionRunChecks );
+		pluginCheckData.append(
+			'include-experimental',
+			includeExperimental && includeExperimental.checked ? 1 : 0
+		);
 
 		return fetch( ajaxurl, {
 			method: 'POST',

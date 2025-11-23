@@ -2,7 +2,11 @@
 <ruleset name="WordPress Coding Standards for Plugin Check Plugin">
 	<description>Sniffs for WordPress plugins, with minor modifications for Performance</description>
 
-	<rule ref="PHPCompatibility"/>
+	<rule ref="PHPCompatibility" >
+		<exclude name="PHPCompatibility.FunctionUse.NewFunctions.str_containsFound"/>
+		<exclude name="PHPCompatibility.FunctionUse.NewFunctions.str_starts_withFound"/>
+		<exclude name="PHPCompatibility.FunctionUse.NewFunctions.str_ends_withFound"/>
+	</rule>
 	<config name="testVersion" value="7.4-"/>
 
 	<rule ref="WordPress-Core">
@@ -21,6 +25,7 @@
 	<file>./tests/phpunit</file>
 
 	<exclude-pattern>*/tests/phpunit/testdata/plugins/*</exclude-pattern>
+	<exclude-pattern>*/includes/Lib/*</exclude-pattern>
 
 	<!-- Do not require docblocks for unit tests -->
 	<rule ref="Squiz.Commenting.FunctionComment.Missing">

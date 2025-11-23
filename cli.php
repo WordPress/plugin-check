@@ -47,11 +47,15 @@ WP_CLI::add_command(
 		 * to verify it is the one that was added below.
 		 */
 		'after_invoke' => function () {
+			if ( ! defined( 'WP_CONTENT_DIR' ) ) {
+				// Defines WP_CONTENT_DIR just in case it is not defined.
+				define( 'WP_CONTENT_DIR', ABSPATH . 'wp-content' );
+			}
 			if (
-				file_exists( ABSPATH . 'wp-content/object-cache.php' ) &&
-				false !== strpos( file_get_contents( ABSPATH . 'wp-content/object-cache.php' ), 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' )
+				file_exists( WP_CONTENT_DIR . '/object-cache.php' ) &&
+				false !== strpos( file_get_contents( WP_CONTENT_DIR . '/object-cache.php' ), 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' )
 			) {
-				unlink( ABSPATH . 'wp-content/object-cache.php' );
+				unlink( WP_CONTENT_DIR . '/object-cache.php' );
 			}
 		},
 	)
@@ -66,9 +70,14 @@ WP_CLI::add_command(
 WP_CLI::add_hook(
 	'after_wp_config_load',
 	function () {
+		if ( ! defined( 'WP_CONTENT_DIR' ) ) {
+			// Defines WP_CONTENT_DIR just in case it is not defined.
+			define( 'WP_CONTENT_DIR', ABSPATH . 'wp-content' );
+		}
+
 		if ( CLI_Runner::is_plugin_check() ) {
-			if ( ! file_exists( ABSPATH . 'wp-content/object-cache.php' ) ) {
-				if ( ! copy( __DIR__ . '/drop-ins/object-cache.copy.php', ABSPATH . 'wp-content/object-cache.php' ) ) {
+			if ( ! file_exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
+				if ( ! copy( __DIR__ . '/drop-ins/object-cache.copy.php', WP_CONTENT_DIR . '/object-cache.php' ) ) {
 					WP_CLI::error( 'Unable to copy object-cache.php file.' );
 				}
 			}

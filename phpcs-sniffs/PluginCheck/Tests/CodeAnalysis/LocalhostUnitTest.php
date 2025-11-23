@@ -7,9 +7,9 @@
 
 namespace PluginCheckCS\PluginCheck\Tests\CodeAnalysis;
 
+use PHP_CodeSniffer\Sniffs\Sniff;
 use PluginCheckCS\PluginCheck\Sniffs\CodeAnalysis\LocalhostSniff;
 use PluginCheckCS\PluginCheck\Tests\AbstractSniffUnitTest;
-use PHP_CodeSniffer\Sniffs\Sniff;
 
 /**
  * Unit tests for LocalhostSniff.
@@ -35,6 +35,10 @@ final class LocalhostUnitTest extends AbstractSniffUnitTest {
 			25 => 2,
 			28 => 1,
 			30 => 1,
+			35 => 1,
+			36 => 1,
+			40 => 1,
+			41 => 1,
 		);
 	}
 

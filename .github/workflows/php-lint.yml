@@ -39,17 +39,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.0'
+          php-version: 'latest'
 
       - name: Validate Composer configuration
         run: composer validate
 
       - name: Install PHP dependencies
-        uses: ramsey/composer-install@57532f8be5bda426838819c5ee9afb8af389d51a
+        uses: ramsey/composer-install@3cf229dc2919194e9e36783941438d17239e8520
         with:
           composer-options: '--prefer-dist'
 
@@ -61,3 +61,32 @@ jobs:
 
       - name: PHPMD
         run: composer phpmd
+
+  php-lint-sniffs:
+    name: PHP (Sniffs)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0'
+
+      - name: Validate Composer configuration
+        working-directory: "phpcs-sniffs"
+        run: composer validate
+
+      - name: Install PHP dependencies
+        uses: ramsey/composer-install@3cf229dc2919194e9e36783941438d17239e8520
+        with:
+          composer-options: '--prefer-dist'
+          working-directory: "phpcs-sniffs"
+
+      - name: PHP Lint
+        working-directory: "phpcs-sniffs"
+        run: composer lint
+
+      - name: PHP Lint PHPCS
+        working-directory: "phpcs-sniffs"
+        run: composer check-cs

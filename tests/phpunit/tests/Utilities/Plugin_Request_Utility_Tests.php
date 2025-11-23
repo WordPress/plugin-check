@@ -235,6 +235,8 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 			'.git',
 			'vendor',
 			'node_modules',
+			'vendor_prefixed',
+			'vendor-prefixed',
 		);
 
 		$actual_directories = Plugin_Request_Utility::get_directories_to_ignore();
@@ -260,8 +262,6 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 
 		$result = Plugin_Request_Utility::get_directories_to_ignore();
 
-		$this->assertEquals( $custom_ignore_directories, $result );
-
 		// Remove the filter to avoid interfering with other tests.
 		remove_filter(
 			$filter_name,
@@ -269,6 +269,8 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 				return $custom_ignore_directories;
 			}
 		);
+
+		$this->assertEquals( $custom_ignore_directories, $result );
 	}
 
 	public function test_filter_ignore_files() {
@@ -289,8 +291,6 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 
 		$result = Plugin_Request_Utility::get_files_to_ignore();
 
-		$this->assertEquals( $custom_ignore_files, $result );
-
 		// Remove the filter to avoid interfering with other tests.
 		remove_filter(
 			$filter_name,
@@ -298,6 +298,8 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 				return $custom_ignore_files;
 			}
 		);
+
+		$this->assertEquals( $custom_ignore_files, $result );
 	}
 
 	public function test_plugin_without_error_for_ignore_directories() {
@@ -331,10 +333,6 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 
 		$results = $checks->run_checks( $check_context, $checks_to_run );
 
-		$this->assertInstanceOf( Check_Result::class, $results );
-		$this->assertEmpty( $results->get_warnings() );
-		$this->assertEmpty( $results->get_errors() );
-
 		// Remove the filter to avoid interfering with other tests.
 		remove_filter(
 			$filter_name,
@@ -342,6 +340,10 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 				return $custom_ignore_directories;
 			}
 		);
+
+		$this->assertInstanceOf( Check_Result::class, $results );
+		$this->assertEmpty( $results->get_warnings() );
+		$this->assertEmpty( $results->get_errors() );
 	}
 
 	public function test_plugin_with_error_for_ignore_directories() {
@@ -464,6 +466,14 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 
 		$results = $checks->run_checks( $check_context, $checks_to_run );
 
+		// Remove the filter to avoid interfering with other tests.
+		remove_filter(
+			$filter_name,
+			static function () use ( $custom_ignore_files ) {
+				return $custom_ignore_files;
+			}
+		);
+
 		$this->assertInstanceOf( Check_Result::class, $results );
 
 		$errors   = $results->get_errors();
@@ -473,13 +483,5 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		$this->assertEmpty( $warnings );
 		$this->assertEquals( 2, $results->get_error_count() );
 		$this->assertEquals( 0, $results->get_warning_count() );
-
-		// Remove the filter to avoid interfering with other tests.
-		remove_filter(
-			$filter_name,
-			static function () use ( $custom_ignore_files ) {
-				return $custom_ignore_files;
-			}
-		);
 	}
 }

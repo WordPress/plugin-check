@@ -5,6 +5,8 @@
  * @package PluginCheck
  */
 
+use PHP_CodeSniffer\Util\Standards;
+
 if ( ! defined( 'PHP_CODESNIFFER_IN_TESTS' ) ) {
 	define( 'PHP_CODESNIFFER_IN_TESTS', true );
 }
@@ -28,7 +30,7 @@ require_once $bootstrap_script_path; // Support for PHPUnit 6.x+.
 /**
  * Configure the environment to ignore tests from other coding standards.
  */
-$available_standards = PHP_CodeSniffer\Util\Standards::getInstalledStandards();
+$available_standards = Standards::getInstalledStandards();
 $ignored_standards   = array( 'Generic' );
 
 foreach ( $available_standards as $available_standard ) {

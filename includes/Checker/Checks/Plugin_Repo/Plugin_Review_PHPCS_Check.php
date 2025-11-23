@@ -74,4 +74,28 @@ class Plugin_Review_PHPCS_Check extends Abstract_PHP_CodeSniffer_Check {
 	public function get_documentation_url(): string {
 		return __( 'https://developer.wordpress.org/plugins/plugin-basics/best-practices/', 'plugin-check' );
 	}
+
+	/**
+	 * Amends the given result with a message for the specified file, including error information.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param Check_Result $result   The check result to amend, including the plugin context to check.
+	 * @param bool         $error    Whether it is an error or notice.
+	 * @param string       $message  Error message.
+	 * @param string       $code     Error code.
+	 * @param string       $file     Absolute path to the file where the issue was found.
+	 * @param int          $line     The line on which the message occurred. Default is 0 (unknown line).
+	 * @param int          $column   The column on which the message occurred. Default is 0 (unknown column).
+	 * @param string       $docs     URL for further information about the message.
+	 * @param int          $severity Severity level. Default is 5.
+	 */
+	protected function add_result_message_for_file( Check_Result $result, $error, $message, $code, $file, $line = 0, $column = 0, string $docs = '', $severity = 5 ) {
+		if ( 'PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound' === $code ) {
+			$message .= ' ' . esc_html__( 'When your plugin is hosted on WordPress.org, you no longer need to manually include this function call for translations under your plugin slug. WordPress will automatically load the translations for you as needed.', 'plugin-check' );
+			$docs     = 'https://make.wordpress.org/core/2016/07/06/i18n-improvements-in-4-6/';
+		}
+
+		parent::add_result_message_for_file( $result, $error, $message, $code, $file, $line, $column, $docs, $severity );
+	}
 }

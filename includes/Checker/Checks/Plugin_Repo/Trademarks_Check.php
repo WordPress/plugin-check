@@ -11,10 +11,11 @@ use Exception;
 use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Checks\Abstract_File_Check;
+use WordPress\Plugin_Check\Lib\Readme\Parser as PCPParser;
 use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Traits\Find_Readme;
 use WordPress\Plugin_Check\Traits\Stable_Check;
-use WordPressdotorg\Plugin_Directory\Readme\Parser;
+use WordPressdotorg\Plugin_Directory\Readme\Parser as DotorgParser;
 
 /**
  * Check for trademarks.
@@ -265,7 +266,7 @@ class Trademarks_Check extends Abstract_File_Check {
 
 		$readme_file = reset( $readme );
 
-		$parser = new Parser( $readme_file );
+		$parser = class_exists( DotorgParser::class ) ? new DotorgParser( $readme_file ) : new PCPParser( $readme_file );
 
 		try {
 			$this->validate_name_has_no_trademarks( $parser->name );

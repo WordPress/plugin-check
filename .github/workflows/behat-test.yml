@@ -13,6 +13,7 @@ on:
       - 'behat.yml'
       - 'composer.json'
       - 'composer.lock'
+      - 'phpcs-rulesets/*.xml'
   pull_request:
     branches:
       - trunk
@@ -26,6 +27,7 @@ on:
       - 'behat.yml'
       - 'composer.json'
       - 'composer.lock'
+      - 'phpcs-rulesets/*.xml'
     types:
       - opened
       - reopened
@@ -63,16 +65,14 @@ jobs:
         - '7.4'
         - '8.0'
         - '8.1'
+        - '8.2'
         wordpress: [ 'latest' ]
         include:
-          - php: '8.2'
+          - php: '8.4'
             wordpress: 'latest'
             coverage: true
           - php: '7.4'
             wordpress: '6.3'
-          - php: '8.3'
-            wordpress: 'trunk'
-            experimental: true
           - php: '8.4'
             wordpress: 'trunk'
             experimental: true
@@ -81,7 +81,7 @@ jobs:
       WP_ENV_CORE: ${{ matrix.wordpress == 'trunk' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', matrix.wordpress ) }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -93,7 +93,7 @@ jobs:
           ini-values: pcov.directory=.,pcov.exclude=~(vendor|tests)~
 
       - name: Install PHP dependencies
-        uses: ramsey/composer-install@57532f8be5bda426838819c5ee9afb8af389d51a
+        uses: ramsey/composer-install@3cf229dc2919194e9e36783941438d17239e8520
         with:
           composer-options: '--prefer-dist'
 
@@ -155,7 +155,7 @@ jobs:
 
       - name: Upload code coverage report
         if: ${{ matrix.coverage }}
-        uses: codecov/codecov-action@v5.0.2
+        uses: codecov/codecov-action@v5.5.1
         with:
           files: ${{ steps.coverage_files.outputs.files }}
           flags: feature

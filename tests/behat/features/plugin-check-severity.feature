@@ -199,11 +199,11 @@ Feature: Test that the severity level in plugin check works.
       """
     And STDOUT should contain:
       """
-      WordPress.WP.AlternativeFunctions.rand_mt_rand,ERRORS_LOW_SEVERITY,5
+      WordPress.WP.AlternativeFunctions.rand_mt_rand,ERROR_LOW_SEVERITY,5
       """
     And STDOUT should contain:
       """
-      WordPress.Security.EscapeOutput.OutputNotEscaped,ERRORS_LOW_SEVERITY,5
+      WordPress.Security.EscapeOutput.OutputNotEscaped,ERROR_LOW_SEVERITY,5
       """
 
     When I run the WP-CLI command `plugin check foo-bar-wp --format=csv --fields=code,type,severity --warning-severity=7 --include-low-severity-warnings`
@@ -213,7 +213,7 @@ Feature: Test that the severity level in plugin check works.
       """
     And STDOUT should contain:
       """
-      upgrade_notice_limit,WARNINGS_LOW_SEVERITY,5
+      upgrade_notice_limit,WARNING_LOW_SEVERITY,5
       """
     And STDOUT should contain:
       """

@@ -119,6 +119,49 @@ Feature: Test that the WP-CLI command works.
       WordPress.Security.EscapeOutput.OutputNotEscaped
       """
 
+    When I run the WP-CLI command `plugin check foo-single.php --ignore-codes=WordPress.WP.AlternativeFunctions.rand_mt_rand`
+    Then STDOUT should not contain:
+      """
+      WordPress.WP.AlternativeFunctions.rand_mt_rand
+      """
+    And STDOUT should contain:
+      """
+      WordPress.Security.EscapeOutput.OutputNotEscaped
+      """
+
+    When I run the WP-CLI command `plugin check foo-single.php --ignore-codes=WordPress.Security.EscapeOutput.OutputNotEscaped`
+    Then STDOUT should not contain:
+      """
+      WordPress.Security.EscapeOutput.OutputNotEscaped
+      """
+    And STDOUT should contain:
+      """
+      WordPress.WP.AlternativeFunctions.rand_mt_rand
+      """
+
+    When I run the WP-CLI command `plugin check foo-single.php --ignore-codes="WordPress.WP.AlternativeFunctions.rand_mt_rand,WordPress.Security.EscapeOutput.OutputNotEscaped"`
+    Then STDOUT should not contain:
+      """
+      WordPress.Security.EscapeOutput.OutputNotEscaped
+      """
+    And STDOUT should not contain:
+      """
+      WordPress.WP.AlternativeFunctions.rand_mt_rand
+      """
+
+    When I run the WP-CLI command `plugin check foo-single.php --format=json --fields=line,column,type,code`
+    Then STDOUT should contain:
+      """
+      FILE:
+      """
+
+    When I run the WP-CLI command `plugin check foo-single.php --format=strict-json --fields=line,column,type,code`
+    Then STDOUT should be valid JSON
+    And STDOUT should not contain:
+      """
+      FILE:
+      """
+
   Scenario: Check plugin with special chars in plugin name
     Given a WP install with the Plugin Check plugin
     And a wp-content/plugins/johns-post-counter/johns-post-counter.php file:
@@ -460,10 +503,12 @@ Feature: Test that the WP-CLI command works.
        */
 
       $text = 'I am bad'; // This should trigger the error.
+
+      $string = 'This is experimental string.';
       """
     And I run the WP-CLI command `plugin activate foo-sample`
 
-    # The two checks from pcp-addon should be available.
+    # The two stable checks from pcp-addon should be available.
     When I run the WP-CLI command `plugin list-checks --fields=slug,category,stability --format=csv`
     Then STDOUT should contain:
       """
@@ -472,6 +517,17 @@ Feature: Test that the WP-CLI command works.
     And STDOUT should contain:
       """
       example_runtime,new_category,stable
+      """
+    And STDOUT should not contain:
+      """
+      example_experimental,new_category,experimental
+      """
+
+    # Experimental checks from pcp-addon should be available.
+    When I run the WP-CLI command `plugin list-checks --fields=slug,category,stability --format=csv --include-experimental`
+    Then STDOUT should contain:
+      """
+      example_experimental,new_category,experimental
       """
 
     # The new check category should therefore also be available.
@@ -493,6 +549,13 @@ Feature: Test that the WP-CLI command works.
     Then STDOUT should contain:
       """
       prohibited_text_detected,ERROR
+      """
+
+    # Running experimental checks, including the one from pcp-addon
+    When I run the WP-CLI command `plugin check foo-sample --fields=code,type --format=csv --include-experimental`
+    Then STDOUT should contain:
+      """
+      experimental_text_detected,ERROR
       """
 
     # Running only the check from pcp-addon
@@ -608,9 +671,9 @@ Feature: Test that the WP-CLI command works.
 
     When I run the WP-CLI command `plugin check foo-single.php`
     Then STDOUT should contain:
-	  """
-	  Success: Checks complete. No errors found.
-	  """
+      """
+      Success: Checks complete. No errors found.
+      """
 
   Scenario: Check for mismatched plugin name in non-English language setup
     Given a WP install with the Plugin Check plugin
@@ -677,9 +740,9 @@ Feature: Test that the WP-CLI command works.
 
     When I run the WP-CLI command `plugin check foo-sample`
     Then STDOUT should not contain:
-	    """
-	    mismatched_plugin_name
-	    """
+      """
+      mismatched_plugin_name
+      """
 
   Scenario: Check Contributors value in readme in markdown format
     Given a WP install with the Plugin Check plugin
@@ -716,6 +779,135 @@ Feature: Test that the WP-CLI command works.
 
     When I run the WP-CLI command `plugin check foo-sample`
     Then STDOUT should not contain:
-	    """
-	    readme_invalid_contributors
-	    """
+      """
+      readme_invalid_contributors
+      """
+
+  Scenario: Check duplicated error messages for hidden files and application files
+    Given a WP install with the Plugin Check plugin
+    And a wp-content/plugins/foo-sample/foo-sample.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Sample
+       * Plugin URI: https://foo-sample.com
+       * Description: Custom plugin.
+       * Version: 0.1.0
+       * Author: WordPress Performance Team
+       * Author URI: https://make.wordpress.org/performance/
+       * License: GPL-2.0+
+       * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+       */
+
+      """
+    And a wp-content/plugins/foo-sample/.DS_Store file:
+      """
+      """
+
+    When I run the WP-CLI command `plugin check foo-sample --checks=file_type`
+    Then STDOUT should contain:
+      """
+      hidden_files
+      """
+    And STDOUT should not contain:
+      """
+      application_detected
+      """
+
+  Scenario: Check for i18n severity
+    Given a WP install with the Plugin Check plugin
+    And a wp-content/plugins/foo-sample/foo-sample.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Sample
+       * Plugin URI: https://foo-sample.com
+       * Description: Custom plugin.
+       * Version: 0.1.0
+       * Author: WordPress Performance Team
+       * Author URI: https://make.wordpress.org/performance/
+       * License: GPL-2.0+
+       * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+       */
+
+      esc_html_e( 'Hello world', "${var}" );
+      esc_html_e( domain: 'foo-sample' );
+      esc_html_e( '%s', 'foo-sample' );
+      echo esc_html_x( 'Hello world', $var, 'foo-sample' );
+      esc_html_e( 'Hello world', $var );
+      esc_html_e( 'Hello world', 'foo-sample', 'too-many-args' );
+      """
+
+    When I run the WP-CLI command `plugin check foo-sample --checks=i18n_usage --fields=line,type,code,severity --format=csv`
+    Then STDOUT should contain:
+      """
+      13,ERROR,WordPress.WP.I18n.InterpolatedVariableDomain,7
+      """
+    And STDOUT should contain:
+      """
+      14,ERROR,WordPress.WP.I18n.MissingArgText,7
+      """
+    And STDOUT should contain:
+      """
+      15,ERROR,WordPress.WP.I18n.NoEmptyStrings,7
+      """
+    And STDOUT should contain:
+      """
+      16,ERROR,WordPress.WP.I18n.NonSingularStringLiteralContext,7
+      """
+    And STDOUT should contain:
+      """
+      17,ERROR,WordPress.WP.I18n.NonSingularStringLiteralDomain,7
+      """
+    And STDOUT should contain:
+      """
+      18,ERROR,WordPress.WP.I18n.TooManyFunctionArgs,7
+      """
+
+  Scenario: Check unsupported plugin name in plugin header field
+    Given a WP install with the Plugin Check plugin
+    And a wp-content/plugins/foo-sample/foo-sample.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: अद्भुत प्लगिन
+       * Plugin URI: https://foo-sample.com
+       * Description: Custom plugin.
+       * Version: 0.1.0
+       * Author: WordPress Performance Team
+       * Author URI: https://make.wordpress.org/performance/
+       * License: GPL-2.0+
+       * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+       */
+
+      """
+
+    When I run the WP-CLI command `plugin check foo-sample`
+    Then STDOUT should contain:
+      """
+      plugin_header_unsupported_plugin_name
+      """
+
+  Scenario: Check plugin with missing Text Domain plugin header field
+    Given a WP install with the Plugin Check plugin
+    And a wp-content/plugins/foo-sample/foo-sample.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Sample
+       * Plugin URI: https://foo-sample.com
+       * Description: Custom plugin.
+       * Version: 0.1.0
+       * Author: WordPress Performance Team
+       * Author URI: https://make.wordpress.org/performance/
+       * License: GPL-2.0+
+       * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+       */
+
+      """
+
+    When I run the WP-CLI command `plugin check foo-sample --slug=custom-slug`
+    Then STDOUT should not contain:
+      """
+      textdomain_mismatch
+      """

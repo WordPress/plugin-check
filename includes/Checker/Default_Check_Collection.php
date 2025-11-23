@@ -184,7 +184,7 @@ class Default_Check_Collection implements Check_Collection {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @return Traversable Checks iterator.
+	 * @return Traversable<mixed, mixed> Checks iterator.
 	 */
 	public function getIterator(): Traversable {
 		return new ArrayIterator( $this->checks );
@@ -195,7 +195,7 @@ class Default_Check_Collection implements Check_Collection {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string|int $offset Either a check slug (string) or index (integer).
+	 * @param mixed $offset Either a check slug (string) or index (integer).
 	 * @return bool True if a check exists at the given slug or index, false otherwise.
 	 */
 	#[\ReturnTypeWillChange]
@@ -212,7 +212,7 @@ class Default_Check_Collection implements Check_Collection {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string|int $offset Either a check slug (string) or index (integer).
+	 * @param mixed $offset Either a check slug (string) or index (integer).
 	 * @return Check|null Check with the given slug or index, or null if it does not exist.
 	 */
 	#[\ReturnTypeWillChange]
@@ -238,8 +238,8 @@ class Default_Check_Collection implements Check_Collection {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string|int $offset Either a check slug (string) or index (integer).
-	 * @param mixed      $value  Value to set.
+	 * @param mixed $offset Either a check slug (string) or index (integer).
+	 * @param mixed $value  Value to set.
 	 */
 	#[\ReturnTypeWillChange]
 	public function offsetSet( $offset, $value ) {
@@ -253,7 +253,7 @@ class Default_Check_Collection implements Check_Collection {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string|int $offset Either a check slug (string) or index (integer).
+	 * @param mixed $offset Either a check slug (string) or index (integer).
 	 */
 	#[\ReturnTypeWillChange]
 	public function offsetUnset( $offset ) {

@@ -8,10 +8,6 @@
 define( 'TESTS_PLUGIN_DIR', dirname( __DIR__, 2 ) );
 define( 'UNIT_TESTS_PLUGIN_DIR', TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/' );
 
-if ( file_exists( TESTS_PLUGIN_DIR . '/build-phpunit/vendor/autoload.php' ) ) {
-	require_once TESTS_PLUGIN_DIR . '/build-phpunit/vendor/autoload.php';
-}
-
 if ( file_exists( TESTS_PLUGIN_DIR . '/vendor/autoload.php' ) ) {
 	require_once TESTS_PLUGIN_DIR . '/vendor/autoload.php';
 }
@@ -28,6 +24,8 @@ if ( false !== getenv( 'WP_TESTS_DIR' ) ) {
 } else { // Fallback.
 	$_test_root = '/tmp/wordpress-tests-lib';
 }
+
+require_once $_test_root . '/includes/functions.php';
 
 // Force plugin to be active.
 $GLOBALS['wp_tests_options'] = array(

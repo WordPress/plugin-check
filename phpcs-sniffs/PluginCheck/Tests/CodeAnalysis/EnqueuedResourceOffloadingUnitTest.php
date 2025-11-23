@@ -7,9 +7,9 @@
 
 namespace PluginCheckCS\PluginCheck\Tests\CodeAnalysis;
 
+use PHP_CodeSniffer\Sniffs\Sniff;
 use PluginCheckCS\PluginCheck\Sniffs\CodeAnalysis\EnqueuedResourceOffloadingSniff;
 use PluginCheckCS\PluginCheck\Tests\AbstractSniffUnitTest;
-use PHP_CodeSniffer\Sniffs\Sniff;
 
 /**
  * Unit tests for EnqueuedResourceOffloadingSniff.
@@ -19,13 +19,21 @@ final class EnqueuedResourceOffloadingUnitTest extends AbstractSniffUnitTest {
 	/**
 	 * Returns the lines where errors should occur.
 	 *
+	 * @param string $test_file The name of the test file being checked.
+	 *
 	 * @return array <int line number> => <int number of errors>
 	 */
-	public function getErrorList() {
-		return array(
-			5  => 1,
-			13 => 1,
-		);
+	public function getErrorList( $test_file = '' ) {
+		switch ( $test_file ) {
+			case 'EnqueuedResourceOffloadingUnitTest.1.inc':
+				return array(
+					5  => 1,
+					13 => 1,
+					22 => 1,
+				);
+			default:
+				return array();
+		}
 	}
 
 	/**

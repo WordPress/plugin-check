@@ -78,4 +78,41 @@ class Late_Escaping_Check extends Abstract_PHP_CodeSniffer_Check {
 	public function get_documentation_url(): string {
 		return __( 'https://developer.wordpress.org/apis/security/escaping/', 'plugin-check' );
 	}
+
+	/**
+	 * Amends the given result with a message for the specified file, including error information.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @param Check_Result $result   The check result to amend, including the plugin context to check.
+	 * @param bool         $error    Whether it is an error or notice.
+	 * @param string       $message  Error message.
+	 * @param string       $code     Error code.
+	 * @param string       $file     Absolute path to the file where the issue was found.
+	 * @param int          $line     The line on which the message occurred. Default is 0 (unknown line).
+	 * @param int          $column   The column on which the message occurred. Default is 0 (unknown column).
+	 * @param string       $docs     URL for further information about the message.
+	 * @param int          $severity Severity level. Default is 5.
+	 */
+	protected function add_result_message_for_file( Check_Result $result, $error, $message, $code, $file, $line = 0, $column = 0, string $docs = '', $severity = 5 ) {
+		switch ( $code ) {
+			case 'WordPress.Security.EscapeOutput.OutputNotEscaped':
+				$docs = __( 'https://developer.wordpress.org/apis/security/escaping/#escaping-functions', 'plugin-check' );
+				break;
+
+			case 'WordPress.Security.EscapeOutput.UnsafePrintingFunction':
+				$docs = __( 'https://developer.wordpress.org/apis/security/escaping/#escaping-with-localization', 'plugin-check' );
+				break;
+
+			case 'WordPress.Security.EscapeOutput.UnsafeSearchQuery':
+				$docs = __( 'https://developer.wordpress.org/reference/functions/get_search_query/', 'plugin-check' );
+				break;
+
+			default:
+				$docs = __( 'https://developer.wordpress.org/apis/security/escaping/', 'plugin-check' );
+				break;
+		}
+
+		parent::add_result_message_for_file( $result, $error, $message, $code, $file, $line, $column, $docs, $severity );
+	}
 }

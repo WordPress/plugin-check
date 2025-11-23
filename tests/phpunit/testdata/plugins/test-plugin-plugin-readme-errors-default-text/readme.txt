@@ -8,7 +8,7 @@ Requires PHP:      5.6
 Stable tag:        1.0.0
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
-Donate URL:        https://example.com
+Donate Link:       https://example.com
 Tags:              tag1, testing, security
 
 Here is a short description of the plugin.

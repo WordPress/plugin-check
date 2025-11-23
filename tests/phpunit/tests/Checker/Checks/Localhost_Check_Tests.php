@@ -23,9 +23,13 @@ class Localhost_Check_Tests extends WP_UnitTestCase {
 		$this->assertNotEmpty( $errors );
 		$this->assertArrayNotHasKey( 'load.php', $errors ); // Localhost in comment should not be error.
 		$this->assertArrayHasKey( 'another.php', $errors );
+		$this->assertArrayHasKey( 'yet-another.php', $errors );
 
 		$this->assertCount( 1, wp_list_filter( $errors['another.php'][2][15], array( 'code' => 'PluginCheck.CodeAnalysis.Localhost.Found' ) ) );
 		$this->assertCount( 1, wp_list_filter( $errors['another.php'][3][15], array( 'code' => 'PluginCheck.CodeAnalysis.Localhost.Found' ) ) );
 		$this->assertCount( 1, wp_list_filter( $errors['another.php'][4][15], array( 'code' => 'PluginCheck.CodeAnalysis.Localhost.Found' ) ) );
+		$this->assertCount( 1, wp_list_filter( $errors['yet-another.php'][2][15], array( 'code' => 'PluginCheck.CodeAnalysis.Localhost.Found' ) ) );
+		$this->assertCount( 1, wp_list_filter( $errors['yet-another.php'][3][15], array( 'code' => 'PluginCheck.CodeAnalysis.Localhost.Found' ) ) );
+		$this->assertCount( 1, wp_list_filter( $errors['yet-another.php'][4][15], array( 'code' => 'PluginCheck.CodeAnalysis.Localhost.Found' ) ) );
 	}
 }

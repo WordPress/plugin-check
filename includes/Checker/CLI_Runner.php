@@ -179,6 +179,31 @@ class CLI_Runner extends Abstract_Check_Runner {
 	}
 
 	/**
+	 * Returns the mode parameter.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return string The mode parameter.
+	 */
+	protected function get_mode_param() {
+		$mode = 'new';
+
+		foreach ( $_SERVER['argv'] as $value ) {
+			if ( false !== strpos( $value, '--mode=' ) ) {
+				$mode = str_replace( '--mode=', '', $value );
+				break;
+			}
+		}
+
+		// Validate mode parameter.
+		if ( ! in_array( $mode, array( 'new', 'update' ), true ) ) {
+			$mode = 'new';
+		}
+
+		return $mode;
+	}
+
+	/**
 	 * Initializes the runtime environment so that runtime checks can be run against a separate set of database tables.
 	 *
 	 * @since 1.3.0

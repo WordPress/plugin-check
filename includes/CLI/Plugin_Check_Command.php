@@ -15,6 +15,7 @@ use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Checker\Default_Check_Repository;
 use WordPress\Plugin_Check\Plugin_Context;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
+use WordPress\Plugin_Check\Utilities\Results_Exporter;
 use WP_CLI;
 
 /**
@@ -42,6 +43,9 @@ final class Plugin_Check_Command {
 		'table',
 		'csv',
 		'json',
+		'strict-table',
+		'strict-csv',
+		'strict-json',
 	);
 
 	/**
@@ -70,14 +74,20 @@ final class Plugin_Check_Command {
 	 * : Exclude checks provided as an argument in comma-separated values, e.g. i18n_usage, late_escaping.
 	 * Applies after evaluating `--checks`.
 	 *
+	 * [--ignore-codes=<codes>]
+	 * : Ignore error codes provided as an argument in comma-separated values.
+	 *
 	 * [--format=<format>]
-	 * : Format to display the results. Options are table, csv, and json. The default will be a table.
+	 * : Format to display the results. Options are table, csv, json, strict-table, strict-csv, and strict-json. The default will be a table.
 	 * ---
 	 * default: table
 	 * options:
 	 *   - table
 	 *   - csv
 	 *   - json
+	 *   - strict-table
+	 *   - strict-csv
+	 *   - strict-json
 	 * ---
 	 *
 	 * [--categories]
@@ -97,7 +107,7 @@ final class Plugin_Check_Command {
 	 *
 	 * [--exclude-directories=<directories>]
 	 * : Additional directories to exclude from checks.
-	 * By default, `.git`, `vendor` and `node_modules` directories are excluded.
+	 * By default, `.git`, `vendor`, `vendor_prefixed`, `vendor-prefixed` and `node_modules` directories are excluded.
 	 *
 	 * [--exclude-files=<files>]
 	 * : Additional files to exclude from checks.
@@ -120,11 +130,21 @@ final class Plugin_Check_Command {
 	 * [--slug=<slug>]
 	 * : Slug to override the default.
 	 *
+	 * [--mode=<mode>]
+	 * : Mode to run the checks in. Options are 'new' (default) or 'update'.
+	 * ---
+	 * default: new
+	 * options:
+	 *   - new
+	 *   - update
+	 * ---
+	 *
 	 * ## EXAMPLES
 	 *
 	 *   wp plugin check akismet
 	 *   wp plugin check akismet --checks=late_escaping
 	 *   wp plugin check akismet --format=json
+	 *   wp plugin check akismet --mode=update
 	 *
 	 * @subcommand check
 	 *
@@ -155,12 +175,17 @@ final class Plugin_Check_Command {
 				'include-low-severity-errors'   => false,
 				'include-low-severity-warnings' => false,
 				'slug'                          => '',
+				'ignore-codes'                  => '',
+				'mode'                          => 'new',
 			)
 		);
 
 		// Create the plugin and checks array from CLI arguments.
 		$plugin = isset( $args[0] ) ? $args[0] : '';
 		$checks = wp_parse_list( $options['checks'] );
+
+		// Ignore codes.
+		$ignore_codes = isset( $options['ignore-codes'] ) ? wp_parse_list( $options['ignore-codes'] ) : array();
 
 		// Create the categories array from CLI arguments.
 		$categories = isset( $options['categories'] ) ? wp_parse_list( $options['categories'] ) : array();
@@ -204,6 +229,7 @@ final class Plugin_Check_Command {
 			$runner->set_plugin( $plugin );
 			$runner->set_categories( $categories );
 			$runner->set_slug( $options['slug'] );
+			$runner->set_mode( $options['mode'] );
 		} catch ( Exception $error ) {
 			WP_CLI::error( $error->getMessage() );
 		}
@@ -248,36 +274,70 @@ final class Plugin_Check_Command {
 		$include_low_severity_errors   = ! empty( $options['include-low-severity-errors'] ) ? true : false;
 		$include_low_severity_warnings = ! empty( $options['include-low-severity-warnings'] ) ? true : false;
 
-		// Print the formatted results.
-		// Go over all files with errors first and print them, combined with any warnings in the same file.
+		$all_results = array();
+
+		// Collect all errors.
 		foreach ( $errors as $file_name => $file_errors ) {
 			$file_warnings = array();
 			if ( isset( $warnings[ $file_name ] ) ) {
 				$file_warnings = $warnings[ $file_name ];
 				unset( $warnings[ $file_name ] );
 			}
-			$file_results = $this->flatten_file_results( $file_errors, $file_warnings );
+			$file_results = Results_Exporter::flatten_file_results( $file_errors, $file_warnings );
+
+			if ( ! empty( $ignore_codes ) ) {
+				$file_results = $this->get_filtered_results_by_ignore_codes( $file_results, $ignore_codes );
+			}
 
 			if ( '' !== $error_severity || '' !== $warning_severity ) {
 				$file_results = $this->get_filtered_results_by_severity( $file_results, intval( $error_severity ), intval( $warning_severity ), $include_low_severity_errors, $include_low_severity_warnings );
 			}
 
-			if ( ! empty( $file_results ) ) {
-				$this->display_results( $formatter, $file_name, $file_results );
+			foreach ( $file_results as $item ) {
+				$item['file']  = $file_name;
+				$all_results[] = $item;
 			}
 		}
 
-		// If there are any files left with only warnings, print those next.
+		// Collect remaining warnings.
 		foreach ( $warnings as $file_name => $file_warnings ) {
-			$file_results = $this->flatten_file_results( array(), $file_warnings );
+			$file_results = Results_Exporter::flatten_file_results( array(), $file_warnings );
+
+			if ( ! empty( $ignore_codes ) ) {
+				$file_results = $this->get_filtered_results_by_ignore_codes( $file_results, $ignore_codes );
+			}
 
 			if ( '' !== $error_severity || '' !== $warning_severity ) {
 				$file_results = $this->get_filtered_results_by_severity( $file_results, intval( $error_severity ), intval( $warning_severity ), $include_low_severity_errors, $include_low_severity_warnings );
 			}
 
-			if ( ! empty( $file_results ) ) {
-				$this->display_results( $formatter, $file_name, $file_results );
+			foreach ( $file_results as $item ) {
+				$item['file']  = $file_name;
+				$all_results[] = $item;
 			}
+		}
+
+		// Handle strict-* formats.
+		if ( str_starts_with( $options['format'], 'strict-' ) ) {
+			$base_format = substr( $options['format'], 7 );
+
+			$formatter_args           = $assoc_args;
+			$formatter_args['format'] = $base_format;
+
+			$formatter = $this->get_formatter( $formatter_args, $default_fields );
+			$formatter->display_items( $all_results );
+			return;
+		}
+
+		// Group results by file.
+		$results_by_file = array();
+
+		foreach ( $all_results as $item ) {
+			$results_by_file[ $item['file'] ][] = $item;
+		}
+
+		foreach ( $results_by_file as $file_name => $file_results ) {
+			$this->display_results( $formatter, $file_name, $file_results );
 		}
 	}
 
@@ -537,78 +597,6 @@ final class Plugin_Check_Command {
 	}
 
 	/**
-	 * Flattens and combines the given associative array of file errors and file warnings into a two-dimensional array.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param array $file_errors   Errors from a Check_Result, for a specific file.
-	 * @param array $file_warnings Warnings from a Check_Result, for a specific file.
-	 * @return array Combined file results.
-	 *
-	 * @SuppressWarnings(PHPMD.NPathComplexity)
-	 */
-	private function flatten_file_results( $file_errors, $file_warnings ) {
-		$file_results = array();
-
-		foreach ( $file_errors as $line => $line_errors ) {
-			foreach ( $line_errors as $column => $column_errors ) {
-				foreach ( $column_errors as $column_error ) {
-
-					$column_error['message'] = str_replace( array( '<br>', '<strong>', '</strong>', '<code>', '</code>' ), array( ' ', '', '', '`', '`' ), $column_error['message'] );
-
-					$file_results[] = array_merge(
-						$column_error,
-						array(
-							'type'   => 'ERROR',
-							'line'   => $line,
-							'column' => $column,
-						)
-					);
-				}
-			}
-		}
-
-		foreach ( $file_warnings as $line => $line_warnings ) {
-			foreach ( $line_warnings as $column => $column_warnings ) {
-				foreach ( $column_warnings as $column_warning ) {
-
-					$column_warning['message'] = str_replace( array( '<br>', '<strong>', '</strong>', '<code>', '</code>' ), array( ' ', '', '', '`', '`' ), $column_warning['message'] );
-
-					$file_results[] = array_merge(
-						$column_warning,
-						array(
-							'type'   => 'WARNING',
-							'line'   => $line,
-							'column' => $column,
-						)
-					);
-				}
-			}
-		}
-
-		usort(
-			$file_results,
-			static function ( $a, $b ) {
-				if ( $a['line'] < $b['line'] ) {
-					return -1;
-				}
-				if ( $a['line'] > $b['line'] ) {
-					return 1;
-				}
-				if ( $a['column'] < $b['column'] ) {
-					return -1;
-				}
-				if ( $a['column'] > $b['column'] ) {
-					return 1;
-				}
-				return 0;
-			}
-		);
-
-		return $file_results;
-	}
-
-	/**
 	 * Displays the results.
 	 *
 	 * @since 1.0.0
@@ -653,10 +641,10 @@ final class Plugin_Check_Command {
 			if ( 'ERROR' === $item['type'] && $item['severity'] >= $error_severity ) {
 				$errors[] = $item;
 			} elseif ( $include_low_severity_errors && 'ERROR' === $item['type'] && $item['severity'] < $error_severity ) {
-				$item['type'] = 'ERRORS_LOW_SEVERITY';
+				$item['type'] = 'ERROR_LOW_SEVERITY';
 				$errors[]     = $item;
 			} elseif ( $include_low_severity_warnings && 'WARNING' === $item['type'] && $item['severity'] < $warning_severity ) {
-				$item['type'] = 'WARNINGS_LOW_SEVERITY';
+				$item['type'] = 'WARNING_LOW_SEVERITY';
 				$warnings[]   = $item;
 			} elseif ( 'WARNING' === $item['type'] && $item['severity'] >= $warning_severity ) {
 				$warnings[] = $item;
@@ -664,5 +652,23 @@ final class Plugin_Check_Command {
 		}
 
 		return array_merge( $errors, $warnings );
+	}
+
+	/**
+	 * Returns check results filtered by ignore codes.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @param array $results      Check results.
+	 * @param array $ignore_codes Array of error codes to be ignored.
+	 * @return array Filtered results.
+	 */
+	private function get_filtered_results_by_ignore_codes( $results, $ignore_codes ) {
+		return array_filter(
+			$results,
+			static function ( $result ) use ( $ignore_codes ) {
+				return ! in_array( $result['code'], $ignore_codes, true );
+			}
+		);
 	}
 }

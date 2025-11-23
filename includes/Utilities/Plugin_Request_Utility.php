@@ -143,11 +143,13 @@ class Plugin_Request_Utility {
 	 * @since 1.0.0
 	 */
 	public static function get_directories_to_ignore() {
-		// By default, ignore the '.git', 'vendor' and 'node_modules' directories.
+		// By default, ignore the '.git', 'vendor', 'vendor_prefixed, 'vendor-prefixed' and 'node_modules' directories.
 		$default_ignore_directories = array(
 			'.git',
 			'vendor',
 			'node_modules',
+			'vendor_prefixed',
+			'vendor-prefixed',
 		);
 
 		/**
