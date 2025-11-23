@@ -88,7 +88,7 @@ class Parser {
 	public $faq = array();
 
 	/**
-	 * Warning flags which indicate specific parsing failures have occured.
+	 * Warning flags which indicate specific parsing failures have occurred.
 	 *
 	 * @var array
 	 */
@@ -830,7 +830,7 @@ class Parser {
 			if (
 				// x.y or x.y.z
 				! preg_match( '!^\d+\.\d(\.\d+)?$!', $version ) ||
-				// Allow plugins to mark themselves as requireing Stable+0.1 (trunk/master) but not higher
+				// Allow plugins to mark themselves as requiring Stable+0.1 (trunk/master) but not higher
 				defined( 'WP_CORE_STABLE_BRANCH' ) && ( (float) $version > (float) WP_CORE_STABLE_BRANCH + 0.1 )
 			) {
 				$this->warnings['requires_header_ignored'] = true;
@@ -945,7 +945,7 @@ class Parser {
 		$probably_compatible = array(
 			'GPL',
 			'General Public License',
-			// 'GNU 2', 'GNU Public', 'GNU Version 2' explicitely not included, as it's not a specific license.
+			// 'GNU 2', 'GNU Public', 'GNU Version 2' explicitly not included, as it's not a specific license.
 			'MIT',
 			'ISC',
 			'Expat',

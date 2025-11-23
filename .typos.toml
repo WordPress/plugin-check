@@ -10,10 +10,29 @@ extend-exclude = [
 ]
 
 [default.extend-words]
-# Brand names and legitimate TLDs that may appear elsewhere
+# Brand names and legitimate TLDs
 chanel = "chanel"
 marshalls = "marshalls"
 immobilien = "immobilien"
 lolipop = "lolipop"
 onl = "onl"
 passagens = "passagens"
+
+# WordPress core function names (intentional naming)
+stati = "stati"  # WordPress function: get_post_stati
+wheres = "wheres"  # WordPress variable: $wheres
+
+# WordPress core action/hook names (must match exactly)
+setted = "setted"  # WordPress hooks: setted_site_transient, setted_transient
+
+# WordPress core constants (legacy naming)
+INITALIZED = "INITALIZED"  # WordPress constant: MAGPIE_INITALIZED
+
+# Third-party library names
+ba = "ba"  # jQuery plugin: jquery.ba-serializeobject
+
+# Creative Commons license abbreviations
+ND = "ND"  # CC BY-ND (No Derivatives)
+
+# Parser checks for invalid licenses (intentionally includes common misspellings)
+Proprietery = "Proprietery"  # Intentional check in Parser.php for common license typo
