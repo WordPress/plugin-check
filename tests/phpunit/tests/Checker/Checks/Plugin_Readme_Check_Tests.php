@@ -622,4 +622,37 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertCount( 1, wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'readme_invalid_donate_link_domain' ) ) );
 	}
+
+	public function test_run_with_undocumented_third_party_services() {
+		$check         = new Plugin_Readme_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-third-party-undocumented/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check->run( $check_result );
+
+		$errors = $check_result->get_errors();
+
+		$this->assertNotEmpty( $errors );
+		$this->assertArrayHasKey( 'readme.txt', $errors );
+
+		// Check for undocumented third-party service errors.
+		$undocumented_errors = wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'undocumented_third_party_service' ) );
+		$this->assertNotEmpty( $undocumented_errors, 'Should detect undocumented third-party services' );
+	}
+
+	public function test_run_with_documented_third_party_services() {
+		$check         = new Plugin_Readme_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-third-party-documented/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check->run( $check_result );
+
+		$errors = $check_result->get_errors();
+
+		// Should not have undocumented third-party service errors.
+		if ( ! empty( $errors ) && isset( $errors['readme.txt'] ) ) {
+			$undocumented_errors = wp_list_filter( $errors['readme.txt'][0][0], array( 'code' => 'undocumented_third_party_service' ) );
+			$this->assertEmpty( $undocumented_errors, 'Should not flag properly documented third-party services' );
+		}
+	}
 }

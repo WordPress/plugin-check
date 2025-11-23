@@ -12,11 +12,11 @@ use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Checks\Abstract_File_Check;
 use WordPress\Plugin_Check\Lib\Readme\Parser as PCPParser;
 use WordPress\Plugin_Check\Traits\Amend_Check_Result;
-use WordPress\Plugin_Check\Traits\Find_Readme;
-use WordPress\Plugin_Check\Traits\TLD_Names;
 use WordPress\Plugin_Check\Traits\External_Utils;
+use WordPress\Plugin_Check\Traits\Find_Readme;
 use WordPress\Plugin_Check\Traits\License_Utils;
 use WordPress\Plugin_Check\Traits\Stable_Check;
+use WordPress\Plugin_Check\Traits\TLD_Names;
 use WordPress\Plugin_Check\Traits\URL_Utils;
 use WordPress\Plugin_Check\Traits\Version_Utils;
 use WordPressdotorg\Plugin_Directory\Readme\Parser as DotorgParser;
@@ -854,20 +854,79 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 *
 	 * @since 1.4.0
 	 *
-	 * @param Check_Result $result      The Check Result to amend.
-	 * @param string       $readme_file Readme file.
+	 * @param Check_Result           $result      The Check Result to amend.
+	 * @param string                 $readme_file Readme file.
+	 * @param DotorgParser|PCPParser $parser      The Parser object.
+	 * @param array                  $files       Array of plugin files.
 	 */
-	private function check_for_privacy_notes( Check_Result $result, string $readme_file, Parser $parser, array $files ) {
+	private function check_for_privacy_notes( Check_Result $result, string $readme_file, $parser, array $files ) {
 		$existing_tld_names = $this->get_tld_names();
-		$domains            = $this->load_domains_mentioned_in_readme( $readme_file, $existing_tld_names );
-		$files_ext          = self::filter_files_by_extensions( $files, array( 'php', 'css', 'js' ) );
 
-		foreach( $files_ext as $file ) {
-			$result = $this->find_external_calls( $file );
-			
+		// Load domains mentioned in readme.
+		$this->domains_mentioned_readme = $this->load_domains_mentioned_in_readme( $readme_file, $existing_tld_names );
+
+		// Filter files to check (PHP, JS, CSS).
+		$files_ext = self::filter_files_by_extensions( $files, array( 'php', 'css', 'js' ) );
+
+		// Collect all external domains found in the plugin files.
+		$found_domains = array();
+		foreach ( $files_ext as $file ) {
+			$domains_in_file = $this->find_external_domains_in_file( $file );
+			if ( ! empty( $domains_in_file ) ) {
+				foreach ( $domains_in_file as $domain ) {
+					$found_domains[ $domain ] = $file;
+				}
+			}
 		}
 
-		
+		// Skip if no external domains found.
+		if ( empty( $found_domains ) ) {
+			return;
+		}
+
+		// Check each found domain.
+		foreach ( $found_domains as $domain => $file ) {
+			// Extract base domain using TLD list.
+			$base_domain = $this->extract_domain_from_host( $domain, $existing_tld_names );
+
+			// Check if domain is mentioned in readme.
+			if ( ! $this->is_domain_mentioned_in_readme( $base_domain ) ) {
+				$this->add_result_error_for_file(
+					$result,
+					sprintf(
+						/* translators: 1: domain, 2: file where found */
+						__( '<strong>Undocumented use of a 3rd party or external service.</strong><br>We permit plugins to require the use of 3rd party (external) services, provided they are properly documented in a clear manner. Please update your readme with documentation for the external service "%1$s" found in file %2$s. In order to do so, you must update your readme to: clearly explain that your plugin is relying on a 3rd party as a service and under what circumstances, provide a link to the service, and provide a link to the service\'s terms of use and/or privacy policies.', 'plugin-check' ),
+						esc_html( $domain ),
+						esc_html( basename( $file ) )
+					),
+					'undocumented_third_party_service',
+					$readme_file,
+					0,
+					0,
+					'https://developer.wordpress.org/plugins/wordpress-org/detailed-plugin-guidelines/#8-plugins-may-not-send-executable-code-via-third-party-systems',
+					7
+				);
+				continue;
+			}
+
+			// Domain is mentioned, check if it's documented with privacy/terms.
+			if ( ! $this->is_domain_documented_readme( $base_domain ) ) {
+				$this->add_result_warning_for_file(
+					$result,
+					sprintf(
+						/* translators: %s: domain */
+						__( '<strong>Third-party service may not be properly documented.</strong><br>The external service "%s" is mentioned in your readme, but we could not find clear links to privacy policy or terms of service. Please ensure you provide links to the service\'s terms of use and/or privacy policies.', 'plugin-check' ),
+						esc_html( $domain )
+					),
+					'incomplete_third_party_service_documentation',
+					$readme_file,
+					0,
+					0,
+					'https://developer.wordpress.org/plugins/wordpress-org/detailed-plugin-guidelines/#8-plugins-may-not-send-executable-code-via-third-party-systems',
+					6
+				);
+			}
+		}
 	}
 
 	/**

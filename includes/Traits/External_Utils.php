@@ -27,7 +27,7 @@ trait External_Utils {
 		$domains_mentioned = array();
 		$urls              = array();
 
-		$typical_off_loading_extensions = [
+		$typical_off_loading_extensions = array(
 			'css',
 			'svg',
 			'jpg',
@@ -39,15 +39,17 @@ trait External_Utils {
 			'mpg',
 			'mpeg',
 			'mp3',
-		];
+		);
 
 		if ( ! empty( $lines ) ) {
 			foreach ( $lines as $line ) {
 				preg_match_all( '/@?(https?:\/\/)?(www\.)?[-a-zA-Z0-9:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9(:%_\+~#?&\/=]*)/', $line, $result );
 				foreach ( $result[0] as $url ) {
 					$url = strtolower( $url );
-					if ( ! str_starts_with( $url, '@' ) ) { //Remove domains in email addresses.
-						if ( ! str_starts_with( $url, 'http' ) ) { //Add protocol if domain taken without protocol.
+					// Remove domains in email addresses.
+					if ( ! str_starts_with( $url, '@' ) ) {
+						// Add protocol if domain taken without protocol.
+						if ( ! str_starts_with( $url, 'http' ) ) {
 							$url = 'http://' . $url;
 						}
 						$urls[] = $url;
@@ -66,21 +68,32 @@ trait External_Utils {
 						}
 						preg_match_all( '/(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]/', $url, $result );
 						foreach ( $result[0] as $domain ) {
-							$domain         = strtolower( $domain );
-							$domainElements = explode( '.', $domain );
-							$tld            = end( $domainElements );
-							if ( $tld == (int) $tld ) {
-								//Invalid TLD, numeric, looks like detected a version.
-							} else if ( in_array( $tld, array_merge( $typical_off_loading_extensions, [
-								'php',
-								'html',
-								'zip'
-							] ) ) ) {
-								//Invalid, looks like detected a file
+							$domain          = strtolower( $domain );
+							$domain_elements = explode( '.', $domain );
+							$tld             = end( $domain_elements );
+							// Invalid TLD, numeric, looks like detected a version.
+							if ( $tld === (int) $tld ) {
+								continue;
+							} elseif (
+								in_array(
+									$tld,
+									array_merge(
+										$typical_off_loading_extensions,
+										array(
+											'php',
+											'html',
+											'zip',
+										)
+									),
+									true
+								)
+							) {
+								// Invalid, looks like detected a file.
+								continue;
 							} else {
 								$host = $parsed_url['host'];
 
-								//Get domain biggest TLD.
+								// Get domain biggest TLD.
 								$domain_tld = '';
 								foreach ( $existing_tld_names as $tld ) {
 									if ( str_ends_with( $host, $tld ) ) {
@@ -91,21 +104,21 @@ trait External_Utils {
 								}
 
 								if ( ! empty( $domain_tld ) ) {
-									// Get domain from host and tld
-									$domain = str_replace( '.' . $domain_tld, '', $host );  // remove the TLD from the host
-									$parts  = explode( '.', $domain );  // split the remaining host into parts
+									// Get domain from host and TLD.
+									$domain = str_replace( '.' . $domain_tld, '', $host );  // Remove the TLD from the host.
+									$parts  = explode( '.', $domain );  // Split the remaining host into parts.
 									$domain = end( $parts ) . '.' . $domain_tld;
 
-									//Find domain
+									// Find domain.
 									$key = $this->get_key_domain_mentioned_in_readme( $domain );
 									if ( false !== $key ) {
-										// If found, just add URL
+										// If found, just add URL.
 										$domains_mentioned[ $key ]['urls'][] = $url;
 										if ( ! empty( $path ) ) {
 											$domains_mentioned[ $key ]['paths'][] = $path;
 										}
 									} else {
-										//Not found, create it.
+										// Not found, create it.
 										$domain_mentioned = array(
 											'domains' => $this->add_domains_of_same_service( $domain ),
 											'urls'    => array( $url ),
@@ -122,13 +135,15 @@ trait External_Utils {
 					}
 				}
 			}
-
 		}
 		if ( ! empty( $domains_mentioned ) ) {
-			$domains_mentioned = array_map( function ( $domain ) {
-				$domain['urls'] = array_unique( $domain['urls']);
-				return $domain;
-			}, $domains_mentioned );
+			$domains_mentioned = array_map(
+				function ( $domain ) {
+					$domain['urls'] = array_unique( $domain['urls'] );
+					return $domain;
+				},
+				$domains_mentioned
+			);
 		}
 
 		return $domains_mentioned;
@@ -140,14 +155,14 @@ trait External_Utils {
 	 * @since 1.4.0
 	 *
 	 * @param string $string String.
-	 * @return string|bool Key of domain mentioned in readme file, or false if not found.
+	 * @return string|int|bool Key of domain mentioned in readme file, or false if not found.
 	 */
-	function get_key_domain_mentioned_in_readme( $string ) {
-		if ( ! empty( $this->domainsMentionedReadme ) ) {
-			foreach ( $this->domainsMentionedReadme as $key => $domains ) {
+	protected function get_key_domain_mentioned_in_readme( $string ) {
+		if ( ! empty( $this->domains_mentioned_readme ) ) {
+			foreach ( $this->domains_mentioned_readme as $key => $domains ) {
 				if ( ! empty( $domains['domains'] ) ) {
 					foreach ( $domains['domains'] as $domain ) {
-						if ( str_contains( $string, $domain ) ) {
+						if ( str_contains( $string, $domain ) || str_contains( $domain, $string ) ) {
 							return $key;
 						}
 					}
@@ -167,20 +182,20 @@ trait External_Utils {
 	 * @return array An array containing domains of the same service.
 	 */
 	protected function add_domains_of_same_service( $domain ) {
-		$domains                 = array( $domain );
-		$domainsOfTheSameService = array(
-			'paypal.com'    => [ 'paypal.com', 'paypalobjects.com' ],
-			'google.com'    => [ 'google.com', 'googleapis.com', 'googletagmanager.com' ],
-			'microsoft.com' => [ 'microsoft.com', 'outlook.com', 'live.com' ],
-			'atlassian.net' => [ 'atlassian.com', 'trello.com' ],
-			'dropbox.com'   => [ 'dropbox.com', 'dropboxapi.com' ],
-			'tiktok.com'   => [ 'tiktok.com', 'tiktokapis.com' ],
-			'zendesk.com' => [ 'zendesk.com', 'zdassets.com' ]
+		$domains                     = array( $domain );
+		$domains_of_the_same_service = array(
+			'paypal.com'    => array( 'paypal.com', 'paypalobjects.com' ),
+			'google.com'    => array( 'google.com', 'googleapis.com', 'googletagmanager.com' ),
+			'microsoft.com' => array( 'microsoft.com', 'outlook.com', 'live.com' ),
+			'atlassian.net' => array( 'atlassian.com', 'trello.com' ),
+			'dropbox.com'   => array( 'dropbox.com', 'dropboxapi.com' ),
+			'tiktok.com'    => array( 'tiktok.com', 'tiktokapis.com' ),
+			'zendesk.com'   => array( 'zendesk.com', 'zdassets.com' ),
 		);
-		foreach ( $domainsOfTheSameService as $key => $service ) {
-			foreach ( $service as $serviceDomain ) {
-				if ( $serviceDomain === $domain ) {
-					$domains = array_merge( $domains, $domainsOfTheSameService[ $key ] );
+		foreach ( $domains_of_the_same_service as $key => $service ) {
+			foreach ( $service as $service_domain ) {
+				if ( $service_domain === $domain ) {
+					$domains = array_merge( $domains, $domains_of_the_same_service[ $key ] );
 					$domains = array_unique( $domains );
 				}
 			}
@@ -219,16 +234,16 @@ trait External_Utils {
 		$privacy = false;
 		$terms   = false;
 
-		if ( ! empty( $this->domainsMentionedReadme[ $key ]['paths'] ) ) {
-			foreach ( $this->domainsMentionedReadme[ $key ]['paths'] as $path ) {
-				foreach ( $this->privacyCommonURIsPaths as $privacyStr ) {
-					if ( str_contains( $path, $privacyStr ) ) {
+		if ( ! empty( $this->domains_mentioned_readme[ $key ]['paths'] ) ) {
+			foreach ( $this->domains_mentioned_readme[ $key ]['paths'] as $path ) {
+				foreach ( $this->privacy_common_uris_paths as $privacy_str ) {
+					if ( str_contains( $path, $privacy_str ) ) {
 						$privacy = $path;
 						break;
 					}
 				}
-				foreach ( $this->termsCommonURIsPaths as $termsStr ) {
-					if ( str_contains( $path, $termsStr ) ) {
+				foreach ( $this->terms_common_uris_paths as $terms_str ) {
+					if ( str_contains( $path, $terms_str ) ) {
 						$terms = $path;
 						break;
 					}
@@ -243,181 +258,215 @@ trait External_Utils {
 		return false;
 	}
 
-	protected function find_external_calls( $file ) {
-		$lines = file( $file );
-		$this->find_functions();
-		$this->find_classes();
-		$this->regex_estructures( $lines );
-		$this->find_declarations( $lines );
-		
-	}
+	/**
+	 * Common privacy URI paths.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @var array
+	 */
+	private $privacy_common_uris_paths = array( 'privacy', 'legal' );
 
-	//Check PHP function calls loading URLs.
-	function find_functions() {
-		if ( ! empty( $this->stmts ) ) {
-			$funcCalls = $this->nodeFinder->findInstanceOf( $this->stmts, Node\Expr\FuncCall::class );
-			if ( ! empty( $funcCalls ) ) {
-				foreach ( $funcCalls as $funccall ) {
-					$foundInSameLine = true;
-					$lastFoundExprArray = [];
-					if ( $this->hasFunctionName( $funccall ) ) {
-						$log          = '';
-						$functionName = $this->getCallName($funccall);
+	/**
+	 * Common terms URI paths.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @var array
+	 */
+	private $terms_common_uris_paths = array( 'terms', 'tos', 'conditions', 'legal' );
 
-						//Enqueue functions
-						if ( in_array( $functionName, [
-							'wp_register_script',
-							'wp_enqueue_script',
-							'wp_register_style',
-							'wp_enqueue_style'
-						] ) ) {
-							// Look for second parameter of this PHP functions.
-							if ( isset( $funccall->args[1] ) ) {
-								$argValue = $funccall->args[1]->value;
-								if ( ! empty( $argValue ) ) {
-									$log = $this->checkArgGetLog( $argValue, $foundInSameLine, $lastFoundExprArray );
-								}
-							}
-						}
+	/**
+	 * Domains mentioned in readme.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @var array
+	 */
+	private $domains_mentioned_readme = array();
 
-						// External calls
-						if ( in_array( $functionName, [
-							'wp_remote_request',
-							'wp_safe_remote_request',
-							'wp_remote_get',
-							'wp_safe_remote_get',
-							'wp_remote_post',
-							'wp_safe_remote_post',
-							'wp_remote_head',
-							'wp_safe_remote_head',
-							'wp_remote_fopen',
-							'file_get_contents',
-							'download_url',
-							'fopen',
-							'file'
-						] ) ) {
-							// Look for first parameter of this PHP functions.
-							if ( isset( $funccall->args[0] ) ) {
-								$argValue = $funccall->args[0]->value;
-								if ( ! empty( $argValue ) ) {
-									$log = $this->checkArgGetLog( $argValue, $foundInSameLine, $lastFoundExprArray );
-								}
-							}
-						}
+	/**
+	 * Find external domains in a file.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @param string $file File path.
+	 * @return array Array of domains found in the file.
+	 */
+	protected function find_external_domains_in_file( $file ) {
+		$domains = array();
 
-						if ( ! empty( $log ) ) {
-							if ( ! $this->isAlreadyLogged( $funccall->getStartLine() ) ) {
-								$this->logCallExpr( $funccall, 1, $log, true );
-								if(!$foundInSameLine && !empty($lastFoundExprArray)){
-									foreach ($lastFoundExprArray as $expr) {
-										$this->saveLog( 0, '# ↳ Found: ' . $this->prettyPrinter->prettyPrint( [ $expr ] ), $this->getLogPostContextId( $log, $this->getLogLineID( $funccall->getStartLine() ) ) );
-									}
-								}
-							}
-						}
-					}
-				}
-			}
+		// Skip if file doesn't exist or is not readable.
+		if ( ! file_exists( $file ) || ! is_readable( $file ) ) {
+			return $domains;
 		}
-	}
 
-	//Check PHP class calls loading URLs.
-	function find_classes() {
-		if ( ! empty( $this->stmts ) ) {
-			$classNews = $this->nodeFinder->findInstanceOf( $this->stmts, Node\Expr\New_::class );
-			if ( ! empty( $classNews ) ) {
-				foreach ( $classNews as $classNew ) {
-					$foundInSameLine = true;
-					$lastFoundExprArray = [];
-					if ( $this->hasClassNewName( $classNew ) ) {
-						$log       = '';
-						$className = $classNew->class->toString();
-						if ( in_array( $className, [
-							'SoapClient',
-							'nusoap_client',
-						] ) ) {
-							if ( isset( $classNew->args[0] ) ) {
-								$argValue = $classNew->args[0]->value;
-								if ( ! empty( $argValue ) ) {
-									$log = $this->checkArgGetLog( $argValue, $foundInSameLine, $lastFoundExprArray );
-								}
-							}
-						}
-
-						if ( ! empty( $log ) ) {
-							if ( ! $this->isAlreadyLogged( $classNew->getStartLine() ) ) {
-								$this->saveLinesNodeDetailLog( $classNew, $log, true );
-								if(!$foundInSameLine && !empty($lastFoundExprArray)){
-									foreach ($lastFoundExprArray as $expr) {
-										$this->saveLog( 0, '# ↳ Found: ' . $this->prettyPrinter->prettyPrint( [ $expr ] ), $this->getLogPostContextId( $log, $this->getLogLineID( $classNew->getStartLine() ) ) );
-									}
-								}
-							}
-						}
-					}
-				}
-			}
+		$content = file_get_contents( $file );
+		if ( false === $content ) {
+			return $domains;
 		}
-	}
 
-	// Regex over typical code structures cointaining URLs
-	function regex_estructures( $lines ) {
-		$regexArray = [
-			'src-simple'       => '/src\s*=\s*\\\?\'((.*?(<\?.+?\?>)?.*?)+?)\\\?\'/',
-			'src-double'       => '/src\s*=\s*\\\?"((.*?(<\?.+?\?>)?.*?)+?)\\\?"/',
-			'css-simple'       => '/[:|\\s]\s*url\s*\(\s*\'((.*?(<\?.+?\?>)?.*?)+?)\'\s*\)/',
-			//We are not covering the case of doing url(https://example.com) as without ' or " this is hard to find.
-			'css-double'       => '/[:|\\s]\s*url\s*\(\s*"((.*?(<\?.+?\?>)?.*?)+?)"\s*\)/',
-			//'css' => '[:|\\s]url\s*\(\s*["|\']?(.+?)["|\']?\)',
-			'jsImport'         => '/@import\s*["|\'|`]((.*?(<\?.+?\?>)?.*?)+?)["|\'|`]/',
-			'jsImportScripts'  => '/importScripts\s*\(\s*["|\'|`]((.*?(<\?.+?\?>)?.*?)+?)["|\'|`]\s*\)/',
-			'jsSetAttribute'   => '/setAttribute\s*\(\s*["|\'|`]src["|\'|`]\s*,\s*["|\'|`](.+?)["|\'|`]\s*\)/',
-			'jsAjax-simple'    => '/\s*url\s*:\s*\'((.*?(<\?.+?\?>)?.*?)+?)\'\s*/',
-			'jsAjax-double'    => '/\s*url\s*:\s*"((.*?(<\?.+?\?>)?.*?)+?)"\s*/',
-			'jsAjax-inverted'  => '/\s*url\s*:\s*`((.*?(<\?.+?\?>)?.*?)+?)`\s*/',
-			'jsFetch-simple'   => '/\s*fetch\s*\(\s*\'((.*?(<\?.+?\?>)?.*?)+?)\'\s*/',
-			'jsFetch-double'   => '/\s*fetch\s*\(\s*"((.*?(<\?.+?\?>)?.*?)+?)"\s*/',
-			'jsFetch-inverted' => '/\s*fetch\s*\(\s*`((.*?(<\?.+?\?>)?.*?)+?)`\s*/',
-		];
-
-		foreach ( $regexArray as $regex ) {
-			$this->logRegexIncidences( $lines, $regex, '', false );
+		// Skip plugin header section in PHP files to avoid flagging metadata URLs.
+		$extension = pathinfo( $file, PATHINFO_EXTENSION );
+		if ( 'php' === $extension ) {
+			// Remove the plugin header block (first DocBlock in the file).
+			$content = preg_replace( '#^<\?php\s*/\*\*.*?\*/\s*#s', '', $content, 1 );
 		}
-	}
 
-	// Look for any PHP / JS variable declaration and guess if that looks like a external service.
-	// TODO this function consumes too much time because of getStringsFromAssignsExpr, find ways to optimize it.
-	function find_declarations( $lines ) {
-		// Find all the assings in PHP
-		if ( ! empty( $this->stmts ) ) {
-			$assigns = $this->nodeFinder->findInstanceOf( $this->stmts, Node\Expr\Assign::class );
-			if ( ! empty( $assigns ) ) {
-				foreach ( $assigns as $assign ) {
-					if ( ! empty( $assign->expr ) ) {
-						$foundInSameLine = true;
-						$stringsArray = $this->getStringsFromAssignsExpr( $assign->expr, $foundInSameLine );
-						if ( ! empty( $stringsArray ) ) {
-							foreach ( $stringsArray as $string ) {
-								$log = $this->checkStringGetLog( $string, true );
-								if ( ! empty( $log ) ) {
-									if ( ! $this->isAlreadyLogged( $assign->getStartLine() ) ) {
-										$this->saveLinesNodeDetailLog( $assign, $log, true );
-										if(!$foundInSameLine){
-											$this->saveLog( 0, '# ↳ Detected: ' . $string, $this->getLogPostContextId( $log, $this->getLogLineID( $assign->getStartLine() ) ) );
-										}
-									}
-								}
-							}
-						}
+		// Pattern to match URLs in function calls that indicate actual service usage.
+		$service_patterns = array(
+			// Remote HTTP functions.
+			'#(?:wp_remote_get|wp_remote_post|wp_remote_request|wp_safe_remote_get|wp_safe_remote_post|wp_safe_remote_request|file_get_contents|fopen|curl_init)\s*\(\s*["\'](?:https?:)?//([a-zA-Z0-9][-a-zA-Z0-9]*(?:\.[a-zA-Z0-9][-a-zA-Z0-9]*)+)[^"\']*["\']#i',
+			// Enqueue functions.
+			'#(?:wp_enqueue_script|wp_register_script|wp_enqueue_style|wp_register_style)\s*\([^,]+,\s*["\'](?:https?:)?//([a-zA-Z0-9][-a-zA-Z0-9]*(?:\.[a-zA-Z0-9][-a-zA-Z0-9]*)+)[^"\']*["\']#i',
+			// JavaScript fetch.
+			'#fetch\s*\(\s*["\'](?:https?:)?//([a-zA-Z0-9][-a-zA-Z0-9]*(?:\.[a-zA-Z0-9][-a-zA-Z0-9]*)+)[^"\']*["\']#i',
+		);
+
+		foreach ( $service_patterns as $pattern ) {
+			if ( preg_match_all( $pattern, $content, $matches ) ) {
+				foreach ( $matches[1] as $domain ) {
+					$domain = strtolower( trim( $domain ) );
+
+					// Skip common WordPress and localhost domains.
+					if ( $this->is_common_wordpress_domain( $domain ) ) {
+						continue;
 					}
+
+					if ( $this->is_localhost_domain( $domain ) ) {
+						continue;
+					}
+
+					if ( $this->is_known_safe_domain( $domain ) ) {
+						continue;
+					}
+
+					$domains[] = $domain;
 				}
 			}
 		}
 
-		// Find anything else that looks like an assign (mostly for JS but will also catch PHP and HTML)
-		// Regex: anything looking like a URL preceded by "XXXX =" except for href.
-		$regex = '/[a-zA-Z_$][a-zA-Z_$0-9]*(?<!href)\s*=\s*["|\'](https?:\/\/[www\.]?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)["|\']/';
-		$this->logRegexIncidences( $lines, $regex, '', true );
+		return array_unique( $domains );
 	}
 
+	/**
+	 * Check if domain is a common WordPress domain.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @param string $domain Domain to check.
+	 * @return bool True if it's a common WordPress domain, false otherwise.
+	 */
+	private function is_common_wordpress_domain( $domain ) {
+		$wordpress_domains = array(
+			'wordpress.org',
+			'w.org',
+			'wordpress.com',
+			'gravatar.com',
+			'wp.com',
+		);
+
+		foreach ( $wordpress_domains as $wp_domain ) {
+			if ( str_contains( $domain, $wp_domain ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check if domain is a common/known safe domain that should be ignored.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @param string $domain Domain to check.
+	 * @return bool True if it's a known safe domain, false otherwise.
+	 */
+	private function is_known_safe_domain( $domain ) {
+		$safe_domains = array(
+			'github.com',
+			'gitlab.com',
+			'bitbucket.org',
+			'gnu.org',         // GNU licenses.
+			'opensource.org',  // OSI licenses.
+			'creativecommons.org',
+			'fsf.org',         // Free Software Foundation.
+		);
+
+		foreach ( $safe_domains as $safe_domain ) {
+			if ( str_contains( $domain, $safe_domain ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check if domain is a localhost/staging domain.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @param string $domain Domain to check.
+	 * @return bool True if it's a localhost domain, false otherwise.
+	 */
+	private function is_localhost_domain( $domain ) {
+		$patterns = array(
+			'localhost',
+			'127.0.0.1',
+			'example.com',
+			'example.org',
+			'.local',
+			'.test',
+			'.localhost',
+		);
+
+		foreach ( $patterns as $pattern ) {
+			if ( str_contains( $domain, $pattern ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Extract domain from URL or hostname.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @param string $host           Hostname to extract domain from.
+	 * @param array  $existing_tld_names Array of TLD names.
+	 * @return string Extracted domain.
+	 */
+	private function extract_domain_from_host( $host, $existing_tld_names ) {
+		$host       = strtolower( $host );
+		$domain_tld = '';
+
+		// Get domain biggest TLD.
+		foreach ( $existing_tld_names as $tld ) {
+			if ( str_ends_with( $host, $tld ) ) {
+				if ( strlen( $tld ) > strlen( $domain_tld ) ) {
+					$domain_tld = $tld;
+				}
+			}
+		}
+
+		if ( empty( $domain_tld ) ) {
+			// Fallback: assume last two parts are the domain.
+			$parts = explode( '.', $host );
+			if ( count( $parts ) >= 2 ) {
+				return $parts[ count( $parts ) - 2 ] . '.' . $parts[ count( $parts ) - 1 ];
+			}
+			return $host;
+		}
+
+		// Get domain from host and TLD.
+		$domain = str_replace( '.' . $domain_tld, '', $host );
+		$parts  = explode( '.', $domain );
+		$domain = end( $parts ) . '.' . $domain_tld;
+
+		return $domain;
+	}
 }
