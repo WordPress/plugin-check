@@ -25,128 +25,215 @@ trait External_Utils {
 	protected function load_domains_mentioned_in_readme( $readme_file, $existing_tld_names ) {
 		$lines             = file( $readme_file );
 		$domains_mentioned = array();
-		$urls              = array();
 
-		$typical_off_loading_extensions = array(
-			'css',
-			'svg',
-			'jpg',
-			'jpeg',
-			'gif',
-			'png',
-			'webm',
-			'mp4',
-			'mpg',
-			'mpeg',
-			'mp3',
-		);
+		if ( empty( $lines ) ) {
+			return $domains_mentioned;
+		}
 
-		if ( ! empty( $lines ) ) {
-			foreach ( $lines as $line ) {
-				preg_match_all( '/@?(https?:\/\/)?(www\.)?[-a-zA-Z0-9:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9(:%_\+~#?&\/=]*)/', $line, $result );
-				foreach ( $result[0] as $url ) {
-					$url = strtolower( $url );
-					// Remove domains in email addresses.
-					if ( ! str_starts_with( $url, '@' ) ) {
-						// Add protocol if domain taken without protocol.
-						if ( ! str_starts_with( $url, 'http' ) ) {
-							$url = 'http://' . $url;
-						}
-						$urls[] = $url;
+		$urls = $this->extract_urls_from_readme_lines( $lines );
+		if ( empty( $urls ) ) {
+			return $domains_mentioned;
+		}
+
+		$domains_mentioned = $this->process_urls_for_domains( $urls, $existing_tld_names );
+		$domains_mentioned = $this->cleanup_domain_urls( $domains_mentioned );
+
+		return $domains_mentioned;
+	}
+
+	/**
+	 * Extract URLs from readme file lines.
+	 *
+	 * @since 1.8.0
+	 *
+	 * @param array $lines Lines from readme file.
+	 * @return array Array of unique URLs.
+	 */
+	private function extract_urls_from_readme_lines( $lines ) {
+		$urls = array();
+		foreach ( $lines as $line ) {
+			preg_match_all( '/@?(https?:\/\/)?(www\.)?[-a-zA-Z0-9:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9(:%_\+~#?&\/=]*)/', $line, $result );
+			foreach ( $result[0] as $url ) {
+				$url = strtolower( $url );
+				// Remove domains in email addresses.
+				if ( ! str_starts_with( $url, '@' ) ) {
+					// Add protocol if domain taken without protocol.
+					if ( ! str_starts_with( $url, 'http' ) ) {
+						$url = 'http://' . $url;
 					}
-				}
-			}
-			$urls = array_unique( $urls );
-
-			if ( ! empty( $urls ) ) {
-				foreach ( $urls as $url ) {
-					$parsed_url = parse_url( $url );
-					if ( false !== $parsed_url ) {
-						$path = '';
-						if ( ! empty( $parsed_url['path'] ) ) {
-							$path = $parsed_url['path'];
-						}
-						preg_match_all( '/(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]/', $url, $result );
-						foreach ( $result[0] as $domain ) {
-							$domain          = strtolower( $domain );
-							$domain_elements = explode( '.', $domain );
-							$tld             = end( $domain_elements );
-							// Invalid TLD, numeric, looks like detected a version.
-							if ( $tld === (int) $tld ) {
-								continue;
-							} elseif (
-								in_array(
-									$tld,
-									array_merge(
-										$typical_off_loading_extensions,
-										array(
-											'php',
-											'html',
-											'zip',
-										)
-									),
-									true
-								)
-							) {
-								// Invalid, looks like detected a file.
-								continue;
-							} else {
-								$host = $parsed_url['host'];
-
-								// Get domain biggest TLD.
-								$domain_tld = '';
-								foreach ( $existing_tld_names as $tld ) {
-									if ( str_ends_with( $host, $tld ) ) {
-										if ( strlen( $tld ) > strlen( $domain_tld ) ) {
-											$domain_tld = $tld;
-										}
-									}
-								}
-
-								if ( ! empty( $domain_tld ) ) {
-									// Get domain from host and TLD.
-									$domain = str_replace( '.' . $domain_tld, '', $host );  // Remove the TLD from the host.
-									$parts  = explode( '.', $domain );  // Split the remaining host into parts.
-									$domain = end( $parts ) . '.' . $domain_tld;
-
-									// Find domain.
-									$key = $this->get_key_domain_mentioned_in_readme( $domain );
-									if ( false !== $key ) {
-										// If found, just add URL.
-										$domains_mentioned[ $key ]['urls'][] = $url;
-										if ( ! empty( $path ) ) {
-											$domains_mentioned[ $key ]['paths'][] = $path;
-										}
-									} else {
-										// Not found, create it.
-										$domain_mentioned = array(
-											'domains' => $this->add_domains_of_same_service( $domain ),
-											'urls'    => array( $url ),
-											'paths'   => array(),
-										);
-										if ( ! empty( $path ) ) {
-											$domain_mentioned['paths'] = array( $path );
-										}
-										$domains_mentioned[] = $domain_mentioned;
-									}
-								}
-							}
-						}
-					}
+					$urls[] = $url;
 				}
 			}
 		}
-		if ( ! empty( $domains_mentioned ) ) {
-			$domains_mentioned = array_map(
-				function ( $domain ) {
-					$domain['urls'] = array_unique( $domain['urls'] );
-					return $domain;
-				},
-				$domains_mentioned
-			);
+		return array_unique( $urls );
+	}
+
+	/**
+	 * Process URLs to extract domains.
+	 *
+	 * @since 1.8.0
+	 *
+	 * @param array $urls               Array of URLs.
+	 * @param array $existing_tld_names Array of existing TLD names.
+	 * @return array Array of domain information.
+	 */
+	private function process_urls_for_domains( $urls, $existing_tld_names ) {
+		$domains_mentioned = array();
+
+		foreach ( $urls as $url ) {
+			$parsed_url = parse_url( $url );
+			if ( false === $parsed_url || empty( $parsed_url['host'] ) ) {
+				continue;
+			}
+
+			$path = ! empty( $parsed_url['path'] ) ? $parsed_url['path'] : '';
+			$this->extract_domain_from_url( $url, $parsed_url['host'], $path, $existing_tld_names, $domains_mentioned );
 		}
 
 		return $domains_mentioned;
+	}
+
+	/**
+	 * Extract domain from URL and add to domains array.
+	 *
+	 * @since 1.8.0
+	 *
+	 * @param string $url               The URL.
+	 * @param string $host              The host from parsed URL.
+	 * @param string $path              The path from parsed URL.
+	 * @param array  $existing_tld_names Array of existing TLD names.
+	 * @param array  &$domains_mentioned Reference to domains array to update.
+	 */
+	private function extract_domain_from_url( $url, $host, $path, $existing_tld_names, &$domains_mentioned ) {
+		preg_match_all( '/(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]/', $url, $result );
+
+		foreach ( $result[0] as $domain ) {
+			$domain = strtolower( $domain );
+
+			if ( $this->is_invalid_domain( $domain ) ) {
+				continue;
+			}
+
+			$domain_tld = $this->get_longest_matching_tld( $host, $existing_tld_names );
+			if ( empty( $domain_tld ) ) {
+				continue;
+			}
+
+			$domain = $this->extract_root_domain( $host, $domain_tld );
+			$this->add_or_update_domain( $domain, $url, $path, $domains_mentioned );
+		}
+	}
+
+	/**
+	 * Check if domain is invalid (numeric TLD or file extension).
+	 *
+	 * @since 1.8.0
+	 *
+	 * @param string $domain Domain to check.
+	 * @return bool True if invalid, false otherwise.
+	 */
+	private function is_invalid_domain( $domain ) {
+		$typical_off_loading_extensions = array( 'css', 'svg', 'jpg', 'jpeg', 'gif', 'png', 'webm', 'mp4', 'mpg', 'mpeg', 'mp3' );
+		$domain_elements                = explode( '.', $domain );
+		$tld                            = end( $domain_elements );
+
+		// Invalid TLD, numeric, looks like detected a version.
+		if ( $tld === (int) $tld ) {
+			return true;
+		}
+
+		// Invalid, looks like detected a file.
+		return in_array(
+			$tld,
+			array_merge( $typical_off_loading_extensions, array( 'php', 'html', 'zip' ) ),
+			true
+		);
+	}
+
+	/**
+	 * Get the longest matching TLD from host.
+	 *
+	 * @since 1.8.0
+	 *
+	 * @param string $host              The host.
+	 * @param array  $existing_tld_names Array of existing TLD names.
+	 * @return string The longest matching TLD or empty string.
+	 */
+	private function get_longest_matching_tld( $host, $existing_tld_names ) {
+		$domain_tld = '';
+		foreach ( $existing_tld_names as $tld ) {
+			if ( str_ends_with( $host, $tld ) && strlen( $tld ) > strlen( $domain_tld ) ) {
+				$domain_tld = $tld;
+			}
+		}
+		return $domain_tld;
+	}
+
+	/**
+	 * Extract root domain from host and TLD.
+	 *
+	 * @since 1.8.0
+	 *
+	 * @param string $host       The host.
+	 * @param string $domain_tld The TLD.
+	 * @return string The root domain.
+	 */
+	private function extract_root_domain( $host, $domain_tld ) {
+		$domain = str_replace( '.' . $domain_tld, '', $host );
+		$parts  = explode( '.', $domain );
+		return end( $parts ) . '.' . $domain_tld;
+	}
+
+	/**
+	 * Add or update domain in domains array.
+	 *
+	 * @since 1.8.0
+	 *
+	 * @param string $domain            The domain.
+	 * @param string $url               The URL.
+	 * @param string $path              The path.
+	 * @param array  &$domains_mentioned Reference to domains array to update.
+	 */
+	private function add_or_update_domain( $domain, $url, $path, &$domains_mentioned ) {
+		$key = $this->get_key_domain_mentioned_in_readme( $domain );
+
+		if ( false !== $key ) {
+			// Domain exists, add URL and path.
+			$domains_mentioned[ $key ]['urls'][] = $url;
+			if ( ! empty( $path ) ) {
+				$domains_mentioned[ $key ]['paths'][] = $path;
+			}
+		} else {
+			// Create new domain entry.
+			$domain_mentioned    = array(
+				'domains' => $this->add_domains_of_same_service( $domain ),
+				'urls'    => array( $url ),
+				'paths'   => ! empty( $path ) ? array( $path ) : array(),
+			);
+			$domains_mentioned[] = $domain_mentioned;
+		}
+	}
+
+	/**
+	 * Cleanup domain URLs by removing duplicates.
+	 *
+	 * @since 1.8.0
+	 *
+	 * @param array $domains_mentioned Array of domain information.
+	 * @return array Cleaned array.
+	 */
+	private function cleanup_domain_urls( $domains_mentioned ) {
+		if ( empty( $domains_mentioned ) ) {
+			return $domains_mentioned;
+		}
+
+		return array_map(
+			function ( $domain ) {
+				$domain['urls'] = array_unique( $domain['urls'] );
+				return $domain;
+			},
+			$domains_mentioned
+		);
 	}
 
 	/**

@@ -22,6 +22,8 @@ trait TLD_Names {
 	 * Based on the file https://github.com/mozilla-mobile/firefox-ios/blob/main/BrowserKit/Sources/Common/Constants/EffectiveTLDNames.swift
 	 *
 	 * @return array An array of all existing tld names.
+	 *
+	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
 	 */
 	protected function get_tld_names() {
 		return array(

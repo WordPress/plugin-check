@@ -27,6 +27,7 @@ use WordPressdotorg\Plugin_Directory\Readme\Parser as DotorgParser;
  * @since 1.0.0
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class Plugin_Readme_Check extends Abstract_File_Check {
 
