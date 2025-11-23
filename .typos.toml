@@ -1,15 +1,19 @@
 [default]
 extend-ignore-re = [
-    "avail_post_stati",
-    "ba",
-    "MAGPIE_INITALIZED",
-    "setted_site_transient",
-    "setted_transient",
-    "stati",
-    "wheres",
+  # Ignore TLD names file - contains legitimate domain extensions that look like typos
 ]
 
 [files]
+# Ignore spell checking in TLD names file as it contains legitimate domain extensions
 extend-exclude = [
-	"includes/Lib/Readme/*.php"
+  "includes/Traits/TLD_Names.php"
 ]
+
+[default.extend-words]
+# Brand names and legitimate TLDs that may appear elsewhere
+chanel = "chanel"
+marshalls = "marshalls"
+immobilien = "immobilien"
+lolipop = "lolipop"
+onl = "onl"
+passagens = "passagens"

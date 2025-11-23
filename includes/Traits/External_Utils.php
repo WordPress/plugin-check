@@ -154,15 +154,15 @@ trait External_Utils {
 	 *
 	 * @since 1.4.0
 	 *
-	 * @param string $string String.
+	 * @param string $domain_search Domain search string.
 	 * @return string|int|bool Key of domain mentioned in readme file, or false if not found.
 	 */
-	protected function get_key_domain_mentioned_in_readme( $string ) {
+	protected function get_key_domain_mentioned_in_readme( $domain_search ) {
 		if ( ! empty( $this->domains_mentioned_readme ) ) {
 			foreach ( $this->domains_mentioned_readme as $key => $domains ) {
 				if ( ! empty( $domains['domains'] ) ) {
 					foreach ( $domains['domains'] as $domain ) {
-						if ( str_contains( $string, $domain ) || str_contains( $domain, $string ) ) {
+						if ( str_contains( $domain_search, $domain ) || str_contains( $domain, $domain_search ) ) {
 							return $key;
 						}
 					}
