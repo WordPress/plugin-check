@@ -286,6 +286,59 @@
 				type: messageType,
 				message: messageText,
 			} ) + resultsContainer.innerHTML;
+
+		// Wire up Download Report dropdown and links.
+		const downloadBtn = document.getElementById( 'pcp-download-report-button' );
+		const downloadMenu = document.getElementById( 'pcp-download-menu' );
+		const csvLink = document.getElementById( 'pcp-export-csv' );
+		const pdfLink = document.getElementById( 'pcp-export-pdf' );
+
+		if ( downloadBtn && downloadMenu && csvLink && pdfLink ) {
+			// Build query params from current selections.
+			const params = new URLSearchParams();
+			params.set( 'plugin', pluginsList.value );
+			params.set(
+				'include-experimental',
+				includeExperimental && includeExperimental.checked ? '1' : '0'
+			);
+			params.set( '_wpnonce', pluginCheck.exportNonce );
+
+			for ( let i = 0; i < categoriesList.length; i++ ) {
+				if ( categoriesList[ i ].checked ) {
+					params.append( 'categories[]', categoriesList[ i ].value );
+				}
+			}
+
+			const csvUrl = `${ pluginCheck.adminPostUrl }?action=${ encodeURIComponent(
+				pluginCheck.exportCsvAction
+			) }&${ params.toString() }`;
+			const pdfUrl = `${ pluginCheck.adminPostUrl }?action=${ encodeURIComponent(
+				pluginCheck.exportPdfAction
+			) }&${ params.toString() }`;
+
+			csvLink.setAttribute( 'href', csvUrl );
+			pdfLink.setAttribute( 'href', pdfUrl );
+
+			downloadBtn.addEventListener( 'click', function () {
+				// Toggle visibility.
+				if ( 'none' === downloadMenu.style.display ) {
+					downloadMenu.style.display = 'block';
+				} else {
+					downloadMenu.style.display = 'none';
+				}
+			} );
+
+			// Hide the menu if clicking elsewhere.
+			document.addEventListener( 'click', function ( evt ) {
+				if (
+					downloadMenu.style.display === 'block' &&
+					! downloadMenu.contains( evt.target ) &&
+					evt.target !== downloadBtn
+				) {
+					downloadMenu.style.display = 'none';
+				}
+			} );
+		}
 	}
 
 	/**

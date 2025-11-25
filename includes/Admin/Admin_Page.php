@@ -11,6 +11,7 @@ use WordPress\Plugin_Check\Checker\Check;
 use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Repository;
 use WordPress\Plugin_Check\Checker\Default_Check_Repository;
+use WordPress\Plugin_Check\Admin\Report_Exporter;
 
 /**
  * Class is handling admin tools page functionality.
@@ -196,6 +197,10 @@ final class Admin_Page {
 			'const PLUGIN_CHECK = ' . json_encode(
 				array(
 					'nonce'                           => $this->admin_ajax->get_nonce(),
+					'exportNonce'                     => wp_create_nonce( Report_Exporter::NONCE_ACTION ),
+					'adminPostUrl'                    => admin_url( 'admin-post.php' ),
+					'exportCsvAction'                 => Report_Exporter::ACTION_EXPORT_CSV,
+					'exportPdfAction'                 => Report_Exporter::ACTION_EXPORT_PDF,
 					'actionGetChecksToRun'            => Admin_AJAX::ACTION_GET_CHECKS_TO_RUN,
 					'actionSetUpRuntimeEnvironment'   => Admin_AJAX::ACTION_SET_UP_ENVIRONMENT,
 					'actionRunChecks'                 => Admin_AJAX::ACTION_RUN_CHECKS,

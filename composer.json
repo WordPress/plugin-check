@@ -10,7 +10,8 @@
     "composer/installers": "^2.2",
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0.0",
     "plugin-check/phpcs-sniffs": "@dev",
-    "wp-coding-standards/wpcs": "^3.1.0"
+    "wp-coding-standards/wpcs": "^3.1.0",
+    "dompdf/dompdf": "^3.1"
   },
   "require-dev": {
     "phpcompatibility/php-compatibility": "^9.3",
