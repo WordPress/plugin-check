@@ -9,6 +9,7 @@ namespace Admin;
 
 use WordPress\Plugin_Check\Admin\Admin_AJAX;
 use WordPress\Plugin_Check\Admin\Admin_Page;
+use WordPress\Plugin_Check\Checker\Check_Types;
 use WP_UnitTestCase;
 
 class Admin_Page_Tests extends WP_UnitTestCase {
@@ -237,6 +238,21 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 				return $custom_categories;
 			}
 		);
+	}
+
+	public function test_filter_check_types() {
+		$types = array_keys( Check_Types::get_types() );
+
+		// Render the admin page.
+		ob_start();
+		$this->admin_page->render_page();
+		$output = ob_get_contents();
+		ob_end_clean();
+
+		foreach ( $types as $type ) {
+			$this->assertStringContainsString( '<input type="checkbox" id="' . $type . '" name="types" value="' . $type . '" checked="checked" />', $output );
+
+		}
 	}
 
 	/**
