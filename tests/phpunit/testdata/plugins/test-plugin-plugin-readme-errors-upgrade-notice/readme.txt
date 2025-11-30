@@ -11,7 +11,7 @@ Plugin description.
 
 == Upgrade Notice ==
 
-Long notice message here. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Long notice message here. This is a sample text used as a placeholder in design, writing, or development projects. It contains no meaningful content but helps visualize the layout and typography. You can replace this paragraph with your actual content when it's ready. The quick brown fox jumps over the lazy dog. Meanwhile, designers and developers continue to use dummy text to fill in sections where final text is not yet available.
 
 = 1.0.1 =
 
@@ -19,4 +19,4 @@ Minor update. There should be no warning here.
 
 = 1.0.0 =
 
-Another long message. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Another long message. This is a sample text used as a placeholder in design, writing, or development projects. It contains no meaningful content but helps visualize the layout and typography. You can replace this paragraph with your actual content when it's ready. The quick brown fox jumps over the lazy dog. Meanwhile, designers and developers continue to use dummy text to fill in sections where final text is not yet available.

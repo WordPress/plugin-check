@@ -14,6 +14,7 @@ use WordPress\Plugin_Check\Lib\Readme\Parser as PCPParser;
 use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Traits\External_Utils;
 use WordPress\Plugin_Check\Traits\Find_Readme;
+use WordPress\Plugin_Check\Traits\Language_Utils;
 use WordPress\Plugin_Check\Traits\License_Utils;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 use WordPress\Plugin_Check\Traits\TLD_Names;
@@ -39,6 +40,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	use License_Utils;
 	use URL_Utils;
 	use Version_Utils;
+	use Language_Utils;
 
 	/**
 	 * Gets the categories for the check.
@@ -125,6 +127,9 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 		// Check the readme file for requires headers.
 		$this->check_requires_headers( $result, $readme_file, $parser );
+
+		// Check the readme for language.
+		$this->check_language( $result, $readme_file, $parser );
 	}
 
 	/**
@@ -988,6 +993,49 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 					0,
 					0,
 					'https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/#readme-header-information'
+				);
+			}
+		}
+	}
+
+	/**
+	 * Checks the readme file for official language.
+	 *
+	 * @since 1.8.0
+	 *
+	 * @param Check_Result           $result      The Check Result to amend.
+	 * @param string                 $readme_file Readme file.
+	 * @param DotorgParser|PCPParser $parser      The Parser object.
+	 */
+	private function check_language( Check_Result $result, string $readme_file, $parser ) {
+		$check_language = $this->is_on_official_language( $parser->short_description );
+
+		if ( ! $check_language ) {
+			$this->add_result_error_for_file(
+				$result,
+				__( 'The readme short description contains unofficial language. It must be written in standard English.', 'plugin-check' ),
+				'readme_short_description_non_official_language',
+				$readme_file,
+				0,
+				0,
+				'https://make.wordpress.org/plugins/2025/07/28/requiring-the-readme-to-be-written-in-english/',
+				6
+			);
+		}
+
+		if ( ! empty( $parser->sections['description'] ) ) {
+			$check_language = $this->is_on_official_language( $parser->sections['description'] );
+
+			if ( ! $check_language ) {
+				$this->add_result_error_for_file(
+					$result,
+					__( 'The readme description contains unofficial language. It must be written in standard English.', 'plugin-check' ),
+					'readme_description_non_official_language',
+					$readme_file,
+					0,
+					0,
+					'https://make.wordpress.org/plugins/2025/07/28/requiring-the-readme-to-be-written-in-english/',
+					7
 				);
 			}
 		}

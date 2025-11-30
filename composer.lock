@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2173de658966f1fdbc4338e3ed6aa47f",
+    "content-hash": "c04c7f592e6fd46ca5db240abdeed74a",
     "packages": [
         {
             "name": "automattic/vipwpcs",
@@ -359,6 +359,57 @@
             "time": "2024-09-29T15:01:53+00:00"
         },
         {
+            "name": "patrickschur/language-detection",
+            "version": "v5.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/patrickschur/language-detection.git",
+                "reference": "df8d32021b2ef9fde52e6fcccb83e3806822c9c6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/patrickschur/language-detection/zipball/df8d32021b2ef9fde52e6fcccb83e3806822c9c6",
+                "reference": "df8d32021b2ef9fde52e6fcccb83e3806822c9c6",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "ext-mbstring": "*",
+                "php": "^7.4 || ^8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.5.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "LanguageDetection\\": "src/LanguageDetection"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Patrick Schur",
+                    "email": "patrick_schur@outlook.de"
+                }
+            ],
+            "description": "A language detection library for PHP. Detects the language from a given text string.",
+            "homepage": "https://github.com/patrickschur/language-detection",
+            "keywords": [
+                "detect",
+                "detection",
+                "language"
+            ],
+            "support": {
+                "issues": "https://github.com/patrickschur/language-detection/issues",
+                "source": "https://github.com/patrickschur/language-detection/tree/v5.3.1"
+            },
+            "time": "2025-03-25T22:47:08+00:00"
+        },
+        {
             "name": "phpcsstandards/phpcsextra",
             "version": "1.4.1",
             "source": {
@@ -535,11 +586,11 @@
         },
         {
             "name": "plugin-check/phpcs-sniffs",
-            "version": "dev-readme-parser-package",
+            "version": "dev-1009-require-users-to-write-readmetxt-in-english",
             "dist": {
                 "type": "path",
                 "url": "./phpcs-sniffs",
-                "reference": "38a3177de31ea90867b4a1bcdc968b4424252a85"
+                "reference": "8c311db53cccec71ca05c3094c533fc6f42ade6c"
             },
             "require": {
                 "ext-libxml": "*",
@@ -554,6 +605,7 @@
                 "php-parallel-lint/php-parallel-lint": "^1.3.2",
                 "phpcompatibility/php-compatibility": "^9.0",
                 "phpunit/phpunit": "^7.0 || ^8.0 || ^9.0",
+                "slevomat/coding-standard": "^8",
                 "wp-coding-standards/wpcs": "^3.0"
             },
             "suggest": {
@@ -7108,8 +7160,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "phpcompatibility/php-compatibility": 20,
-        "plugin-check/phpcs-sniffs": 20
+        "plugin-check/phpcs-sniffs": 20,
+        "phpcompatibility/php-compatibility": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
@@ -7117,9 +7169,9 @@
         "php": ">=7.4",
         "ext-json": "*"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "platform-overrides": {
         "php": "7.4"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }
