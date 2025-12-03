@@ -73,19 +73,19 @@ class Trademarks_Check_Tests extends WP_UnitTestCase {
 				Trademarks_Check::TYPE_NAME,
 				'test-trademarks-plugin-header-woocommerce-string/load.php',
 				'load.php',
-				'The plugin name includes a restricted term. Your chosen plugin name - "WooCommerce Example String" - contains the restricted term "woocommerce" which cannot be used within in your plugin name, unless your plugin name ends with "for woocommerce". The term must still not appear anywhere else in your name.',
+				'The plugin name includes a restricted term. Your chosen plugin name - "WooCommerce Example String" - contains the restricted term "woocommerce" which cannot be used within in your plugin name, unless it is preceded by one of the following terms: "for", "with", "using", "and". It also cannot appear at the beginning of your plugin name.',
 			),
 			'Plugin headers - WP Example String'          => array(
 				Trademarks_Check::TYPE_NAME,
 				'test-trademarks-plugin-header-acronym/load.php',
 				'load.php',
-				'The plugin name includes a restricted term. Your plugin name - "WP Example String" - contains the restricted term "wp" which can be used , as long as you don\'t change it to the full name. For example: You can use WP but not WordPress.',
+				'The plugin name includes a restricted term. Your chosen plugin name - "WP Example String" - contains the restricted term "wp" which cannot be used at all in your plugin name.',
 			),
 			'Plugin headers - WooCommerce String for WooCommerce' => array(
 				Trademarks_Check::TYPE_NAME,
 				'test-trademarks-plugin-header-woocommerce-string-for-woocommerce/load.php',
 				'load.php',
-				'The plugin name includes a restricted term. Your chosen plugin name - "WooCommerce String for WooCommerce" - contains the restricted term "woocommerce" which cannot be used within in your plugin name, unless your plugin name ends with "for woocommerce". The term must still not appear anywhere else in your name.',
+				'The plugin name includes a restricted term. Your chosen plugin name - "WooCommerce String for WooCommerce" - contains the restricted term "woocommerce" which cannot be used within in your plugin name, unless it is preceded by one of the following terms: "for", "with", "using", "and". It also cannot appear at the beginning of your plugin name.',
 			),
 			'Plugin headers - WordPress String for WooCommerce' => array(
 				Trademarks_Check::TYPE_NAME,
@@ -113,6 +113,71 @@ class Trademarks_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertEmpty( $warnings );
 		$this->assertSame( 0, $check_result->get_warning_count() );
+	}
+
+	public function test_trademarks_with_with_woocommerce_exceptions() {
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-trademarks-plugin-header-example-string-with-woocommerce/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check = new Trademarks_Check( Trademarks_Check::TYPE_NAME );
+		$check->run( $check_result );
+
+		$warnings = $check_result->get_warnings();
+
+		$this->assertEmpty( $warnings );
+		$this->assertSame( 0, $check_result->get_warning_count() );
+	}
+
+	public function test_trademarks_with_using_woocommerce_exceptions() {
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-trademarks-plugin-header-example-string-using-woocommerce/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check = new Trademarks_Check( Trademarks_Check::TYPE_NAME );
+		$check->run( $check_result );
+
+		$warnings = $check_result->get_warnings();
+
+		$this->assertEmpty( $warnings );
+		$this->assertSame( 0, $check_result->get_warning_count() );
+	}
+
+	public function test_trademarks_with_and_woocommerce_exceptions() {
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-trademarks-plugin-header-example-string-and-woocommerce/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check = new Trademarks_Check( Trademarks_Check::TYPE_NAME );
+		$check->run( $check_result );
+
+		$warnings = $check_result->get_warnings();
+
+		$this->assertEmpty( $warnings );
+		$this->assertSame( 0, $check_result->get_warning_count() );
+	}
+
+	public function test_trademarks_with_for_woocommerce_in_middle() {
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-trademarks-plugin-header-example-for-woocommerce-feature/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check = new Trademarks_Check( Trademarks_Check::TYPE_NAME );
+		$check->run( $check_result );
+
+		$warnings = $check_result->get_warnings();
+
+		$this->assertEmpty( $warnings );
+		$this->assertSame( 0, $check_result->get_warning_count() );
+	}
+
+	public function test_trademarks_with_for_woocommerce_at_beginning_fails() {
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-trademarks-for-woocommerce-example/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check = new Trademarks_Check( Trademarks_Check::TYPE_NAME );
+		$check->run( $check_result );
+
+		$warnings = $check_result->get_warnings();
+
+		$this->assertNotEmpty( $warnings );
+		$this->assertSame( 1, $check_result->get_warning_count() );
 	}
 
 	public function test_single_file_plugin_without_error_for_trademarks() {

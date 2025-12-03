@@ -152,12 +152,24 @@ class Trademarks_Check extends Abstract_File_Check {
 	 * Lists of allowed acronyms of trademarks.
 	 *
 	 * @since 1.3.0
+	 * @deprecated 1.4.0 Acronym exceptions have been removed as they are now widely recognized.
 	 *
 	 * @var string[]
 	 */
-	const ALLOWED_ACRONYMS = array(
-		'wp',
-		'wc',
+	const ALLOWED_ACRONYMS = array();
+
+	/**
+	 * Allowed term prefixes for trademarks (e.g., -for-, -with-, -using-, -and-).
+	 *
+	 * @since 1.4.0
+	 *
+	 * @var string[]
+	 */
+	const TRADEMARK_PREFIXES = array(
+		'-for-',
+		'-with-',
+		'-using-',
+		'-and-',
 	);
 
 	/**
@@ -355,10 +367,10 @@ class Trademarks_Check extends Abstract_File_Check {
 			trim( $check, '-' ) === $check
 			&& in_array( $check, self::FOR_USE_EXCEPTIONS, true )
 		) {
-			// Trademarks that do NOT end in "-", but are within the FOR_USE_EXCEPTIONS array can be used, but only if it ends with 'for x'.
+			// Trademarks that do NOT end in "-", but are within the FOR_USE_EXCEPTIONS array can be used with allowed prefixes.
 			$message = sprintf(
 				/* translators: 1: plugin name, 2: found trademarked term */
-				__( 'The plugin name includes a restricted term. Your chosen plugin name - "%1$s" - contains the restricted term "%2$s" which cannot be used within in your plugin name, unless your plugin name ends with "for %2$s". The term must still not appear anywhere else in your name.', 'plugin-check' ),
+				__( 'The plugin name includes a restricted term. Your chosen plugin name - "%1$s" - contains the restricted term "%2$s" which cannot be used within in your plugin name, unless it is preceded by one of the following terms: "for", "with", "using", "and". It also cannot appear at the beginning of your plugin name.', 'plugin-check' ),
 				esc_html( $plugin_name ),
 				esc_html( trim( $check, '-' ) )
 			);
@@ -369,7 +381,7 @@ class Trademarks_Check extends Abstract_File_Check {
 			// Trademarks that are allowed to use as an acronym.
 			$message = sprintf(
 				/* translators: 1: plugin slug, 2: found trademarked term */
-				__( 'The plugin name includes a restricted term. Your plugin name - "%1$s" - contains the restricted term "%2$s" which can be used , as long as you don\'t change it to the full name. For example: You can use WP but not WordPress.', 'plugin-check' ),
+				__( 'The plugin name includes a restricted term. Your plugin name - "%1$s" - contains the restricted term "%2$s" which cannot be used at all in your plugin name.', 'plugin-check' ),
 				esc_html( $plugin_name ),
 				esc_html( trim( $check, '-' ) )
 			);
@@ -413,10 +425,10 @@ class Trademarks_Check extends Abstract_File_Check {
 			trim( $check, '-' ) === $check
 			&& in_array( $check, self::FOR_USE_EXCEPTIONS, true )
 		) {
-			// Trademarks that do NOT end in "-", but are within the FOR_USE_EXCEPTIONS array can be used, but only if it ends with 'for x'.
+			// Trademarks that do NOT end in "-", but are within the FOR_USE_EXCEPTIONS array can be used with allowed prefixes.
 			$message = sprintf(
 				/* translators: 1: plugin slug, 2: found trademarked term */
-				__( 'The plugin slug includes a restricted term. Your plugin slug - "%1$s" - contains the restricted term "%2$s" which cannot be used within in your plugin slug, unless your plugin slug ends with "for %2$s". The term must still not appear anywhere else in your plugin slug.', 'plugin-check' ),
+				__( 'The plugin slug includes a restricted term. Your plugin slug - "%1$s" - contains the restricted term "%2$s" which cannot be used within in your plugin slug, unless it is preceded by one of the following terms: "for", "with", "using", "and". It also cannot appear at the beginning of your plugin slug.', 'plugin-check' ),
 				esc_html( $plugin_slug ),
 				esc_html( trim( $check, '-' ) )
 			);
@@ -424,10 +436,10 @@ class Trademarks_Check extends Abstract_File_Check {
 			trim( $check, '-' ) === $check
 			&& in_array( $check, self::ALLOWED_ACRONYMS, true )
 		) {
-			// Trademarks that are allowed to use with Acronym.
+			// Trademarks that are allowed to use with Acronym (deprecated - now treated as regular trademarks).
 			$message = sprintf(
 				/* translators: 1: plugin slug, 2: found trademarked term */
-				__( 'The plugin slug includes a restricted term. Your plugin slug - "%1$s" - contains the restricted term "%2$s" which can be used within the plugin slug, as long as you don\'t use the full name in the plugin name. For example: You can use WP but not WordPress.', 'plugin-check' ),
+				__( 'The plugin slug includes a restricted term. Your plugin slug - "%1$s" - contains the restricted term "%2$s" which cannot be used at all in your plugin slug.', 'plugin-check' ),
 				esc_html( $plugin_slug ),
 				esc_html( trim( $check, '-' ) )
 			);
@@ -524,21 +536,33 @@ class Trademarks_Check extends Abstract_File_Check {
 			return false;
 		}
 
-		$for_trademark        = '-for-' . $trademark;
-		$for_trademark_length = strlen( $for_trademark );
-		if ( ! ( substr( $slug, -$for_trademark_length ) === $for_trademark ) ) {
-			// The slug doesn't end with 'for-TRADEMARK', so it's an invalid use.
+		// Check if slug starts with any allowed prefix + trademark (e.g., starts with "for-trademark").
+		// This is not allowed - trademark cannot be at the beginning.
+		foreach ( self::TRADEMARK_PREFIXES as $prefix ) {
+			$prefix_without_leading_dash = ltrim( $prefix, '-' );
+			if ( 0 === strpos( $slug, $prefix_without_leading_dash . $trademark ) ) {
+				return false;
+			}
+		}
+
+		// Check if slug starts with the trademark directly.
+		if ( 0 === strpos( $slug, $trademark ) ) {
 			return false;
 		}
 
-		/*
-		 * Yes if slug ENDS with 'for-TRADEMARK'.
-		 * Validate that the term still doesn't appear in another position of the slug.
-		 */
-		$short_slug = substr( $slug, 0, -1 * strlen( $for_trademark ) );
+		// Check if any allowed prefix + trademark pattern exists in the slug.
+		foreach ( self::TRADEMARK_PREFIXES as $prefix ) {
+			$pattern = $prefix . $trademark;
+			if ( false !== strpos( $slug, $pattern ) ) {
+				// Found a valid prefix pattern, now verify trademark doesn't appear elsewhere.
+				$slug_without_pattern = str_replace( $pattern, '', $slug );
+				if ( false === strpos( $slug_without_pattern, $trademark ) ) {
+					return true;
+				}
+			}
+		}
 
-		// If the trademark still doesn't exist in the slug, it's OK.
-		return false === strpos( $short_slug, $trademark );
+		return false;
 	}
 
 	/**
