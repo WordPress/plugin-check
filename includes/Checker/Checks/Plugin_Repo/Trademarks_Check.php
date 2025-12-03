@@ -147,17 +147,6 @@ class Trademarks_Check extends Abstract_File_Check {
 		'youtube-',
 		'you-tube-',
 	);
-
-	/**
-	 * Lists of allowed acronyms of trademarks.
-	 *
-	 * @since 1.3.0
-	 * @deprecated 1.4.0 Acronym exceptions have been removed as they are now widely recognized.
-	 *
-	 * @var string[]
-	 */
-	const ALLOWED_ACRONYMS = array();
-
 	/**
 	 * Allowed term prefixes for trademarks (e.g., -for-, -with-, -using-, -and-).
 	 *
@@ -374,17 +363,6 @@ class Trademarks_Check extends Abstract_File_Check {
 				esc_html( $plugin_name ),
 				esc_html( trim( $check, '-' ) )
 			);
-		} elseif (
-			trim( $check, '-' ) === $check
-			&& in_array( $check, self::ALLOWED_ACRONYMS, true )
-		) {
-			// Trademarks that are allowed to use as an acronym.
-			$message = sprintf(
-				/* translators: 1: plugin slug, 2: found trademarked term */
-				__( 'The plugin name includes a restricted term. Your plugin name - "%1$s" - contains the restricted term "%2$s" which cannot be used at all in your plugin name.', 'plugin-check' ),
-				esc_html( $plugin_name ),
-				esc_html( trim( $check, '-' ) )
-			);
 		} elseif ( trim( $check, '-' ) === $check ) {
 			// Trademarks that do NOT end in "-" indicate slug cannot contain term at all.
 			$message = sprintf(
@@ -429,17 +407,6 @@ class Trademarks_Check extends Abstract_File_Check {
 			$message = sprintf(
 				/* translators: 1: plugin slug, 2: found trademarked term */
 				__( 'The plugin slug includes a restricted term. Your plugin slug - "%1$s" - contains the restricted term "%2$s" which cannot be used within in your plugin slug, unless it is preceded by one of the following terms: "for", "with", "using", "and". It also cannot appear at the beginning of your plugin slug.', 'plugin-check' ),
-				esc_html( $plugin_slug ),
-				esc_html( trim( $check, '-' ) )
-			);
-		} elseif (
-			trim( $check, '-' ) === $check
-			&& in_array( $check, self::ALLOWED_ACRONYMS, true )
-		) {
-			// Trademarks that are allowed to use with Acronym (deprecated - now treated as regular trademarks).
-			$message = sprintf(
-				/* translators: 1: plugin slug, 2: found trademarked term */
-				__( 'The plugin slug includes a restricted term. Your plugin slug - "%1$s" - contains the restricted term "%2$s" which cannot be used at all in your plugin slug.', 'plugin-check' ),
 				esc_html( $plugin_slug ),
 				esc_html( trim( $check, '-' ) )
 			);
