@@ -116,6 +116,14 @@ final class Plugin_Check_Command {
 	 * [--exclude-files=<files>]
 	 * : Additional files to exclude from checks.
 	 *
+	 * [--include-files=<files>]
+	 * : Specific files to include in checks (comma-separated). Mutually exclusive with --exclude-files.
+	 * When specified, only the listed files will be checked.
+	 *
+	 * [--include-directories=<directories>]
+	 * : Specific directories to include in checks (comma-separated, recursive). Mutually exclusive with --exclude-directories.
+	 * When specified, only files within the listed directories will be checked.
+	 *
 	 * [--severity=<severity>]
 	 * : Severity level.
 	 *
@@ -157,6 +165,9 @@ final class Plugin_Check_Command {
 	 *   wp plugin check akismet --mode=update
 	 *   wp plugin check akismet --ai
 	 *   wp plugin check akismet --ai --ai-model=openai::gpt-4o
+	 *   wp plugin check akismet --include-files=akismet.php,class.akismet.php
+	 *   wp plugin check akismet --include-directories=includes,views
+	 *   wp plugin check akismet --exclude-directories=tests,vendor
 	 *
 	 * @subcommand check
 	 *
@@ -172,9 +183,27 @@ final class Plugin_Check_Command {
 	 * @SuppressWarnings(PHPMD.CyclomaticComplexity)
 	 */
 	public function check( $args, $assoc_args ) {
-		// Get options based on the CLI arguments.
-		$options = $this->get_options(
-			$assoc_args,
+		$plugin = isset( $args[0] ) ? $args[0] : '';
+		$config = array();
+
+		if ( ! empty( $plugin ) ) {
+			$plugin_path = '';
+			if ( is_dir( $plugin ) ) {
+				$plugin_path = $plugin;
+			} elseif ( is_file( $plugin ) ) {
+				$plugin_path = dirname( $plugin );
+			} elseif ( ! filter_var( $plugin, FILTER_VALIDATE_URL ) ) {
+				// Assume slug for installed plugin.
+				$plugin_path = WP_PLUGIN_DIR . '/' . $plugin;
+			}
+
+			if ( ! empty( $plugin_path ) && is_dir( $plugin_path ) ) {
+				$config = Plugin_Request_Utility::get_plugin_configuration( $plugin_path );
+				Plugin_Request_Utility::load_filters_from_config( $plugin_path );
+			}
+		}
+
+		$defaults = array_merge(
 			array(
 				'checks'                        => '',
 				'format'                        => 'table',
@@ -191,11 +220,15 @@ final class Plugin_Check_Command {
 				'mode'                          => 'new',
 				'ai'                            => false,
 				'ai-model'                      => '',
-			)
+			),
+			$config
 		);
 
+		// Get options based on the CLI arguments.
+		$options = $this->get_options( $assoc_args, $defaults );
+
 		// Create the plugin and checks array from CLI arguments.
-		$plugin = isset( $args[0] ) ? $args[0] : '';
+		// $plugin is already set above.
 		$checks = wp_parse_list( $options['checks'] );
 
 		// Ignore codes.
@@ -205,6 +238,14 @@ final class Plugin_Check_Command {
 		$categories = isset( $options['categories'] ) ? wp_parse_list( $options['categories'] ) : array();
 
 		$excluded_directories = isset( $options['exclude-directories'] ) ? wp_parse_list( $options['exclude-directories'] ) : array();
+		$included_directories = isset( $options['include-directories'] ) ? wp_parse_list( $options['include-directories'] ) : array();
+
+		// Validate mutual exclusivity for directories.
+		if ( ! empty( $excluded_directories ) && ! empty( $included_directories ) ) {
+			WP_CLI::error(
+				__( 'The --include-directories and --exclude-directories options are mutually exclusive. Please use only one.', 'plugin-check' )
+			);
+		}
 
 		add_filter(
 			'wp_plugin_check_ignore_directories',
@@ -213,12 +254,34 @@ final class Plugin_Check_Command {
 			}
 		);
 
+		add_filter(
+			'wp_plugin_check_include_directories',
+			static function ( $dirs ) use ( $included_directories ) {
+				return array_unique( array_merge( $dirs, $included_directories ) );
+			}
+		);
+
 		$excluded_files = isset( $options['exclude-files'] ) ? wp_parse_list( $options['exclude-files'] ) : array();
+		$included_files = isset( $options['include-files'] ) ? wp_parse_list( $options['include-files'] ) : array();
+
+		// Validate mutual exclusivity for files.
+		if ( ! empty( $excluded_files ) && ! empty( $included_files ) ) {
+			WP_CLI::error(
+				__( 'The --include-files and --exclude-files options are mutually exclusive. Please use only one.', 'plugin-check' )
+			);
+		}
 
 		add_filter(
 			'wp_plugin_check_ignore_files',
 			static function ( $dirs ) use ( $excluded_files ) {
 				return array_unique( array_merge( $dirs, $excluded_files ) );
+			}
+		);
+
+		add_filter(
+			'wp_plugin_check_include_files',
+			static function ( $dirs ) use ( $included_files ) {
+				return array_unique( array_merge( $dirs, $included_files ) );
 			}
 		);
 

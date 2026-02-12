@@ -285,6 +285,9 @@ abstract class Abstract_File_Check implements Static_Check {
 			$directories_to_ignore = Plugin_Request_Utility::get_directories_to_ignore();
 
 			$files_to_ignore = Plugin_Request_Utility::get_files_to_ignore();
+			$directories_to_include = Plugin_Request_Utility::get_directories_to_include();
+			$files_to_include       = Plugin_Request_Utility::get_files_to_include();
+			$ignore_patterns        = Plugin_Request_Utility::get_files_to_ignore_patterns();
 
 			foreach ( $iterator as $file ) {
 				if ( ! $file->isFile() ) {
@@ -295,6 +298,30 @@ abstract class Abstract_File_Check implements Static_Check {
 
 				// Flag to check if the file should be included or not.
 				$include_file = true;
+
+				if ( ! empty( $directories_to_include ) || ! empty( $files_to_include ) ) {
+					$include_file = false;
+
+					foreach ( $directories_to_include as $directory ) {
+						if ( false !== strpos( $file_path, '/' . $directory . '/' ) ) {
+							$include_file = true;
+							break;
+						}
+					}
+
+					if ( ! $include_file ) {
+						foreach ( $files_to_include as $inc_file ) {
+							if ( str_ends_with( $file_path, "/" . $inc_file ) ) {
+								$include_file = true;
+								break;
+							}
+						}
+					}
+
+					if ( ! $include_file ) {
+						continue;
+					}
+				}
 
 				foreach ( $directories_to_ignore as $directory ) {
 					// Check if the current file belongs to the directory you want to ignore.
@@ -308,6 +335,16 @@ abstract class Abstract_File_Check implements Static_Check {
 					if ( str_ends_with( $file_path, "/$ignore_file" ) ) {
 						$include_file = false;
 						break;
+					}
+				}
+
+				if ( $include_file && ! empty( $ignore_patterns ) ) {
+					$relative_path = substr( $file_path, strlen( $location ) + 1 );
+					foreach ( $ignore_patterns as $pattern ) {
+						if ( preg_match( $pattern, $relative_path ) ) {
+							$include_file = false;
+							break;
+						}
 					}
 				}
 

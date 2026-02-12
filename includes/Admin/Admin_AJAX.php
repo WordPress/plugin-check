@@ -125,6 +125,14 @@ final class Admin_AJAX {
 		$runner->set_check_slugs( $checks );
 		$runner->set_plugin( $plugin );
 
+		// Load configuration filters (e.g. .distignore, .plugin-check.json).
+		if ( ! empty( $plugin ) ) {
+			$plugin_path = WP_PLUGIN_DIR . '/' . basename( $plugin );
+			if ( is_dir( $plugin_path ) ) {
+				Plugin_Request_Utility::load_filters_from_config( $plugin_path );
+			}
+		}
+
 		return array(
 			'checks' => $checks,
 			'plugin' => $plugin,

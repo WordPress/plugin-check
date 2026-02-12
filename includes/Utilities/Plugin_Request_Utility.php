@@ -205,6 +205,46 @@ class Plugin_Request_Utility {
 	}
 
 	/**
+	 * Gets the directories to include using the filter.
+	 *
+	 * @since 1.9.0
+	 */
+	public static function get_directories_to_include() {
+		$default_include_directories = array();
+
+		/**
+		 * Filters the directories to include.
+		 *
+		 * @since 1.9.0
+		 *
+		 * @param array $default_include_directories An array of directories to include.
+		 */
+		$directories_to_include = (array) apply_filters( 'wp_plugin_check_include_directories', $default_include_directories );
+
+		return $directories_to_include;
+	}
+
+	/**
+	 * Gets the files to include using the filter.
+	 *
+	 * @since 1.9.0
+	 */
+	public static function get_files_to_include() {
+		$default_include_files = array();
+
+		/**
+		 * Filters the files to include.
+		 *
+		 * @since 1.9.0
+		 *
+		 * @param array $default_include_files An array of files to include.
+		 */
+		$files_to_include = (array) apply_filters( 'wp_plugin_check_include_files', $default_include_files );
+
+		return $files_to_include;
+	}
+
+	/**
 	 * Returns the plugin basename after downloading and installing the plugin.
 	 *
 	 * @since 1.1.0
@@ -344,5 +384,226 @@ class Plugin_Request_Utility {
 		}
 
 		return $is_valid;
+	}
+
+	/**
+	 * Gets the configuration from .plugin-check.json in the plugin root.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param string $plugin_root_path The plugin root path.
+	 * @return array The configuration array.
+	 */
+	public static function get_plugin_configuration( $plugin_root_path ) {
+		$config_file = trailingslashit( $plugin_root_path ) . '.plugin-check.json';
+
+		if ( ! file_exists( $config_file ) ) {
+			return array();
+		}
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		$content = file_get_contents( $config_file );
+
+		if ( empty( $content ) ) {
+			return array();
+		}
+
+		$config = json_decode( $content, true );
+
+		if ( JSON_ERROR_NONE !== json_last_error() ) {
+			return array();
+		}
+
+		return (array) $config;
+	}
+
+	/**
+	 * Gets the entries from .distignore in the plugin root.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param string $plugin_root_path The plugin root path.
+	 * @return array The list of ignored entries.
+	 */
+	public static function get_distignore_entries( $plugin_root_path ) {
+		$distignore_file = trailingslashit( $plugin_root_path ) . '.distignore';
+
+		if ( ! file_exists( $distignore_file ) ) {
+			return array();
+		}
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		$content = file_get_contents( $distignore_file );
+
+		if ( empty( $content ) ) {
+			return array();
+		}
+
+		$lines = explode( "\n", $content );
+		$entries = array();
+
+		foreach ( $lines as $line ) {
+			$line = trim( $line );
+			if ( empty( $line ) || str_starts_with( $line, '#' ) ) {
+				continue;
+			}
+			$entries[] = $line;
+		}
+
+		return $entries;
+	}
+
+	/**
+	 * Converts a gitignore pattern to a PCRE regex.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param string $pattern Gitignore pattern.
+	 * @return string PCRE regex.
+	 */
+	public static function convert_gitignore_pattern_to_regex( $pattern ) {
+		$pattern = trim( $pattern );
+		if ( empty( $pattern ) ) {
+			return '';
+		}
+
+		$start_anchor = '(?:^|/)';
+		$end_anchor   = '(?:/|$)';
+
+		if ( str_starts_with( $pattern, '/' ) ) {
+			$start_anchor = '^';
+			$pattern      = substr( $pattern, 1 );
+		}
+
+		if ( str_ends_with( $pattern, '/' ) ) {
+			$end_anchor = '/';
+			$pattern    = substr( $pattern, 0, -1 );
+		}
+
+		$pattern = preg_quote( $pattern, '#' );
+
+		// Convert double-star glob to match-all regex.
+		$pattern = str_replace( '\*\*', '.*', $pattern );
+
+		// Convert single-star glob to non-slash wildcard.
+		$pattern = str_replace( '\*', '[^/]*', $pattern );
+
+		// Convert question-mark glob to single non-slash char.
+		$pattern = str_replace( '\?', '[^/]', $pattern );
+
+		return '#' . $start_anchor . $pattern . $end_anchor . '#';
+	}
+
+	/**
+	 * Gets the patterns to ignore using the filter.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return array Array of regex patterns.
+	 */
+	public static function get_files_to_ignore_patterns() {
+		$default_ignore_patterns = array();
+
+		/**
+		 * Filters the regex patterns to ignore.
+		 *
+		 * @since 1.9.0
+		 *
+		 * @param array $default_ignore_patterns An array of regex patterns to ignore.
+		 */
+		$ignore_patterns = (array) apply_filters( 'wp_plugin_check_ignore_patterns', $default_ignore_patterns );
+
+		return $ignore_patterns;
+	}
+
+	/**
+	 * Loads configuration filters from the plugin config files.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param string $plugin_path The plugin root path.
+	 */
+	public static function load_filters_from_config( $plugin_path ) {
+		$plugin_path = untrailingslashit( $plugin_path );
+		self::load_distignore_filters( $plugin_path );
+		self::load_config_filters( $plugin_path );
+	}
+
+	/**
+	 * Loads .distignore filters.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param string $plugin_path The plugin root path.
+	 */
+	public static function load_distignore_filters( $plugin_path ) {
+		// Load .distignore patterns.
+		$distignore_entries = self::get_distignore_entries( $plugin_path );
+		if ( ! empty( $distignore_entries ) ) {
+			add_filter(
+				'wp_plugin_check_ignore_patterns',
+				static function ( $patterns ) use ( $distignore_entries ) {
+					foreach ( $distignore_entries as $entry ) {
+						$regex = self::convert_gitignore_pattern_to_regex( $entry );
+						if ( ! empty( $regex ) ) {
+							$patterns[] = $regex;
+						}
+					}
+					return $patterns;
+				}
+			);
+		}
+	}
+
+	/**
+	 * Loads .plugin-check.json filters.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param string $plugin_path The plugin root path.
+	 */
+	public static function load_config_filters( $plugin_path ) {
+		// Load .plugin-check.json config.
+		$config = self::get_plugin_configuration( $plugin_path );
+
+		if ( ! empty( $config['exclude-directories'] ) ) {
+			$dirs = wp_parse_list( $config['exclude-directories'] );
+			add_filter(
+				'wp_plugin_check_ignore_directories',
+				static function ( $ignore_dirs ) use ( $dirs ) {
+					return array_unique( array_merge( $ignore_dirs, $dirs ) );
+				}
+			);
+		}
+
+		if ( ! empty( $config['exclude-files'] ) ) {
+			$files = wp_parse_list( $config['exclude-files'] );
+			add_filter(
+				'wp_plugin_check_ignore_files',
+				static function ( $ignore_files ) use ( $files ) {
+					return array_unique( array_merge( $ignore_files, $files ) );
+				}
+			);
+		}
+
+		if ( ! empty( $config['include-directories'] ) ) {
+			$dirs = wp_parse_list( $config['include-directories'] );
+			add_filter(
+				'wp_plugin_check_include_directories',
+				static function ( $include_dirs ) use ( $dirs ) {
+					return array_unique( array_merge( $include_dirs, $dirs ) );
+				}
+			);
+		}
+
+		if ( ! empty( $config['include-files'] ) ) {
+			$files = wp_parse_list( $config['include-files'] );
+			add_filter(
+				'wp_plugin_check_include_files',
+				static function ( $include_files ) use ( $files ) {
+					return array_unique( array_merge( $include_files, $files ) );
+				}
+			);
+		}
 	}
 }
