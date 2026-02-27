@@ -14,6 +14,7 @@
  * @package plugin-check
  */
 
+use Composer\Autoload\ClassLoader;
 use WordPress\Plugin_Check\Plugin_Main;
 
 define( 'WP_PLUGIN_CHECK_VERSION', '1.8.0' );
@@ -44,7 +45,7 @@ function wp_plugin_check_load() {
 	$autoloader = require_once WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'vendor/autoload.php';
 
 	// Avoid conflicts with the AI client bundled in WordPress core (7.0+).
-	if ( wp_plugin_check_has_core_ai_client() && $autoloader instanceof \Composer\Autoload\ClassLoader ) {
+	if ( wp_plugin_check_has_core_ai_client() && $autoloader instanceof ClassLoader ) {
 		$autoloader->setPsr4( 'WordPress\\AiClient\\', array() );
 		$autoloader->setPsr4( 'WordPress\\AI_Client\\', array() );
 	}
