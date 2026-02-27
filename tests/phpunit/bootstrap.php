@@ -8,10 +8,6 @@
 define( 'TESTS_PLUGIN_DIR', dirname( __DIR__, 2 ) );
 define( 'UNIT_TESTS_PLUGIN_DIR', TESTS_PLUGIN_DIR . '/tests/phpunit/testdata/plugins/' );
 
-if ( file_exists( TESTS_PLUGIN_DIR . '/vendor/autoload.php' ) ) {
-	require_once TESTS_PLUGIN_DIR . '/vendor/autoload.php';
-}
-
 // Detect where to load the WordPress tests environment from.
 if ( false !== getenv( 'WP_TESTS_DIR' ) ) {
 	$_test_root = getenv( 'WP_TESTS_DIR' );
@@ -34,3 +30,8 @@ $GLOBALS['wp_tests_options'] = array(
 
 // Start up the WP testing environment.
 require $_test_root . '/includes/bootstrap.php';
+
+// Load Composer autoloader after core bootstrap to avoid core AI client conflicts.
+if ( file_exists( TESTS_PLUGIN_DIR . '/vendor/autoload.php' ) ) {
+	require_once TESTS_PLUGIN_DIR . '/vendor/autoload.php';
+}
