@@ -41,7 +41,13 @@ function wp_plugin_check_load() {
 	}
 
 	// Load the Composer autoloader.
-	require_once WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'vendor/autoload.php';
+	$autoloader = require_once WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'vendor/autoload.php';
+
+	// Avoid conflicts with the AI client bundled in WordPress core (7.0+).
+	if ( wp_plugin_check_has_core_ai_client() && $autoloader instanceof \Composer\Autoload\ClassLoader ) {
+		$autoloader->setPsr4( 'WordPress\\AiClient\\', array() );
+		$autoloader->setPsr4( 'WordPress\\AI_Client\\', array() );
+	}
 
 	// Setup the plugin.
 	$instance = new Plugin_Main( WP_PLUGIN_CHECK_MAIN_FILE );
@@ -77,6 +83,17 @@ function wp_plugin_check_display_composer_autoload_notice() {
 		'<code>composer install</code>'
 	);
 	echo '</p></div>';
+}
+
+/**
+ * Checks whether the current WordPress install includes the AI client in core.
+ *
+ * @since 1.8.1
+ *
+ * @return bool True if core provides the AI client, false otherwise.
+ */
+function wp_plugin_check_has_core_ai_client() {
+	return defined( 'ABSPATH' ) && defined( 'WPINC' ) && file_exists( ABSPATH . WPINC . '/ai-client/bootstrap.php' );
 }
 
 wp_plugin_check_load();
