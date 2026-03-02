@@ -14,7 +14,7 @@
     "patrickschur/language-detection": "^5.3",
     "php-http/curl-client": "^2.3",
     "plugin-check/phpcs-sniffs": "@dev",
-    "wordpress/wp-ai-client": "^0.2.1",
+    "wordpress/wp-ai-client": "^0.4.0",
     "wp-coding-standards/wpcs": "^3.2.0"
   },
   "require-dev": {
