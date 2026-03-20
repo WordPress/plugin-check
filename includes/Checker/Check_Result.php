@@ -88,7 +88,7 @@ final class Check_Result {
 	 *
 	 *     @type string $code   Violation code according to the message. Default empty string.
 	 *     @type string $file   The file in which the message occurred. Default empty string (unknown file).
-	 *     @type int    $line   The line on which the message occurred. Default 0 (unknown line).
+	 *     @type int    $line   The line on which the message occurred. Default 1 (unknown line).
 	 *     @type int    $column The column on which the message occurred. Default 0 (unknown column).
 	 *     @type string $link   View in code editor link. Default empty string.
 	 * }
@@ -97,7 +97,7 @@ final class Check_Result {
 		$defaults = array(
 			'code'     => '',
 			'file'     => '',
-			'line'     => 0,
+			'line'     => 1,
 			'column'   => 0,
 			'link'     => '',
 			'docs'     => '',
@@ -113,7 +113,7 @@ final class Check_Result {
 		);
 
 		$file   = str_replace( $this->plugin()->path( '/' ), '', $data['file'] );
-		$line   = $data['line'];
+		$line   = $data['line'] > 0 ? $data['line'] : 1;
 		$column = $data['column'];
 		unset( $data['line'], $data['column'], $data['file'] );
 

@@ -56,7 +56,7 @@ Feature: Test that the WP-CLI command works.
     Then STDOUT should contain:
       """
       line,column,type,code,message,docs
-      0,0,ERROR,missing_direct_file_access_protection,"PHP file should prevent direct access. Add a check like: if ( ! defined( 'ABSPATH' ) ) exit;",https://developer.wordpress.org/plugins/wordpress-org/common-issues/#direct-file-access
+    1,0,ERROR,missing_direct_file_access_protection,"PHP file should prevent direct access. Add a check like: if ( ! defined( 'ABSPATH' ) ) exit;",https://developer.wordpress.org/plugins/wordpress-org/common-issues/#direct-file-access
       16,15,ERROR,WordPress.WP.AlternativeFunctions.rand_mt_rand,"mt_rand() is discouraged. Use the far less predictable wp_rand() instead.",
       17,10,ERROR,WordPress.Security.EscapeOutput.OutputNotEscaped,"All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found '$number'.",https://developer.wordpress.org/apis/security/escaping/#escaping-functions
       """
