@@ -65,7 +65,7 @@ Feature: Test that the WP-CLI command works.
     Then STDOUT should contain:
       """
       line,column,code
-      0,0,missing_direct_file_access_protection
+      1,0,missing_direct_file_access_protection
       16,15,WordPress.WP.AlternativeFunctions.rand_mt_rand
       17,10,WordPress.Security.EscapeOutput.OutputNotEscaped
       """
