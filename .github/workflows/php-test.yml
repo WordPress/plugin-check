@@ -10,6 +10,7 @@ on:
       - '.github/workflows/php-test.yml'
       - '**.php'
       - '.wp-env.json'
+      - '.wp-env.test.json'
       - '**/package.json'
       - 'package-lock.json'
       - 'phpcs-rulesets/*.xml'
@@ -26,6 +27,7 @@ on:
       - '.github/workflows/php-test.yml'
       - '**.php'
       - '.wp-env.json'
+      - '.wp-env.test.json'
       - '**/package.json'
       - 'package-lock.json'
       - 'phpcs-rulesets/*.xml'
@@ -91,9 +93,9 @@ jobs:
       - name: Start WordPress
         run: |
           if [[ ${{ matrix.coverage == true }} == true ]]; then
-            npm run wp-env start -- --xdebug=coverage
+            npm run wp-env:start:tests -- --xdebug=coverage
           else
-            npm run wp-env start
+            npm run wp-env:start:tests
           fi
 
       - name: Run tests

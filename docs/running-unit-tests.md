@@ -8,7 +8,7 @@ Follow these instructions to configure and run tests:
 
 1. You would need npm installed in your computer.
 2. Ensure that you have installed all npm dependencies with `npm ci`.
-3. You need to have Docker installed and running wp-env environment `npm run wp-env start`.
+3. You need to have Docker installed and start the PHPUnit wp-env stack with `npm run wp-env:start:tests` (see the main README if you also use the development site).
 4. Run tests with npm command `npm run test-php`.
 
 The full test suite is run against PRs as a GitHub action ([example](https://github.com/WordPress/plugin-check/actions/runs/9660204610)) so tests can be run against all supported environments. Passing tests is a requirement for merging PRs. Being able to run them locally is meant to help developers while working on or debugging tests, prior to submitting their code for review.

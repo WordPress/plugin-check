@@ -60,9 +60,15 @@ You can start the built-in environment as follows:
 npm run wp-env start
 ```
 
-If you want to stop the environment again, you can use:
+To run PHP unit tests (or `composer` / PHPStan commands that use the test stack), start the separate PHPUnit environment as well:
+```
+npm run wp-env:start:tests
+```
+
+If you want to stop the environments again, you can use:
 ```
 npm run wp-env stop
+npm run wp-env:stop:tests
 ```
 
 For further information on contributing, please see the [contributing guide](/CONTRIBUTING.md).

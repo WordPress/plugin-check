@@ -22,7 +22,9 @@ tests
 .phpunit.result.cache
 .typos.toml
 .wp-env.json
+.wp-env.test.json
 .wp-env.override.json
+.wp-env.test.override.json
 behat.yml
 codecov.yml
 composer.lock
