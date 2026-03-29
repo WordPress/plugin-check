@@ -3,6 +3,8 @@
   "description": "Plugin Check is a WordPress.org tool which provides checks to help plugins meet the directory requirements and follow various best practices.",
   "license": "GPL-2.0-or-later",
   "type": "wordpress-plugin",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
   "require": {
     "php": ">=7.4",
     "ext-json": "*",
@@ -14,18 +16,18 @@
     "patrickschur/language-detection": "^5.3",
     "php-http/curl-client": "^2.3",
     "plugin-check/phpcs-sniffs": "@dev",
-    "wp-coding-standards/wpcs": "^3.2.0"
+    "wp-coding-standards/wpcs": "dev-develop as 3.3.0"
   },
   "require-dev": {
-    "phpcompatibility/php-compatibility": "dev-develop",
+    "phpcompatibility/php-compatibility": "^10.0@alpha",
     "phpmd/phpmd": "^2.9",
     "phpstan/extension-installer": "^1.2",
     "phpstan/phpstan": "^1.10",
     "slevomat/coding-standard": "^8.18",
     "szepeviktor/phpstan-wordpress": "^1.1",
     "wp-cli/extension-command": "^2.1",
-    "wp-cli/wp-cli": "^2.8",
-    "wp-cli/wp-cli-tests": "^5.0.0",
+    "wp-cli/wp-cli": "^2.13",
+    "wp-cli/wp-cli-tests": "^5.1",
     "wp-cli/language-command": "^2.0",
     "wp-cli/i18n-command": "^2.6",
     "wp-cli/entity-command": "^2.8",
