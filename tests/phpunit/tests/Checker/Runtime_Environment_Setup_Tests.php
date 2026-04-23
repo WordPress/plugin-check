@@ -92,86 +92,62 @@ class Runtime_Environment_Setup_Tests extends WP_UnitTestCase {
 		$this->assertFalse( $runtime_setup->can_set_up() );
 	}
 
-	public function test_before_runtime_setup_action_fires() {
+	public function test_set_up_fires_setup_environment_hooks() {
 		$this->set_up_mock_filesystem();
 
-		$fired   = false;
-		$context = null;
+		$calls = array();
+
 		add_action(
 			'wp_plugin_check_before_runtime_setup',
-			function ( $ctx ) use ( &$fired, &$context ) {
-				$fired   = true;
-				$context = $ctx;
+			static function ( $environment_setup ) use ( &$calls ) {
+				$calls[] = array( 'before', $environment_setup );
 			}
 		);
 
-		$runtime_setup = new Runtime_Environment_Setup();
-		$runtime_setup->set_up();
-
-		$this->assertTrue( $fired );
-		$this->assertIsArray( $context );
-		$this->assertArrayHasKey( 'early_exit', $context );
-		$this->assertFalse( $context['early_exit'] );
-	}
-
-	public function test_after_runtime_setup_action_fires() {
-		$this->set_up_mock_filesystem();
-
-		$fired   = false;
-		$context = null;
 		add_action(
 			'wp_plugin_check_after_runtime_setup',
-			function ( $ctx ) use ( &$fired, &$context ) {
-				$fired   = true;
-				$context = $ctx;
+			static function ( $environment_setup ) use ( &$calls ) {
+				$calls[] = array( 'after', $environment_setup );
 			}
 		);
 
 		$runtime_setup = new Runtime_Environment_Setup();
 		$runtime_setup->set_up();
 
-		$this->assertTrue( $fired );
-		$this->assertIsArray( $context );
-		$this->assertArrayHasKey( 'early_exit', $context );
+		$this->assertCount( 2, $calls );
+		$this->assertSame( 'before', $calls[0][0] );
+		$this->assertSame( 'after', $calls[1][0] );
+		$this->assertSame( $runtime_setup, $calls[0][1] );
+		$this->assertSame( $runtime_setup, $calls[1][1] );
 	}
 
-	public function test_before_runtime_cleanup_action_fires() {
-		$fired   = false;
-		$context = null;
+	public function test_clean_up_fires_cleanup_environment_hooks() {
+		$this->set_up_mock_filesystem();
+
+		$calls = array();
+
 		add_action(
 			'wp_plugin_check_before_runtime_cleanup',
-			function ( $ctx ) use ( &$fired, &$context ) {
-				$fired   = true;
-				$context = $ctx;
+			static function ( $environment_setup ) use ( &$calls ) {
+				$calls[] = array( 'before', $environment_setup );
 			}
 		);
 
-		$runtime_setup = new Runtime_Environment_Setup();
-		$runtime_setup->clean_up();
-
-		$this->assertTrue( $fired );
-		$this->assertIsArray( $context );
-		$this->assertArrayHasKey( 'early_exit', $context );
-		$this->assertFalse( $context['early_exit'] );
-	}
-
-	public function test_after_runtime_cleanup_action_fires() {
-		$fired   = false;
-		$context = null;
 		add_action(
 			'wp_plugin_check_after_runtime_cleanup',
-			function ( $ctx ) use ( &$fired, &$context ) {
-				$fired   = true;
-				$context = $ctx;
+			static function ( $environment_setup ) use ( &$calls ) {
+				$calls[] = array( 'after', $environment_setup );
 			}
 		);
 
 		$runtime_setup = new Runtime_Environment_Setup();
 		$runtime_setup->clean_up();
 
-		$this->assertTrue( $fired );
-		$this->assertIsArray( $context );
-		$this->assertArrayHasKey( 'early_exit', $context );
+		$this->assertCount( 2, $calls );
+		$this->assertSame( 'before', $calls[0][0] );
+		$this->assertSame( 'after', $calls[1][0] );
+		$this->assertSame( $runtime_setup, $calls[0][1] );
+		$this->assertSame( $runtime_setup, $calls[1][1] );
 	}
 
 	public function test_clean_up() {
