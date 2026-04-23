@@ -92,6 +92,64 @@ class Runtime_Environment_Setup_Tests extends WP_UnitTestCase {
 		$this->assertFalse( $runtime_setup->can_set_up() );
 	}
 
+	public function test_set_up_fires_setup_environment_hooks() {
+		$this->set_up_mock_filesystem();
+
+		$calls = array();
+
+		add_action(
+			'wp_plugin_check_before_setup_environment',
+			static function ( $environment_setup ) use ( &$calls ) {
+				$calls[] = array( 'before', $environment_setup );
+			}
+		);
+
+		add_action(
+			'wp_plugin_check_after_setup_environment',
+			static function ( $environment_setup ) use ( &$calls ) {
+				$calls[] = array( 'after', $environment_setup );
+			}
+		);
+
+		$runtime_setup = new Runtime_Environment_Setup();
+		$runtime_setup->set_up();
+
+		$this->assertCount( 2, $calls );
+		$this->assertSame( 'before', $calls[0][0] );
+		$this->assertSame( 'after', $calls[1][0] );
+		$this->assertSame( $runtime_setup, $calls[0][1] );
+		$this->assertSame( $runtime_setup, $calls[1][1] );
+	}
+
+	public function test_clean_up_fires_cleanup_environment_hooks() {
+		$this->set_up_mock_filesystem();
+
+		$calls = array();
+
+		add_action(
+			'wp_plugin_check_before_cleanup_environment',
+			static function ( $environment_setup ) use ( &$calls ) {
+				$calls[] = array( 'before', $environment_setup );
+			}
+		);
+
+		add_action(
+			'wp_plugin_check_after_cleanup_environment',
+			static function ( $environment_setup ) use ( &$calls ) {
+				$calls[] = array( 'after', $environment_setup );
+			}
+		);
+
+		$runtime_setup = new Runtime_Environment_Setup();
+		$runtime_setup->clean_up();
+
+		$this->assertCount( 2, $calls );
+		$this->assertSame( 'before', $calls[0][0] );
+		$this->assertSame( 'after', $calls[1][0] );
+		$this->assertSame( $runtime_setup, $calls[0][1] );
+		$this->assertSame( $runtime_setup, $calls[1][1] );
+	}
+
 	public function test_clean_up() {
 		global $wp_filesystem, $wpdb, $table_prefix;
 
