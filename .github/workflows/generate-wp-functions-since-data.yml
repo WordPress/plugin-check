@@ -1,0 +1,46 @@
+name: Generate WP Functions Since Data
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 5 * * 1'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout plugin-check
+        uses: actions/checkout@v6
+
+      - name: Checkout WordPress core
+        uses: actions/checkout@v6
+        with:
+          repository: WordPress/WordPress
+          path: wordpress-core
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Generate dataset
+        run: |
+          php tools/generate-wp-function-since-data.php \
+            --wordpress-dir=wordpress-core \
+            --output=includes/Vars/wp-functions-since.json
+
+      - name: Create pull request with updated dataset
+        uses: peter-evans/create-pull-request@v8
+        with:
+          branch: codex/update-wp-functions-since-data
+          commit-message: 'Update WordPress function since dataset'
+          title: 'Update WordPress function since dataset'
+          body: |
+            Automated update for `includes/Vars/wp-functions-since.json`.
+          add-paths: |
+            includes/Vars/wp-functions-since.json

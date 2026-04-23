@@ -74,6 +74,7 @@
     "lint": "phpcs --standard=phpcs.xml.dist",
     "phpmd": "phpmd . text phpmd.xml",
     "phpstan": "phpstan analyse --memory-limit=2048M",
+    "generate-wp-functions-since-data": "php tools/generate-wp-function-since-data.php --wordpress-dir=../../../ --output=includes/Vars/wp-functions-since.json",
     "prepare-behat-tests": "install-package-tests",
     "test": "phpunit"
   },
@@ -84,6 +85,7 @@
     "lint": "Detect coding standards issues",
     "phpmd": "Run PHP mess detector",
     "phpstan": "Run static analysis",
+    "generate-wp-functions-since-data": "Generate the WordPress function @since dataset used by wp_functions_compatibility check",
     "prepare-behat-tests": "Prepare functional tests",
     "test": "Run unit tests"
   }

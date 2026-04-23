@@ -528,7 +528,7 @@
 				}
 				mergeAggregatedResults( results );
 				renderResults( results );
-			} catch ( e ) {
+			} catch {
 				// Ignore for now.
 			}
 		}
@@ -762,4 +762,4 @@
 		const template = templates[ templateSlug ];
 		return template( data );
 	}
-} )( PLUGIN_CHECK ); /* global PLUGIN_CHECK */
+} )( PLUGIN_CHECK );

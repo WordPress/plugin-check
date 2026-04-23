@@ -55,14 +55,23 @@ npm install
 
 With the above commands, you can use the plugin in any development environment as you like. The recommended way is to use the built-in development environment, which is based on the [`@wordpress/env` package](https://www.npmjs.com/package/@wordpress/env), as that will allow you to use the preconfigured commands to e.g. run unit tests, linting etc. You will need to have Docker installed to use this environment.
 
-You can start the built-in environment as follows:
+Start the **development** site:
+
 ```
 npm run wp-env start
 ```
 
-If you want to stop the environment again, you can use:
+Start the **tests** stack:
+
+```
+npm run wp-env:start:tests
+```
+
+Stop each stack when finished:
+
 ```
 npm run wp-env stop
+npm run wp-env:stop:tests
 ```
 
 For further information on contributing, please see the [contributing guide](/CONTRIBUTING.md).

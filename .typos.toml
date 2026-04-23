@@ -6,6 +6,7 @@ extend-ignore-re = [
     "setted_site_transient",
     "setted_transient",
     "stati",
+    "url_is_accessable_via_ssl",
     "wheres",
 ]
 

@@ -101,6 +101,7 @@ class Default_Check_Repository extends Empty_Check_Repository {
 				'minified_files'             => new Checks\Plugin_Repo\Minified_Files_Check(),
 				'direct_file_access'         => new Checks\Plugin_Repo\Direct_File_Access_Check(),
 				'external_admin_menu_links'  => new Checks\Plugin_Repo\External_Admin_Menu_Links_Check(),
+				'wp_functions_compatibility' => new Checks\Plugin_Repo\WP_Functions_Compatibility_Check(),
 			)
 		);
 

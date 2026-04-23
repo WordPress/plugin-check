@@ -654,7 +654,7 @@ trait AI_Check_Names {
 			$text .= ' (' . implode( ', ', $decoded['disallowed_type'] ) . ')';
 		}
 		if ( ! empty( $text ) ) {
-			$parts[] = '<strong>' . __( '🚫 Disallowed:', 'plugin-check' ) . '</strong> ' . $text;
+			$parts[] = '<strong>🚫 ' . esc_html__( 'Disallowed:', 'plugin-check' ) . '</strong> ' . $text;
 		}
 	}
 
@@ -669,7 +669,7 @@ trait AI_Check_Names {
 	 */
 	protected function add_naming_section( &$parts, $decoded ) {
 		if ( ! empty( $decoded['possible_naming_issues'] ) && ! empty( $decoded['naming_explanation'] ) ) {
-			$parts[] = '<strong>' . __( '📝 Naming:', 'plugin-check' ) . '</strong> ' . $decoded['naming_explanation'];
+			$parts[] = '<strong>📝 ' . esc_html__( 'Naming:', 'plugin-check' ) . '</strong> ' . $decoded['naming_explanation'];
 		}
 	}
 
@@ -684,7 +684,7 @@ trait AI_Check_Names {
 	 */
 	protected function add_owner_section( &$parts, $decoded ) {
 		if ( ! empty( $decoded['possible_owner_issues'] ) && ! empty( $decoded['owner_explanation'] ) ) {
-			$parts[] = '<strong>' . __( '©️ Owner/Trademark:', 'plugin-check' ) . '</strong> ' . $decoded['owner_explanation'];
+			$parts[] = '<strong>©️ ' . esc_html__( 'Owner/Trademark:', 'plugin-check' ) . '</strong> ' . $decoded['owner_explanation'];
 		}
 	}
 
@@ -699,7 +699,7 @@ trait AI_Check_Names {
 	 */
 	protected function add_description_section( &$parts, $decoded ) {
 		if ( ! empty( $decoded['possible_description_issues'] ) && ! empty( $decoded['description_explanation'] ) ) {
-			$parts[] = '<strong>' . __( '📄 Description:', 'plugin-check' ) . '</strong> ' . $decoded['description_explanation'];
+			$parts[] = '<strong>📄 ' . esc_html__( 'Description:', 'plugin-check' ) . '</strong> ' . $decoded['description_explanation'];
 		}
 	}
 
@@ -715,7 +715,7 @@ trait AI_Check_Names {
 	protected function add_trademarks_section( &$parts, $decoded ) {
 		if ( ! empty( $decoded['trademarks_or_project_names_array'] ) && is_array( $decoded['trademarks_or_project_names_array'] ) ) {
 			$trademarks = implode( ', ', array_map( 'esc_html', $decoded['trademarks_or_project_names_array'] ) );
-			$parts[]    = '<strong>' . __( '™️ Trademarks Detected:', 'plugin-check' ) . '</strong> ' . $trademarks;
+			$parts[]    = '<strong>™️ ' . esc_html__( 'Trademarks Detected:', 'plugin-check' ) . '</strong> ' . $trademarks;
 		}
 	}
 
@@ -745,7 +745,7 @@ trait AI_Check_Names {
 		}
 
 		if ( ! empty( $suggestions ) ) {
-			$parts[] = '<br><strong>' . __( '💡 Suggestions:', 'plugin-check' ) . '</strong><br>' . implode( '<br>', $suggestions );
+			$parts[] = '<br><strong>💡 ' . esc_html__( 'Suggestions:', 'plugin-check' ) . '</strong><br>' . implode( '<br>', $suggestions );
 		}
 	}
 
@@ -761,7 +761,7 @@ trait AI_Check_Names {
 	protected function add_language_section( &$parts, $decoded ) {
 		if ( isset( $decoded['description_language_is_in_english'] ) && false === $decoded['description_language_is_in_english'] ) {
 			if ( ! empty( $decoded['description_what_is_not_in_english'] ) ) {
-				$parts[] = '<strong>' . __( '🌐 Language:', 'plugin-check' ) . '</strong> ' . $decoded['description_what_is_not_in_english'];
+				$parts[] = '<strong>🌐 ' . esc_html__( 'Language:', 'plugin-check' ) . '</strong> ' . $decoded['description_what_is_not_in_english'];
 			}
 		}
 	}
