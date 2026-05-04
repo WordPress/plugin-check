@@ -35,3 +35,4 @@
 | enqueued_styles_scope | performance | Checks whether any stylesheets are loaded on all pages, which is usually not desirable and can lead to performance issues. | [Learn more](https://developer.wordpress.org/plugins/) |
 | enqueued_scripts_scope | performance | Checks whether any scripts are loaded on all pages, which is usually not desirable and can lead to performance issues. | [Learn more](https://developer.wordpress.org/plugins/) |
 | non_blocking_scripts | performance | Checks whether scripts and styles are enqueued using a recommended loading strategy. | [Learn more](https://developer.wordpress.org/plugins/) |
+| privacy_policy | plugin_repo | Checks that plugins handling personal data call wp_add_privacy_policy_content() to suggest privacy policy text to site administrators. | [Learn more](https://developer.wordpress.org/plugins/privacy/suggesting-text-for-the-site-privacy-policy/) |
