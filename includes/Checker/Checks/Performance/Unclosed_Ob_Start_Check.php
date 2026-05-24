@@ -121,9 +121,9 @@ class Unclosed_Ob_Start_Check extends Abstract_File_Check {
 					);
 					$awaiting_function_brace = false;
 				}
-				$brace_depth++;
+				++$brace_depth;
 			} elseif ( '}' === $token ) {
-				$brace_depth--;
+				--$brace_depth;
 				$current_scope = end( $scope_stack );
 				if ( 'function' === $current_scope['type'] && $current_scope['start_depth'] === $brace_depth ) {
 					$this->process_scope( $result, $file, $current_scope );

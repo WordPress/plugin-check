@@ -27,7 +27,7 @@ $closure = function() {
 	ob_get_clean();
 };
 
-// 5. ob_start() inside a function, closed only conditionally (if) → flagged as warning (line 33).
+// 5. ob_start() inside a function, closed only conditionally (if) → flagged as warning (line 32).
 function conditional_close() {
 	ob_start();
 	if ( true ) {

@@ -24,15 +24,18 @@ class Unclosed_Ob_Start_Check_Tests extends WP_UnitTestCase {
 		$this->assertCount( 3, $warnings['load.php'] );
 
 		// 14: ob_start() at the top of the file with no closing call.
-		$this->assertEquals( 'unclosed_ob_start', $warnings['load.php'][0][0][0]['code'] );
-		$this->assertEquals( 14, $warnings['load.php'][0][0][0]['line'] );
-		
+		$this->assertArrayHasKey( 14, $warnings['load.php'] );
+		$this->assertEquals( 'unclosed_ob_start', $warnings['load.php'][14][0][0]['code'] );
+		$this->assertEquals( 14, $warnings['load.php'][14][0][0]['line'] );
+
 		// 18: Multiple ob_start() in the same scope, only one closed.
-		$this->assertEquals( 'unclosed_ob_start', $warnings['load.php'][1][0][0]['code'] );
-		$this->assertEquals( 18, $warnings['load.php'][1][0][0]['line'] );
-		
-		// 33: ob_start() inside a function, closed only conditionally (if).
-		$this->assertEquals( 'unclosed_ob_start', $warnings['load.php'][2][0][0]['code'] );
-		$this->assertEquals( 33, $warnings['load.php'][2][0][0]['line'] );
+		$this->assertArrayHasKey( 18, $warnings['load.php'] );
+		$this->assertEquals( 'unclosed_ob_start', $warnings['load.php'][18][0][0]['code'] );
+		$this->assertEquals( 18, $warnings['load.php'][18][0][0]['line'] );
+
+		// 32: ob_start() inside a function, closed only conditionally (if).
+		$this->assertArrayHasKey( 32, $warnings['load.php'] );
+		$this->assertEquals( 'unclosed_ob_start', $warnings['load.php'][32][0][0]['code'] );
+		$this->assertEquals( 32, $warnings['load.php'][32][0][0]['line'] );
 	}
 }
