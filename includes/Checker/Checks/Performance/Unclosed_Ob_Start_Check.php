@@ -83,31 +83,7 @@ class Unclosed_Ob_Start_Check extends Abstract_File_Check {
 
 		foreach ( $tokens as $index => $token ) {
 			if ( is_array( $token ) ) {
-				$token_type = $token[0];
-
-				if ( T_FUNCTION === $token_type ) {
-					$awaiting_function_brace = true;
-				} elseif ( T_STRING === $token_type ) {
-					$next_index = $this->get_next_significant_token_index( $tokens, $index );
-					if ( null !== $next_index && '(' === $tokens[ $next_index ] ) {
-						if ( $this->is_global_function_call( $tokens, $index ) ) {
-							$name = strtolower( $token[1] );
-							$line = (int) $token[2];
-
-							if ( 'ob_start' === $name ) {
-								$scope_stack[ count( $scope_stack ) - 1 ]['ob_starts'][] = array(
-									'line'  => $line,
-									'depth' => $brace_depth,
-								);
-							} elseif ( in_array( $name, array( 'ob_get_clean', 'ob_end_clean', 'ob_get_flush', 'ob_end_flush' ), true ) ) {
-								$scope_stack[ count( $scope_stack ) - 1 ]['ob_closes'][] = array(
-									'line'  => $line,
-									'depth' => $brace_depth,
-								);
-							}
-						}
-					}
-				}
+				$this->process_array_token( $token, $index, $tokens, $brace_depth, $scope_stack, $awaiting_function_brace );
 				continue;
 			}
 
@@ -136,6 +112,55 @@ class Unclosed_Ob_Start_Check extends Abstract_File_Check {
 		while ( count( $scope_stack ) > 0 ) {
 			$current_scope = array_pop( $scope_stack );
 			$this->process_scope( $result, $file, $current_scope );
+		}
+	}
+
+	/**
+	 * Processes an array token to update function detection state and track ob_start/close calls.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @param array $token                   The array token.
+	 * @param int   $index                   Token index.
+	 * @param array $tokens                  All tokens.
+	 * @param int   $brace_depth             Current brace depth.
+	 * @param array $scope_stack             The scope stack.
+	 * @param bool  $awaiting_function_brace Whether awaiting a function's opening brace.
+	 */
+	private function process_array_token( array $token, int $index, array &$tokens, int $brace_depth, array &$scope_stack, bool &$awaiting_function_brace ) {
+		$token_type = $token[0];
+
+		if ( T_FUNCTION === $token_type ) {
+			$awaiting_function_brace = true;
+			return;
+		}
+
+		if ( T_STRING !== $token_type ) {
+			return;
+		}
+
+		$next_index = $this->get_next_significant_token_index( $tokens, $index );
+		if ( null === $next_index || '(' !== $tokens[ $next_index ] ) {
+			return;
+		}
+
+		if ( ! $this->is_global_function_call( $tokens, $index ) ) {
+			return;
+		}
+
+		$name = strtolower( $token[1] );
+		$line = (int) $token[2];
+
+		if ( 'ob_start' === $name ) {
+			$scope_stack[ count( $scope_stack ) - 1 ]['ob_starts'][] = array(
+				'line'  => $line,
+				'depth' => $brace_depth,
+			);
+		} elseif ( in_array( $name, array( 'ob_get_clean', 'ob_end_clean', 'ob_get_flush', 'ob_end_flush' ), true ) ) {
+			$scope_stack[ count( $scope_stack ) - 1 ]['ob_closes'][] = array(
+				'line'  => $line,
+				'depth' => $brace_depth,
+			);
 		}
 	}
 
