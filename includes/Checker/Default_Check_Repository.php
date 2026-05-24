@@ -103,6 +103,7 @@ class Default_Check_Repository extends Empty_Check_Repository {
 				'direct_file_access'         => new Checks\Plugin_Repo\Direct_File_Access_Check(),
 				'external_admin_menu_links'  => new Checks\Plugin_Repo\External_Admin_Menu_Links_Check(),
 				'wp_functions_compatibility' => new Checks\Plugin_Repo\WP_Functions_Compatibility_Check(),
+				'unclosed_ob_start'          => new Checks\Performance\Unclosed_Ob_Start_Check(),
 			)
 		);
 
