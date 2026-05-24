@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Disallow Logical And Or"
+    >
+    <standard>
+    <![CDATA[
+    Using the logical "and" and "or" operators is not allowed.
+
+    The logical "and" and "or" operators have a significantly lower operator precedence than their boolean "&&" and "||" counter-parts, which often leads to unexpected bugs.
+    The boolean "&&" and "||" operators are nearly always the better choice.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Using boolean operators.">
+        <![CDATA[
+if (isset($var) <em>&&</em> $var > 10) {}
+
+if (empty($var) <em>||</em> $var < 0) {}
+        ]]>
+        </code>
+        <code title="Invalid: Using logical operators.">
+        <![CDATA[
+if (isset($var) <em>and</em> $var > 10) {}
+
+if (empty($var) <em>or</em> $var < 0) {}
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

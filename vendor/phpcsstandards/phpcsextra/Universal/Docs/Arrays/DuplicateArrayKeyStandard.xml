@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Duplicate Array Key"
+    >
+    <standard>
+    <![CDATA[
+    When a second array item with the same key is declared, it will overwrite the first.
+    This sniff detects when this is happening in array declarations.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Arrays with unique keys.">
+        <![CDATA[
+$args = array(
+    <em>'foo'</em> => 22,
+    <em>'bar'</em> => 25,
+    <em>'baz'</em> => 28,
+);
+
+$args = array(
+    22,
+    25,
+    2 => 28,
+);
+        ]]>
+        </code>
+        <code title="Invalid: Array with duplicate keys.">
+        <![CDATA[
+$args = array(
+    <em>'foo'</em> => 22,
+    <em>'bar'</em> => 25,
+    <em>'bar'</em> => 28,
+);
+
+$args = array(
+    22,
+    25,
+    1 => 28,
+);
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

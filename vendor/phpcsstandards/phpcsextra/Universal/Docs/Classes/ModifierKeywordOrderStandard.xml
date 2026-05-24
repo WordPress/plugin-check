@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Class Modifier Keyword Order"
+    >
+    <standard>
+    <![CDATA[
+    Requires that class modifier keywords consistently use the same keyword order.
+
+    By default the expected order is "abstract/final readonly", but this can be changed via the sniff configuration.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Modifier keywords ordered correctly.">
+        <![CDATA[
+<em>final readonly</em> class Foo {}
+<em>abstract readonly</em> class Bar {}
+        ]]>
+        </code>
+        <code title="Invalid: Modifier keywords in reverse order.">
+        <![CDATA[
+<em>readonly final</em> class Foo {}
+<em>readonly abstract</em> class Bar {}
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

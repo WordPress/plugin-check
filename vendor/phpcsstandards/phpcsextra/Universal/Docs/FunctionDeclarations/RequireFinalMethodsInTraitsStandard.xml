@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Require Final Methods in Traits"
+    >
+    <standard>
+    <![CDATA[
+    Requires the use of the `final` keyword for non-abstract, non-private methods in traits.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Final methods in a trait.">
+        <![CDATA[
+trait Foo {
+    <em>final</em> public function bar() {}
+    <em>final</em> public static function baz() {}
+
+    // Also valid (out of scope):
+    protected abstract function overload() {}
+    private function okay() {}
+}
+        ]]>
+        </code>
+        <code title="Invalid: Non-final methods in a trait.">
+        <![CDATA[
+trait Foo {
+    <em>public function</em> bar() {}
+    <em>protected static function</em> baz() {}
+}
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

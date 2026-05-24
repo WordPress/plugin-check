@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Foreach Unique Assignment"
+    >
+    <standard>
+    <![CDATA[
+    When a foreach control structure uses the same variable for both the $key as well as the $value assignment, the key will be disregarded and be inaccessible and the variable will contain the value.
+    Mix in reference assignments and the behaviour becomes even more unpredictable.
+
+    This is a coding error. Either use unique variables for the key and the value or don't assign the key.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Using unique variables.">
+        <![CDATA[
+foreach ($array as $k => $v ) {}
+        ]]>
+        </code>
+        <code title="Invalid: Using the same variable for both the key as well as the value.">
+        <![CDATA[
+foreach ($array as $k => $k ) {}
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Attribute Bracket Spacing"
+    >
+    <standard>
+    <![CDATA[
+    Enforce a fixed number of spaces on the inside of attribute block brackets. By default, 0 (no) spaces are allowed.
+
+    Optionally allows for new lines.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: No whitespace on the inside of attribute block brackets.">
+        <![CDATA[
+<em>#[</em>MyAttribute()<em>]<em>
+class Foo {}
+        ]]>
+        </code>
+        <code title="Invalid: Whitespace on the inside of attribute block brackets.">
+        <![CDATA[
+<em>#[ </em>MyAttribute()<em>  ]<em>
+class Foo {}
+        ]]>
+        </code>
+    </code_comparison>
+
+    <standard>
+    <![CDATA[
+    When the option to allow a new line is turned on, the sniff will verify that there are no blank lines at the start/end of the attribute block.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: No blank lines at the start/end of an attribute block.">
+        <![CDATA[
+#[<em>
+    </em>MyAttribute()<em>
+<em>]
+class Foo {}
+        ]]>
+        </code>
+        <code title="Invalid: Blank lines at the start/end of an attribute block.">
+        <![CDATA[
+#[<em>
+
+
+    </em>MyAttribute()<em>
+
+<em>]
+class Foo {}
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

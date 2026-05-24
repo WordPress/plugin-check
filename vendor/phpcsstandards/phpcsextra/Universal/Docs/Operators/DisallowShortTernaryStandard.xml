@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Disallow Short Ternary"
+    >
+    <standard>
+    <![CDATA[
+    Using short ternaries is not allowed.
+
+    While short ternaries are useful when used correctly, the principle of them is often misunderstood and they are more often than not used incorrectly, leading to hard to debug issues and/or PHP warnings/notices.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Full ternary.">
+        <![CDATA[
+echo !empty($a) <em>?</em> $a <em>:</em> 'default';
+        ]]>
+        </code>
+        <code title="Invalid: Short ternary.">
+        <![CDATA[
+echo !empty($a) <em>?:</em> 'default';
+echo $a <em>? :</em> 'default';
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

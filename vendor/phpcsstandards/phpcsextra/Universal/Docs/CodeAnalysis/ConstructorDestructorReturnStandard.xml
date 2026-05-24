@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Constructor Destructor Return"
+    >
+    <standard>
+    <![CDATA[
+    A class constructor/destructor can not have a return type declarations. This would result in a fatal error.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: No return type declaration.">
+        <![CDATA[
+class Foo {
+    public function __construct() {}
+}
+        ]]>
+        </code>
+        <code title="Invalid: Return type declaration.">
+        <![CDATA[
+class Foo {
+    public function __construct()<em>: int</em> {}
+}
+        ]]>
+        </code>
+    </code_comparison>
+
+    <standard>
+    <![CDATA[
+    A class constructor/destructor should not return anything.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Class constructor/destructor doesn't return anything.">
+        <![CDATA[
+class Foo {
+    public function __construct() {
+        // Do something.
+    }
+
+    public function __destruct() {
+        // Do something.
+        return;
+    }
+}
+        ]]>
+        </code>
+        <code title="Invalid: Class constructor/destructor returns a value.">
+        <![CDATA[
+class Foo {
+    public function __construct() {
+        // Do something.
+        return <em>$this</em>;
+    }
+
+    public function __destruct() {
+        // Do something.
+        return <em>false</em>;
+    }
+}
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

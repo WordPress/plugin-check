@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="One Statement In Short Echo Tag"
+    >
+    <standard>
+    <![CDATA[
+    Best practice: Short open echo tags should only ever contain *one* statement.
+    Use normal "<?php" tags for multi-statement PHP.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Using short open echo tag with one statement.">
+        <![CDATA[
+div><?= $text ?></div>
+        ]]>
+        </code>
+        <code title="Invalid: Using short open echo tag with multiple statements.">
+        <![CDATA[
+<div><em><?=</em> $text; <em>echo $moreText;</em> ?></div>
+        ]]>
+        </code>
+    </code_comparison>
+    <code_comparison>
+        <code title="Valid: Using normal PHP tag with multiple statements.">
+        <![CDATA[
+<div><em><?php</em>
+echo $text;
+echo $moreText;
+?></div>
+        ]]>
+        </code>
+        <code title="Invalid: Using short open echo tag with multiple statements.">
+        <![CDATA[
+<div><em><?=</em> $text;
+<em>echo $moreText;</em>
+?></div>
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

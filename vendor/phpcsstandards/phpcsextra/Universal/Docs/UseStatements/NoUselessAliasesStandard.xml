@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="No Useless Aliases"
+    >
+    <standard>
+    <![CDATA[
+    Detects useless aliases for import use statements.
+
+    Aliasing something to the same name as the original construct is considered useless.
+    Note: as OO and function names in PHP are case-insensitive, aliasing to the same name, using a different case is also considered useless.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Import use statement with an alias to a different name.">
+        <![CDATA[
+use Vendor\Package\ClassName as AnotherName;
+use function functionName as my_function;
+use const SOME_CONSTANT as MY_CONSTANT;
+        ]]>
+        </code>
+        <code title="Invalid: Import use statement with an alias to the same name.">
+        <![CDATA[
+use Vendor\Package\ClassName as ClassName;
+use function functionName as FunctionName;
+use const SOME_CONSTANT as SOME_CONSTANT;
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Require Attribute Parentheses"
+    >
+    <standard>
+    <![CDATA[
+    Require the use of parentheses when instantiating an attribute.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Attribute instantiation with parentheses.">
+        <![CDATA[
+#[MyAttribute<em>()</em>]
+class Foo {}
+        ]]>
+        </code>
+        <code title="Invalid: Attribute instantiation without parentheses.">
+        <![CDATA[
+#[MyAttribute<em></em>]
+class Foo {}
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

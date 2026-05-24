@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="No Reserved Keyword Parameter Names"
+    >
+    <standard>
+    <![CDATA[
+    It is recommended not to use reserved keywords as parameter names as this can become confusing when people use them in function calls using named parameters.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Parameter names do not use reserved keywords.">
+        <![CDATA[
+function foo( $input, $description ) {}
+        ]]>
+        </code>
+        <code title="Invalid: Parameter names use reserved keywords.">
+        <![CDATA[
+function foo( $string, $echo = true ) {}
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

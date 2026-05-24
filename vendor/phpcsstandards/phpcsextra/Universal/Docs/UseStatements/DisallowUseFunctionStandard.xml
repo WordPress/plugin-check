@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Disallow Use Function"
+    >
+    <standard>
+    <![CDATA[
+    Disallow the use of `use function` import statements, with or without alias.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Other type of use import statements.">
+        <![CDATA[
+use Vendor\Sub\ClassName;
+use const Vendor\Sub\CONST;
+        ]]>
+        </code>
+        <code title="Invalid: `use function` import statements.">
+        <![CDATA[
+use function Vendor\Sub\functionName;
+use function Vendor\Sub\functionName as other;
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

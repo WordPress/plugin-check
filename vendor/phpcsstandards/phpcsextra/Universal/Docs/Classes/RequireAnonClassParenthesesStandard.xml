@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Require Anonymous Class Parentheses"
+    >
+    <standard>
+    <![CDATA[
+    Require the use of parentheses when declaring an anonymous class.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Anonymous class with parentheses.">
+        <![CDATA[
+$anon = new class<em>()</em> {};
+        ]]>
+        </code>
+        <code title="Invalid: Anonymous class without parentheses.">
+        <![CDATA[
+$anon = new class<em></em> {};
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

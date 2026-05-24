@@ -1,0 +1,72 @@
+{
+	"name": "automattic/vipwpcs",
+	"type": "phpcodesniffer-standard",
+	"description": "PHP_CodeSniffer rules (sniffs) to enforce WordPress VIP minimum coding conventions",
+	"keywords": [
+		"phpcs",
+		"static analysis",
+		"standards",
+		"WordPress"
+	],
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Contributors",
+			"homepage": "https://github.com/Automattic/VIP-Coding-Standards/graphs/contributors"
+		}
+	],
+	"require": {
+		"php": ">=5.4",
+		"phpcsstandards/phpcsextra": "^1.2.1",
+		"phpcsstandards/phpcsutils": "^1.0.11",
+		"sirbrillig/phpcs-variable-analysis": "^2.11.18",
+		"squizlabs/php_codesniffer": "^3.9.2",
+		"wp-coding-standards/wpcs": "^3.1.0"
+	},
+	"require-dev": {
+		"php-parallel-lint/php-parallel-lint": "^1.3.2",
+		"php-parallel-lint/php-console-highlighter": "^1.0.0",
+		"phpcompatibility/php-compatibility": "^9",
+		"phpcsstandards/phpcsdevtools": "^1.0",
+		"phpunit/phpunit": "^4 || ^5 || ^6 || ^7 || ^8 || ^9"
+	},
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
+	},
+	"scripts": {
+		"test-ruleset": "bin/ruleset-tests",
+		"lint": [
+			"bin/php-lint",
+			"bin/xml-lint"
+		],
+		"cs": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcs",
+		"test": "bin/unit-tests",
+		"test-coverage": "bin/unit-tests-coverage",
+		"feature-completeness": [
+			"@php ./vendor/phpcsstandards/phpcsdevtools/bin/phpcs-check-feature-completeness -q ./WordPressVIPMinimum"
+		],
+		"check": [
+			"@lint",
+			"@test-ruleset",
+			"@test",
+			"@cs",
+			"@feature-completeness"
+		]
+	},
+	"scripts-descriptions": {
+		"lint": "VIPCS: Lint PHP and XML files in against parse errors.",
+		"cs": "VIPCS: Check the code style and code quality of the codebase via PHPCS.",
+		"test": "VIPCS: Run the unit tests for the VIPCS sniffs.",
+		"test-coverage": "VIPCS: Run the unit tests for the VIPCS sniffs with coverage enabled.",
+		"test-ruleset": "VIPCS: Run the ruleset tests for the VIPCS sniffs.",
+		"feature-completeness": "VIPCS: Check if all the VIPCS sniffs have tests.",
+		"check": "VIPCS: Run all checks (lint, CS, feature completeness) and tests."
+	},
+	"support": {
+		"issues": "https://github.com/Automattic/VIP-Coding-Standards/issues",
+		"wiki": "https://github.com/Automattic/VIP-Coding-Standards/wiki",
+		"source": "https://github.com/Automattic/VIP-Coding-Standards"
+	}
+}

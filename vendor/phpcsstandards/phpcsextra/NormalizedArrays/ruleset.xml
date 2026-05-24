@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="NormalizedArrays" namespace="PHPCSExtra\NormalizedArrays" xsi:noNamespaceSchemaLocation="https://schema.phpcodesniffer.com/phpcs.xsd">
+
+    <description>A ruleset for PHP_CodeSniffer to check arrays for normalized format.</description>
+</ruleset>

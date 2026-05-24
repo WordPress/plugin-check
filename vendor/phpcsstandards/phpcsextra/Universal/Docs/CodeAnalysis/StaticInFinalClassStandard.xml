@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Static in Final Class"
+    >
+    <standard>
+    <![CDATA[
+    When a class is declared as final, using the `static` keyword for late static binding is unnecessary and redundant.
+    This rule also covers using `static` in a comparison with `instanceof`, using `static` for class instantiations or as a return type.
+
+    `self` should be used instead.
+
+    This applies to final classes, anonymous classes (final by nature) and enums (final by design).
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Using 'self' in a final OO construct.">
+        <![CDATA[
+final class Foo
+{
+    public function myMethod($param) : <em>self</em>
+    {
+        $var = <em>self</em>::functionCall();
+        $var = $obj instanceof <em>self</em>;
+        $var = new <em>self</em>;
+    }
+}
+        ]]>
+        </code>
+        <code title="Invalid: Using 'static' in a final OO construct.">
+        <![CDATA[
+$anon = new class {
+    public function myMethod(
+    ): int|<em>static</em>|false {
+        $var = <em>static</em>::$prop;
+        $var = $obj instanceof <em>static</em>;
+        $var = new <em>static</em>();
+    }
+};
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

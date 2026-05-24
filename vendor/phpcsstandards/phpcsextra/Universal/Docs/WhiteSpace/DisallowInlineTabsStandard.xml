@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Disallow Inline Tabs"
+    >
+    <standard>
+    <![CDATA[
+    Spaces must be used for mid-line alignment.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Spaces used for alignment.">
+        <![CDATA[
+$title<em>[space]</em>= 'text';
+$text<em>[space][space]</em>= 'more text';
+        ]]>
+        </code>
+        <code title="Invalid: Tabs used for alignment.">
+        <![CDATA[
+$title<em>[tab]</em>= 'text';
+$text<em>[tab]</em>= 'more text';
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

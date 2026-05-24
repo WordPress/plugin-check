@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="No Leading Backslash"
+    >
+    <standard>
+    <![CDATA[
+    Import `use` statements must never begin with a leading backslash as they should always be fully qualified.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Import use statement without leading backslash.">
+        <![CDATA[
+<em>use Package</em>\ClassName;
+        ]]>
+        </code>
+        <code title="Invalid: Import use statement with leading backslash.">
+        <![CDATA[
+use <em>\</em>Package\ClassName;
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Constant Modifier Keyword Order"
+    >
+    <standard>
+    <![CDATA[
+    Requires that constant modifier keywords consistently use the same keyword order.
+
+    By default the expected order is "final visibility", but this can be changed via the sniff configuration.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Modifier keywords ordered correctly.">
+        <![CDATA[
+class CorrectOrder {
+    <em>final public</em> const FOO = 'foo';
+}
+        ]]>
+        </code>
+        <code title="Invalid: Modifier keywords in reverse order.">
+        <![CDATA[
+class IncorrectOrder {
+    #[SomeAttribute]
+    <em>protected final</em> const BAR = 'foo';
+}
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

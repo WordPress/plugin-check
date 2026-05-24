@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Type Separator Spacing"
+    >
+    <standard>
+    <![CDATA[
+    Enforce spacing rules around the union, intersection and DNF type operators.
+    - No space on either side of a union or intersection type operator.
+    - No space on the inside of DNF type parenthesis or before/after if the previous/next "thing" is part of the type.
+    - One space before a DNF open parenthesis when it is at the start of a type.
+    - One space after a DNF close parenthesis when it is at the end of a type.
+
+    This applies to all locations where type declarations can be used, i.e. property types, constant types, parameter types and return types.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Correct spacing around the separators.">
+        <![CDATA[
+function foo(
+    int<em>|</em>string $paramA,
+    TypeA<em>&</em>TypeB $paramB,
+    <em>(</em>TypeA&TypeB<em>)</em>|null $paramC
+): int<em>|</em>false {}
+        ]]>
+        </code>
+        <code title="Invalid: Incorrect spacing around the separators.">
+        <![CDATA[
+function foo(
+    int<em> | </em>string $paramA,
+    TypeA<em> & </em>TypeB $paramB,
+    <em>( </em>TypeA&TypeB<em> ) </em>|null $paramC
+): int<em>
+   |
+   </em>false {}
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

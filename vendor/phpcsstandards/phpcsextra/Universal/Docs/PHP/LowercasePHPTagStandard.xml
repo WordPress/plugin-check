@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Lowercase PHP Tag"
+    >
+    <standard>
+    <![CDATA[
+    Enforces that the PHP open tag is lowercase.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Lowercase open tag.">
+        <![CDATA[
+<?php
+echo 'hello!';
+        ]]>
+        </code>
+        <code title="Invalid: Uppercase open tag.">
+        <![CDATA[
+<?PHP
+echo 'hello!';
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

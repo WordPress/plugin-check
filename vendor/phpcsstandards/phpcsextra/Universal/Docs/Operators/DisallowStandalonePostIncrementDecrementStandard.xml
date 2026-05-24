@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Disallow Standalone Post-Increment/Decrement"
+    >
+    <standard>
+    <![CDATA[
+    In a stand-alone in/decrement statement, pre-in/decrement should always be favoured over post-in/decrement.
+
+    This reduces the chance of bugs when code gets moved around.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Pre-in/decrement in a stand-alone statement.">
+        <![CDATA[
+<em>++</em>$i;
+<em>--</em>$j;
+        ]]>
+        </code>
+        <code title="Invalid: Post-in/decrement in a stand-alone statement.">
+        <![CDATA[
+$i<em>++</em>;
+$j<em>--</em>;
+        ]]>
+        </code>
+    </code_comparison>
+    <standard>
+    <![CDATA[
+    Using multiple increment/decrement operators in a stand-alone statement is strongly discouraged.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Single in/decrement operator in a stand-alone statement.">
+        <![CDATA[
+<em>++</em>$i;
+        ]]>
+        </code>
+        <code title="Invalid: Multiple in/decrement operators in a stand-alone statement.">
+        <![CDATA[
+<em>--</em>$i<em>++</em><em>++</em>;
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

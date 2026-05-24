@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Array Brace Spacing"
+    >
+    <standard>
+    <![CDATA[
+    There should be no space between the "array" keyword and the array open brace.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: No space between the keyword and the open brace.">
+        <![CDATA[
+$args = array(1, 2);
+        ]]>
+        </code>
+        <code title="Invalid: Space between the keyword and the open brace.">
+        <![CDATA[
+$args = array<em>  </em>(1, 2);
+        ]]>
+        </code>
+    </code_comparison>
+    <standard>
+    <![CDATA[
+    There should be no space between the array open brace and the array close brace for an empty array.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: No space between the braces.">
+        <![CDATA[
+$args = array();
+
+$args = [];
+        ]]>
+        </code>
+        <code title="Invalid: Space between the braces.">
+        <![CDATA[
+$args = array(<em> </em>);
+
+$args = [<em>  </em>];
+        ]]>
+        </code>
+    </code_comparison>
+    <standard>
+    <![CDATA[
+    There should be no space after the array open brace and before the array close brace in a single-line array.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: No space on the inside of the braces.">
+        <![CDATA[
+$args = array(1, 2);
+
+$args = [1, 2];
+        ]]>
+        </code>
+        <code title="Invalid: Space on the inside of the braces.">
+        <![CDATA[
+$args = array(<em> </em>1, 2<em> </em>);
+
+$args = [<em>  </em>1, 2<em>  </em>];
+        ]]>
+        </code>
+    </code_comparison>
+    <standard>
+    <![CDATA[
+    There should be a new line after the array open brace and before the array close brace in a multi-line array.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: One new line after the open brace and before the close brace.">
+        <![CDATA[
+$args = array(<em>
+</em>    1,
+    2<em>
+</em>);
+
+$args = [<em>
+</em>    1,
+    2<em>
+</em>];
+        ]]>
+        </code>
+        <code title="Invalid: No new lines after the open brace and/or before the close brace.">
+        <![CDATA[
+$args = array(1,
+    2);
+
+$args = [1,
+    2];
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

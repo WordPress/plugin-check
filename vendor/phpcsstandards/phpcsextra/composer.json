@@ -1,0 +1,81 @@
+{
+    "name" : "phpcsstandards/phpcsextra",
+    "description" : "A collection of sniffs and standards for use with PHP_CodeSniffer.",
+    "type" : "phpcodesniffer-standard",
+    "keywords" : [ "phpcs", "phpcbf", "standards", "static analysis", "php_codesniffer", "phpcodesniffer-standard" ],
+    "license" : "LGPL-3.0-or-later",
+    "authors" : [
+        {
+            "name" : "Juliette Reinders Folmer",
+            "role" : "lead",
+            "homepage" : "https://github.com/jrfnl"
+        },
+        {
+            "name" : "Contributors",
+            "homepage" : "https://github.com/PHPCSStandards/PHPCSExtra/graphs/contributors"
+        }
+    ],
+    "support" : {
+        "issues" : "https://github.com/PHPCSStandards/PHPCSExtra/issues",
+        "source" : "https://github.com/PHPCSStandards/PHPCSExtra",
+        "security": "https://github.com/PHPCSStandards/PHPCSExtra/security/policy"
+    },
+    "require" : {
+        "php" : ">=5.4",
+        "squizlabs/php_codesniffer" : "^3.13.5 || ^4.0.1",
+        "phpcsstandards/phpcsutils" : "^1.2.0"
+    },
+    "require-dev" : {
+        "php-parallel-lint/php-parallel-lint": "^1.4.0",
+        "php-parallel-lint/php-console-highlighter": "^1.0",
+        "phpcsstandards/phpcsdevcs": "^1.2.0",
+        "phpcsstandards/phpcsdevtools": "^1.2.1",
+        "phpunit/phpunit": "^4.5 || ^5.0 || ^6.0 || ^7.0 || ^8.0 || ^9.3.4"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "extra": {
+        "branch-alias": {
+            "dev-stable": "1.x-dev",
+            "dev-develop": "1.x-dev"
+        }
+    },
+    "scripts" : {
+        "lint": [
+            "@php ./vendor/php-parallel-lint/php-parallel-lint/parallel-lint . --show-deprecated -e php --exclude vendor --exclude .git"
+        ],
+        "checkcs": [
+            "@php ./vendor/squizlabs/php_codesniffer/bin/phpcs"
+        ],
+        "fixcs": [
+            "@php ./vendor/squizlabs/php_codesniffer/bin/phpcbf"
+        ],
+        "check-complete": [
+            "@php ./vendor/phpcsstandards/phpcsdevtools/bin/phpcs-check-feature-completeness ./Modernize ./NormalizedArrays ./Universal"
+        ],
+        "test-phpcs3": [
+            "@php ./vendor/phpunit/phpunit/phpunit --filter PHPCSExtra --no-coverage ./vendor/squizlabs/php_codesniffer/tests/AllTests.php"
+        ],
+        "test-phpcs4": [
+            "@php ./vendor/phpunit/phpunit/phpunit --no-coverage"
+        ],
+        "coverage-phpcs3": [
+            "@php ./vendor/phpunit/phpunit/phpunit --filter PHPCSExtra ./vendor/squizlabs/php_codesniffer/tests/AllTests.php"
+        ],
+        "coverage-phpcs4": [
+            "@php ./vendor/phpunit/phpunit/phpunit"
+        ],
+        "coverage-phpcs3-local": [
+            "@php ./vendor/phpunit/phpunit/phpunit --filter PHPCSExtra ./vendor/squizlabs/php_codesniffer/tests/AllTests.php --coverage-html ./build/coverage-html"
+        ],
+        "coverage-phpcs4-local": [
+            "@php ./vendor/phpunit/phpunit/phpunit --coverage-html ./build/coverage-html"
+        ]
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        },
+        "lock": false
+    }
+}

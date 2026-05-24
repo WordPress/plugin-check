@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Disallow Lonely If"
+    >
+    <standard>
+    <![CDATA[
+    Disallows `if` statements as the only statement in an `else` block.
+
+    If an `if` statement is the only statement in the `else` block, use `elseif` instead.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Use of elseif or if followed by another statement.">
+        <![CDATA[
+if ($foo) {
+    // ...
+} <em>elseif ($bar)</em> {
+    // ...
+}
+
+if ($foo) {
+    // ...
+} else {
+    <em>if ($bar) {
+        // ...
+    }
+
+    doSomethingElse();
+    </em>
+}
+
+        ]]>
+        </code>
+        <code title="Invalid: Lonely if in an else block.">
+        <![CDATA[
+if ($foo) {
+    // ...
+} else {
+    <em>if ($bar) {
+        // ...
+    } else {
+        // ...
+    }</em>
+}
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

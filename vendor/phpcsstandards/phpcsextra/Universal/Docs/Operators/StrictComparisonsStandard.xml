@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Strict Comparisons"
+    >
+    <standard>
+    <![CDATA[
+    Using loose comparisons is not allowed.
+
+    Loose comparisons will type juggle the values being compared, which often results in bugs.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Using strict comparisons.">
+        <![CDATA[
+if ($var <em>===</em> 'text') {}
+
+if ($var <em>!==</em> true) {}
+        ]]>
+        </code>
+        <code title="Invalid: Using loose comparisons.">
+        <![CDATA[
+if ($var <em>==</em> 'text') {}
+
+if ($var <em>!=</em> true) {}
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

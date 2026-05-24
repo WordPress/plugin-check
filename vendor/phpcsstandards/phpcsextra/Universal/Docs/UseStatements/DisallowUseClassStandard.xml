@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Disallow Use Class/Trait/Interface"
+    >
+    <standard>
+    <![CDATA[
+    Disallow the use of `use` import statements for classes, traits and interfaces, with or without alias.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Other type of use import statements.">
+        <![CDATA[
+use function Vendor\Sub\functionName;
+use const Vendor\Sub\CONST;
+        ]]>
+        </code>
+        <code title="Invalid: Class/trait/interface use import statement.">
+        <![CDATA[
+use Vendor\Sub\ClassName;
+use Vendor\Sub\InterfaceName as Other;
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

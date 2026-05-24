@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="If-else Declarations"
+    >
+    <standard>
+    <![CDATA[
+    The `else` and `elseif` keywords should be on a new line.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: `elseif` and `else` each on a new line.">
+        <![CDATA[
+if ($foo) {
+    $var = 1;
+}<em>
+elseif</em> ($bar) {
+    $var = 2;
+}
+else {
+    $var = 3;
+}
+        ]]>
+        </code>
+        <code title="Invalid: `elseif` and `else` on the same line as the closing curly of the preceding (else)if.">
+        <![CDATA[
+if ($foo) {
+    $var = 1;
+} <em>elseif</em> ($bar) {
+    $var = 2;
+} <em>else</em> {
+    $var = 3;
+}
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

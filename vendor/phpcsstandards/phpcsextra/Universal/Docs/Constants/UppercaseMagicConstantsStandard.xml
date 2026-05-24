@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Uppercase Magic Constants"
+    >
+    <standard>
+    <![CDATA[
+    The PHP native `__...__` magic constant should be in uppercase.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Using uppercase.">
+        <![CDATA[
+echo <em>__LINE__</em>;
+include <em>__DIR__</em> . '/file.php';
+        ]]>
+        </code>
+        <code title="Invalid: Using lowercase or mixed case.">
+        <![CDATA[
+echo <em>__NameSpace__</em>;
+include dirname(<em>__file__</em>) . '/file.php';
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

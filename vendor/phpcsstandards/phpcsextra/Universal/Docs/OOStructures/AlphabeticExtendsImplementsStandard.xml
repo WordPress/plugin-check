@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Alphabetic Extends Implements"
+    >
+    <standard>
+    <![CDATA[
+    The names used in class "implements" or interface "extends" statements should be listed in alphabetic order.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Names listed alphabetically.">
+        <![CDATA[
+class Baz implements <em>Bar, Foo</em>
+{
+}
+        ]]>
+        </code>
+        <code title="Invalid: Names not listed alphabetically.">
+        <![CDATA[
+class Baz implements <em>Foo, Bar</em>
+{
+}
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

@@ -1,0 +1,74 @@
+{
+  "name": "dealerdirect/phpcodesniffer-composer-installer",
+  "description": "PHP_CodeSniffer Standards Composer Installer Plugin",
+  "type": "composer-plugin",
+  "keywords": [
+    "composer", "installer", "plugin",
+    "phpcs", "phpcbf", "codesniffer", "phpcodesniffer", "php_codesniffer",
+    "standard", "standards", "style guide", "stylecheck",
+    "qa", "quality", "code quality", "tests"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Franck Nijhof",
+      "email": "opensource@frenck.dev",
+      "homepage": "https://frenck.dev",
+      "role": "Open source developer"
+    },
+    {
+      "name" : "Contributors",
+      "homepage" : "https://github.com/PHPCSStandards/composer-installer/graphs/contributors"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/PHPCSStandards/composer-installer/issues",
+    "source": "https://github.com/PHPCSStandards/composer-installer",
+    "security": "https://github.com/PHPCSStandards/composer-installer/security/policy"
+  },
+  "require": {
+    "php": ">=5.4",
+    "composer-plugin-api": "^2.2",
+    "squizlabs/php_codesniffer": "^3.1.0 || ^4.0"
+  },
+  "require-dev": {
+    "ext-json": "*",
+    "ext-zip": "*",
+    "composer/composer": "^2.2",
+    "phpcompatibility/php-compatibility": "^9.0 || ^10.0.0@dev",
+    "php-parallel-lint/php-parallel-lint": "^1.4.0",
+    "yoast/phpunit-polyfills": "^1.0"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "autoload": {
+    "psr-4": {
+      "PHPCSStandards\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "PHPCSStandards\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\Tests\\": "tests/"
+    }
+  },
+  "config": {
+    "lock": false
+  },
+  "extra": {
+    "class": "PHPCSStandards\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\Plugin"
+  },
+  "scripts": {
+    "install-codestandards": [
+      "PHPCSStandards\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\Plugin::run"
+    ],
+    "lint": [
+      "@php ./vendor/php-parallel-lint/php-parallel-lint/parallel-lint . -e php --show-deprecated --exclude vendor --exclude .git"
+    ],
+    "test": [
+      "@php ./vendor/phpunit/phpunit/phpunit --no-coverage"
+    ],
+    "coverage": [
+      "@php ./vendor/phpunit/phpunit/phpunit"
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Anonymous Class Keyword Spacing"
+    >
+    <standard>
+    <![CDATA[
+    Checks the spacing between the "class" keyword and the open parenthesis for anonymous classes with parentheses.
+
+    The desired amount of spacing is configurable and defaults to no space.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: No space between the class keyword and the open parenthesis.">
+        <![CDATA[
+$foo = new <em>class(</em>$param)
+{
+    public function __construct($p) {}
+};
+        ]]>
+        </code>
+        <code title="Invalid: Space between the class keyword and the open parenthesis.">
+        <![CDATA[
+$foo = new <em>class (</em>$param)
+{
+    public function __construct($p) {}
+};
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

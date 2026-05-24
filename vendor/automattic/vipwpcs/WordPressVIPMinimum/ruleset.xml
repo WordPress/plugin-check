@@ -1,0 +1,191 @@
+<?xml version="1.0"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="WordPressVIPMinimum" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/PHPCSStandards/PHP_CodeSniffer/master/phpcs.xsd">
+	<description>WordPress VIP Minimum Coding Standards</description>
+
+	<!--
+		 Trigger error if PHPCSUtils cannot be found.
+		 PHPCSUtils does not contain any sniffs, so this rule isn't strictly necessary, but
+		 by having this here anyway, if PHPCSUtils is missing, the user will get a
+		 descriptive error message during the loading of the ruleset instead of
+		 a fatal "class not found" error once the sniffs start running.
+	-->
+	<rule ref="PHPCSUtils"/>
+
+	<rule ref="Generic.PHP.Syntax"/>
+	<rule ref="Generic.PHP.NoSilencedErrors">
+		<properties>
+			<property name="error" value="true"/>
+		</properties>
+	</rule>
+
+	<rule ref="WordPressVIPMinimum.Security.Twig">
+		<include-pattern>*.twig</include-pattern>
+	</rule>
+
+	<rule ref="WordPress.Security.EscapeOutput"/>
+	<rule ref="WordPress.Security.NonceVerification"/>
+	<rule ref="WordPress.Security.ValidatedSanitizedInput">
+		<exclude name="WordPress.Security.ValidatedSanitizedInput.MissingUnslash"/>
+	</rule>
+	<rule ref="WordPress.Security.PluginMenuSlug"/>
+	<rule ref="WordPress.PHP.IniSet"/>
+	<rule ref="WordPress.WP.EnqueuedResources"/>
+	<rule ref="WordPress.WP.PostsPerPage"/>
+	<rule ref="WordPress.DateTime.RestrictedFunctions"/>
+	<rule ref="WordPress.DB.PreparedSQL"/>
+	<rule ref="WordPress.DB.DirectDatabaseQuery"/>
+	<rule ref="WordPress.DB.SlowDBQuery"/>
+	<rule ref="WordPress.WP.GlobalVariablesOverride"/>
+	<rule ref="Universal.Operators.StrictComparisons" phpcs-only="true">
+		<type>warning</type>
+	</rule>
+	<rule ref="Generic.CodeAnalysis.AssignmentInCondition"/>
+	<rule ref="WordPress.CodeAnalysis.AssignmentInTernaryCondition"/>
+	<rule ref="WordPress.PHP.StrictInArray"/>
+	<rule ref="WordPress.PHP.DontExtract"/>
+	<rule ref="WordPress.WP.CronInterval">
+		<properties>
+			<!-- Set to 900 (15 minutes), which is the requirement for the VIP platform. -->
+			<property name="min_interval" value="900"/>
+		</properties>
+	</rule>
+
+	<rule ref="Generic.VersionControl.GitMergeConflict"/>
+	<rule ref="Generic.NamingConventions.ConstructorName"/>
+	<rule ref="Generic.PHP.DisallowShortOpenTag"/>
+	<!-- Covers rule: Omitting the closing PHP tag at the end of a file is preferred. -->
+	<rule ref="PSR2.Files.ClosingTag"/>
+	<rule ref="Squiz.WhiteSpace.SuperfluousWhitespace">
+		<exclude name="Squiz.WhiteSpace.SuperfluousWhitespace.EmptyLines"/>
+		<exclude name="Squiz.WhiteSpace.SuperfluousWhitespace.EndLine"/>
+		<include-pattern>*.php</include-pattern>
+		<include-pattern>*.inc</include-pattern>
+		<exclude-pattern>*.js</exclude-pattern>
+		<exclude-pattern>*.css</exclude-pattern>
+	</rule>
+	<rule ref="Squiz.PHP.CommentedOutCode"/>
+
+	<!-- https://docs.wpvip.com/technical-references/code-review/#eval-and-create_function -->
+	<rule ref="Squiz.PHP.Eval.Discouraged">
+		<type>error</type>
+		<message>`eval()` is a security risk, please refrain from using it.</message>
+	</rule>
+
+	<!-- https://docs.wpvip.com/technical-references/code-review/#settings-alteration -->
+	<rule ref="WordPress.PHP.DiscouragedPHPFunctions">
+		<!-- https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/pull/633#issuecomment-266634811 -->
+		<properties>
+			<property name="exclude" type="array">
+				<element value="obfuscation"/>
+			</property>
+		</properties>
+	</rule>
+	<rule ref="WordPress.PHP.DiscouragedPHPFunctions.runtime_configuration_error_reporting">
+		<type>error</type>
+	</rule>
+	<rule ref="WordPress.PHP.DiscouragedPHPFunctions.runtime_configuration_ini_restore">
+		<type>error</type>
+	</rule>
+	<rule ref="WordPress.PHP.DiscouragedPHPFunctions.runtime_configuration_apache_setenv">
+		<type>error</type>
+	</rule>
+	<rule ref="WordPress.PHP.DiscouragedPHPFunctions.runtime_configuration_putenv">
+		<type>error</type>
+	</rule>
+	<rule ref="WordPress.PHP.DiscouragedPHPFunctions.runtime_configuration_set_include_path">
+		<type>error</type>
+	</rule>
+	<rule ref="WordPress.PHP.DiscouragedPHPFunctions.runtime_configuration_restore_include_path">
+		<type>error</type>
+	</rule>
+	<rule ref="WordPress.PHP.DiscouragedPHPFunctions.runtime_configuration_magic_quotes_runtime">
+		<type>error</type>
+	</rule>
+	<rule ref="WordPress.PHP.DiscouragedPHPFunctions.runtime_configuration_set_magic_quotes_runtime">
+		<type>error</type>
+	</rule>
+	<rule ref="WordPress.PHP.DiscouragedPHPFunctions.runtime_configuration_dl">
+		<type>error</type>
+	</rule>
+	<rule ref="WordPress.PHP.DiscouragedPHPFunctions.system_calls_exec">
+		<type>error</type>
+	</rule>
+	<rule ref="WordPress.PHP.DiscouragedPHPFunctions.system_calls_shell_exec">
+		<type>error</type>
+	</rule>
+
+	<!-- https://docs.wpvip.com/technical-references/code-review/#commented-out-code-debug-code-or-output -->
+	<rule ref="WordPress.PHP.DevelopmentFunctions">
+		<!-- This is already covered in WordPress.PHP.DiscouragedPHPFunctions sniff -->
+		<exclude name="WordPress.PHP.DevelopmentFunctions.prevent_path_disclosure_error_reporting"/>
+	</rule>
+	<!-- https://docs.wpvip.com/technical-references/code-review/#settings-alteration -->
+	<rule ref="WordPress.PHP.DevelopmentFunctions.prevent_path_disclosure_phpinfo">
+		<type>error</type>
+	</rule>
+	<rule ref="WordPress.PHP.DevelopmentFunctions.error_log_error_log">
+		<type>error</type>
+	</rule>
+
+	<!-- https://docs.wpvip.com/technical-references/code-review/#use-wp_json_encode-over-json_encode -->
+	<!-- hhttps://docs.wpvip.com/technical-references/code-review/vip-errors/#h-filesystem-operations -->
+	<!-- https://docs.wpvip.com/technical-references/code-review/vip-warnings/#h-remote-calls -->
+	<rule ref="WordPress.WP.AlternativeFunctions">
+		<!-- This is already covered in WordPressVIPMinimum.Performance.FetchingRemoteData.FileGetContentsUnknown -->
+		<exclude name="WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents"/>
+		<!-- This is already covered in WordPressVIPMinimum.Functions.StripTags.StripTagsOneParameter -->
+		<exclude name="WordPress.WP.AlternativeFunctions.strip_tags_strip_tags"/>
+		<!-- This is already covered in WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_file_put_contents -->
+		<exclude name="WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents"/>
+		<!-- This is already covered in WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_fputs -->
+		<exclude name="WordPress.WP.AlternativeFunctions.file_system_operations_fputs"/>
+		<!-- This is already covered in WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_fwrite -->
+		<exclude name="WordPress.WP.AlternativeFunctions.file_system_operations_fwrite"/>
+		<!-- This is already covered in WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_is_writable -->
+		<exclude name="WordPress.WP.AlternativeFunctions.file_system_operations_is_writable"/>
+		<!-- This is already covered in WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_is_writeable -->
+		<exclude name="WordPress.WP.AlternativeFunctions.file_system_operations_is_writeable"/>
+		<!-- This is already covered in WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_rename -->
+		<exclude name="WordPress.WP.AlternativeFunctions.rename_rename"/>
+		<!-- This is already covered in WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_touch -->
+		<exclude name="WordPress.WP.AlternativeFunctions.file_system_operations_touch"/>
+		<!-- This is already covered in WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_unlink -->
+		<exclude name="WordPress.WP.AlternativeFunctions.unlink_unlink"/>
+		<!-- This is already covered in WordPressVIPMinimum.Functions.RestrictedFunctions.directory_mkdir -->
+		<exclude name="WordPress.WP.AlternativeFunctions.file_system_operations_mkdir"/>
+		<!-- This is already covered in WordPressVIPMinimum.Functions.RestrictedFunctions.directory_rmdir -->
+		<exclude name="WordPress.WP.AlternativeFunctions.file_system_operations_rmdir"/>
+		<!-- This is already covered in WordPressVIPMinimum.Functions.RestrictedFunctions.chmod_chgrp -->
+		<exclude name="WordPress.WP.AlternativeFunctions.file_system_operations_chgrp"/>
+		<!-- This is already covered in WordPressVIPMinimum.Functions.RestrictedFunctions.chmod_chown -->
+		<exclude name="WordPress.WP.AlternativeFunctions.file_system_operations_chown"/>
+		<!-- This is already covered in WordPressVIPMinimum.Functions.RestrictedFunctions.chmod_chmod -->
+		<exclude name="WordPress.WP.AlternativeFunctions.file_system_operations_chmod"/>
+	</rule>
+	<!-- VIP recommends other functions -->
+	<rule ref="WordPress.WP.AlternativeFunctions.curl_curl_init">
+		<message>Using cURL functions is highly discouraged within VIP context. Please see: https://docs.wpvip.com/technical-references/code-quality-and-best-practices/retrieving-remote-data/.</message>
+	</rule>
+	<rule ref="WordPress.WP.AlternativeFunctions.curl_curl_close">
+		<message>Using cURL functions is highly discouraged within VIP context. Please see: https://docs.wpvip.com/technical-references/code-quality-and-best-practices/retrieving-remote-data/.</message>
+	</rule>
+	<rule ref="WordPress.WP.AlternativeFunctions.curl_curl_getinfo">
+		<message>Using cURL functions is highly discouraged within VIP context. Please see: https://docs.wpvip.com/technical-references/code-quality-and-best-practices/retrieving-remote-data/.</message>
+	</rule>
+
+	<rule ref="WordPressVIPMinimum.Functions.RestrictedFunctions.get_posts_get_children">
+		<type>error</type>
+		<message>`%1$s()` performs a no-LIMIT query by default, make sure to set a reasonable `posts_per_page`. `%1$s()` will do a -1 query by default, a maximum of 100 should be used.</message>
+	</rule>
+
+	<!-- Include VariableAnalysis checks -->
+	<rule ref="VariableAnalysis"/>
+	<rule ref="VariableAnalysis.CodeAnalysis.VariableAnalysis">
+		<properties>
+			<!-- Do not report on unused variables before require nor usused or undefined variables in file scope. -->
+			<property name="allowUnusedVariablesBeforeRequire" value="true"/>
+			<property name="allowUndefinedVariablesInFileScope" value="true"/>
+		</properties>
+	</rule>
+
+</ruleset>

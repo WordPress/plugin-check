@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="First Class Callable Spacing"
+    >
+    <standard>
+    <![CDATA[
+    There should be no space around the ellipsis when used in a first class callable.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: No space around the ellipsis in a first class callable.">
+        <![CDATA[
+$callback = foo(<em>...</em>);
+array_map(
+    $this->method(<em>...</em>),
+    $array
+);
+        ]]>
+        </code>
+        <code title="Invalid: Space found around the ellipsis in a first class callable.">
+        <![CDATA[
+$callback = foo(<em> </em>...<em> </em>);
+array_map(
+    $this->method(<em>
+        </em>...<em>
+    </em>),
+    $array
+);
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

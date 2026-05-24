@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Precision Alignment"
+    >
+    <standard>
+    <![CDATA[
+    Detects when the indentation is not a multiple of a tab-width, i.e. when precision alignment is used.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Indentation equals (a multiple of) the tab width.">
+        <![CDATA[
+// Code samples presume tab width = 4.
+<em>[space][space][space][space]</em>$foo = 'bar';
+
+<em>[tab]</em>$foo = 'bar';
+        ]]>
+        </code>
+        <code title="Invalid: Precision alignment used, indentation does not equal (a multiple of) the tab width.">
+        <![CDATA[
+// Code samples presume tab width = 4.
+<em>[space][space]</em>$foo = 'bar';
+
+<em>[tab][space]</em>$foo = 'bar';
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

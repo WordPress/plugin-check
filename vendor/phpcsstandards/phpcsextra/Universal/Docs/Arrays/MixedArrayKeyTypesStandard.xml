@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Mixed Array Key Types"
+    >
+    <standard>
+    <![CDATA[
+    In an array where the items have keys, all items should either have a numeric key assigned or a string key. A mix of numeric and string keys is not allowed.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Arrays with either numeric keys or string keys.">
+        <![CDATA[
+$args = array(
+    <em>'foo'</em> => 22,
+    <em>'bar'</em> => 25,
+);
+
+$args = array(
+    <em>0</em> => 22,
+    <em>1</em> => 25,
+);
+        ]]>
+        </code>
+        <code title="Invalid: Arrays with a mix of numeric and string keys.">
+        <![CDATA[
+$args = array(
+    'foo' => 22,
+    25,
+);
+
+$args = array(
+    'foo' => 22,
+    12    => 25,
+);
+
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

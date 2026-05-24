@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Mixed Keyed Unkeyed Array"
+    >
+    <standard>
+    <![CDATA[
+    All items in an array should either have an explicit key assigned or none. A mix of keyed and unkeyed items is not allowed.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Arrays with all items either keyed or unkeyed.">
+        <![CDATA[
+$args = array(
+    <em>'foo'</em> => 22,
+    <em>'bar'</em> => 25,
+);
+
+$args = array(22, 25);
+        ]]>
+        </code>
+        <code title="Invalid: Array with a mix of keyed and unkeyed items.">
+        <![CDATA[
+$args = array(
+    'foo' => 22,
+    25,
+);
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Disallow Namespace Declaration Without Name"
+    >
+    <standard>
+    <![CDATA[
+    Namespace declarations without a namespace name are not allowed.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Named namespace declaration.">
+        <![CDATA[
+namespace <em>Vendor\Name</em> {
+}
+        ]]>
+        </code>
+        <code title="Invalid: Namespace declaration without a name (=global namespace).">
+        <![CDATA[
+namespace<em> </em>{
+}
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Disallow Exit/Die Parentheses"
+    >
+    <standard>
+    <![CDATA[
+    Disallows the use of parentheses when calling `exit` or `die` without passing the `$status` parameter.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Exit/die without parentheses or with parameter.">
+        <![CDATA[
+die<em></em>;
+exit<em>($status)</em>;
+        ]]>
+        </code>
+        <code title="Invalid: Exit/die with parentheses, but without parameter.">
+        <![CDATA[
+die<em>()</em>;
+exit<em>()</em>;
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

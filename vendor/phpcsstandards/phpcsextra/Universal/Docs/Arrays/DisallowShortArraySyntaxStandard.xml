@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Disallow Short Array Syntax"
+    >
+    <standard>
+    <![CDATA[
+    The array keyword must be used to define arrays.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Using long form array syntax.">
+        <![CDATA[
+$arr = <em>array(</em>
+    'foo' => 'bar',
+<em>)</em>;
+        ]]>
+        </code>
+        <code title="Invalid: Using short array syntax.">
+        <![CDATA[
+$arr = <em>[</em>
+    'foo' => 'bar',
+<em>]</em>;
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

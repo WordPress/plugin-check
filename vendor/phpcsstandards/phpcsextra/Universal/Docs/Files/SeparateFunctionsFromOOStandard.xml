@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Separate Functions From OO"
+    >
+    <standard>
+    <![CDATA[
+    A file should either declare (global/namespaced) functions or declare OO structures, but not both.
+
+    Nested function declarations, i.e. functions declared within a function/method will be disregarded for the purposes of this sniff.
+    The same goes for anonymous classes, closures and arrow functions.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Files containing only functions or only OO.">
+        <![CDATA[
+// Valid1.php
+<?php
+class Bar {
+    public function foo() {}
+}
+
+// Valid2.php
+<?php
+function foo() {}
+function bar() {}
+function baz() {}
+        ]]>
+        </code>
+        <code title="Invalid: File containing both OO structure declarations as well as function declarations.">
+        <![CDATA[
+// Invalid.php
+<?php
+function foo() {}
+
+class Bar {
+    public function foo() {}
+}
+
+function bar() {}
+function baz() {}
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

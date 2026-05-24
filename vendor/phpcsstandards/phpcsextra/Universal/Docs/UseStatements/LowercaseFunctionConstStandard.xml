@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Lowercase Function Const"
+    >
+    <standard>
+    <![CDATA[
+    `function` and `const` keywords in import `use` statements should be in lowercase.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Lowercase keywords.">
+        <![CDATA[
+use <em>function</em> strpos;
+use <em>const</em> PHP_EOL;
+        ]]>
+        </code>
+        <code title="Invalid: Non-lowercase keywords.">
+        <![CDATA[
+use <em>Function</em> strpos;
+use <em>CONST</em> PHP_EOL;
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

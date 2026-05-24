@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Require Final Class"
+    >
+    <standard>
+    <![CDATA[
+    Requires the use of the `final` keyword for non-abstract class declarations.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Final class.">
+        <![CDATA[
+<em>final class</em> Foo {}
+<em>final class</em> Bar extends MyAbstract {}
+        ]]>
+        </code>
+        <code title="Invalid: Non-final class.">
+        <![CDATA[
+<em>class</em> Foo {}
+<em>abstract class</em> Bar implements MyInterface {}
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

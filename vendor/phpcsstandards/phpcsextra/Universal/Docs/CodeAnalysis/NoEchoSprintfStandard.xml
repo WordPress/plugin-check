@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="No Echo Sprintf"
+    >
+    <standard>
+    <![CDATA[
+    Detects use of `echo [v]sprintf(...);`. Use `[v]printf()` instead.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Using [v]printf() or echo with anything but [v]sprintf().">
+        <![CDATA[
+<em>printf</em>('text %s text', $var);
+<em>echo callMe</em>('text %s text', $var);
+        ]]>
+        </code>
+        <code title="Invalid: Using echo [v]sprintf().">
+        <![CDATA[
+<em>echo sprintf</em>('text %s text', $var);
+<em>echo vsprintf</em>('text %s text', [$var]);
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

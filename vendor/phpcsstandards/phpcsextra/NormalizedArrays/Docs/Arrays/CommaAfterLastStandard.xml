@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Comma After Last Array Item"
+    >
+    <standard>
+    <![CDATA[
+    For single-line arrays, there should be <em>no</em> comma after the last array item.
+
+    However, for multi-line arrays, there <em>should</em> be a comma after the last array item.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Single-line array without a comma after the last item.">
+        <![CDATA[
+$args = array(1, 2, 3);
+        ]]>
+        </code>
+        <code title="Invalid: Single-line array with a comma after the last item.">
+        <![CDATA[
+$args = array(1, 2, 3<em>,</em> );
+        ]]>
+        </code>
+    </code_comparison>
+    <code_comparison>
+        <code title="Valid: Multi-line array with a comma after the last item.">
+        <![CDATA[
+$args = [
+    1 => 'foo',
+    2 => 'bar'<em>,</em>
+];
+        ]]>
+        </code>
+        <code title="Invalid: Multi-line array without a comma after the last item.">
+        <![CDATA[
+$args = [
+    1 => 'foo',
+    2 => 'bar'
+];
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

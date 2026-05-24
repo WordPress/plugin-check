@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Disallow Mixed Group Use"
+    >
+    <standard>
+    <![CDATA[
+    Disallow group use statements which combine imports for namespace/OO, functions and/or constants in one statement.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Single type group use statements.">
+        <![CDATA[
+use Some\NS\ {
+    ClassName,
+    AnotherClass,
+};
+use function Some\NS\ {
+    SubLevel\functionName,
+    SubLevel\AnotherFunction,
+};
+use const Some\NS\ {
+    Constants\MY_CONSTANT as SOME_CONSTANT,
+};
+        ]]>
+        </code>
+        <code title="Invalid: Mixed group use statement.">
+        <![CDATA[
+use Some\NS\ {
+    ClassName,
+    function SubLevel\functionName,
+    const MY_CONSTANT as SOME_CONSTANT,
+    function SubLevel\AnotherName,
+    AnotherLevel,
+};
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

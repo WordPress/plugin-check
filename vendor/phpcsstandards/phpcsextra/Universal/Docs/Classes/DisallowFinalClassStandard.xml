@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Disallow Final Class"
+    >
+    <standard>
+    <![CDATA[
+    Disallows the use of the `final` keyword for class declarations.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Non-final class.">
+        <![CDATA[
+<em>class</em> Foo {}
+<em>abstract class</em> Bar implements MyInterface {}
+        ]]>
+        </code>
+        <code title="Invalid: Final class.">
+        <![CDATA[
+<em>final class</em> Foo {}
+<em>final class</em> Bar extends MyAbstract {}
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

@@ -1,0 +1,50 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - '*.x'
+  pull_request:
+
+jobs:
+  tests:
+    if: "! contains(toJSON(github.event.commits.*.msg), 'skip') && ! contains(toJSON(github.event.commits.*.msg), 'ci')" #skip ci...
+    runs-on: ${{ matrix.operating-system }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        operating-system: [ubuntu-latest]
+        php-versions: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4', '8.5']
+        include:
+          - php-versions: '7.4'
+            COMPOSER_FLAGS: '--prefer-stable --prefer-lowest'
+            PHPUNIT_FLAGS: '--coverage-clover build/coverage.xml'
+
+    name: PHP ${{ matrix.php-versions }} - ${{ matrix.operating-system }}
+
+    env:
+      extensions: curl json libxml dom
+      key: cache-v1 # can be any string, change to clear the extension cache.
+
+    steps:
+      # Checks out a copy of your repository on the ubuntu machine
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP Action
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: ${{ env.extensions }}
+          coverage: xdebug
+          tools: 'composer:v2, pecl'
+
+      - name: Install Composer dependencies
+        run: composer update ${{ matrix.COMPOSER_FLAGS }} --no-interaction
+
+      - name: boot test server
+        run: vendor/bin/http_test_server > /dev/null 2>&1 &
+
+      - name: Run tests
+        run: composer test

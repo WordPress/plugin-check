@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Trailing Commas in Attribute Blocks"
+    >
+    <standard>
+    <![CDATA[
+    Require a trailing comma for multi-line attribute blocks in which multiple attributes are being instantiated.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Multiple attributes in a multi-line attribute block with trailing comma.">
+        <![CDATA[
+#[
+    AttributeOne(10),
+    AttributeTwo,
+    AttributeThree(MY_CONST)<em>,</em>
+]
+class Foo {}
+        ]]>
+        </code>
+        <code title="Invalid: Multiple attributes in a multi-line attribute block without trailing comma.">
+        <![CDATA[
+#[
+    AttributeOne(10),
+    AttributeTwo,
+    AttributeThree(MY_CONST)<em>
+</em>]
+class Foo {}
+        ]]>
+        </code>
+    </code_comparison>
+
+    <standard>
+    <![CDATA[
+    Forbid trailing commas in attribute blocks in all other cases.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Single line attribute block without trailing comma.">
+        <![CDATA[
+#[AttributeOne, AttributeTwo]
+class Foo {}
+        ]]>
+        </code>
+        <code title="Invalid: Single line attribute block with trailing comma.">
+        <![CDATA[
+#[AttributeOne, AttributeTwo<em>,<em>]
+class Foo {}
+        ]]>
+        </code>
+    </code_comparison>
+    <code_comparison>
+        <code title="Valid: Single attribute in a multi-line attribute block without trailing comma.">
+        <![CDATA[
+#[
+    MyAttribute(
+        paramA: 10,
+        paramB: 20,
+    )
+]
+class Foo {}
+        ]]>
+        </code>
+        <code title="Invalid: Single attribute in a multi-line attribute block with trailing comma.">
+        <![CDATA[
+#[
+    MyAttribute(
+        paramA: 10,
+        paramB: 20,
+    )<em>,</em>
+]
+class Foo {}
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Function Calls to Dirname"
+    >
+    <standard>
+    <![CDATA[
+    PHP >= 5.3: Usage of dirname(__FILE__) can be replaced with __DIR__.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Using __DIR__.">
+        <![CDATA[
+$path = <em>__DIR__</em>;
+        ]]>
+        </code>
+        <code title="Invalid: Using dirname(__FILE__).">
+        <![CDATA[
+$path = <em>dirname(__FILE__)</em>;
+        ]]>
+        </code>
+    </code_comparison>
+    <standard>
+    <![CDATA[
+    PHP >= 7.0: Nested calls to dirname() can be replaced by using dirname() with the $levels parameter.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Using dirname() with the $levels parameter.">
+        <![CDATA[
+$path = <em>dirname($file, 3)</em>;
+        ]]>
+        </code>
+        <code title="Invalid: Nested function calls to dirname().">
+        <![CDATA[
+$path = <em>dirname(dirname(dirname($file)))</em>;
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

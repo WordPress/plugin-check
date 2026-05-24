@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Disallow Alternative Control Structure Syntax"
+    >
+    <standard>
+    <![CDATA[
+    The use of the alternative syntax for control structures is not allowed.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Using curly brace syntax for control structures.">
+        <![CDATA[
+if ($foo) <em>{</em>
+    $var = 1;
+<em>}</em>
+
+while (++$i < 10) <em>{</em>
+    echo $i;
+<em>}</em>
+        ]]>
+        </code>
+        <code title="Invalid: Using the alternative syntax for control structures.">
+        <![CDATA[
+if ($foo) <em>:</em>
+    $var = 1;
+<em>endif;</em>
+
+while (++$i < 10)<em>:</em>
+    echo $i;
+<em>endwhile;</em>
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

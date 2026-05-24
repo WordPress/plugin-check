@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Disallow Anonymous Class Parentheses"
+    >
+    <standard>
+    <![CDATA[
+    Disallows the use of parentheses when declaring an anonymous class without passing parameters.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Anonymous class without parentheses or with parameters.">
+        <![CDATA[
+$anon = new class<em></em> {};
+$anon = new class<em>($param)</em> {};
+        ]]>
+        </code>
+        <code title="Invalid: Anonymous class with parentheses.">
+        <![CDATA[
+$anon = new class<em>()</em> {};
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

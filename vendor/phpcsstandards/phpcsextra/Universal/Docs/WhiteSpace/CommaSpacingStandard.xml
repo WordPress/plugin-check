@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Comma Spacing"
+    >
+    <standard>
+    <![CDATA[
+    There should be no space before a comma and exactly one space, or a new line, after a comma.
+
+    The sniff makes the following exceptions to this rule:
+    1. A comma preceded or followed by a parenthesis, curly or square bracket.
+       These will not be flagged to prevent conflicts with sniffs handling spacing around braces.
+    2. A comma preceded or followed by another comma, like for skipping items in a list assignment.
+       These will not be flagged.
+    3. A comma preceded by a non-indented heredoc/nowdoc closer.
+       In that case, unless the `php_version` config directive is set to a version higher than PHP 7.3.0,
+       a new line before will be enforced to prevent parse errors on PHP < 7.3.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Correct spacing.">
+        <![CDATA[
+isset($param1<em>, </em>$param2<em>, </em>$param3);
+
+function_call(
+    $param1<em>,</em>
+    $param2<em>,</em>
+    $param3
+);
+
+$array = array($item1<em>, </em>$item2<em>, </em>$item3);
+$array = [
+    $item1<em>,</em>
+    $item2<em>,</em>
+];
+
+list(, $a<em>, </em>$b<em>,</em>,) = $array;
+list(
+    ,
+    $a<em>,</em>
+    $b<em>,</em>
+) = $array;
+        ]]>
+        </code>
+        <code title="Invalid: Incorrect spacing.">
+        <![CDATA[
+unset($param1<em>  ,   </em>$param2<em>,</em>$param3);
+
+function_call(
+    $a
+    <em>,</em>$b
+    <em>,</em>$c
+);
+
+$array = array($item1<em>,</em>$item2<em>  ,  </em>$item3);
+$array = [
+    $item1,
+    $item2<em>  ,</em>
+];
+
+list( ,$a, $b<em>  ,</em>,) = $array;
+list(
+    ,
+    $a,
+    $b<em>  ,</em>
+) = $array;
+        ]]>
+        </code>
+    </code_comparison>
+    <standard>
+    <![CDATA[
+    A comma should follow the code and not be placed after a trailing comment.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Comma after the code.">
+        <![CDATA[
+function_call(
+    $param1<em>,</em> // Comment.
+    $param2<em>,</em> /* Comment. */
+);
+        ]]>
+        </code>
+        <code title="Invalid: Comma after a trailing comment.">
+        <![CDATA[
+function_call(
+    $param1 // Comment.
+    <em>,</em>
+    $param2 /* Comment. */<em>,</em>
+);
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

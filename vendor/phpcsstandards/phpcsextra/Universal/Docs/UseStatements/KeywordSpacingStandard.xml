@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Import Use Keyword Spacing"
+    >
+    <standard>
+    <![CDATA[
+    Enforce a single space after the `use`, `function`, `const` keywords and both before and after the `as` keyword in import `use` statements.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Single space used around keywords.">
+        <![CDATA[
+use<em> </em>function<em> </em>strpos;
+use<em> </em>const<em> </em>PHP_EOL<em> </em>as<em> </em>MY_EOL;
+        ]]>
+        </code>
+        <code title="Invalid: Incorrect spacing used around keywords.">
+        <![CDATA[
+use<em>    </em>function<em>   </em>strpos;
+use<em>
+  </em>const<em>
+  </em>PHP_EOL<em>
+  </em>as<em>
+  </em>MY_EOL;
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

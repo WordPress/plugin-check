@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Disallow Curly Brace Namespace Syntax"
+    >
+    <standard>
+    <![CDATA[
+    Namespace declarations using the curly brace syntax are not allowed.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Namespace declaration without braces.">
+        <![CDATA[
+namespace Vendor\Project\Sub<em>;</em>
+
+// Code
+        ]]>
+        </code>
+        <code title="Invalid: Namespace declaration with braces.">
+        <![CDATA[
+namespace Vendor\Project\Scoped <em>{</em>
+    // Code.
+<em>}</em>
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

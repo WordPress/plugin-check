@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Gutenberg Coding Standards" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/PHPCSStandards/PHP_CodeSniffer/master/phpcs.xsd">
+
+	<description>The Coding standard for the Gutenberg Coding Standards itself.</description>
+
+	<file>.</file>
+
+	<!-- Exclude Composer vendor directory. -->
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+
+	<!-- Only check PHP files. -->
+	<arg name="extensions" value="php"/>
+
+	<!-- Show progress, show the error codes for each message (source). -->
+	<arg value="ps"/>
+
+	<!-- Strip the filepaths down to the relevant bit. -->
+	<arg name="basepath" value="."/>
+
+	<!-- Check up to 8 files simultaneously. -->
+	<arg name="parallel" value="8"/>
+
+	<!--
+	#############################################################################
+	SET UP THE RULESETS
+	#############################################################################
+	-->
+
+	<rule ref="WordPress">
+		<!-- This project needs to comply with naming standards from PHPCS, not WP. -->
+		<exclude name="WordPress.Files.FileName"/>
+		<exclude name="WordPress.NamingConventions.ValidVariableName"/>
+	</rule>
+
+	<rule ref="Squiz.Commenting.FunctionCommentThrowTag.Missing">
+		<exclude-pattern>/PluginCheck/Tests/.+$</exclude-pattern>
+	</rule>
+
+	<!-- Check code for cross-version PHP compatibility. -->
+	<config name="testVersion" value="7.4-"/>
+
+	<!-- Enforce PSR1 compatible namespaces. -->
+	<rule ref="PSR1.Classes.ClassDeclaration"/>
+
+	<!-- Disallows grouped use declarations. -->
+	<rule ref="SlevomatCodingStandard.Namespaces.DisallowGroupUse" />
+	<!-- Disallows leading backslash in use statement. -->
+	<rule ref="SlevomatCodingStandard.Namespaces.UseDoesNotStartWithBackslash" />
+	<!-- Checks whether uses at the top of a file are alphabetically sorted. -->
+	<rule ref="SlevomatCodingStandard.Namespaces.AlphabeticallySortedUses" />
+
+	<!-- Prohibits uses from the same namespace. -->
+	<rule ref="SlevomatCodingStandard.Namespaces.UseFromSameNamespace" />
+	<!-- Looks for unused imports from other namespaces. -->
+	<rule ref="SlevomatCodingStandard.Namespaces.UnusedUses">
+	<properties>
+	  <property name="searchAnnotations" value="true" />
+	</properties>
+	</rule>
+	<!-- All references to functions, classes and constants should import using a use statement. -->
+	<rule ref="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly">
+		<properties>
+			<property name="allowFullyQualifiedGlobalFunctions" value="true" />
+			<property name="allowFullyQualifiedGlobalClasses" value="true" />
+			<property name="allowFullyQualifiedGlobalConstants" value="true" />
+			<property name="allowFallbackGlobalFunctions" value="true" />
+			<property name="allowFallbackGlobalConstants" value="true" />
+			<property
+			name="allowFullyQualifiedNameForCollidingClasses"
+			value="true"
+			/>
+		</properties>
+	</rule>
+</ruleset>

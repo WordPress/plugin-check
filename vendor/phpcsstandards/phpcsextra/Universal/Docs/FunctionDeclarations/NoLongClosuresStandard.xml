@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="No Long Closures"
+    >
+    <standard>
+    <![CDATA[
+    Forbids the use of long closures and recommends using named functions instead.
+
+    By default a closure is considered "longish" (warning) when it contains more than 5 lines of code and too long (error) when it contains more than 8 lines of code.
+    Also, by default only code lines are counted and blank lines and comment lines are ignored.
+    Each of these settings can be changed via the sniff configuration.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Short closure.">
+        <![CDATA[
+$closure = function() {
+    line1();
+    line2();
+    line3();
+};
+        ]]>
+        </code>
+        <code title="Invalid: Long closure.">
+        <![CDATA[
+$closure = function() {
+    line1();
+    line2();
+    line3();
+    line4();
+    line5();
+    line6();
+    line7();
+    line8();
+    line9();
+    line10();
+};
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

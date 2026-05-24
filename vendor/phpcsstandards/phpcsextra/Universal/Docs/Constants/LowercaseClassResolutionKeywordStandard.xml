@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Lowercase Class Resolution Keyword"
+    >
+    <standard>
+    <![CDATA[
+    The "class" keyword when used for class name resolution, i.e. `::class`, must be in lowercase.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Using lowercase.">
+        <![CDATA[
+echo MyClass::class;
+        ]]>
+        </code>
+        <code title="Invalid: Using uppercase or mixed case.">
+        <![CDATA[
+echo <em>MyClass::CLASS</em>;
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

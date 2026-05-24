@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="Concatenation position"
+    >
+    <standard>
+    <![CDATA[
+    Enforces that the concatenation operator for multi-line concatenations is in a preferred position, either always at the start of the next line or always at the end of the previous line.
+
+    The preferred position is configurable and defaults to "start" for _start of the next line_.
+
+    Note: mid-line concatenation is still allowed and will not be flagged by this sniff.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Multi-line concatenation with the concatenation operator at the start of each line.">
+        <![CDATA[
+$var = 'text' . $a
+    <em>.</em> $b . 'text'
+    <em>.</em> $c;
+        ]]>
+        </code>
+        <code title="Invalid: Multi-line concatenation with the concatenation operator not consistently at the start of each line.">
+        <![CDATA[
+$var = 'text' . $a <em>.</em>
+    $b . 'text'
+    <em>.</em> $c;
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>

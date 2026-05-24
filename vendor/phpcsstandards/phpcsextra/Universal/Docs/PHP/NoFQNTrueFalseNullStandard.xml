@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://phpcsstandards.github.io/PHPCSDevTools/phpcsdocs.xsd"
+    title="No FQN True False or Null"
+    >
+    <standard>
+    <![CDATA[
+    Forbids using `true`, `false` and `null` as fully qualified constants.
+    ]]>
+    </standard>
+    <code_comparison>
+        <code title="Valid: Using true/false/null without namespace separator prefix.">
+        <![CDATA[
+$a = <em>null</em>;
+
+if ($something === <em>false</em>) {}
+        ]]>
+        </code>
+        <code title="Invalid: Using true/false/null as fully qualified constants.">
+        <![CDATA[
+$a = <em>\</em>null;
+
+if ($something === <em>\</em>false) {}
+        ]]>
+        </code>
+    </code_comparison>
+</documentation>
