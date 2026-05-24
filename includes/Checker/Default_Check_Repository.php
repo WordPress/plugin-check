@@ -76,6 +76,7 @@ class Default_Check_Repository extends Empty_Check_Repository {
 				'enqueued_styles_size'       => new Checks\Performance\Enqueued_Styles_Size_Check(),
 				'code_obfuscation'           => new Checks\Plugin_Repo\Code_Obfuscation_Check(),
 				'plugin_content'             => new Checks\Plugin_Repo\Plugin_Content_Check(),
+				'trialware'                  => new Checks\Plugin_Repo\Trialware_Check(),
 				'file_type'                  => new Checks\Plugin_Repo\File_Type_Check(),
 				'plugin_header_fields'       => new Checks\Plugin_Repo\Plugin_Header_Fields_Check(),
 				'late_escaping'              => new Checks\Security\Late_Escaping_Check(),

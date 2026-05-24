@@ -9,6 +9,7 @@ namespace WordPress\Plugin_Check\Checker;
 
 use Exception;
 use WordPress\Plugin_Check\Admin\Settings_Page;
+use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\Trialware_Check;
 use WordPress\Plugin_Check\Checker\Exception\Invalid_Check_Slug_Exception;
 use WordPress\Plugin_Check\Checker\Preparations\Universal_Runtime_Preparation;
 use WordPress\Plugin_Check\Traits\AI_Analyzer;
@@ -461,6 +462,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			}
 		}
 
+		$ai_analysis = $this->finalize_ai_confirmed_issues( $results, $ai_analysis );
 		$results->set_ai_analysis( $ai_analysis );
 		$results->set_ai_stats( $ai_stats );
 
@@ -471,6 +473,78 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		}
 
 		return $results;
+	}
+
+	/**
+	 * Promotes AI-confirmed candidate issues and removes unconfirmed AI-only candidates.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param Check_Result $results     Check result.
+	 * @param array        $ai_analysis AI analysis results.
+	 * @return array Updated AI analysis results.
+	 */
+	private function finalize_ai_confirmed_issues( Check_Result $results, array $ai_analysis ) {
+		$confirmed_trialware = array();
+		$updated_analysis    = array();
+
+		foreach ( $ai_analysis as $key => $analysis ) {
+			if ( ! is_array( $analysis ) || Trialware_Check::CANDIDATE_CODE !== ( $analysis['code'] ?? '' ) ) {
+				$updated_analysis[ $key ] = $analysis;
+				continue;
+			}
+
+			if ( ! empty( $analysis['is_false_positive'] ) ) {
+				continue;
+			}
+
+			$issue_key                         = $this->get_ai_issue_location_key( $analysis );
+			$analysis['code']                  = Trialware_Check::CONFIRMED_CODE;
+			$analysis['type']                  = 'error';
+			$updated_analysis[ $key ]          = $analysis;
+			$confirmed_trialware[ $issue_key ] = true;
+		}
+
+		$results->transform_messages(
+			function ( array $message, $is_error, $file, $line, $column ) use ( $confirmed_trialware ) {
+				if ( Trialware_Check::CANDIDATE_CODE !== ( $message['code'] ?? '' ) ) {
+					return $message;
+				}
+
+				$issue_key = $this->get_ai_issue_location_key(
+					array(
+						'file'   => $file,
+						'line'   => $line,
+						'column' => $column,
+					)
+				);
+
+				if ( empty( $confirmed_trialware[ $issue_key ] ) ) {
+					return null;
+				}
+
+				$message['error']    = true;
+				$message['code']     = Trialware_Check::CONFIRMED_CODE;
+				$message['severity'] = 7;
+				$message['message']  = __( 'Trialware or locked built-in feature detected. Plugins hosted on WordPress.org must not restrict functionality already included in the plugin behind license keys, trials, quotas, payments, or other artificial limits.', 'plugin-check' );
+
+				return $message;
+			}
+		);
+
+		return $updated_analysis;
+	}
+
+	/**
+	 * Gets a stable location key for AI issue matching.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param array $issue Issue data.
+	 * @return string Location key.
+	 */
+	private function get_ai_issue_location_key( array $issue ) {
+		return ( $issue['file'] ?? '' ) . ':' . (int) ( $issue['line'] ?? 0 ) . ':' . (int) ( $issue['column'] ?? 0 );
 	}
 
 	/**
