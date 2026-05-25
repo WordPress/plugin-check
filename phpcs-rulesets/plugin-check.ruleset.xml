@@ -40,6 +40,9 @@
 		<severity>6</severity>
 	</rule>
 
+	<!-- Prevent runtime fatal errors. -->
+	<rule ref="PluginCheck.CodeAnalysis.RuntimeFatalErrorPrevention"/>
+
 	<!-- Prohibit the use of the `goto` PHP language construct. -->
 	<rule ref="Generic.PHP.DiscourageGoto.Found">
 		<type>error</type>
