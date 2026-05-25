@@ -1,0 +1,57 @@
+name: PR Playground Preview - Cleanup
+
+# When a pull request is closed (either merged or just closed), remove all of
+# its Playground preview zip assets (pr-<PR_NUMBER>-*.zip) from the shared
+# `ci-artifacts` release. Without this, those assets would linger forever
+# because the main workflow's automatic cleanup only kicks in while the same
+# PR keeps receiving new commits.
+#
+# This workflow is intentionally tiny: it only deletes assets whose name
+# starts with `pr-<PR_NUMBER>-`, so it cannot touch artifacts from other PRs.
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    name: Delete PR ${{ github.event.pull_request.number }} Playground artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete pr-<NUMBER>-*.zip assets from the ci-artifacts release
+        env:
+          GH_TOKEN:    ${{ secrets.GITHUB_TOKEN }}
+          REPO:        ${{ github.repository }}
+          RELEASE_TAG: ci-artifacts
+          PR_NUMBER:   ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+
+          # If the release does not exist yet (no PR has ever produced a
+          # preview), there is nothing to do.
+          if ! gh release view "$RELEASE_TAG" --repo "$REPO" >/dev/null 2>&1; then
+            echo "Release '$RELEASE_TAG' does not exist in $REPO — nothing to clean up."
+            exit 0
+          fi
+
+          mapfile -t assets < <(
+            gh release view "$RELEASE_TAG" --repo "$REPO" --json assets \
+              --jq ".assets[] | select(.name | startswith(\"pr-$PR_NUMBER-\")) | .name"
+          )
+
+          if [ "${#assets[@]}" -eq 0 ]; then
+            echo "No Playground preview artifacts found for PR #$PR_NUMBER."
+            exit 0
+          fi
+
+          echo "Deleting ${#assets[@]} asset(s) for PR #$PR_NUMBER:"
+          printf '  - %s\n' "${assets[@]}"
+
+          for asset in "${assets[@]}"; do
+            gh release delete-asset "$RELEASE_TAG" "$asset" --repo "$REPO" --yes
+          done
+
+          echo "Cleanup complete for PR #$PR_NUMBER."

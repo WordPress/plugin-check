@@ -48,6 +48,14 @@ The preview boots a fresh WordPress, installs and activates the PR's build of Pl
 
 The button is added by the official [`WordPress/action-wp-playground-pr-preview`](https://github.com/WordPress/action-wp-playground-pr-preview) action via `.github/workflows/pr-playground-preview.yml`. That workflow builds a production zip of the plugin (Composer dependencies installed without `--dev`, dev files excluded via `.distignore`), uploads it as a GitHub Actions artifact, exposes it on a public download URL, and appends the **"Open in WordPress Playground"** button to the PR description with a blueprint that installs and activates that exact build.
 
+**One-time maintenance note for repository admins:** the helper action creates a release tagged `ci-artifacts` to host the per-PR zips. GitHub creates that release as a **draft** the first time, and draft releases don't serve their assets publicly, which makes the Playground download fail with a 404. The fix is one command, run once:
+
+```bash
+gh release edit ci-artifacts --repo WordPress/plugin-check --draft=false --prerelease=true
+```
+
+After that, the release stays as a pre-release and every future PR's preview button works automatically.
+
 ## Contributing
 
 To set up the repository locally, you will need to clone this GitHub repository (or a fork of it) and then install the relevant dependencies:
