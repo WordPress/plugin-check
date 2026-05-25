@@ -72,6 +72,7 @@ class Default_Check_Repository extends Empty_Check_Repository {
 			'wp_plugin_check_checks',
 			array(
 				'i18n_usage'                 => new Checks\General\I18n_Usage_Check(),
+				'error_reporting'            => new Checks\General\Error_Reporting_Check(),
 				'enqueued_scripts_size'      => new Checks\Performance\Enqueued_Scripts_Size_Check(),
 				'enqueued_styles_size'       => new Checks\Performance\Enqueued_Styles_Size_Check(),
 				'code_obfuscation'           => new Checks\Plugin_Repo\Code_Obfuscation_Check(),
