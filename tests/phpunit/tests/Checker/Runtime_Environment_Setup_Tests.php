@@ -166,4 +166,41 @@ class Runtime_Environment_Setup_Tests extends WP_UnitTestCase {
 		$this->assertTrue( 0 <= strpos( $wpdb->last_query, $table_prefix . 'pc_' ) );
 		$this->assertFalse( $wp_filesystem->exists( WP_CONTENT_DIR . '/object-cache.php' ) );
 	}
+
+	/**
+	 * Ensures the after_setup_environment action fires when set_up() returns early.
+	 *
+	 * This test relies on the drop-in version constant being defined at this point in the run.
+	 * `test_clean_up` defines it earlier in the same process, so set_up() takes the early-return
+	 * branch guarded by `WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION`. The after_* action lives
+	 * in a `finally` block and must still fire.
+	 */
+	public function test_set_up_fires_after_action_on_early_return() {
+		$this->set_up_mock_filesystem();
+
+		if ( ! defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) ) {
+			define( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION', 1 );
+		}
+
+		$this->assertTrue(
+			defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) && WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION,
+			'Pre-condition: the drop-in version constant must be defined to force the early-return branch.'
+		);
+
+		$after_called = false;
+		add_action(
+			'wp_plugin_check_after_setup_environment',
+			static function () use ( &$after_called ) {
+				$after_called = true;
+			}
+		);
+
+		$runtime_setup = new Runtime_Environment_Setup();
+		$runtime_setup->set_up();
+
+		$this->assertTrue(
+			$after_called,
+			'wp_plugin_check_after_setup_environment must fire even when set_up() returns early.'
+		);
+	}
 }
