@@ -92,6 +92,22 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 
 		$args = $this->get_args( $result );
 
+		/**
+		 * Filters the PHPCS arguments for a check before it runs.
+		 *
+		 * Lets integrations override the PHPCS standard, runtime-set values,
+		 * extensions, installed_paths, sniffs and other arguments returned by
+		 * the check's `get_args()` implementation — without having to subclass
+		 * and swap the check via `wp_plugin_check_checks`.
+		 *
+		 * @since 1.10.0
+		 *
+		 * @param array                          $args   PHPCS arguments returned by `get_args()`.
+		 * @param Abstract_PHP_CodeSniffer_Check $check  The check instance.
+		 * @param Check_Result                   $result The check result.
+		 */
+		$args = apply_filters( 'wp_plugin_check_phpcs_args', $args, $this, $result );
+
 		// Reset PHP_CodeSniffer config.
 		$this->reset_php_codesniffer_config();
 

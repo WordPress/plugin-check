@@ -85,6 +85,7 @@ In any case, passing the checks in this tool likely helps to achieve a smooth pl
 
 * Enhancement - Add `wp_plugin_check_before_setup_environment`, `wp_plugin_check_after_setup_environment`, `wp_plugin_check_before_cleanup_environment`, and `wp_plugin_check_after_cleanup_environment` actions around `Runtime_Environment_Setup::set_up()` and `clean_up()`.
 * Enhancement - Introduce the `WP_PLUGIN_CHECK_BOOTSTRAP_FILE` constant. When defined, the referenced file is loaded on the early-execution paths (`object-cache.php` drop-in and `cli.php`) so that integrations can register listeners for plugin-check hooks without patching generated drop-ins.
+* Enhancement - Add the `wp_plugin_check_phpcs_args` filter, applied to the arguments returned by every `Abstract_PHP_CodeSniffer_Check::get_args()`. Integrations can override the PHPCS `standard`, `runtime-set`, `extensions`, `sniffs`, `exclude`, and `installed_paths` without having to subclass and swap the check.
 
 = 1.9.0 =
 
