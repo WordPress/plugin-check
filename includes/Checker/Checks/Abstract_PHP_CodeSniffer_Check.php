@@ -100,7 +100,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		 * the check's `get_args()` implementation — without having to subclass
 		 * and swap the check via `wp_plugin_check_checks`.
 		 *
-		 * @since 1.10.0
+		 * @since 2.0.0
 		 *
 		 * @param array                          $args   PHPCS arguments returned by `get_args()`.
 		 * @param Abstract_PHP_CodeSniffer_Check $check  The check instance.
