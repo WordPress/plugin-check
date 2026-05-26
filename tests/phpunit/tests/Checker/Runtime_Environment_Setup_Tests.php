@@ -99,15 +99,15 @@ class Runtime_Environment_Setup_Tests extends WP_UnitTestCase {
 
 		add_action(
 			'wp_plugin_check_before_runtime_setup',
-			static function ( $environment_setup ) use ( &$calls ) {
-				$calls[] = array( 'before', $environment_setup );
+			static function ( $payload ) use ( &$calls ) {
+				$calls[] = array( 'before', $payload );
 			}
 		);
 
 		add_action(
 			'wp_plugin_check_after_runtime_setup',
-			static function ( $environment_setup ) use ( &$calls ) {
-				$calls[] = array( 'after', $environment_setup );
+			static function ( $payload ) use ( &$calls ) {
+				$calls[] = array( 'after', $payload );
 			}
 		);
 
@@ -117,8 +117,11 @@ class Runtime_Environment_Setup_Tests extends WP_UnitTestCase {
 		$this->assertCount( 2, $calls );
 		$this->assertSame( 'before', $calls[0][0] );
 		$this->assertSame( 'after', $calls[1][0] );
-		$this->assertSame( $runtime_setup, $calls[0][1] );
-		$this->assertSame( $runtime_setup, $calls[1][1] );
+		// Hooks receive the runtime-setup payload array, not the instance.
+		$this->assertIsArray( $calls[0][1] );
+		$this->assertIsArray( $calls[1][1] );
+		$this->assertArrayHasKey( 'early_exit', $calls[0][1] );
+		$this->assertArrayHasKey( 'early_exit', $calls[1][1] );
 	}
 
 	public function test_clean_up_fires_cleanup_environment_hooks() {
@@ -128,15 +131,15 @@ class Runtime_Environment_Setup_Tests extends WP_UnitTestCase {
 
 		add_action(
 			'wp_plugin_check_before_runtime_cleanup',
-			static function ( $environment_setup ) use ( &$calls ) {
-				$calls[] = array( 'before', $environment_setup );
+			static function ( $payload ) use ( &$calls ) {
+				$calls[] = array( 'before', $payload );
 			}
 		);
 
 		add_action(
 			'wp_plugin_check_after_runtime_cleanup',
-			static function ( $environment_setup ) use ( &$calls ) {
-				$calls[] = array( 'after', $environment_setup );
+			static function ( $payload ) use ( &$calls ) {
+				$calls[] = array( 'after', $payload );
 			}
 		);
 
@@ -146,8 +149,11 @@ class Runtime_Environment_Setup_Tests extends WP_UnitTestCase {
 		$this->assertCount( 2, $calls );
 		$this->assertSame( 'before', $calls[0][0] );
 		$this->assertSame( 'after', $calls[1][0] );
-		$this->assertSame( $runtime_setup, $calls[0][1] );
-		$this->assertSame( $runtime_setup, $calls[1][1] );
+		// Hooks receive the runtime-cleanup payload array, not the instance.
+		$this->assertIsArray( $calls[0][1] );
+		$this->assertIsArray( $calls[1][1] );
+		$this->assertArrayHasKey( 'early_exit', $calls[0][1] );
+		$this->assertArrayHasKey( 'early_exit', $calls[1][1] );
 	}
 
 	public function test_clean_up() {

@@ -79,6 +79,8 @@ final class Check_Result {
 	/**
 	 * Adds an error or warning to the respective stack.
 	 *
+	 * @SuppressWarnings(PHPMD.NPathComplexity)
+	 *
 	 * @since 1.0.0
 	 *
 	 * @param bool   $error   Whether it is an error message.

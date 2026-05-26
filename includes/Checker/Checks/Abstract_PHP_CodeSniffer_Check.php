@@ -59,6 +59,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	 * Amends the given result by running the check on the associated plugin.
 	 *
 	 * @SuppressWarnings(PHPMD.NPathComplexity)
+	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
 	 *
 	 * @since 1.0.0
 	 *
