@@ -27,8 +27,10 @@ Feature: Test that WP_PLUGIN_CHECK_BOOTSTRAP_FILE is loaded in the WP-CLI path.
       define( 'WP_PLUGIN_CHECK_BOOTSTRAP_FILE', __DIR__ . '/pcp-bootstrap-missing.php' );
       """
 
-    When I run the WP-CLI command `plugin list --require=./wp-content/pcp-config.php --require=./wp-content/plugins/plugin-check/cli.php`
-    Then STDERR should contain:
+    # `try` rather than `run`: the warning is the test point and `run` rejects any non-empty STDERR.
+    When I try the WP-CLI command `plugin list --require=./wp-content/pcp-config.php --require=./wp-content/plugins/plugin-check/cli.php`
+    Then the return code should be 0
+    And STDERR should contain:
       """
       WP_PLUGIN_CHECK_BOOTSTRAP_FILE
       """
@@ -73,16 +75,27 @@ Feature: Test that WP_PLUGIN_CHECK_BOOTSTRAP_FILE is loaded in the WP-CLI path.
     And a wp-content/pcp-bootstrap.php file:
       """
       <?php
-      add_action(
-          'wp_plugin_check_before_setup_environment',
+      // PCP loads this file from cli.php before wp-settings.php, so add_action()
+      // is not defined yet. Defer registration to after_wp_config_load and
+      // require plugin.php manually since wp-settings.php has not run.
+      WP_CLI::add_hook(
+          'after_wp_config_load',
           static function () {
-              WP_CLI::log( 'PCP before_setup fired' );
-          }
-      );
-      add_action(
-          'wp_plugin_check_after_cleanup_environment',
-          static function () {
-              WP_CLI::log( 'PCP after_cleanup fired' );
+              if ( ! function_exists( 'add_action' ) ) {
+                  require_once ABSPATH . 'wp-includes/plugin.php';
+              }
+              add_action(
+                  'wp_plugin_check_before_runtime_setup',
+                  static function () {
+                      WP_CLI::log( 'PCP before_setup fired' );
+                  }
+              );
+              add_action(
+                  'wp_plugin_check_after_runtime_cleanup',
+                  static function () {
+                      WP_CLI::log( 'PCP after_cleanup fired' );
+                  }
+              );
           }
       );
       """

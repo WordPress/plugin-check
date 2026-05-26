@@ -27,15 +27,25 @@ Feature: Test that the `wp_plugin_check_check_result` filter can suppress indivi
     And a wp-content/pcp-bootstrap.php file:
       """
       <?php
-      add_filter(
-          'wp_plugin_check_check_result',
-          static function ( $data ) {
-              if ( is_array( $data )
-                   && 'WordPress.WP.AlternativeFunctions.rand_mt_rand' === ( $data['code'] ?? '' )
-              ) {
-                  return null;
+      // PCP loads this file from cli.php before wp-settings.php, so add_filter()
+      // is not defined yet. Defer registration to after_wp_config_load.
+      WP_CLI::add_hook(
+          'after_wp_config_load',
+          static function () {
+              if ( ! function_exists( 'add_filter' ) ) {
+                  require_once ABSPATH . 'wp-includes/plugin.php';
               }
-              return $data;
+              add_filter(
+                  'wp_plugin_check_check_result',
+                  static function ( $data ) {
+                      if ( is_array( $data )
+                           && 'WordPress.WP.AlternativeFunctions.rand_mt_rand' === ( $data['code'] ?? '' )
+                      ) {
+                          return null;
+                      }
+                      return $data;
+                  }
+              );
           }
       );
       """
@@ -78,15 +88,25 @@ Feature: Test that the `wp_plugin_check_check_result` filter can suppress indivi
     And a wp-content/pcp-bootstrap.php file:
       """
       <?php
-      add_filter(
-          'wp_plugin_check_check_result',
-          static function ( $data ) {
-              if ( is_array( $data )
-                   && 'WordPress.WP.AlternativeFunctions.rand_mt_rand' === ( $data['code'] ?? '' )
-              ) {
-                  $data['message'] = 'PCP-RESULT-FILTER-REWROTE-THIS-MESSAGE';
+      // PCP loads this file from cli.php before wp-settings.php, so add_filter()
+      // is not defined yet. Defer registration to after_wp_config_load.
+      WP_CLI::add_hook(
+          'after_wp_config_load',
+          static function () {
+              if ( ! function_exists( 'add_filter' ) ) {
+                  require_once ABSPATH . 'wp-includes/plugin.php';
               }
-              return $data;
+              add_filter(
+                  'wp_plugin_check_check_result',
+                  static function ( $data ) {
+                      if ( is_array( $data )
+                           && 'WordPress.WP.AlternativeFunctions.rand_mt_rand' === ( $data['code'] ?? '' )
+                      ) {
+                          $data['message'] = 'PCP-RESULT-FILTER-REWROTE-THIS-MESSAGE';
+                      }
+                      return $data;
+                  }
+              );
           }
       );
       """

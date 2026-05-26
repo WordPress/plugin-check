@@ -27,16 +27,26 @@ Feature: Test that the `wp_plugin_check_phpcs_args` filter can override PHPCS ar
     And a wp-content/pcp-bootstrap.php file:
       """
       <?php
-      add_filter(
-          'wp_plugin_check_phpcs_args',
-          static function ( array $args ): array {
-              // Append our sniff code to whatever `exclude` already holds (PHPCS expects a CSV string).
-              $existing        = isset( $args['exclude'] ) ? (string) $args['exclude'] : '';
-              $args['exclude'] = ltrim(
-                  $existing . ',WordPress.WP.AlternativeFunctions.rand_mt_rand',
-                  ','
+      // PCP loads this file from cli.php before wp-settings.php, so add_filter()
+      // is not defined yet. Defer registration to after_wp_config_load.
+      WP_CLI::add_hook(
+          'after_wp_config_load',
+          static function () {
+              if ( ! function_exists( 'add_filter' ) ) {
+                  require_once ABSPATH . 'wp-includes/plugin.php';
+              }
+              add_filter(
+                  'wp_plugin_check_phpcs_args',
+                  static function ( array $args ): array {
+                      // Append our sniff code to whatever `exclude` already holds (PHPCS expects a CSV string).
+                      $existing        = isset( $args['exclude'] ) ? (string) $args['exclude'] : '';
+                      $args['exclude'] = ltrim(
+                          $existing . ',WordPress.WP.AlternativeFunctions.rand_mt_rand',
+                          ','
+                      );
+                      return $args;
+                  }
               );
-              return $args;
           }
       );
       """
