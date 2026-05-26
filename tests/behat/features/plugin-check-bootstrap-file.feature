@@ -104,6 +104,10 @@ Feature: Test that WP_PLUGIN_CHECK_BOOTSTRAP_FILE is loaded in the WP-CLI path.
       <?php
       define( 'WP_PLUGIN_CHECK_BOOTSTRAP_FILE', __DIR__ . '/pcp-bootstrap.php' );
       """
+    # Runtime hooks only fire when `plugin check` actually invokes runtime checks,
+    # which requires the target plugin to be active — see
+    # Abstract_Check_Runner::allow_runtime_checks().
+    And I run the WP-CLI command `plugin activate foo-single`
 
     When I run the WP-CLI command `plugin check foo-single.php --require=./wp-content/pcp-config.php --require=./wp-content/plugins/plugin-check/cli.php`
     Then STDOUT should contain:
