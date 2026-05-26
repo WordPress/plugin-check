@@ -189,7 +189,7 @@ class Runtime_Environment_Setup_Tests extends WP_UnitTestCase {
 
 		$after_called = false;
 		add_action(
-			'wp_plugin_check_after_setup_environment',
+			'wp_plugin_check_after_runtime_setup',
 			static function () use ( &$after_called ) {
 				$after_called = true;
 			}
@@ -200,7 +200,7 @@ class Runtime_Environment_Setup_Tests extends WP_UnitTestCase {
 
 		$this->assertTrue(
 			$after_called,
-			'wp_plugin_check_after_setup_environment must fire even when set_up() returns early.'
+			'wp_plugin_check_after_runtime_setup must fire even when set_up() returns early.'
 		);
 	}
 }
