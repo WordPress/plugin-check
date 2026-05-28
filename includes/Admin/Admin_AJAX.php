@@ -228,16 +228,19 @@ final class Admin_AJAX {
 
 		$categories = filter_input( INPUT_POST, 'categories', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
 		$categories = is_null( $categories ) ? array() : $categories;
-
-		$runner = $this->get_ajax_runner();
+		$checks     = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
+		$checks     = is_null( $checks ) ? array() : $checks;
+		$use_ai     = 1 === filter_input( INPUT_POST, 'use-ai', FILTER_VALIDATE_INT );
+		$runner     = $this->get_ajax_runner();
 
 		if ( is_wp_error( $runner ) ) {
-			wp_send_json_error( $runner, 403 );
+			wp_send_json_error( $runner, 500 );
 		}
 
 		try {
 			$this->configure_runner( $runner );
 			$runner->set_categories( $categories );
+			$runner->set_use_ai( $use_ai );
 
 			$plugin_basename = $runner->get_plugin_basename();
 			$checks_to_run   = $runner->get_checks_to_run();
@@ -260,6 +263,8 @@ final class Admin_AJAX {
 	 * Run checks.
 	 *
 	 * @since 1.0.0
+	 *
+	 * @SuppressWarnings(PHPMD.NPathComplexity)
 	 */
 	public function run_checks() {
 		$this->check_request_validity();
@@ -270,11 +275,34 @@ final class Admin_AJAX {
 			wp_send_json_error( $runner, 500 );
 		}
 
-		$types = filter_input( INPUT_POST, 'types', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
-		$types = is_null( $types ) ? array() : $types;
+		$runner = Plugin_Request_Utility::get_runner();
+
+		if ( is_null( $runner ) ) {
+			$runner = new AJAX_Runner();
+		}
+
+		// Make sure we are using the correct runner instance.
+		if ( ! ( $runner instanceof AJAX_Runner ) ) {
+			wp_send_json_error(
+				new WP_Error( 'invalid-runner', __( 'AJAX Runner was not initialized correctly.', 'plugin-check' ) ),
+				500
+			);
+		}
+
+		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
+		$checks = is_null( $checks ) ? array() : $checks;
+		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+
+		$include_experimental = 1 === filter_input( INPUT_POST, 'include-experimental', FILTER_VALIDATE_INT );
+		$use_ai               = 1 === filter_input( INPUT_POST, 'use-ai', FILTER_VALIDATE_INT );
+		$types                = filter_input( INPUT_POST, 'types', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
+		$types                = is_null( $types ) ? array( 'error', 'warning' ) : $types;
 
 		try {
-			$this->configure_runner( $runner );
+			$runner->set_experimental_flag( $include_experimental );
+			$runner->set_check_slugs( $checks );
+			$runner->set_plugin( $plugin );
+			$runner->set_use_ai( $use_ai );
 			$results = $runner->run();
 		} catch ( Exception $error ) {
 			wp_send_json_error(
@@ -284,6 +312,18 @@ final class Admin_AJAX {
 		}
 
 		$response_data = $this->prepare_results_response( $results, $types );
+
+		// Include AI analysis results if available.
+		$ai_analysis = $results->get_ai_analysis();
+		if ( ! empty( $ai_analysis ) ) {
+			$response_data['ai_analysis'] = $ai_analysis;
+		}
+
+		// Include AI statistics if available.
+		$ai_stats = $results->get_ai_stats();
+		if ( ! empty( $ai_stats ) ) {
+			$response_data['ai_stats'] = $ai_stats;
+		}
 
 		wp_send_json_success( $response_data );
 	}
@@ -314,7 +354,6 @@ final class Admin_AJAX {
 
 		return $response;
 	}
-
 
 	/**
 	 * Handles exporting Plugin Check results.

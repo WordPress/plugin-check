@@ -199,64 +199,6 @@ trait AI_Check_Names {
 	}
 
 	/**
-	 * Applies a model preference to the prompt builder if supported.
-	 *
-	 * @since 1.9.0
-	 *
-	 * @param object $builder Prompt builder instance.
-	 * @param string $model_preference Model preference.
-	 * @return object|WP_Error Updated builder or WP_Error.
-	 */
-	protected function apply_model_preference( $builder, $model_preference ) {
-		if ( empty( $model_preference ) ) {
-			return $builder;
-		}
-
-		$preference = $this->normalize_model_preference( $model_preference );
-
-		try {
-			$result = $builder->using_model_preference( $preference );
-			return $result ? $result : $builder;
-		} catch ( \Exception $e ) {
-			// If method doesn't exist or fails, return WP_Error.
-			return new WP_Error(
-				'model_preference_error',
-				sprintf(
-					/* translators: %s: Exception message */
-					__( 'Failed to apply model preference: %s', 'plugin-check' ),
-					$e->getMessage()
-				)
-			);
-		}
-	}
-
-	/**
-	 * Normalizes a model preference string into a supported preference format.
-	 *
-	 * @since 1.9.0
-	 *
-	 * @param string $model_preference Model preference string.
-	 * @return string|array Normalized preference.
-	 */
-	protected function normalize_model_preference( $model_preference ) {
-		$trimmed = trim( (string) $model_preference );
-		if ( '' === $trimmed ) {
-			return '';
-		}
-
-		foreach ( array( '::', '|', ':' ) as $separator ) {
-			if ( false !== strpos( $trimmed, $separator ) ) {
-				list( $provider, $model ) = array_map( 'trim', explode( $separator, $trimmed, 2 ) );
-				if ( '' !== $provider && '' !== $model ) {
-					return array( $provider, $model );
-				}
-			}
-		}
-
-		return $trimmed;
-	}
-
-	/**
 	 * Extracts token usage from a result object, if available.
 	 *
 	 * @since 1.9.0

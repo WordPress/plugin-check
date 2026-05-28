@@ -1,0 +1,109 @@
+name: PR Playground Preview Publish
+
+# Publishes the read-only build artifact from "PR Playground Preview Build" and
+# writes the Playground button to the PR. This workflow must not check out or
+# execute pull request code.
+
+on:
+  workflow_run:
+    workflows:
+      - PR Playground Preview
+      - PR Playground Preview Build
+    types:
+      - completed
+
+permissions:
+  actions: read
+  contents: write
+  pull-requests: write
+
+jobs:
+  playground-preview:
+    name: Publish Playground preview button
+    runs-on: ubuntu-latest
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request'
+    steps:
+      - name: Download Playground preview metadata
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          gh run download "$RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --name plugin-check-preview-metadata \
+            --dir preview-metadata
+
+      - name: Read Playground preview metadata
+        id: metadata
+        run: |
+          pr_number="$(cat preview-metadata/pr-number)"
+          head_sha="$(cat preview-metadata/head-sha)"
+
+          if ! [[ "$pr_number" =~ ^[0-9]+$ ]]; then
+            echo "Invalid PR number in preview metadata: $pr_number" >&2
+            exit 1
+          fi
+
+          if ! [[ "$head_sha" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Invalid head SHA in preview metadata: $head_sha" >&2
+            exit 1
+          fi
+
+          echo "pr-number=$pr_number" >> "$GITHUB_OUTPUT"
+          echo "head-sha=$head_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Expose built artifact as a public URL
+        id: expose
+        uses: WordPress/action-wp-playground-pr-preview/.github/actions/expose-artifact-on-public-url@v2
+        with:
+          artifact-name:              plugin-check-zip
+          artifact-filename:          plugin-check.zip
+          artifact-source-run-id:     ${{ github.event.workflow_run.id }}
+          artifact-source-repository: ${{ github.repository }}
+          pr-number:                  ${{ steps.metadata.outputs.pr-number }}
+          commit-sha:                 ${{ steps.metadata.outputs.head-sha }}
+          artifacts-to-keep:          '2'
+          github-token:               ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate Playground blueprint
+        id: blueprint
+        env:
+          ARTIFACT_URL: ${{ steps.expose.outputs.artifact-url }}
+        run: |
+          node - <<'NODE' >> "$GITHUB_OUTPUT"
+          const url = process.env.ARTIFACT_URL;
+          if (!url) {
+            throw new Error('ARTIFACT_URL is required');
+          }
+          const blueprint = {
+            "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+            landingPage: "/wp-admin/tools.php?page=plugin-check",
+            phpExtensionBundles: [ "kitchen-sink" ],
+            steps: [
+              {
+                step: "login",
+                username: "admin",
+                password: "password",
+              },
+              {
+                step: "installPlugin",
+                pluginZipFile: {
+                  resource: "url",
+                  url,
+                },
+                options: { activate: true },
+              },
+            ],
+          };
+          console.log(`blueprint=${JSON.stringify(blueprint)}`);
+          NODE
+
+      - name: Post Playground Preview Button
+        uses: WordPress/action-wp-playground-pr-preview@v2
+        with:
+          mode:         append-to-description
+          blueprint:    ${{ steps.blueprint.outputs.blueprint }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          pr-number:    ${{ steps.metadata.outputs.pr-number }}

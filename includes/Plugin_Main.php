@@ -9,6 +9,7 @@ namespace WordPress\Plugin_Check;
 
 use WordPress\Plugin_Check\Admin\Admin_AJAX;
 use WordPress\Plugin_Check\Admin\Admin_Page;
+use WordPress\Plugin_Check\Admin\Settings_Page;
 
 /**
  * Main class for the plugin.
@@ -55,6 +56,11 @@ class Plugin_Main {
 	 * @global Plugin_Context $context The plugin context instance.
 	 */
 	public function add_hooks() {
+		// Initialize AI Client on init hook if the class exists.
+		if ( class_exists( '\WordPress\AI_Client\AI_Client' ) ) {
+			add_action( 'init', array( '\WordPress\AI_Client\AI_Client', 'init' ) );
+		}
+
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			global $context;
 
@@ -67,6 +73,10 @@ class Plugin_Main {
 		// Create the Admin page.
 		$admin_page = new Admin_Page( $admin_ajax );
 		$admin_page->add_hooks();
+
+		// Create the Settings page.
+		$settings_page = new Settings_Page();
+		$settings_page->add_hooks();
 
 		// Create the Plugin Check Namer tool page.
 		$namer_page_class = '\\WordPress\\Plugin_Check\\Admin\\Namer_Page';
