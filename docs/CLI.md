@@ -17,7 +17,11 @@ Runs plugin check.
 Applies after evaluating `--checks`.
 
 [--ignore-codes=<codes>]
-: Ignore error codes provided as an argument in comma-separated values.
+: Ignore result codes provided as an argument in comma-separated values, e.g. missing_composer_json_file.
+Result codes are individual findings emitted by checks. They are different from check slugs used with
+`--checks` and `--exclude-checks`.
+Use an output format such as `--format=json` or `--format=csv` to inspect result codes.
+For example: `wp plugin check akismet --format=csv --fields=code,message`.
 
 [--format=<format>]
 : Format to display the results. Options are table, csv, json, ctrf, strict-table, strict-csv, strict-json, and strict-ctrf. The default will be a table.
@@ -52,9 +56,13 @@ options:
 [--exclude-directories=<directories>]
 : Additional directories to exclude from checks.
 By default, `.git`, `vendor`, `vendor_prefixed`, `vendor-prefixed` and `node_modules` directories are excluded.
+This only excludes files from file-based scans. It does not suppress plugin-level findings such as
+missing_composer_json_file; use `--ignore-codes` for specific result codes.
 
 [--exclude-files=<files>]
 : Additional files to exclude from checks.
+This only excludes files from file-based scans. It does not suppress plugin-level findings such as
+missing_composer_json_file; use `--ignore-codes` for specific result codes.
 
 [--severity=<severity>]
 : Severity level.
@@ -87,6 +95,8 @@ options:
 ```
 wp plugin check akismet
 wp plugin check akismet --checks=late_escaping
+wp plugin check akismet --format=csv --fields=code,message
+wp plugin check akismet --ignore-codes=missing_composer_json_file
 wp plugin check akismet --format=json
 wp plugin check akismet --format=ctrf
 wp plugin check akismet --mode=update
