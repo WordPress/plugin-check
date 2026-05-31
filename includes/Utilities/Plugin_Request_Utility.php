@@ -439,7 +439,7 @@ class Plugin_Request_Utility {
 			return array();
 		}
 
-		$lines = explode( "\n", $content );
+		$lines   = explode( "\n", $content );
 		$entries = array();
 
 		foreach ( $lines as $line ) {

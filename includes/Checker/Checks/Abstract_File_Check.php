@@ -284,7 +284,7 @@ abstract class Abstract_File_Check implements Static_Check {
 
 			$directories_to_ignore = Plugin_Request_Utility::get_directories_to_ignore();
 
-			$files_to_ignore = Plugin_Request_Utility::get_files_to_ignore();
+			$files_to_ignore        = Plugin_Request_Utility::get_files_to_ignore();
 			$directories_to_include = Plugin_Request_Utility::get_directories_to_include();
 			$files_to_include       = Plugin_Request_Utility::get_files_to_include();
 			$ignore_patterns        = Plugin_Request_Utility::get_files_to_ignore_patterns();
@@ -311,7 +311,7 @@ abstract class Abstract_File_Check implements Static_Check {
 
 					if ( ! $include_file ) {
 						foreach ( $files_to_include as $inc_file ) {
-							if ( str_ends_with( $file_path, "/" . $inc_file ) ) {
+							if ( str_ends_with( $file_path, '/' . $inc_file ) ) {
 								$include_file = true;
 								break;
 							}

@@ -58,11 +58,11 @@ By default, `.git`, `vendor`, `vendor_prefixed`, `vendor-prefixed` and `node_mod
 
 [--include-files=<files>]
 : Specific files to include in checks (comma-separated). Mutually exclusive with --exclude-files.
-: When specified, only the listed files will be checked.
+When specified, only the listed files will be checked.
 
 [--include-directories=<directories>]
 : Specific directories to include in checks (comma-separated, recursive). Mutually exclusive with --exclude-directories.
-: When specified, only files within the listed directories will be checked.
+When specified, only files within the listed directories will be checked.
 
 [--severity=<severity>]
 : Severity level.
