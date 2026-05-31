@@ -16,6 +16,8 @@ use WordPress\Plugin_Check\Checker\CLI_Runner;
  * Class providing utility methods to return plugin information based on the request.
  *
  * @since 1.0.0
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class Plugin_Request_Utility {
 

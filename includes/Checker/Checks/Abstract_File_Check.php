@@ -265,6 +265,9 @@ abstract class Abstract_File_Check implements Static_Check {
 	 *
 	 * @param Check_Context $plugin Context for the plugin to check.
 	 * @return array List of absolute file paths.
+	 *
+	 * @SuppressWarnings(PHPMD.NPathComplexity)
+	 * @SuppressWarnings(PHPMD.CyclomaticComplexity)
 	 */
 	private static function get_files( Check_Context $plugin ) {
 		$location = wp_normalize_path( $plugin->location() );
