@@ -37,3 +37,19 @@
 | enqueued_scripts_scope | performance | Checks whether any scripts are loaded on all pages, which is usually not desirable and can lead to performance issues. | [Learn more](https://developer.wordpress.org/plugins/) |
 | non_blocking_scripts | performance | Checks whether scripts and styles are enqueued using a recommended loading strategy. | [Learn more](https://developer.wordpress.org/plugins/) |
 | ai_provider | general | Recommends the WordPress AI Client when a plugin integrates directly with a third-party AI provider. | [Learn more](https://developer.wordpress.org/plugins/) |
+
+## Notes
+
+### Escaping widget wrapper output
+
+The `late_escaping` check expects all output to be escaped before it is sent to the browser. This also applies to widget display arguments such as `before_widget`, `after_widget`, `before_title`, and `after_title`.
+
+Classic widget examples often echo these values directly because themes provide the wrapper markup. When a plugin outputs them, use an escaping function that allows expected HTML, such as `wp_kses_post()`. Escape widget text according to the content it allows, such as `esc_html()` for plain text titles or `wp_kses_post()` for titles that intentionally allow limited markup:
+
+```php
+echo wp_kses_post( $args['before_widget'] );
+echo wp_kses_post( $args['before_title'] );
+echo esc_html( $title );
+echo wp_kses_post( $args['after_title'] );
+echo wp_kses_post( $args['after_widget'] );
+```
