@@ -28,6 +28,7 @@
 | no_unfiltered_uploads | plugin_repo | Detects disallowed usage of <code>ALLOW_UNFILTERED_UPLOADS</code>. | [Learn more](https://make.wordpress.org/plugins/handbook/performing-reviews/review-checklist/) |
 | trademarks | plugin_repo | Checks the usage of trademarks or other projects in the plugin slug. | [Learn more](https://developer.wordpress.org/plugins/wordpress-org/detailed-plugin-guidelines/) |
 | offloading_files | plugin_repo | Prevents using remote services that are not necessary. | [Learn more](https://developer.wordpress.org/plugins/wordpress-org/common-issues/#calling-files-remotely) |
+| write_file | plugin_repo | Detects if plugins save data in the plugin folder instead of using the uploads directory or database. | [Learn more](https://developer.wordpress.org/plugins/wordpress-org/common-issues/#saving-data-in-the-plugin-folder) |
 | setting_sanitization | plugin_repo | Ensures sanitization in register_setting(). | [Learn more](https://developer.wordpress.org/reference/functions/register_setting/) |
 | prefixing | plugin_repo | Checks plugin for unique prefixing for everything the plugin defines in the public namespace. | [Learn more](https://developer.wordpress.org/plugins/plugin-basics/best-practices/) |
 | enqueued_scripts_size | performance | Checks whether the cumulative size of all scripts enqueued on a page exceeds 293 KB. | [Learn more](https://developer.wordpress.org/plugins/) |
