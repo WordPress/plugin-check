@@ -179,11 +179,6 @@
 	border-bottom: 1px solid #c3c4c7;
 }
 
-.plugin-check__file-results:not(:has(.plugin-check__file-results-panel.open))
-	.plugin-check__file-results-header {
-	border-bottom: 0;
-}
-
 .plugin-check__file-results-toggle {
 	display: flex;
 	align-items: center;
