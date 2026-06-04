@@ -189,9 +189,6 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 	 * @return string|null First matching file path, or null if none found.
 	 */
 	private function find_file_with_personal_data_signal( array $php_files ): ?string {
-		$personal_data_functions = array_map( 'strtolower', self::PERSONAL_DATA_FUNCTIONS );
-		$wpdb_methods            = array_map( 'strtolower', self::WPDB_METHODS );
-
 		foreach ( $php_files as $file ) {
 			$source = file_get_contents( $file );
 			if ( false === $source || '' === $source ) {
@@ -202,50 +199,75 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 			$count  = count( $tokens );
 
 			for ( $i = 0; $i < $count; $i++ ) {
-				$token = $tokens[ $i ];
-
-				// Match `add_user_meta(`, `update_user_meta(`, etc.
-				if ( is_array( $token ) && T_STRING === $token[0] ) {
-					$name = strtolower( $token[1] );
-					if ( ! in_array( $name, $personal_data_functions, true ) ) {
-						continue;
-					}
-					if ( ! $this->is_global_function_call( $tokens, $i ) ) {
-						continue;
-					}
-					$next = $this->get_next_significant_token_index( $tokens, $i );
-					if ( null === $next || '(' !== $tokens[ $next ] ) {
-						continue;
-					}
+				if ( $this->is_personal_data_function_call( $tokens, $i ) ) {
 					return $file;
 				}
 
-				// Match `$wpdb->insert(`, `$wpdb->update(`, etc.
-				if ( is_array( $token ) && T_VARIABLE === $token[0] && '$wpdb' === $token[1] ) {
-					$next = $this->get_next_significant_token_index( $tokens, $i );
-					if ( null === $next ) {
-						continue;
-					}
-					$next_token = $tokens[ $next ];
-					if ( ! is_array( $next_token ) || T_OBJECT_OPERATOR !== $next_token[0] ) {
-						continue;
-					}
-					$method_index = $this->get_next_significant_token_index( $tokens, $next );
-					if ( null === $method_index ) {
-						continue;
-					}
-					$method_token = $tokens[ $method_index ];
-					if ( ! is_array( $method_token ) || T_STRING !== $method_token[0] ) {
-						continue;
-					}
-					if ( in_array( strtolower( $method_token[1] ), $wpdb_methods, true ) ) {
-						return $file;
-					}
+				if ( $this->is_wpdb_method_call( $tokens, $i ) ) {
+					return $file;
 				}
 			}
 		}
 
 		return null;
+	}
+
+	/**
+	 * Checks if the token at the given index is a personal data function call.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param array $tokens Token stream.
+	 * @param int   $index  Current token index.
+	 * @return bool
+	 */
+	private function is_personal_data_function_call( array $tokens, int $index ): bool {
+		$token = $tokens[ $index ];
+		if ( ! is_array( $token ) || T_STRING !== $token[0] ) {
+			return false;
+		}
+		$name = strtolower( $token[1] );
+		if ( ! in_array( $name, self::PERSONAL_DATA_FUNCTIONS, true ) ) {
+			return false;
+		}
+		if ( ! $this->is_global_function_call( $tokens, $index ) ) {
+			return false;
+		}
+		$next = $this->get_next_significant_token_index( $tokens, $index );
+		if ( null === $next || '(' !== $tokens[ $next ] ) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Checks if the token at the given index is a `$wpdb` method call (insert, update, replace).
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param array $tokens Token stream.
+	 * @param int   $index  Current token index.
+	 * @return bool
+	 */
+	private function is_wpdb_method_call( array $tokens, int $index ): bool {
+		$token = $tokens[ $index ];
+		if ( ! is_array( $token ) || T_VARIABLE !== $token[0] || '$wpdb' !== $token[1] ) {
+			return false;
+		}
+
+		$arrow_index  = $this->get_next_significant_token_index( $tokens, $index );
+		$method_index = $this->get_next_significant_token_index( $tokens, $arrow_index );
+
+		if ( null === $arrow_index || null === $method_index ) {
+			return false;
+		}
+
+		$arrow_token  = $tokens[ $arrow_index ];
+		$method_token = $tokens[ $method_index ];
+
+		return is_array( $arrow_token ) && T_OBJECT_OPERATOR === $arrow_token[0]
+			&& is_array( $method_token ) && T_STRING === $method_token[0]
+			&& in_array( strtolower( $method_token[1] ), self::WPDB_METHODS, true );
 	}
 
 	/**
@@ -260,8 +282,6 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 	 * @return bool True if the filter is registered.
 	 */
 	private function plugin_registers_exporter( array $php_files ): bool {
-		$target_filter = self::EXPORTER_FILTER;
-
 		foreach ( $php_files as $file ) {
 			$source = file_get_contents( $file );
 			if ( false === $source || '' === $source ) {
@@ -272,39 +292,47 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 			$count  = count( $tokens );
 
 			for ( $i = 0; $i < $count; $i++ ) {
-				$token = $tokens[ $i ];
-				if ( ! is_array( $token ) || T_STRING !== $token[0] ) {
-					continue;
-				}
-				if ( 'add_filter' !== strtolower( $token[1] ) ) {
-					continue;
-				}
-				if ( ! $this->is_global_function_call( $tokens, $i ) ) {
-					continue;
-				}
-
-				$open_paren = $this->get_next_significant_token_index( $tokens, $i );
-				if ( null === $open_paren || '(' !== $tokens[ $open_paren ] ) {
-					continue;
-				}
-
-				$arg_index = $this->get_next_significant_token_index( $tokens, $open_paren );
-				if ( null === $arg_index ) {
-					continue;
-				}
-
-				$arg = $tokens[ $arg_index ];
-				if ( ! is_array( $arg ) || T_CONSTANT_ENCAPSED_STRING !== $arg[0] ) {
-					continue;
-				}
-
-				if ( trim( $arg[1], "\"' \t\n\r\0\x0B" ) === $target_filter ) {
+				if ( $this->is_exporter_filter_registration( $tokens, $i ) ) {
 					return true;
 				}
 			}
 		}
 
 		return false;
+	}
+
+	/**
+	 * Checks if the token at the given index is an `add_filter` call registering
+	 * the personal data exporter filter.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param array $tokens Token stream.
+	 * @param int   $index  Current token index.
+	 * @return bool
+	 */
+	private function is_exporter_filter_registration( array $tokens, int $index ): bool {
+		$token = $tokens[ $index ];
+		if ( ! is_array( $token ) || T_STRING !== $token[0] || 'add_filter' !== strtolower( $token[1] ) ) {
+			return false;
+		}
+		if ( ! $this->is_global_function_call( $tokens, $index ) ) {
+			return false;
+		}
+
+		$open_paren = $this->get_next_significant_token_index( $tokens, $index );
+		$arg_index  = $this->get_next_significant_token_index( $tokens, $open_paren );
+
+		if ( null === $open_paren || '(' !== $tokens[ $open_paren ] || null === $arg_index ) {
+			return false;
+		}
+
+		$arg = $tokens[ $arg_index ];
+		if ( ! is_array( $arg ) || T_CONSTANT_ENCAPSED_STRING !== $arg[0] ) {
+			return false;
+		}
+
+		return trim( $arg[1], "\"' \t\n\r\0\x0B" ) === self::EXPORTER_FILTER;
 	}
 
 	/**
