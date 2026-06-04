@@ -505,7 +505,11 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 
 		foreach ( $check_slugs as $slug ) {
 			if ( ! in_array( $slug, $available_checks_slugs, true ) ) {
-				echo 'Warning: Check with the slug "' . $slug . '" does not exist.' . PHP_EOL;
+				printf(
+					esc_html__( 'Warning: Check with the slug "%s" does not exist.', 'plugin-check' ),
+					esc_html( $slug )
+				);
+				echo PHP_EOL;
 				$key = array_search( $slug, $check_slugs, true );
 				unset( $check_slugs[ $key ] );
 			}
