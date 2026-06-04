@@ -86,4 +86,32 @@ class Personal_Data_Exporter_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertFalse( $found, 'Unexpected missing_personal_data_exporter warning on a plugin with no personal data.' );
 	}
+
+	public function test_plugin_with_wpdb_insert_no_exporter_triggers_warning() {
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-personal-data-exporter-with-wpdb-insert/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check = new Personal_Data_Exporter_Check();
+		$check->run( $check_result );
+
+		$warnings = $check_result->get_warnings();
+
+		$this->assertNotEmpty( $warnings );
+
+		$found = false;
+		foreach ( $warnings as $file_warnings ) {
+			foreach ( $file_warnings as $line_warnings ) {
+				foreach ( $line_warnings as $col_warnings ) {
+					foreach ( $col_warnings as $warning ) {
+						if ( isset( $warning['code'] ) && 'missing_personal_data_exporter' === $warning['code'] ) {
+							$found = true;
+							break 4;
+						}
+					}
+				}
+			}
+		}
+
+		$this->assertTrue( $found, 'Expected missing_personal_data_exporter warning for $wpdb->insert was not found.' );
+	}
 }
