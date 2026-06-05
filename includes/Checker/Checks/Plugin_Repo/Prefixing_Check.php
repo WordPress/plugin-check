@@ -26,6 +26,14 @@ class Prefixing_Check extends Abstract_PHP_CodeSniffer_Check {
 	use Stable_Check;
 
 	/**
+	 * Cache of file contents for line-level checks.
+	 *
+	 * @since n.e.x.t
+	 * @var array<string, array<int, string>>
+	 */
+	private $file_line_cache = array();
+
+	/**
 	 * Gets the categories for the check.
 	 *
 	 * Every check must have at least one category.
@@ -106,10 +114,105 @@ class Prefixing_Check extends Abstract_PHP_CodeSniffer_Check {
 	 * @param int          $severity Severity level. Default is 5.
 	 */
 	protected function add_result_message_for_file( Check_Result $result, $error, $message, $code, $file, $line = 0, $column = 0, string $docs = '', $severity = 5 ) {
+		// Suppress false positives where a variable sits inside a `foreach` `as` clause
+		// or a `for` loop initializer at the top level of a file. PHPCS' WPCS sniff
+		// treats these as global variable definitions because the enclosing function
+		// early-return does not apply to file top-level scope, but they are loop-local.
+		if ( 'WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound' === $code
+			&& $this->is_variable_in_loop_control( $file, $line )
+		) {
+			return;
+		}
+
 		// Update error type and severity.
 		$error    = false;
 		$severity = 6;
 
 		parent::add_result_message_for_file( $result, $error, $message, $code, $file, $line, $column, $docs, $severity );
+	}
+
+	/**
+	 * Determines whether the variable on the given file/line sits inside a
+	 * `foreach` `as` clause or a `for` loop initializer.
+	 *
+	 * Used to filter out false-positive prefix warnings for loop-local variables
+	 * at the top level of a plugin file, where the WPCS sniff's normal
+	 * function-scope early-return does not apply.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param string $file Absolute path to the file.
+	 * @param int    $line 1-based line number to inspect.
+	 * @return bool True when the variable lives inside a loop control structure.
+	 */
+	private function is_variable_in_loop_control( $file, $line ) {
+		if ( $line <= 0 || ! is_string( $file ) || '' === $file || ! file_exists( $file ) ) {
+			return false;
+		}
+
+		if ( ! isset( $this->file_line_cache[ $file ] ) ) {
+			$contents = file_get_contents( $file ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			if ( false === $contents ) {
+				return false;
+			}
+			$this->file_line_cache[ $file ] = preg_split( '/\r\n|\r|\n/', $contents );
+		}
+
+		$lines = $this->file_line_cache[ $file ];
+		if ( ! isset( $lines[ $line - 1 ] ) ) {
+			return false;
+		}
+
+		$source = $lines[ $line - 1 ];
+
+		// Single-line cases.
+		// foreach ( ... as $key => $value ).
+		if ( preg_match( '/\bforeach\s*\([^)]*\bas\s+\$/', $source ) ) {
+			return true;
+		}
+
+		// for ( $i = 0, $j = 10; ... ) — match any `$var =` inside the parens.
+		if ( preg_match( '/\bfor\s*\([^)]*?\$\w+\s*=/', $source ) ) {
+			return true;
+		}
+
+		// Multi-line cases: the `foreach` or `for` opener sits on a
+		// previous line (with the opening parenthesis unclosed on that
+		// line) and the parenthesised header continues onto the
+		// reported line. Look back up to 10 lines for the opener.
+		// If we hit a `;` or `}` before the opener, we're not in the
+		// same statement.
+		$min_back = max( 0, $line - 11 );
+		for ( $i = $line - 2; $i >= $min_back; $i-- ) {
+			if ( ! isset( $lines[ $i ] ) ) {
+				continue;
+			}
+			if ( preg_match( '/\b(foreach|for)\s*\(\s*$/', $lines[ $i ] ) ) {
+				// Opener found. Walk forward from opener+1 to current line.
+				// If we find `as` keyword, this is a foreach header.
+				// If we find `$var =` before any `;`, this is a for-init.
+				// Stop if we hit a `;` (end of statement) or `)` (end of parens).
+				for ( $j = $i + 1; $j <= $line; $j++ ) {
+					if ( ! isset( $lines[ $j ] ) ) {
+						continue;
+					}
+					$scan = $lines[ $j ];
+					if ( preg_match( '/\bas\b/', $scan ) ) {
+						return true; // Foreach header found.
+					}
+					if ( preg_match( '/\$\w+\s*=/', $scan ) ) {
+						return true; // For-init found.
+					}
+					if ( strpos( $scan, ';' ) !== false ) {
+						break; // End of statement, not in this loop header.
+					}
+					if ( strpos( $scan, ')' ) !== false ) {
+						break; // End of parens.
+					}
+				}
+			}
+		}
+
+		return false;
 	}
 }
