@@ -104,6 +104,16 @@
 	</div>
 
 	<div id="plugin-check__export-controls" class="plugin-check__export-controls"></div>
+	<div id="plugin-check__collapse-expand-controls" class="plugin-check__collapse-expand-controls is-hidden">
+		<button type="button" id="plugin-check__collapse-all" class="button button-secondary" aria-label="<?php esc_attr_e( 'Collapse all file sections', 'plugin-check' ); ?>">
+			<span class="dashicons dashicons-arrow-up-alt2" aria-hidden="true"></span>
+			<?php esc_html_e( 'Collapse All', 'plugin-check' ); ?>
+		</button>
+		<button type="button" id="plugin-check__expand-all" class="button button-secondary" aria-label="<?php esc_attr_e( 'Expand all file sections', 'plugin-check' ); ?>">
+			<span class="dashicons dashicons-arrow-down-alt2" aria-hidden="true"></span>
+			<?php esc_html_e( 'Expand All', 'plugin-check' ); ?>
+		</button>
+	</div>
 	<div id="plugin-check__results"></div>
 
 </div>
