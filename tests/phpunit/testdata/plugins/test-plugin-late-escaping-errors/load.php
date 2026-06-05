@@ -22,3 +22,7 @@
 $test = '<p><strong>Hello World!</strong></p>';
 
 echo $test;
+
+$dom = new DOMDocument();
+$dom->loadHTML( '<p><strong>Hello World!</strong></p>' );
+echo $dom->saveHtml();

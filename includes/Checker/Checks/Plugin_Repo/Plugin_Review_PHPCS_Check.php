@@ -96,6 +96,12 @@ class Plugin_Review_PHPCS_Check extends Abstract_PHP_CodeSniffer_Check {
 			$docs     = 'https://make.wordpress.org/core/2016/07/06/i18n-improvements-in-4-6/';
 		}
 
+		if ( 'WordPress.DB.PreparedSQL.NotPrepared' === $code && $error ) {
+			$error    = false;
+			$message .= ' ' . esc_html__( 'If the query variable is already being passed through $wpdb->prepare(), this warning may be a false positive. You can suppress it by adding a phpcs:ignore comment.', 'plugin-check' );
+			$docs     = 'https://developer.wordpress.org/reference/classes/wpdb/prepare/';
+		}
+
 		parent::add_result_message_for_file( $result, $error, $message, $code, $file, $line, $column, $docs, $severity );
 	}
 }

@@ -18,8 +18,10 @@ class Late_Escaping_Check_Tests extends WP_UnitTestCase {
 
 		$late_escape_check->run( $check_result );
 
-		$errors = $check_result->get_errors();
+		$errors   = $check_result->get_errors();
+		$warnings = $check_result->get_warnings();
 
+		// The original echo $test should still be an error.
 		$this->assertNotEmpty( $errors );
 		$this->assertArrayHasKey( 'load.php', $errors );
 		$this->assertEquals( 1, $check_result->get_error_count() );
@@ -29,6 +31,24 @@ class Late_Escaping_Check_Tests extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 6, $errors['load.php'][24] );
 		$this->assertArrayHasKey( 'code', $errors['load.php'][24][6][0] );
 		$this->assertEquals( 'WordPress.Security.EscapeOutput.OutputNotEscaped', $errors['load.php'][24][6][0]['code'] );
+
+		// Verify saveHtml() false positive is downgraded to a warning.
+		$this->assertNotEmpty( $warnings );
+		$this->assertArrayHasKey( 'load.php', $warnings );
+
+		$found_save_html = false;
+		foreach ( $warnings['load.php'] as $line => $columns ) {
+			foreach ( $columns as $column => $messages ) {
+				foreach ( $messages as $message ) {
+					if ( 'WordPress.Security.EscapeOutput.OutputNotEscaped' === $message['code'] ) {
+						$found_save_html = true;
+						break 3;
+					}
+				}
+			}
+		}
+
+		$this->assertTrue( $found_save_html, 'saveHtml() should be a warning, not an error.' );
 	}
 
 	public function test_run_without_errors() {
