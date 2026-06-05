@@ -165,54 +165,99 @@ class Prefixing_Check extends Abstract_PHP_CodeSniffer_Check {
 
 		$source = $lines[ $line - 1 ];
 
-		// Single-line cases.
-		// foreach ( ... as $key => $value ).
+		if ( $this->is_in_single_line_loop_header( $source ) ) {
+			return true;
+		}
+
+		return $this->is_in_multiline_loop_header( $lines, $line );
+	}
+
+	/**
+	 * Checks whether a single source line contains a `foreach ... as $var` or
+	 * `for ( ... $var = ...` loop header.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param string $source Source line content.
+	 * @return bool True when the line is a single-line loop header.
+	 */
+	private function is_in_single_line_loop_header( $source ) {
+		// foreach ( $items as $key => $value ).
 		if ( preg_match( '/\bforeach\s*\([^)]*\bas\s+\$/', $source ) ) {
 			return true;
 		}
 
-		// for ( $i = 0, $j = 10; ... ) — match any `$var =` inside the parens.
+		// for ( $i = 0, $j = 10; ... ) — match any `$var =` inside parens.
 		if ( preg_match( '/\bfor\s*\([^)]*?\$\w+\s*=/', $source ) ) {
 			return true;
 		}
 
-		// Multi-line cases: the `foreach` or `for` opener sits on a
-		// previous line (with the opening parenthesis unclosed on that
-		// line) and the parenthesised header continues onto the
-		// reported line. Look back up to 10 lines for the opener.
-		// If we hit a `;` or `}` before the opener, we're not in the
-		// same statement.
+		return false;
+	}
+
+	/**
+	 * Checks whether the reported line is part of a multi-line `foreach` or
+	 * `for` header whose opener sits on a previous line.
+	 *
+	 * Looks back up to 10 lines for `foreach (` or `for (` with an unclosed
+	 * opening parenthesis, then walks forward to the reported line checking
+	 * for the `as` keyword (foreach) or `$var =` initializer (for).
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param array<int, string> $lines File contents split by line.
+	 * @param int                $line  1-based line number being inspected.
+	 * @return bool True when the line is inside a multi-line loop header.
+	 */
+	private function is_in_multiline_loop_header( $lines, $line ) {
 		$min_back = max( 0, $line - 11 );
+
 		for ( $i = $line - 2; $i >= $min_back; $i-- ) {
 			if ( ! isset( $lines[ $i ] ) ) {
 				continue;
 			}
-			if ( preg_match( '/\b(foreach|for)\s*\(\s*$/', $lines[ $i ] ) ) {
-				// Opener found. Walk forward from opener+1 to current line.
-				// If we find `as` keyword, this is a foreach header.
-				// If we find `$var =` before any `;`, this is a for-init.
-				// Stop if we hit a `;` (end of statement) or `)` (end of parens).
-				for ( $j = $i + 1; $j <= $line; $j++ ) {
-					if ( ! isset( $lines[ $j ] ) ) {
-						continue;
-					}
-					$scan = $lines[ $j ];
-					if ( preg_match( '/\bas\b/', $scan ) ) {
-						return true; // Foreach header found.
-					}
-					if ( preg_match( '/\$\w+\s*=/', $scan ) ) {
-						return true; // For-init found.
-					}
-					if ( strpos( $scan, ';' ) !== false ) {
-						break; // End of statement, not in this loop header.
-					}
-					if ( strpos( $scan, ')' ) !== false ) {
-						break; // End of parens.
-					}
-				}
+			if ( ! preg_match( '/\b(foreach|for)\s*\(\s*$/', $lines[ $i ] ) ) {
+				continue;
+			}
+			if ( $this->loop_header_contains_variable( $lines, $i + 1, $line ) ) {
+				return true;
 			}
 		}
 
+		return false;
+	}
+
+	/**
+	 * Walks forward from the loop opener to the reported line and checks
+	 * for an `as` keyword (foreach) or `$var =` initializer (for) before
+	 * any statement-terminating `;` or paren-closing `)`.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param array<int, string> $lines File contents split by line.
+	 * @param int                $start 1-based line index just after the opener.
+	 * @param int                $end   1-based line index of the reported line.
+	 * @return bool True when a loop header variable is found.
+	 */
+	private function loop_header_contains_variable( $lines, $start, $end ) {
+		for ( $j = $start; $j <= $end; $j++ ) {
+			if ( ! isset( $lines[ $j - 1 ] ) ) {
+				continue;
+			}
+			$scan = $lines[ $j - 1 ];
+			if ( preg_match( '/\bas\b/', $scan ) ) {
+				return true;
+			}
+			if ( preg_match( '/\$\w+\s*=/', $scan ) ) {
+				return true;
+			}
+			if ( strpos( $scan, ';' ) !== false ) {
+				return false;
+			}
+			if ( strpos( $scan, ')' ) !== false ) {
+				return false;
+			}
+		}
 		return false;
 	}
 }
