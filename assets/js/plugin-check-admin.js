@@ -1401,7 +1401,7 @@
 	/**
 	 * Toggles the open/collapsed state of a single file section.
 	 *
-	 * @since 1.6.0
+	 * @since 2.1.0
 	 *
 	 * @param {HTMLElement} section The file section element.
 	 */
@@ -1431,7 +1431,7 @@
 	/**
 	 * Sets the open state of every file section in the results container.
 	 *
-	 * @since 1.6.0
+	 * @since 2.1.0
 	 *
 	 * @param {boolean} open Open state to apply.
 	 */
