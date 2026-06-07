@@ -92,11 +92,20 @@ jobs:
 
       - name: Start WordPress
         run: |
-          if [[ ${{ matrix.coverage == true }} == true ]]; then
-            npm run wp-env:start:tests -- --xdebug=coverage
-          else
-            npm run wp-env:start:tests
-          fi
+          set +e
+          for i in 1 2 3; do
+            if [[ ${{ matrix.coverage == true }} == true ]]; then
+              npm run wp-env:start:tests -- --xdebug=coverage
+            else
+              npm run wp-env:start:tests
+            fi
+            if [ $? -eq 0 ]; then
+              exit 0
+            fi
+            echo "wp-env start failed (attempt $i), retrying in 30s..."
+            sleep 30
+          done
+          exit 1
 
       - name: Run tests
         run: |
