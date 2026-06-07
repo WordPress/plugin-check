@@ -93,7 +93,7 @@ jobs:
       - name: Start WordPress
         run: |
           set +e
-          for i in 1 2 3; do
+          for i in 1 2 3 4 5; do
             if [[ ${{ matrix.coverage == true }} == true ]]; then
               npm run wp-env:start:tests -- --xdebug=coverage
             else
@@ -102,8 +102,8 @@ jobs:
             if [ $? -eq 0 ]; then
               exit 0
             fi
-            echo "wp-env start failed (attempt $i), retrying in 30s..."
-            sleep 30
+            echo "wp-env start failed (attempt $i), retrying in 60s..."
+            sleep 60
           done
           exit 1
 
