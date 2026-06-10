@@ -11,7 +11,6 @@
 
 namespace PluginCheckCS\PluginCheck\Sniffs\Security;
 
-use PHP_CodeSniffer\Files\File;
 use WordPressCS\WordPress\Helpers\ContextHelper;
 
 /**
