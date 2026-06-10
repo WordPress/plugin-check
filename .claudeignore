@@ -1,0 +1,194 @@
+# =============================================================================
+# .claudeignore — Universal: React / Next.js / Composer / PHP / WordPress
+# Excludes files from Claude Code's automatic context loading.
+# NOTE: For hard security (secrets, credentials), use .claude/settings.json
+#       permissions.deny — .claudeignore is a context filter, not an access block.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Secrets & credentials (also lock down in settings.json permissions.deny)
+# -----------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.key
+*.p12
+*.pfx
+auth.json
+secrets.json
+wp-config.php
+wp-config-local.php
+
+# -----------------------------------------------------------------------------
+# Dependencies
+# -----------------------------------------------------------------------------
+node_modules/
+vendor/
+bower_components/
+
+# -----------------------------------------------------------------------------
+# Build & compiled output
+# -----------------------------------------------------------------------------
+.next/
+.nuxt/
+out/
+dist/
+build/
+*.min.js
+*.min.css
+*.bundle.js
+*.chunk.js
+*.map
+
+# -----------------------------------------------------------------------------
+# Cache & temp
+# -----------------------------------------------------------------------------
+.cache/
+.parcel-cache/
+.turbo/
+.swc/
+.eslintcache
+.stylelintcache
+*.log
+logs/
+tmp/
+temp/
+/storage/framework/cache/
+/storage/framework/sessions/
+/storage/framework/views/
+
+# -----------------------------------------------------------------------------
+# Test coverage & snapshots
+# -----------------------------------------------------------------------------
+coverage/
+.nyc_output/
+__snapshots__/
+playwright-report/
+test-results/
+cypress/videos/
+cypress/screenshots/
+
+# -----------------------------------------------------------------------------
+# WordPress — core, uploads, generated
+# -----------------------------------------------------------------------------
+wp-admin/
+wp-includes/
+wp-content/uploads/
+wp-content/upgrade/
+wp-content/cache/
+wp-content/backup-db/
+wp-content/advanced-cache.php
+wp-content/wp-cache-config.php
+wp-content/object-cache.php
+*.wphash
+
+# -----------------------------------------------------------------------------
+# WordPress — common plugin/theme generated files
+# -----------------------------------------------------------------------------
+wp-content/plugins/akismet/
+wp-content/plugins/hello.php
+wp-content/plugins/woocommerce/i18n/
+wp-content/themes/twenty*/
+
+# -----------------------------------------------------------------------------
+# PHP compiled / tooling
+# -----------------------------------------------------------------------------
+bootstrap/cache/
+storage/logs/
+*.compiled.php
+.phpunit.cache/
+.phpunit.result.cache
+psalm.xml
+phpstan.neon
+phpcs.xml
+
+# -----------------------------------------------------------------------------
+# Composer lock (large, rarely useful in context)
+# -----------------------------------------------------------------------------
+composer.lock
+
+# -----------------------------------------------------------------------------
+# Package locks (rarely need full lock file in context)
+# -----------------------------------------------------------------------------
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+
+# -----------------------------------------------------------------------------
+# Next.js / Vercel
+# -----------------------------------------------------------------------------
+.vercel/
+.next/trace
+next-env.d.ts
+
+# -----------------------------------------------------------------------------
+# TypeScript generated
+# -----------------------------------------------------------------------------
+*.d.ts
+tsconfig.tsbuildinfo
+
+# -----------------------------------------------------------------------------
+# Static assets (binary / large)
+# -----------------------------------------------------------------------------
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
+*.avif
+*.ico
+*.svg
+*.mp4
+*.mov
+*.mp3
+*.wav
+*.woff
+*.woff2
+*.ttf
+*.otf
+*.eot
+*.pdf
+*.zip
+*.tar.gz
+*.gz
+
+# -----------------------------------------------------------------------------
+# IDE & OS
+# -----------------------------------------------------------------------------
+.idea/
+.vscode/
+*.DS_Store
+Thumbs.db
+.fleet/
+
+# -----------------------------------------------------------------------------
+# Git internals
+# -----------------------------------------------------------------------------
+.git/
+
+# -----------------------------------------------------------------------------
+# Docker / infra (usually not relevant to code context)
+# -----------------------------------------------------------------------------
+.docker/
+docker-compose.override.yml
+*.dockerfile
+Dockerfile*
+.terraform/
+*.tfstate
+*.tfstate.backup
+
+# -----------------------------------------------------------------------------
+# Storybook build output
+# -----------------------------------------------------------------------------
+storybook-static/
+
+# -----------------------------------------------------------------------------
+# Misc generated / third-party docs
+# -----------------------------------------------------------------------------
+CHANGELOG.md
+CHANGELOG*.md
+LICENSE
+LICENSE*

@@ -15,7 +15,7 @@
 	<rule ref="WordPress.DB.PreparedSQLPlaceholders"/>
 
 	<!-- Nonces. These are triggered on any GET/POST access items. -->
-	<rule ref="WordPress.Security.NonceVerification">
+	<rule ref="PluginCheck.Security.NonceVerification">
 		<!-- This is triggered on all GET/POST access, it can't be an error. -->
 		<type>warning</type>
 	</rule>

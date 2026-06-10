@@ -1047,7 +1047,7 @@
         },
         {
             "name": "plugin-check/phpcs-sniffs",
-            "version": "dev-665-check-asks-users-to-editwrite-to-plugin-use-uploads-folder",
+            "version": "dev-trunk",
             "dist": {
                 "type": "path",
                 "url": "./phpcs-sniffs",
@@ -7869,5 +7869,5 @@
     "platform-overrides": {
         "php": "7.4"
     },
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }
