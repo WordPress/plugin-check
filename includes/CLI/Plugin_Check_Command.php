@@ -124,6 +124,10 @@ final class Plugin_Check_Command {
 	 * : Specific directories to include in checks (comma-separated, recursive). Mutually exclusive with --exclude-directories.
 	 * When specified, only files within the listed directories will be checked.
 	 *
+	 * [--use-config]
+	 * : Load .plugin-check.json and .distignore from the plugin root. Off by default.
+	 * Must be set explicitly so the scanner behavior stays predictable (e.g. for WordPress.org automated checks).
+	 *
 	 * [--severity=<severity>]
 	 * : Severity level.
 	 *
@@ -168,6 +172,7 @@ final class Plugin_Check_Command {
 	 *   wp plugin check akismet --include-files=akismet.php,class.akismet.php
 	 *   wp plugin check akismet --include-directories=includes,views
 	 *   wp plugin check akismet --exclude-directories=tests,vendor
+	 *   wp plugin check akismet --use-config
 	 *
 	 * @subcommand check
 	 *
@@ -183,11 +188,10 @@ final class Plugin_Check_Command {
 	 * @SuppressWarnings(PHPMD.CyclomaticComplexity)
 	 */
 	public function check( $args, $assoc_args ) {
-		$plugin = isset( $args[0] ) ? $args[0] : '';
-		$config = array();
+		$plugin      = isset( $args[0] ) ? $args[0] : '';
+		$plugin_path = '';
 
 		if ( ! empty( $plugin ) ) {
-			$plugin_path = '';
 			if ( is_dir( $plugin ) ) {
 				$plugin_path = $plugin;
 			} elseif ( is_file( $plugin ) ) {
@@ -195,11 +199,6 @@ final class Plugin_Check_Command {
 			} elseif ( ! filter_var( $plugin, FILTER_VALIDATE_URL ) ) {
 				// Assume slug for installed plugin.
 				$plugin_path = WP_PLUGIN_DIR . '/' . $plugin;
-			}
-
-			if ( ! empty( $plugin_path ) && is_dir( $plugin_path ) ) {
-				$config = Plugin_Request_Utility::get_plugin_configuration( $plugin_path );
-				Plugin_Request_Utility::load_filters_from_config( $plugin_path );
 			}
 		}
 
@@ -220,12 +219,19 @@ final class Plugin_Check_Command {
 				'mode'                          => 'new',
 				'ai'                            => false,
 				'ai-model'                      => '',
+				'use-config'                    => false,
 			),
-			$config
+			array()
 		);
 
 		// Get options based on the CLI arguments.
 		$options = $this->get_options( $assoc_args, $defaults );
+
+		// Load config files only when explicitly opted in.
+		$config = self::maybe_load_plugin_config( $plugin_path, ! empty( $options['use-config'] ) );
+
+		// Re-merge config into defaults so flags parsed later see the values.
+		$options = wp_parse_args( $config, $options );
 
 		// Create the plugin and checks array from CLI arguments.
 		// $plugin is already set above.
@@ -484,6 +490,29 @@ final class Plugin_Check_Command {
 		if ( ! empty( $ai_analysis ) || ! empty( $ai_stats ) ) {
 			$this->display_ai_summary( $ai_analysis, $ai_stats, $false_positive_results );
 		}
+	}
+
+	/**
+	 * Loads .plugin-check.json and .distignore when the --use-config flag is set.
+	 *
+	 * Gated explicitly so the scanner does not silently read author-controlled
+	 * config files. Returns the parsed config so it can be merged into defaults.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param string $plugin_path Plugin root path.
+	 * @param bool   $use_config  Whether the --use-config flag is set.
+	 * @return array Parsed config from .plugin-check.json, or empty array.
+	 */
+	public static function maybe_load_plugin_config( $plugin_path, $use_config ) {
+		if ( empty( $use_config ) || empty( $plugin_path ) || ! is_dir( $plugin_path ) ) {
+			return array();
+		}
+
+		$config = Plugin_Request_Utility::get_plugin_configuration( $plugin_path );
+		Plugin_Request_Utility::load_filters_from_config( $plugin_path );
+
+		return is_array( $config ) ? $config : array();
 	}
 
 	/**
