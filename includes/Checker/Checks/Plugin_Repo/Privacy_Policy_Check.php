@@ -21,6 +21,9 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
  * administrators via wp_add_privacy_policy_content(). This check detects common
  * personal-data-handling patterns and warns if that function is not used.
  *
+ * Uses token-based parsing to avoid false positives from function names appearing
+ * in comments or string literals.
+ *
  * @since 1.7.0
  */
 class Privacy_Policy_Check extends Abstract_File_Check {
@@ -29,20 +32,29 @@ class Privacy_Policy_Check extends Abstract_File_Check {
 	use Stable_Check;
 
 	/**
-	 * Regex patterns that indicate a plugin may handle personal data.
+	 * Function names that indicate a plugin may handle personal data.
 	 *
-	 * Each pattern is accompanied by a human-readable label used in the
+	 * Each function name is accompanied by a human-readable label used in the
 	 * warning message to help plugin authors understand why the check fired.
 	 *
 	 * @since 1.7.0
 	 * @var array<string, string>
 	 */
-	const PERSONAL_DATA_PATTERNS = array(
-		'wp_remote_post\s*\('     => 'wp_remote_post()',
-		'wp_remote_get\s*\('      => 'wp_remote_get()',
-		'setcookie\s*\('          => 'setcookie()',
-		'\$_COOKIE\b'             => '$_COOKIE',
-		'wp_set_auth_cookie\s*\(' => 'wp_set_auth_cookie()',
+	const PERSONAL_DATA_FUNCTIONS = array(
+		'wp_remote_post'     => 'wp_remote_post()',
+		'wp_remote_get'      => 'wp_remote_get()',
+		'setcookie'          => 'setcookie()',
+		'wp_set_auth_cookie' => 'wp_set_auth_cookie()',
+	);
+
+	/**
+	 * Variable names that indicate a plugin may handle personal data.
+	 *
+	 * @since 1.7.0
+	 * @var array<string, string>
+	 */
+	const PERSONAL_DATA_VARIABLES = array(
+		'$_COOKIE' => '$_COOKIE',
 	);
 
 	/**
@@ -74,41 +86,221 @@ class Privacy_Policy_Check extends Abstract_File_Check {
 		}
 
 		// First, detect whether the plugin already calls wp_add_privacy_policy_content().
-		$has_privacy_call = (bool) self::file_preg_match(
-			'#\bwp_add_privacy_policy_content\s*\(#',
-			$php_files
-		);
+		$has_privacy_call = $this->find_function_in_files( $php_files, array( 'wp_add_privacy_policy_content' => 'wp_add_privacy_policy_content()' ) );
 
 		// If the plugin already registers privacy policy content, nothing to warn about.
 		if ( $has_privacy_call ) {
 			return;
 		}
 
-		// Check for each personal-data-handling pattern.
-		foreach ( self::PERSONAL_DATA_PATTERNS as $pattern => $label ) {
-			$matches      = array();
-			$matched_file = self::file_preg_match( '#' . $pattern . '#', $php_files, $matches );
+		// Check for personal-data-handling function calls.
+		$matched_label = $this->find_function_in_files( $php_files, self::PERSONAL_DATA_FUNCTIONS );
 
-			if ( $matched_file ) {
-				$this->add_result_warning_for_file(
-					$result,
-					sprintf(
-						/* translators: %s: The detected function or variable name indicating personal data usage. */
-						__( '<strong>Missing privacy policy content registration.</strong><br>The plugin uses %s which may involve handling personal data, but does not call wp_add_privacy_policy_content(). Plugins that collect, store, or transmit personal data should suggest privacy policy text to site administrators.', 'plugin-check' ),
-						'<code>' . esc_html( $label ) . '</code>'
-					),
-					'missing_privacy_policy_content',
-					$result->plugin()->main_file(),
-					0,
-					0,
-					'https://developer.wordpress.org/plugins/privacy/suggesting-text-for-the-site-privacy-policy/',
-					5
-				);
+		// If no function call found, check for personal-data-handling variable usage.
+		if ( ! $matched_label ) {
+			$matched_label = $this->find_variable_in_files( $php_files, self::PERSONAL_DATA_VARIABLES );
+		}
 
-				// One warning per plugin is sufficient — avoid duplicate messages.
-				return;
+		if ( $matched_label ) {
+			$this->add_result_warning_for_file(
+				$result,
+				sprintf(
+					/* translators: %s: The detected function or variable name indicating personal data usage. */
+					__( '<strong>Missing privacy policy content registration.</strong><br>The plugin uses %s which may involve handling personal data, but does not call wp_add_privacy_policy_content(). Plugins that collect, store, or transmit personal data should suggest privacy policy text to site administrators.', 'plugin-check' ),
+					'<code>' . esc_html( $matched_label ) . '</code>'
+				),
+				'missing_privacy_policy_content',
+				$result->plugin()->main_file(),
+				0,
+				0,
+				'https://developer.wordpress.org/plugins/privacy/suggesting-text-for-the-site-privacy-policy/',
+				5
+			);
+		}
+	}
+
+	/**
+	 * Searches PHP files for a global function call using token-based parsing.
+	 *
+	 * Uses token_get_all() to avoid false positives from function names appearing
+	 * in comments or string literals.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param array                 $files           List of absolute file paths.
+	 * @param array<string, string> $function_names Map of function names (lowercase) to human-readable labels.
+	 * @return string|false Human-readable label of the first matched function, or false if none found.
+	 */
+	private function find_function_in_files( array $files, array $function_names ) {
+		$lowercase_names = array();
+		foreach ( $function_names as $name => $label ) {
+			$lowercase_names[ strtolower( $name ) ] = $label;
+		}
+
+		foreach ( $files as $file ) {
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			$source = file_get_contents( $file );
+			if ( false === $source || '' === $source ) {
+				continue;
+			}
+
+			$tokens = token_get_all( $source );
+
+			foreach ( $tokens as $index => $token ) {
+				if ( ! is_array( $token ) || T_STRING !== $token[0] ) {
+					continue;
+				}
+
+				$name = strtolower( $token[1] );
+				if ( ! isset( $lowercase_names[ $name ] ) ) {
+					continue;
+				}
+
+				$next_index = $this->get_next_significant_token_index( $tokens, $index );
+				if ( null === $next_index || '(' !== $tokens[ $next_index ] ) {
+					continue;
+				}
+
+				if ( ! $this->is_global_function_call( $tokens, $index ) ) {
+					continue;
+				}
+
+				return $lowercase_names[ $name ];
 			}
 		}
+
+		return false;
+	}
+
+	/**
+	 * Checks whether a tokenized T_STRING is a global function call.
+	 *
+	 * Rejects method calls (->method), static calls (Class::method),
+	 * function definitions (function name), instantiation (new name),
+	 * and namespace-qualified calls (\NS\name or NS\name).
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param array $tokens Token stream.
+	 * @param int   $index  Current token index.
+	 * @return bool True if the token represents a global function call.
+	 */
+	private function is_global_function_call( array $tokens, int $index ): bool {
+		$previous_index = $this->get_previous_significant_token_index( $tokens, $index );
+		if ( null === $previous_index ) {
+			return true;
+		}
+
+		$previous_token = $tokens[ $previous_index ];
+
+		if ( is_array( $previous_token ) ) {
+			$disqualifying_tokens = array( T_FUNCTION, T_NEW, T_OBJECT_OPERATOR, T_DOUBLE_COLON );
+
+			// T_NULLSAFE_OBJECT_OPERATOR (?->) only exists on PHP 8.0+.
+			if ( defined( 'T_NULLSAFE_OBJECT_OPERATOR' ) ) {
+				$disqualifying_tokens[] = constant( 'T_NULLSAFE_OBJECT_OPERATOR' );
+			}
+
+			if ( in_array( $previous_token[0], $disqualifying_tokens, true ) ) {
+				return false;
+			}
+
+			if ( T_NS_SEPARATOR === $previous_token[0] ) {
+				$before_namespace_index = $this->get_previous_significant_token_index( $tokens, $previous_index );
+				if ( null === $before_namespace_index ) {
+					return true;
+				}
+
+				$before_namespace_token = $tokens[ $before_namespace_index ];
+				if ( is_array( $before_namespace_token ) && in_array( $before_namespace_token[0], array( T_STRING, T_NAMESPACE ), true ) ) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Searches PHP files for a variable usage using token-based parsing.
+	 *
+	 * Uses token_get_all() to avoid false positives from variable names appearing
+	 * in comments or string literals.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param array                 $files           List of absolute file paths.
+	 * @param array<string, string> $variable_names  Map of variable names to human-readable labels.
+	 * @return string|false Human-readable label of the first matched variable, or false if none found.
+	 */
+	private function find_variable_in_files( array $files, array $variable_names ) {
+		foreach ( $files as $file ) {
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			$source = file_get_contents( $file );
+			if ( false === $source || '' === $source ) {
+				continue;
+			}
+
+			$tokens = token_get_all( $source );
+
+			foreach ( $tokens as $token ) {
+				if ( ! is_array( $token ) || T_VARIABLE !== $token[0] ) {
+					continue;
+				}
+
+				if ( isset( $variable_names[ $token[1] ] ) ) {
+					return $variable_names[ $token[1] ];
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Finds the next significant token index, skipping whitespace.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param array $tokens Token stream.
+	 * @param int   $index  Current token index.
+	 * @return int|null Index of the next significant token, or null if end of stream.
+	 */
+	private function get_next_significant_token_index( array $tokens, int $index ): ?int {
+		$count = count( $tokens );
+		for ( $i = $index + 1; $i < $count; $i++ ) {
+			$token = $tokens[ $i ];
+			if ( is_array( $token ) && T_WHITESPACE === $token[0] ) {
+				continue;
+			}
+
+			return $i;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Finds the previous significant token index, skipping whitespace and comments.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param array $tokens Token stream.
+	 * @param int   $index  Current token index.
+	 * @return int|null Index of the previous significant token, or null if start of stream.
+	 */
+	private function get_previous_significant_token_index( array $tokens, int $index ): ?int {
+		for ( $i = $index - 1; $i >= 0; $i-- ) {
+			$token = $tokens[ $i ];
+
+			if ( is_array( $token ) && in_array( $token[0], array( T_WHITESPACE, T_COMMENT, T_DOC_COMMENT ), true ) ) {
+				continue;
+			}
+
+			return $i;
+		}
+
+		return null;
 	}
 
 	/**

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Test Plugin Privacy Policy Without Errors
  * Plugin URI: https://github.com/WordPress/plugin-check
- * Description: A test plugin that handles personal data AND correctly calls wp_add_privacy_policy_content().
+ * Description: A test plugin that handles personal data AND correctly registers privacy policy content.
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Version: 1.0.0

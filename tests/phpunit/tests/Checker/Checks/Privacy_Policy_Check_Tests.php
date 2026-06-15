@@ -68,4 +68,46 @@ class Privacy_Policy_Check_Tests extends WP_UnitTestCase {
 		$this->assertEmpty( $warnings );
 		$this->assertEmpty( $errors );
 	}
+
+	/**
+	 * Tests that function names appearing only in comments do not satisfy the
+	 * wp_add_privacy_policy_content() check. The fixture contains a real
+	 * wp_remote_post() signal plus a comment-only mention of the privacy
+	 * function; the check must still emit a warning because the real code does
+	 * not register privacy policy content.
+	 */
+	public function test_run_with_comment_only_signals() {
+		$check         = new Privacy_Policy_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-privacy-policy-comment-only/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check->run( $check_result );
+
+		$warnings = $check_result->get_warnings();
+
+		$this->assertNotEmpty( $warnings );
+		$this->assertArrayHasKey( 'load.php', $warnings );
+		$this->assertCount( 1, wp_list_filter( $warnings['load.php'][0][0], array( 'code' => 'missing_privacy_policy_content' ) ) );
+	}
+
+	/**
+	 * Tests that function names and variable names appearing only inside
+	 * string literals do not satisfy the wp_add_privacy_policy_content() check.
+	 * The fixture contains a real wp_remote_post() signal plus a string-only
+	 * mention of the privacy function; the check must still emit a warning
+	 * because the real code does not register privacy policy content.
+	 */
+	public function test_run_with_string_only_signals() {
+		$check         = new Privacy_Policy_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-privacy-policy-string-only/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check->run( $check_result );
+
+		$warnings = $check_result->get_warnings();
+
+		$this->assertNotEmpty( $warnings );
+		$this->assertArrayHasKey( 'load.php', $warnings );
+		$this->assertCount( 1, wp_list_filter( $warnings['load.php'][0][0], array( 'code' => 'missing_privacy_policy_content' ) ) );
+	}
 }
