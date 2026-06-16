@@ -498,7 +498,7 @@ final class Plugin_Check_Command {
 	 * Gated explicitly so the scanner does not silently read author-controlled
 	 * config files. Returns the parsed config so it can be merged into defaults.
 	 *
-	 * @since 1.9.0
+	 * @since 2.1.0
 	 *
 	 * @param string $plugin_path Plugin root path.
 	 * @param bool   $use_config  Whether the --use-config flag is set.

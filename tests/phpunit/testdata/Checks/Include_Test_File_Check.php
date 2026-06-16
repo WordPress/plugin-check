@@ -14,7 +14,7 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
 /**
  * Concrete file check that captures the file list for testing.
  *
- * @since 1.9.0
+ * @since 2.1.0
  */
 class Include_Test_File_Check extends Abstract_File_Check {
 

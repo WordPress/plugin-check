@@ -209,7 +209,7 @@ class Plugin_Request_Utility {
 	/**
 	 * Gets the directories to include using the filter.
 	 *
-	 * @since 1.9.0
+	 * @since 2.1.0
 	 */
 	public static function get_directories_to_include() {
 		$default_include_directories = array();
@@ -217,7 +217,7 @@ class Plugin_Request_Utility {
 		/**
 		 * Filters the directories to include.
 		 *
-		 * @since 1.9.0
+		 * @since 2.1.0
 		 *
 		 * @param array $default_include_directories An array of directories to include.
 		 */
@@ -229,7 +229,7 @@ class Plugin_Request_Utility {
 	/**
 	 * Gets the files to include using the filter.
 	 *
-	 * @since 1.9.0
+	 * @since 2.1.0
 	 */
 	public static function get_files_to_include() {
 		$default_include_files = array();
@@ -237,7 +237,7 @@ class Plugin_Request_Utility {
 		/**
 		 * Filters the files to include.
 		 *
-		 * @since 1.9.0
+		 * @since 2.1.0
 		 *
 		 * @param array $default_include_files An array of files to include.
 		 */
@@ -391,7 +391,7 @@ class Plugin_Request_Utility {
 	/**
 	 * Gets the configuration from .plugin-check.json in the plugin root.
 	 *
-	 * @since 1.9.0
+	 * @since 2.1.0
 	 *
 	 * @param string $plugin_root_path The plugin root path.
 	 * @return array The configuration array.
@@ -422,7 +422,7 @@ class Plugin_Request_Utility {
 	/**
 	 * Gets the entries from .distignore in the plugin root.
 	 *
-	 * @since 1.9.0
+	 * @since 2.1.0
 	 *
 	 * @param string $plugin_root_path The plugin root path.
 	 * @return array The list of ignored entries.
@@ -458,7 +458,7 @@ class Plugin_Request_Utility {
 	/**
 	 * Converts a gitignore pattern to a PCRE regex.
 	 *
-	 * @since 1.9.0
+	 * @since 2.1.0
 	 *
 	 * @param string $pattern Gitignore pattern.
 	 * @return string PCRE regex.
@@ -499,7 +499,7 @@ class Plugin_Request_Utility {
 	/**
 	 * Gets the patterns to ignore using the filter.
 	 *
-	 * @since 1.9.0
+	 * @since 2.1.0
 	 *
 	 * @return array Array of regex patterns.
 	 */
@@ -509,7 +509,7 @@ class Plugin_Request_Utility {
 		/**
 		 * Filters the regex patterns to ignore.
 		 *
-		 * @since 1.9.0
+		 * @since 2.1.0
 		 *
 		 * @param array $default_ignore_patterns An array of regex patterns to ignore.
 		 */
@@ -521,7 +521,7 @@ class Plugin_Request_Utility {
 	/**
 	 * Loads configuration filters from the plugin config files.
 	 *
-	 * @since 1.9.0
+	 * @since 2.1.0
 	 *
 	 * @param string $plugin_path The plugin root path.
 	 */
@@ -534,7 +534,7 @@ class Plugin_Request_Utility {
 	/**
 	 * Loads .distignore filters.
 	 *
-	 * @since 1.9.0
+	 * @since 2.1.0
 	 *
 	 * @param string $plugin_path The plugin root path.
 	 */
@@ -560,7 +560,7 @@ class Plugin_Request_Utility {
 	/**
 	 * Loads .plugin-check.json filters.
 	 *
-	 * @since 1.9.0
+	 * @since 2.1.0
 	 *
 	 * @param string $plugin_path The plugin root path.
 	 */
