@@ -13,6 +13,7 @@
 	<rule ref="PluginCheck.CodeAnalysis.WriteFile" />
 	<rule ref="PluginCheck.Security.VerifyNonce" />
 	<rule ref="PluginCheck.Security.DirectDB" />
+	<rule ref="PluginCheck.Security.AIConnectorAPIKey" />
 
 	<!-- Minified PHP files are not allowed without the original source -->
 	<rule ref="Internal.Tokenizer.Exception">
