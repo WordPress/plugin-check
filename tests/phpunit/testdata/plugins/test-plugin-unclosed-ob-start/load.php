@@ -34,3 +34,20 @@ function conditional_close() {
 		ob_end_clean();
 	}
 }
+
+// 6. Fully-qualified \ob_start() paired in the same function → no issue (PHP 8 FQN handling).
+function fqn_paired() {
+	\ob_start();
+	echo 'hello';
+	\ob_end_clean();
+}
+
+// 7. ob_start() closed via an immediately adjacent hook callback → no issue (statically obvious).
+function hook_paired() {
+	ob_start();
+	add_action( 'template_redirect', 'test_plugin_unclosed_ob_start_close' );
+}
+
+function test_plugin_unclosed_ob_start_close() {
+	ob_end_clean();
+}
