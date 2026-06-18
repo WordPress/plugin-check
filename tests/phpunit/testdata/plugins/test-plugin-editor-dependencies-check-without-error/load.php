@@ -1,7 +1,7 @@
 <?php
 /**
  * File without errors for the editor dependencies check.
- * 
+ *
  * @package plugin-check
  */
 

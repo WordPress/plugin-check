@@ -35,7 +35,7 @@ class Editor_Dependencies_Check extends Abstract_Runtime_Check implements With_S
 	private $viewable_post_types;
 
 	/**
-	 * List of already reported handles.
+	 * Prevent duplicate warnings across multiple URLs.
 	 *
 	 * @var array
 	 */
