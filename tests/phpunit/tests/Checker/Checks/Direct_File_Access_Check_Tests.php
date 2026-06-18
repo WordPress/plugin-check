@@ -235,4 +235,20 @@ class Direct_File_Access_Check_Tests extends WP_UnitTestCase {
 		// Files with only interface definitions should not produce errors.
 		$this->assertArrayNotHasKey( 'includes/interface-only-file.php', $errors );
 	}
+
+	/**
+	 * Test that files with only declare statements are allowed.
+	 */
+	public function test_run_allows_declare_only_files() {
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-direct-file-access-without-errors/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check = new Direct_File_Access_Check();
+		$check->run( $check_result );
+
+		$errors = $check_result->get_errors();
+
+		// Files with only declare(strict_types=1) should not produce errors.
+		$this->assertArrayNotHasKey( 'file-with-declare-only.php', $errors );
+	}
 }

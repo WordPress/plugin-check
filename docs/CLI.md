@@ -20,16 +20,18 @@ Applies after evaluating `--checks`.
 : Ignore error codes provided as an argument in comma-separated values.
 
 [--format=<format>]
-: Format to display the results. Options are table, csv, json, strict-table, strict-csv, and strict-json. The default will be a table.
+: Format to display the results. Options are table, csv, json, ctrf, strict-table, strict-csv, strict-json, and strict-ctrf. The default will be a table.
 ---
 default: table
 options:
   - table
   - csv
   - json
+  - ctrf
   - strict-table
   - strict-csv
   - strict-json
+  - strict-ctrf
 ---
 
 [--categories]
@@ -86,6 +88,7 @@ options:
 wp plugin check akismet
 wp plugin check akismet --checks=late_escaping
 wp plugin check akismet --format=json
+wp plugin check akismet --format=ctrf
 wp plugin check akismet --mode=update
 ```
 

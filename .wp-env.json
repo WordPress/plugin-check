@@ -1,9 +1,5 @@
 {
+  "$schema": "https://schemas.wp.org/trunk/wp-env.json",
   "core": null,
-  "plugins": [ "." ],
-  "env": {
-    "tests": {
-      "phpVersion": "7.4"
-    }
-  }
+  "plugins": [ "." ]
 }

@@ -166,6 +166,28 @@ Feature: Test that the WP-CLI command works.
       FILE:
       """
 
+    When I run the WP-CLI command `plugin check foo-single.php --format=ctrf`
+    Then STDOUT should be valid JSON
+    And STDOUT should contain:
+      """
+      "reportFormat": "CTRF"
+      """
+    And STDOUT should not contain:
+      """
+      FILE:
+      """
+
+    When I run the WP-CLI command `plugin check foo-single.php --format=strict-ctrf`
+    Then STDOUT should be valid JSON
+    And STDOUT should contain:
+      """
+      "reportFormat": "CTRF"
+      """
+    And STDOUT should not contain:
+      """
+      FILE:
+      """
+
   Scenario: Check plugin with special chars in plugin name
     Given a WP install with the Plugin Check plugin
     And a wp-content/plugins/johns-post-counter/johns-post-counter.php file:

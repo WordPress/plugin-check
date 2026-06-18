@@ -81,6 +81,10 @@ class License_Utils_Tests extends WP_UnitTestCase {
 
 			array( 'WTFPL', 'WTFPL' ),
 			array( 'WTFPL v2', 'WTFPL' ),
+
+			array( 'EUPL-1.1', 'EUPL' ),
+			array( 'EUPL-1.2', 'EUPL' ),
+
 			array( 'Do What The F*ck You Want To Public License', 'WTFPL' ),
 			array( 'Do What The Fuck You Want To Public License', 'WTFPL' ),
 		);
@@ -95,7 +99,8 @@ class License_Utils_Tests extends WP_UnitTestCase {
 			array( 'artistic-license-2.0 or MIT', true ),
 			array( 'cc-by-sa-4.0 or cc-by-nc-4.0', true ),
 			array( 'public-domain or unlicense', true ),
-			array( 'eupl-1.1+', true ),
+			array( 'EUPL-1.1', true ),
+			array( 'EUPL-1.2', true ),
 			array( 'AGPL-3.0-only', true ),
 
 			array( 'MIT License', false ),
@@ -129,9 +134,10 @@ class License_Utils_Tests extends WP_UnitTestCase {
 			array( 'WTFPL v2', true ),
 			array( 'Do What The F*ck You Want To Public License', true ),
 			array( 'Do What The Fuck You Want To Public License', true ),
+			array( 'EUPL-1.1', true ),
+			array( 'EUPL-1.2', true ),
 
 			array( 'EPL', false ),
-			array( 'EUPL', false ),
 			array( 'MPL10', false ),
 			array( 'YPL', false ),
 			array( 'ZPL', false ),

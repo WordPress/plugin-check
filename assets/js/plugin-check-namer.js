@@ -268,7 +268,17 @@
 							}
 						}
 
-						tokensText += tokenUsage.total_tokens + ' total';
+						const totalTokens =
+							tokenUsage.total_tokens ||
+							( tokenUsage.prompt_tokens &&
+							tokenUsage.completion_tokens
+								? tokenUsage.prompt_tokens +
+								  tokenUsage.completion_tokens
+								: null );
+
+						if ( totalTokens ) {
+							tokensText += totalTokens + ' total';
+						}
 
 						// Add breakdown with prompt and completion tokens.
 						if (

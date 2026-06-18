@@ -98,7 +98,11 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 	}
 
 	/**
-	 * Looks for UpdateURI in plugin header and amends the given result with an error if found.
+	 * Looks for UpdateURI in plugin header and amends the given result with an error if invalid.
+	 *
+	 * Plugins on WordPress.org should not use this header, but the same URI formats as in the
+	 * directory API are accepted here: a wordpress.org or w.org plugin URL whose slug matches
+	 * this plugin passes; any other value is flagged.
 	 *
 	 * @since 1.0.0
 	 *
@@ -110,19 +114,34 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 		}
 
 		$plugin_main_file = $result->plugin()->main_file();
+		$plugin_slug      = $result->plugin()->slug();
 		$plugin_header    = get_plugin_data( $plugin_main_file );
-		if ( ! empty( $plugin_header['UpdateURI'] ) ) {
-			$this->add_result_error_for_file(
-				$result,
-				__( '<strong>Including An Update Checker / Changing Updates functionality.</strong><br>Plugin Updater detected. Use of the Update URI header is not allowed in plugins hosted on WordPress.org.', 'plugin-check' ),
-				'plugin_updater_detected',
-				$plugin_main_file,
-				0,
-				0,
-				'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#update-checker',
-				9
-			);
+
+		if ( empty( $plugin_header['UpdateURI'] ) ) {
+			return;
 		}
+
+		$update_uri_matches = array();
+		$update_uri_valid   = (bool) preg_match(
+			'!^(https?://)?(wordpress.org|w.org)/plugins?/(?P<slug>[^/]+)/?$!i',
+			$plugin_header['UpdateURI'],
+			$update_uri_matches
+		);
+
+		if ( $update_uri_valid && isset( $update_uri_matches['slug'] ) && $update_uri_matches['slug'] === $plugin_slug ) {
+			return;
+		}
+
+		$this->add_result_error_for_file(
+			$result,
+			__( '<strong>Including An Update Checker / Changing Updates functionality.</strong><br>Plugin Updater detected. Use of the Update URI header is not allowed in plugins hosted on WordPress.org.', 'plugin-check' ),
+			'plugin_updater_detected',
+			$plugin_main_file,
+			0,
+			0,
+			'https://developer.wordpress.org/plugins/wordpress-org/common-issues/#update-checker',
+			9
+		);
 	}
 
 	/**

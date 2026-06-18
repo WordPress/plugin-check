@@ -163,10 +163,12 @@ trait AI_Check_Names {
 		}
 
 		// Try to generate a rich result first.
+		// Use is_callable() instead of method_exists() to detect methods
+		// provided via __call() magic (e.g. WP_AI_Client_Prompt_Builder).
 		$result = null;
-		if ( method_exists( $builder, 'generate_text_result' ) ) {
+		if ( is_callable( array( $builder, 'generate_text_result' ) ) ) {
 			$result = $builder->generate_text_result();
-		} elseif ( method_exists( $builder, 'generateTextResult' ) ) {
+		} elseif ( is_callable( array( $builder, 'generateTextResult' ) ) ) {
 			$result = $builder->generateTextResult();
 		}
 
@@ -197,64 +199,6 @@ trait AI_Check_Names {
 	}
 
 	/**
-	 * Applies a model preference to the prompt builder if supported.
-	 *
-	 * @since 1.9.0
-	 *
-	 * @param object $builder Prompt builder instance.
-	 * @param string $model_preference Model preference.
-	 * @return object|WP_Error Updated builder or WP_Error.
-	 */
-	protected function apply_model_preference( $builder, $model_preference ) {
-		if ( empty( $model_preference ) ) {
-			return $builder;
-		}
-
-		$preference = $this->normalize_model_preference( $model_preference );
-
-		try {
-			$result = $builder->using_model_preference( $preference );
-			return $result ? $result : $builder;
-		} catch ( \Exception $e ) {
-			// If method doesn't exist or fails, return WP_Error.
-			return new WP_Error(
-				'model_preference_error',
-				sprintf(
-					/* translators: %s: Exception message */
-					__( 'Failed to apply model preference: %s', 'plugin-check' ),
-					$e->getMessage()
-				)
-			);
-		}
-	}
-
-	/**
-	 * Normalizes a model preference string into a supported preference format.
-	 *
-	 * @since 1.9.0
-	 *
-	 * @param string $model_preference Model preference string.
-	 * @return string|array Normalized preference.
-	 */
-	protected function normalize_model_preference( $model_preference ) {
-		$trimmed = trim( (string) $model_preference );
-		if ( '' === $trimmed ) {
-			return '';
-		}
-
-		foreach ( array( '::', '|', ':' ) as $separator ) {
-			if ( false !== strpos( $trimmed, $separator ) ) {
-				list( $provider, $model ) = array_map( 'trim', explode( $separator, $trimmed, 2 ) );
-				if ( '' !== $provider && '' !== $model ) {
-					return array( $provider, $model );
-				}
-			}
-		}
-
-		return $trimmed;
-	}
-
-	/**
 	 * Extracts token usage from a result object, if available.
 	 *
 	 * @since 1.9.0
@@ -280,6 +224,11 @@ trait AI_Check_Names {
 		$prompt_tokens     = method_exists( $usage, 'get_prompt_tokens' ) ? $usage->get_prompt_tokens() : ( method_exists( $usage, 'getPromptTokens' ) ? $usage->getPromptTokens() : null );
 		$completion_tokens = method_exists( $usage, 'get_completion_tokens' ) ? $usage->get_completion_tokens() : ( method_exists( $usage, 'getCompletionTokens' ) ? $usage->getCompletionTokens() : null );
 		$total_tokens      = method_exists( $usage, 'get_total_tokens' ) ? $usage->get_total_tokens() : ( method_exists( $usage, 'getTotalTokens' ) ? $usage->getTotalTokens() : null );
+
+		// Compute total from prompt + completion if not directly available.
+		if ( null === $total_tokens && null !== $prompt_tokens && null !== $completion_tokens ) {
+			$total_tokens = $prompt_tokens + $completion_tokens;
+		}
 
 		if ( null === $prompt_tokens && null === $completion_tokens && null === $total_tokens ) {
 			return null;
@@ -647,7 +596,7 @@ trait AI_Check_Names {
 			$text .= ' (' . implode( ', ', $decoded['disallowed_type'] ) . ')';
 		}
 		if ( ! empty( $text ) ) {
-			$parts[] = '<strong>' . __( '🚫 Disallowed:', 'plugin-check' ) . '</strong> ' . $text;
+			$parts[] = '<strong>🚫 ' . esc_html__( 'Disallowed:', 'plugin-check' ) . '</strong> ' . $text;
 		}
 	}
 
@@ -662,7 +611,7 @@ trait AI_Check_Names {
 	 */
 	protected function add_naming_section( &$parts, $decoded ) {
 		if ( ! empty( $decoded['possible_naming_issues'] ) && ! empty( $decoded['naming_explanation'] ) ) {
-			$parts[] = '<strong>' . __( '📝 Naming:', 'plugin-check' ) . '</strong> ' . $decoded['naming_explanation'];
+			$parts[] = '<strong>📝 ' . esc_html__( 'Naming:', 'plugin-check' ) . '</strong> ' . $decoded['naming_explanation'];
 		}
 	}
 
@@ -677,7 +626,7 @@ trait AI_Check_Names {
 	 */
 	protected function add_owner_section( &$parts, $decoded ) {
 		if ( ! empty( $decoded['possible_owner_issues'] ) && ! empty( $decoded['owner_explanation'] ) ) {
-			$parts[] = '<strong>' . __( '©️ Owner/Trademark:', 'plugin-check' ) . '</strong> ' . $decoded['owner_explanation'];
+			$parts[] = '<strong>©️ ' . esc_html__( 'Owner/Trademark:', 'plugin-check' ) . '</strong> ' . $decoded['owner_explanation'];
 		}
 	}
 
@@ -692,7 +641,7 @@ trait AI_Check_Names {
 	 */
 	protected function add_description_section( &$parts, $decoded ) {
 		if ( ! empty( $decoded['possible_description_issues'] ) && ! empty( $decoded['description_explanation'] ) ) {
-			$parts[] = '<strong>' . __( '📄 Description:', 'plugin-check' ) . '</strong> ' . $decoded['description_explanation'];
+			$parts[] = '<strong>📄 ' . esc_html__( 'Description:', 'plugin-check' ) . '</strong> ' . $decoded['description_explanation'];
 		}
 	}
 
@@ -708,7 +657,7 @@ trait AI_Check_Names {
 	protected function add_trademarks_section( &$parts, $decoded ) {
 		if ( ! empty( $decoded['trademarks_or_project_names_array'] ) && is_array( $decoded['trademarks_or_project_names_array'] ) ) {
 			$trademarks = implode( ', ', array_map( 'esc_html', $decoded['trademarks_or_project_names_array'] ) );
-			$parts[]    = '<strong>' . __( '™️ Trademarks Detected:', 'plugin-check' ) . '</strong> ' . $trademarks;
+			$parts[]    = '<strong>™️ ' . esc_html__( 'Trademarks Detected:', 'plugin-check' ) . '</strong> ' . $trademarks;
 		}
 	}
 
@@ -738,7 +687,7 @@ trait AI_Check_Names {
 		}
 
 		if ( ! empty( $suggestions ) ) {
-			$parts[] = '<br><strong>' . __( '💡 Suggestions:', 'plugin-check' ) . '</strong><br>' . implode( '<br>', $suggestions );
+			$parts[] = '<br><strong>💡 ' . esc_html__( 'Suggestions:', 'plugin-check' ) . '</strong><br>' . implode( '<br>', $suggestions );
 		}
 	}
 
@@ -754,7 +703,7 @@ trait AI_Check_Names {
 	protected function add_language_section( &$parts, $decoded ) {
 		if ( isset( $decoded['description_language_is_in_english'] ) && false === $decoded['description_language_is_in_english'] ) {
 			if ( ! empty( $decoded['description_what_is_not_in_english'] ) ) {
-				$parts[] = '<strong>' . __( '🌐 Language:', 'plugin-check' ) . '</strong> ' . $decoded['description_what_is_not_in_english'];
+				$parts[] = '<strong>🌐 ' . esc_html__( 'Language:', 'plugin-check' ) . '</strong> ' . $decoded['description_what_is_not_in_english'];
 			}
 		}
 	}

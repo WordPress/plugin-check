@@ -15,6 +15,7 @@
 | plugin_updater | plugin_repo | Prevents altering WordPress update routines or using custom updaters, which are not allowed on WordPress.org. | [Learn more](https://developer.wordpress.org/plugins/wordpress-org/detailed-plugin-guidelines/) |
 | plugin_uninstall | plugin_repo | Checks related to plugin uninstallation. | [Learn more](https://developer.wordpress.org/plugins/plugin-basics/uninstall-methods/#method-2-uninstall-php) |
 | external_admin_menu_links | plugin_repo | Detects external URLs used in top-level WordPress admin menu, which disrupts the expected user experience. | [Learn more](https://developer.wordpress.org/plugins/wordpress-org/detailed-plugin-guidelines/#11-plugins-should-not-hijack-the-admin) |
+| wp_functions_compatibility | plugin_repo | Checks whether WordPress functions used by the plugin are compatible with the declared minimum supported WordPress version ("Requires at least"). | [Learn more](https://developer.wordpress.org/plugins/plugin-basics/header-requirements/#header-fields) |
 | plugin_review_phpcs | plugin_repo | Runs PHP_CodeSniffer to detect certain best practices plugins should follow for submission on WordPress.org, including heredoc usage detection. | [Learn more](https://developer.wordpress.org/plugins/plugin-basics/best-practices/) |
 | direct_db_queries | security, plugin_repo | Checks the usage of direct database queries, which should be avoided. | [Learn more](https://developer.wordpress.org/apis/database/) |
 | direct_db | security, plugin_repo | Checks the escaping in direct database queries. | [Learn more](https://developer.wordpress.org/apis/database/) |
@@ -27,6 +28,7 @@
 | no_unfiltered_uploads | plugin_repo | Detects disallowed usage of <code>ALLOW_UNFILTERED_UPLOADS</code>. | [Learn more](https://make.wordpress.org/plugins/handbook/performing-reviews/review-checklist/) |
 | trademarks | plugin_repo | Checks the usage of trademarks or other projects in the plugin slug. | [Learn more](https://developer.wordpress.org/plugins/wordpress-org/detailed-plugin-guidelines/) |
 | offloading_files | plugin_repo | Prevents using remote services that are not necessary. | [Learn more](https://developer.wordpress.org/plugins/wordpress-org/common-issues/#calling-files-remotely) |
+| write_file | plugin_repo | Detects if plugins save data in the plugin folder instead of using the uploads directory or database. | [Learn more](https://developer.wordpress.org/plugins/wordpress-org/common-issues/#saving-data-in-the-plugin-folder) |
 | setting_sanitization | plugin_repo | Ensures sanitization in register_setting(). | [Learn more](https://developer.wordpress.org/reference/functions/register_setting/) |
 | prefixing | plugin_repo | Checks plugin for unique prefixing for everything the plugin defines in the public namespace. | [Learn more](https://developer.wordpress.org/plugins/plugin-basics/best-practices/) |
 | enqueued_scripts_size | performance | Checks whether the cumulative size of all scripts enqueued on a page exceeds 293 KB. | [Learn more](https://developer.wordpress.org/plugins/) |

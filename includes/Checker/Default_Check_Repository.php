@@ -95,12 +95,14 @@ class Default_Check_Repository extends Empty_Check_Repository {
 				'trademarks'                 => new Checks\Plugin_Repo\Trademarks_Check(),
 				'non_blocking_scripts'       => new Checks\Performance\Non_Blocking_Scripts_Check(),
 				'offloading_files'           => new Checks\Plugin_Repo\Offloading_Files_Check(),
+				'write_file'                 => new Checks\Plugin_Repo\Write_File_Check(),
 				'setting_sanitization'       => new Checks\Plugin_Repo\Setting_Sanitization_Check(),
 				'prefixing'                  => new Checks\Plugin_Repo\Prefixing_Check(),
 				'direct_db'                  => new Checks\Security\Direct_DB_Check(),
 				'minified_files'             => new Checks\Plugin_Repo\Minified_Files_Check(),
 				'direct_file_access'         => new Checks\Plugin_Repo\Direct_File_Access_Check(),
 				'external_admin_menu_links'  => new Checks\Plugin_Repo\External_Admin_Menu_Links_Check(),
+				'wp_functions_compatibility' => new Checks\Plugin_Repo\WP_Functions_Compatibility_Check(),
 			)
 		);
 

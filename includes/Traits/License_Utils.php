@@ -54,6 +54,7 @@ trait License_Utils {
 		$license = str_replace( 'GNU General Public License', 'GPL', $license );
 		$license = str_replace( ' version ', 'v', $license );
 		$license = preg_replace( '/GPL\s*[-|\.]*\s*[v]?([0-9])(\.[0])?/i', 'GPL$1', $license, 1 );
+		$license = preg_replace( '/EUPL\s*[-|\.]*\s*[v]?([0-9]+)(\.[0-9]+)?/i', 'EUPL', $license );
 		$license = preg_replace( '/Apache.*?([0-9])(\.[0])?/i', 'Apache$1', $license );
 		$license = preg_replace( '/(The\s+)?Unlicense/i', 'Unlicense', $license );
 		// Normalize WTFPL variations - must come before version removal to catch full text.
@@ -94,7 +95,7 @@ trait License_Utils {
 			return true;
 		}
 
-		$match = preg_match( '/GPL|GNU|MIT|FreeBSD|New BSD|BSD-3-Clause|BSD 3 Clause|OpenLDAP|Expat|Apache2|MPL20|ISC|CC0|Unlicense|WTFPL/im', $license );
+		$match = preg_match( '/GPL|EUPL|GNU|MIT|FreeBSD|New BSD|BSD-3-Clause|BSD 3 Clause|OpenLDAP|Expat|Apache2|MPL20|ISC|CC0|Unlicense|WTFPL/im', $license );
 
 		return ( false === $match || 0 === $match ) ? false : true;
 	}

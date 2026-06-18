@@ -41,6 +41,14 @@ final class Results_Exporter {
 	public const FORMAT_MARKDOWN = 'markdown';
 
 	/**
+	 * CTRF export format slug.
+	 *
+	 * @since 2.0.0
+	 * @var string
+	 */
+	public const FORMAT_CTRF = 'ctrf';
+
+	/**
 	 * Normalises the errors and warnings arrays into grouped results by file.
 	 *
 	 * @since 1.8.0
@@ -111,7 +119,7 @@ final class Results_Exporter {
 	public static function export( array $errors, array $warnings, $format, array $args = array() ) {
 		$format = strtolower( (string) $format );
 
-		if ( ! in_array( $format, array( self::FORMAT_CSV, self::FORMAT_JSON, self::FORMAT_MARKDOWN ), true ) ) {
+		if ( ! in_array( $format, array( self::FORMAT_CSV, self::FORMAT_JSON, self::FORMAT_MARKDOWN, self::FORMAT_CTRF ), true ) ) {
 			throw new InvalidArgumentException( __( 'Unsupported export format.', 'plugin-check' ) );
 		}
 
@@ -131,6 +139,10 @@ final class Results_Exporter {
 			case self::FORMAT_MARKDOWN:
 				$content   = self::to_markdown( $grouped, $args );
 				$mime_type = 'text/markdown';
+				break;
+			case self::FORMAT_CTRF:
+				$content   = self::to_ctrf_json( $flat, $args );
+				$mime_type = 'application/json';
 				break;
 			case self::FORMAT_CSV:
 			default:
@@ -165,6 +177,8 @@ final class Results_Exporter {
 		$extension = $format;
 		if ( self::FORMAT_MARKDOWN === $format ) {
 			$extension = 'md';
+		} elseif ( self::FORMAT_CTRF === $format ) {
+			$extension = 'ctrf.json';
 		}
 
 		return sprintf( '%1$s-%2$s.%3$s', $normalized_slug, $timestamp, $extension );
@@ -187,6 +201,133 @@ final class Results_Exporter {
 		);
 
 		return wp_json_encode( $payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
+	}
+
+	/**
+	 * Generates CTRF JSON content for the results.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param array $flat_results Flat list of results including the file name.
+	 * @param array $args         Additional arguments.
+	 * @return string CTRF JSON export content.
+	 */
+	public static function to_ctrf_json( array $flat_results, array $args = array() ) {
+		$timestamp_iso = isset( $args['timestamp_iso'] ) ? (string) $args['timestamp_iso'] : gmdate( 'c' );
+		$start_time    = isset( $args['start_timestamp_ms'] ) ? (int) $args['start_timestamp_ms'] : (int) round( microtime( true ) * 1000 );
+		$stop_time     = isset( $args['stop_timestamp_ms'] ) ? (int) $args['stop_timestamp_ms'] : $start_time;
+		$stop_time     = max( $start_time, $stop_time );
+		$tests         = array();
+		foreach ( $flat_results as $item ) {
+			$tests[] = self::build_ctrf_test( $item );
+		}
+
+		$payload = array(
+			'reportFormat' => 'CTRF',
+			'specVersion'  => '1.0.0',
+			'timestamp'    => $timestamp_iso,
+			'generatedBy'  => 'plugin-check',
+			'results'      => array(
+				'tool'    => array(
+					'name' => 'plugin-check',
+				),
+				'summary' => self::build_ctrf_summary( count( $tests ), $start_time, $stop_time ),
+				'tests'   => $tests,
+			),
+		);
+
+		return wp_json_encode( $payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
+	}
+
+	/**
+	 * Builds CTRF summary payload.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param int $test_count Total number of findings.
+	 * @param int $start_time Start timestamp in milliseconds.
+	 * @param int $stop_time  Stop timestamp in milliseconds.
+	 * @return array CTRF summary payload.
+	 */
+	private static function build_ctrf_summary( $test_count, $start_time, $stop_time ) {
+		return array(
+			'tests'   => $test_count,
+			'passed'  => 0,
+			'failed'  => $test_count,
+			'skipped' => 0,
+			'pending' => 0,
+			'other'   => 0,
+			'start'   => $start_time,
+			'stop'    => $stop_time,
+		);
+	}
+
+	/**
+	 * Builds CTRF labels for a single finding.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param array  $item Finding data.
+	 * @param string $code Normalized finding code.
+	 * @param string $type Normalized finding type.
+	 * @return array<string, bool|int|float|string> CTRF labels.
+	 */
+	private static function build_ctrf_labels( array $item, $code, $type ) {
+		$labels = array(
+			'code' => $code,
+		);
+
+		$optional_labels = array(
+			'findingType' => '' !== $type ? $type : null,
+			'severity'    => isset( $item['severity'] ) && '' !== $item['severity'] ? (int) $item['severity'] : null,
+			'docs'        => ! empty( $item['docs'] ) ? (string) $item['docs'] : null,
+			'link'        => ! empty( $item['link'] ) ? (string) $item['link'] : null,
+		);
+
+		return array_merge(
+			$labels,
+			array_filter(
+				$optional_labels,
+				static function ( $value ) {
+					return null !== $value;
+				}
+			)
+		);
+	}
+
+	/**
+	 * Builds a single CTRF test entry.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param array $item Finding data.
+	 * @return array CTRF test payload.
+	 */
+	private static function build_ctrf_test( array $item ) {
+		$line    = isset( $item['line'] ) ? (int) $item['line'] : 0;
+		$column  = isset( $item['column'] ) ? (int) $item['column'] : 0;
+		$file    = isset( $item['file'] ) ? (string) $item['file'] : '';
+		$code    = isset( $item['code'] ) ? (string) $item['code'] : 'unknown_code';
+		$type    = isset( $item['type'] ) ? (string) $item['type'] : '';
+		$message = isset( $item['message'] ) ? wp_strip_all_tags( (string) $item['message'] ) : '';
+
+		return array(
+			'name'      => sprintf( '%1$s (%2$s:%3$d:%4$d)', $code, $file, $line, $column ),
+			'status'    => 'failed',
+			'duration'  => 0,
+			'message'   => $message,
+			'line'      => $line,
+			'rawStatus' => $type,
+			'filePath'  => $file,
+			'type'      => 'static-analysis',
+			'extra'     => self::build_ctrf_labels( $item, $code, $type ),
+			'suite'     => array_filter(
+				array(
+					'plugin-check',
+					$file,
+				)
+			),
+		);
 	}
 
 	/**

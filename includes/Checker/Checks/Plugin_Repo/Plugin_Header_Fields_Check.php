@@ -515,7 +515,7 @@ class Plugin_Header_Fields_Check implements Static_Check {
 
 				$target_path = wp_normalize_path( $result->plugin()->path() . $domain_path );
 
-				if ( ! is_dir( $target_path ) ) {
+				if ( ! is_dir( $target_path ) && $this->is_new_mode( $result ) ) {
 					$this->add_result_warning_for_file(
 						$result,
 						sprintf(

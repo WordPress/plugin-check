@@ -34,11 +34,19 @@ After having the plugin activated, you can analyze any other plugin installed on
 
 * To check a plugin using WP Admin, please navigate to the _Tools > Plugin Check_ menu. You need to be able to manage plugins on your site in order to access that screen.
 * To check a plugin using WP-CLI, please use the `wp plugin check` command. For example, to check the "Hello Dolly" plugin: `wp plugin check hello.php`
-    * Note that by default when using WP-CLI, only static checks can be executed. In order to also include runtime checks, a workaround is currently necessary using the `--require` argument of WP-CLI, to manually load the `cli.php` file within the plugin checker directory before WordPress is loaded. For example: `wp plugin check hello.php --require=./wp-content/plugins/plugin-check/cli.php`
-    * You could use arbitrary path or URL to check a plugin. For example, to check a plugin from a URL: `wp plugin check https://example.com/plugin.zip` or to check a plugin from a path: `wp plugin check /path/to/plugin`
+    * Note that by default when using WP-CLI, only static checks can be executed. In order to also include runtime checks, a workaround is currently required: use the `--require` argument to manually load `cli.php` from the plugin checker directory before WordPress loads. For example: `wp plugin check hello.php --require=./wp-content/plugins/plugin-check/cli.php`
+    * You can use an arbitrary path or URL to check a plugin. For example, to check a plugin from a URL: `wp plugin check https://example.com/plugin.zip` or to check a plugin from a path: `wp plugin check /path/to/plugin`
 
 <img alt="WordPress plugin checker UI in WP Admin" src="https://github.com/WordPress/plugin-check/assets/3531426/19d0c1ce-8c37-4efd-b8c6-d252e6ce29c9">
 <em>Screenshot of the plugin checker's UI in WP Admin</em>
+
+## Reviewing a pull request in WordPress Playground
+
+Every pull request opened against this repository gets an automatic **"Open in WordPress Playground"** button appended to its description, running this PR's build of Plugin Check in your browser — no local setup required.
+
+The preview boots a fresh WordPress, installs and activates the PR's build of Plugin Check, logs you in as `admin` / `password`, and lands on _Tools → Plugin Check_ so you can run a check straight away. This makes reviewing UI, admin behaviour, and check output dramatically faster, and lowers the bar for non-developer reviewers.
+
+The button is added by the official [`WordPress/action-wp-playground-pr-preview`](https://github.com/WordPress/action-wp-playground-pr-preview) action via `.github/workflows/pr-playground-preview.yml` and `.github/workflows/pr-playground-preview-publish.yml`. The first workflow builds a production zip of the plugin (Composer dependencies installed without `--dev`, dev files excluded via `.distignore`) with read-only permissions and uploads it as a GitHub Actions artifact. After that build succeeds, the publisher workflow exposes the artifact on a public download URL and appends the **"Open in WordPress Playground"** button to the PR description with a blueprint that installs and activates that exact build.
 
 ## Contributing
 
@@ -55,14 +63,23 @@ npm install
 
 With the above commands, you can use the plugin in any development environment as you like. The recommended way is to use the built-in development environment, which is based on the [`@wordpress/env` package](https://www.npmjs.com/package/@wordpress/env), as that will allow you to use the preconfigured commands to e.g. run unit tests, linting etc. You will need to have Docker installed to use this environment.
 
-You can start the built-in environment as follows:
+Start the **development** site:
+
 ```
 npm run wp-env start
 ```
 
-If you want to stop the environment again, you can use:
+Start the **tests** stack:
+
+```
+npm run wp-env:start:tests
+```
+
+Stop each stack when finished:
+
 ```
 npm run wp-env stop
+npm run wp-env:stop:tests
 ```
 
 For further information on contributing, please see the [contributing guide](/CONTRIBUTING.md).

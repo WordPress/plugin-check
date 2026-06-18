@@ -122,4 +122,18 @@ class Plugin_Updater_Check_Tests extends WP_UnitTestCase {
 		$this->assertEquals( 0, $check_result->get_error_count() );
 		$this->assertEquals( 0, $check_result->get_warning_count() );
 	}
+
+	/**
+	 * Update URI may point at this plugin’s WordPress.org URL; that must not be flagged.
+	 */
+	public function test_run_update_uri_wordpress_org_matching_slug_no_error() {
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-update-uri-w-org-ok/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check = new Plugin_Updater_Check( Plugin_Updater_Check::TYPE_PLUGIN_UPDATE_URI_HEADER );
+		$check->run( $check_result );
+
+		$this->assertEmpty( $check_result->get_errors() );
+		$this->assertSame( 0, $check_result->get_error_count() );
+	}
 }

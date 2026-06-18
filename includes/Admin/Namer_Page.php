@@ -54,7 +54,6 @@ final class Namer_Page {
 		add_action( 'admin_menu', array( $this, 'add_page' ) );
 		add_action( 'admin_post_' . self::ACTION_ANALYZE, array( $this, 'handle_analyze' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-		add_action( 'admin_notices', array( $this, 'render_ai_notice' ) );
 		add_action( 'wp_ajax_plugin_check_namer_analyze', array( $this, 'ajax_analyze' ) );
 	}
 
@@ -215,40 +214,6 @@ final class Namer_Page {
 	}
 
 	/**
-	 * Renders admin notice when AI connectors are not configured.
-	 *
-	 * @since 1.9.0
-	 */
-	public function render_ai_notice() {
-		$screen = get_current_screen();
-		if ( ! $screen || $screen->id !== $this->hook_suffix ) {
-			return;
-		}
-
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
-		}
-
-		$ai_config = $this->get_ai_config();
-		if ( ! is_wp_error( $ai_config ) ) {
-			return;
-		}
-		?>
-		<div class="notice notice-warning is-dismissible">
-			<p>
-				<?php
-				printf(
-					/* translators: %s: Error message. */
-					__( 'To use the Namer tool, configure AI connectors in WordPress 7.0+ settings. Details: %s', 'plugin-check' ),
-					esc_html( $ai_config->get_error_message() )
-				);
-				?>
-			</p>
-		</div>
-		<?php
-	}
-
-	/**
 	 * Renders the page.
 	 *
 	 * @since 1.8.0
@@ -268,15 +233,24 @@ final class Namer_Page {
 			<?php
 			if ( is_wp_error( $ai_config ) ) {
 				?>
-				<p class="description">
-					<?php esc_html_e( 'The Plugin Namer requires WordPress 7.0+ with configured AI connectors. Please enable AI connectors in core to use this tool.', 'plugin-check' ); ?>
-				</p>
-				<p>
-					<a class="button button-primary" href="<?php echo esc_url( admin_url( 'options-connectors.php' ) ); ?>">
-						<?php esc_html_e( 'Configure AI Connectors', 'plugin-check' ); ?>
-					</a>
-				</p>
+				<div class="notice notice-error">
+					<p>
+						<?php
+						echo esc_html( $ai_config->get_error_message() );
+						?>
+					</p>
+				</div>
+
 				<?php
+				if ( true === $this->check_ai_prerequisites() && is_wp_error( $this->check_ai_connectors() ) ) {
+					?>
+					<p>
+						<a class="button button-primary" href="<?php echo esc_url( admin_url( 'options-connectors.php' ) ); ?>">
+							<?php esc_html_e( 'Configure AI Connectors', 'plugin-check' ); ?>
+						</a>
+					</p>
+					<?php
+				}
 				return;
 			}
 			?>

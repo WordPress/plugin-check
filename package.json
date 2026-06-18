@@ -10,21 +10,23 @@
     "npm": ">=10.2.3"
   },
   "devDependencies": {
-    "@wordpress/env": "^10.39.0",
-    "@wordpress/scripts": "^31.6.0",
+    "@wordpress/env": "^11.8.0",
+    "@wordpress/scripts": "^32.4.0",
     "gherkin-lint": "^4.2.4"
   },
   "scripts": {
     "wp-env": "wp-env",
+    "wp-env:start:tests": "wp-env start --config=.wp-env.tests.json",
+    "wp-env:stop:tests": "wp-env stop --config=.wp-env.tests.json",
     "lint-js": "wp-scripts lint-js",
     "format-js": "npm run lint-js -- --fix",
     "lint-gherkin": "gherkin-lint",
-    "phpstan": "wp-env run tests-cli --env-cwd=wp-content/plugins/$(basename \"$(pwd)\")/ composer run-script phpstan",
-    "lint-php": "wp-env run tests-cli --env-cwd=wp-content/plugins/$(basename \"$(pwd)\")/ composer run-script lint",
-    "format-php": "wp-env run tests-cli --env-cwd=wp-content/plugins/$(basename \"$(pwd)\")/ composer run-script format",
-    "test-php": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/$(basename \"$(pwd)\") vendor/bin/phpunit -c phpunit.xml.dist",
-    "test-php-coverage": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/$(basename \"$(pwd)\") vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover build/logs/php-coverage.xml",
-    "test-php-multisite": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/$(basename \"$(pwd)\") vendor/bin/phpunit -c tests/phpunit/multisite.xml",
-    "test-php-multisite-coverage": "wp-env run tests-cli --env-cwd=/var/www/html/wp-content/plugins/$(basename \"$(pwd)\") vendor/bin/phpunit -c tests/phpunit/multisite.xml --coverage-clover build/logs/php-coverage-multisite.xml"
+    "phpstan": "wp-env --config=.wp-env.tests.json run cli --env-cwd=wp-content/plugins/$(basename \"$(pwd)\")/ composer run-script phpstan",
+    "lint-php": "wp-env --config=.wp-env.tests.json run cli --env-cwd=wp-content/plugins/$(basename \"$(pwd)\")/ composer run-script lint",
+    "format-php": "wp-env --config=.wp-env.tests.json run cli --env-cwd=wp-content/plugins/$(basename \"$(pwd)\")/ composer run-script format",
+    "test-php": "wp-env --config=.wp-env.tests.json run cli --env-cwd=/var/www/html/wp-content/plugins/$(basename \"$(pwd)\") vendor/bin/phpunit -c phpunit.xml.dist",
+    "test-php-coverage": "wp-env --config=.wp-env.tests.json run cli --env-cwd=/var/www/html/wp-content/plugins/$(basename \"$(pwd)\") vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover build/logs/php-coverage.xml",
+    "test-php-multisite": "wp-env --config=.wp-env.tests.json run cli --env-cwd=/var/www/html/wp-content/plugins/$(basename \"$(pwd)\") vendor/bin/phpunit -c tests/phpunit/multisite.xml",
+    "test-php-multisite-coverage": "wp-env --config=.wp-env.tests.json run cli --env-cwd=/var/www/html/wp-content/plugins/$(basename \"$(pwd)\") vendor/bin/phpunit -c tests/phpunit/multisite.xml --coverage-clover build/logs/php-coverage-multisite.xml"
   }
 }

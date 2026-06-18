@@ -14,6 +14,7 @@ use WordPress\Plugin_Check\Lib\Readme\Parser as PCPParser;
 use WordPress\Plugin_Check\Traits\Amend_Check_Result;
 use WordPress\Plugin_Check\Traits\Language_Utils;
 use WordPress\Plugin_Check\Traits\License_Utils;
+use WordPress\Plugin_Check\Traits\Mode_Aware;
 use WordPress\Plugin_Check\Traits\Readme_Utils;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 use WordPress\Plugin_Check\Traits\URL_Utils;
@@ -31,6 +32,7 @@ use WordPressdotorg\Plugin_Directory\Readme\Parser as DotorgParser;
 class Plugin_Readme_Check extends Abstract_File_Check {
 
 	use Amend_Check_Result;
+	use Mode_Aware;
 	use Readme_Utils;
 	use Stable_Check;
 	use License_Utils;
@@ -256,22 +258,38 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 						}
 
 						if ( version_compare( $tested_upto_major, $latest_wordpress_version, '<' ) ) {
-							$this->add_result_error_for_file(
-								$result,
-								sprintf(
-									/* translators: 1: currently used version, 2: latest stable WordPress version, 3: 'Tested up to' */
-									__( '<strong>Tested up to: %1$s &lt; %2$s.</strong><br>The "%3$s" value in your plugin is not set to the current version of WordPress. This means your plugin will not show up in searches, as we require plugins to be compatible and documented as tested up to the most recent version of WordPress.', 'plugin-check' ),
-									$tested_upto_major,
-									$latest_wordpress_version,
-									'Tested up to'
-								),
-								'outdated_tested_upto_header',
-								$readme_file,
-								0,
-								0,
-								'https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/#readme-header-information',
-								7
+							$outdated_tested_message = sprintf(
+								/* translators: 1: currently used version, 2: latest stable WordPress version, 3: 'Tested up to' */
+								__( '<strong>Tested up to: %1$s &lt; %2$s.</strong><br>The "%3$s" value in your plugin is not set to the current version of WordPress. This means your plugin will not show up in searches, as we require plugins to be compatible and documented as tested up to the most recent version of WordPress.', 'plugin-check' ),
+								$tested_upto_major,
+								$latest_wordpress_version,
+								'Tested up to'
 							);
+							$outdated_tested_docs = 'https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/#readme-header-information';
+
+							if ( $this->is_update_mode( $result ) ) {
+								$this->add_result_warning_for_file(
+									$result,
+									$outdated_tested_message,
+									'outdated_tested_upto_header',
+									$readme_file,
+									0,
+									0,
+									$outdated_tested_docs,
+									5
+								);
+							} else {
+								$this->add_result_error_for_file(
+									$result,
+									$outdated_tested_message,
+									'outdated_tested_upto_header',
+									$readme_file,
+									0,
+									0,
+									$outdated_tested_docs,
+									7
+								);
+							}
 						} elseif ( version_compare( $tested_upto_major, number_format( (float) $latest_wordpress_version + 0.1, 1 ), '>' ) ) {
 							$this->add_result_error_for_file(
 								$result,
