@@ -509,6 +509,10 @@ class Direct_File_Access_Check extends Abstract_File_Check {
 			return true;
 		}
 
+		if ( $expr instanceof Expr\Include_ ) {
+			return true;
+		}
+
 		if ( $this->is_unsafe_expression( $expr ) ) {
 			return false;
 		}
@@ -895,7 +899,7 @@ class Direct_File_Access_Check extends Abstract_File_Check {
 	private function has_only_safe_function_calls( $contents ) {
 		$safe_if_count      = preg_match_all( '/if\s*\([^)]*(?:class_exists|function_exists|interface_exists|trait_exists|defined)\s*\(/i', $contents );
 		$return_count       = preg_match_all( '/return\s*;/', $contents );
-		$all_function_calls = preg_match_all( '/\b(?!class_exists|function_exists|interface_exists|trait_exists|defined|return|if|else|elseif|isset|empty|unset|array|list|echo|print)\w+\s*\(/i', $contents );
+		$all_function_calls = preg_match_all( '/\b(?!class_exists|function_exists|interface_exists|trait_exists|defined|return|if|else|elseif|isset|empty|unset|array|list|echo|print|require|require_once|include|include_once)\w+\s*\(/i', $contents );
 
 		return $safe_if_count > 0 && $return_count >= $safe_if_count && 0 === $all_function_calls;
 	}
