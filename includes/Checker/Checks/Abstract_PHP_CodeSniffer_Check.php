@@ -110,6 +110,8 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		$_SERVER['argv'] = $this->parse_argv( $args, $defaults );
 
 		// Run PHPCS.
+		$this->register_php_codesniffer_error_handler();
+
 		try {
 			ob_start();
 			$runner = new Runner();
@@ -118,6 +120,8 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		} catch ( Exception $e ) {
 			$_SERVER['argv'] = $orig_cmd_args;
 			throw $e;
+		} finally {
+			restore_error_handler();
 		}
 
 		// Reset installed_paths.
@@ -227,6 +231,35 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		}
 
 		return $defaults;
+	}
+
+	/**
+	 * Registers an error handler for known PHPCS notices.
+	 *
+	 * @since n.e.x.t
+	 */
+	private function register_php_codesniffer_error_handler() {
+		$previous_error_handler = null;
+
+		$previous_error_handler = set_error_handler(
+			static function ( $errno, $errstr, $errfile, $errline ) use ( &$previous_error_handler ) {
+				$normalized_file = wp_normalize_path( $errfile );
+
+				if (
+					E_DEPRECATED === $errno &&
+					false !== strpos( $errstr, 'auto_detect_line_endings is deprecated' ) &&
+					false !== strpos( $normalized_file, 'vendor/squizlabs/php_codesniffer/src/Runner.php' )
+				) {
+					return true;
+				}
+
+				if ( is_callable( $previous_error_handler ) ) {
+					return (bool) call_user_func( $previous_error_handler, $errno, $errstr, $errfile, $errline );
+				}
+
+				return false;
+			}
+		);
 	}
 
 	/**
