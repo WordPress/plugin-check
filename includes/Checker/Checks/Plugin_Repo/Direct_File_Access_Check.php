@@ -400,8 +400,9 @@ class Direct_File_Access_Check extends Abstract_File_Check {
 			Stmt\Enum_::class,
 		);
 
-		$has_assignments = false;
-		$has_returns     = false;
+		$has_assignments            = false;
+		$has_returns                = false;
+		$has_structural_declaration = $this->has_structural_declaration( $ast );
 
 		foreach ( $ast as $node ) {
 			$node_class = get_class( $node );
@@ -428,6 +429,10 @@ class Direct_File_Access_Check extends Abstract_File_Check {
 			}
 
 			if ( $node instanceof Stmt\Expression ) {
+				if ( $node->expr instanceof Expr\Include_ && $has_structural_declaration ) {
+					continue;
+				}
+
 				if ( $this->is_safe_expression( $node->expr ) ) {
 					continue;
 				}
@@ -453,6 +458,33 @@ class Direct_File_Access_Check extends Abstract_File_Check {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Checks whether the AST contains structural declarations.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param array $ast The parsed AST nodes.
+	 * @return bool True if the AST contains class/interface/trait/enum declarations, false otherwise.
+	 */
+	private function has_structural_declaration( array $ast ) {
+		foreach ( $ast as $node ) {
+			if (
+				$node instanceof Stmt\Class_ ||
+				$node instanceof Stmt\Interface_ ||
+				$node instanceof Stmt\Trait_ ||
+				$node instanceof Stmt\Enum_
+			) {
+				return true;
+			}
+
+			if ( $node instanceof Stmt\Namespace_ && ! empty( $node->stmts ) ) {
+				return $this->has_structural_declaration( $node->stmts );
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -506,10 +538,6 @@ class Direct_File_Access_Check extends Abstract_File_Check {
 		}
 
 		if ( $this->is_safe_concat( $expr ) ) {
-			return true;
-		}
-
-		if ( $expr instanceof Expr\Include_ ) {
 			return true;
 		}
 
