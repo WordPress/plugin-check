@@ -19,26 +19,28 @@ final class RuntimeFatalErrorPreventionUnitTest extends AbstractSniffUnitTest {
 	/**
 	 * Returns the lines where errors should occur.
 	 *
-	 * @return array<int, int> <int line number> => <int number of errors>
+	 * All findings for this sniff are emitted as warnings to avoid blocking
+	 * submission on potentially legitimate integration patterns.
+	 *
+	 * @return array<int, int>
 	 */
 	public function getErrorList() {
-		return array(
-			16 => 1,
-			23 => 1,
-			30 => 1,
-			36 => 1,
-			47 => 1,
-		);
+		return array();
 	}
 
 	/**
 	 * Returns the lines where warnings should occur.
 	 *
-	 * @return array<int, int> <int line number> => <int number of warnings>
+	 * @return array<int, int>
 	 */
 	public function getWarningList() {
 		return array(
 			5  => 1,
+			16 => 1,
+			23 => 1,
+			30 => 1,
+			36 => 1,
+			47 => 1,
 			59 => 1,
 		);
 	}

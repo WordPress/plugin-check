@@ -17,11 +17,13 @@ use WordPressCS\WordPress\Sniff;
 final class RuntimeFatalErrorPreventionSniff extends Sniff {
 
 	/**
-	 * List of popular optional third-party integration functions.
+	 * Default list of popular optional third-party integration functions.
+	 *
+	 * Overridable via the `wp_plugin_check_runtime_fatal_error_integration_functions` filter.
 	 *
 	 * @var array<string>
 	 */
-	private $integration_functions = array(
+	private $default_integration_functions = array(
 		// WooCommerce.
 		'is_woocommerce',
 		'wc_get_product',
@@ -71,11 +73,20 @@ final class RuntimeFatalErrorPreventionSniff extends Sniff {
 	);
 
 	/**
-	 * List of popular optional third-party classes.
+	 * Active list of third-party integration functions, populated in register().
 	 *
 	 * @var array<string>
 	 */
-	private $optional_classes = array(
+	private $integration_functions = array();
+
+	/**
+	 * Default list of popular optional third-party classes.
+	 *
+	 * Overridable via the `wp_plugin_check_runtime_fatal_error_optional_classes` filter.
+	 *
+	 * @var array<string>
+	 */
+	private $default_optional_classes = array(
 		// WooCommerce.
 		'wc_product',
 		'wc_order',
@@ -96,13 +107,32 @@ final class RuntimeFatalErrorPreventionSniff extends Sniff {
 	);
 
 	/**
+	 * Active list of optional classes, populated in register().
+	 *
+	 * @var array<string>
+	 */
+	private $optional_classes = array();
+
+	/**
 	 * Returns an array of tokens this test wants to listen for.
+	 *
+	 * Also resolves filterable integration functions and optional classes lists.
 	 *
 	 * @since 2.1.0
 	 *
 	 * @return array<int>
 	 */
 	public function register() {
+		$this->integration_functions = $this->filter_list(
+			'wp_plugin_check_runtime_fatal_error_integration_functions',
+			$this->default_integration_functions
+		);
+
+		$this->optional_classes = $this->filter_list(
+			'wp_plugin_check_runtime_fatal_error_optional_classes',
+			$this->default_optional_classes
+		);
+
 		return array(
 			\T_REQUIRE,
 			\T_REQUIRE_ONCE,
@@ -112,6 +142,26 @@ final class RuntimeFatalErrorPreventionSniff extends Sniff {
 			\T_VARIABLE,
 			\T_STRING,
 		);
+	}
+
+	/**
+	 * Apply a filter hook when running under WordPress; otherwise return the default.
+	 *
+	 * Allows the same sniff to run both via PHPCS (which has no WP runtime) and via
+	 * the Plugin Check runner (which loads WP).
+	 *
+	 * @param string $hook    Filter name.
+	 * @param array  $default Default list.
+	 * @return array Filtered list.
+	 */
+	private function filter_list( $hook, $default ) {
+		if ( function_exists( 'apply_filters' ) ) {
+			$filtered = apply_filters( $hook, $default );
+			if ( is_array( $filtered ) ) {
+				return $filtered;
+			}
+		}
+		return $default;
 	}
 
 	/**
@@ -209,7 +259,7 @@ final class RuntimeFatalErrorPreventionSniff extends Sniff {
 
 		if ( '' !== $class_name && in_array( strtolower( $class_name ), $this->optional_classes, true ) ) {
 			if ( ! $this->is_guarded_by_condition( $stackPtr, array( 'class_exists' ), $class_name ) ) {
-				$this->phpcsFile->addError(
+				$this->phpcsFile->addWarning(
 					'Instantiating optional class "%s" without a class_exists() guard is risky and could cause a runtime fatal error.',
 					$stackPtr,
 					'OptionalClassInstantiationUnguarded',
@@ -229,7 +279,7 @@ final class RuntimeFatalErrorPreventionSniff extends Sniff {
 		if ( false !== $next && \T_OPEN_PARENTHESIS === $this->tokens[ $next ]['code'] ) {
 			$var_name = $this->tokens[ $stackPtr ]['content'];
 			if ( ! $this->is_guarded_by_condition( $stackPtr, array( 'is_callable', 'function_exists' ), $var_name ) ) {
-				$this->phpcsFile->addError(
+				$this->phpcsFile->addWarning(
 					'Invoking dynamic callback "%s()" without an is_callable() or function_exists() guard is risky and could cause a runtime fatal error.',
 					$stackPtr,
 					'DynamicCallbackInvocationUnguarded',
@@ -303,7 +353,7 @@ final class RuntimeFatalErrorPreventionSniff extends Sniff {
 		// Case 2: Calling plugin/theme integration functions without function_exists guard.
 		if ( in_array( $function_name, $this->integration_functions, true ) ) {
 			if ( ! $this->is_guarded_by_condition( $stackPtr, array( 'function_exists' ), $this->tokens[ $stackPtr ]['content'] ) ) {
-				$this->phpcsFile->addError(
+				$this->phpcsFile->addWarning(
 					'Calling optional integration function "%s()" without a function_exists() guard is risky and could cause a runtime fatal error.',
 					$stackPtr,
 					'OptionalFunctionCallUnguarded',
@@ -321,7 +371,7 @@ final class RuntimeFatalErrorPreventionSniff extends Sniff {
 				if ( \T_VARIABLE === $this->tokens[ $first_param_ptr ]['code'] ) {
 					$var_name = $this->tokens[ $first_param_ptr ]['content'];
 					if ( ! $this->is_guarded_by_condition( $stackPtr, array( 'is_callable', 'function_exists' ), $var_name ) ) {
-						$this->phpcsFile->addError(
+						$this->phpcsFile->addWarning(
 							'Invoking dynamic callback "%s" via %s() without an is_callable() or function_exists() guard is risky and could cause a runtime fatal error.',
 							$stackPtr,
 							'DynamicCallbackCallUserFuncUnguarded',
@@ -381,8 +431,8 @@ final class RuntimeFatalErrorPreventionSniff extends Sniff {
 													array( $method_name )
 												);
 											} else {
-												// Error if the class definitely does not define the method.
-												$this->phpcsFile->addError(
+												// Warning if the class definitely does not define the method.
+												$this->phpcsFile->addWarning(
 													'Hooked callback method "%s" is not defined in this class. Hooking non-existent methods will cause runtime fatal errors or notices.',
 													$stackPtr,
 													'HookedCallbackMethodNotFound',

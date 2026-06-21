@@ -41,7 +41,9 @@
 	</rule>
 
 	<!-- Prevent runtime fatal errors. -->
-	<rule ref="PluginCheck.CodeAnalysis.RuntimeFatalErrorPrevention"/>
+	<rule ref="PluginCheck.CodeAnalysis.RuntimeFatalErrorPrevention">
+		<type>warning</type>
+	</rule>
 
 	<!-- Prohibit the use of the `goto` PHP language construct. -->
 	<rule ref="Generic.PHP.DiscourageGoto.Found">
