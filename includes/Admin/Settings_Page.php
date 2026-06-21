@@ -168,7 +168,7 @@ final class Settings_Page {
 					$configured_connector_message = sprintf(
 						/* translators: %s: URL to WordPress AI settings. */
 						__( 'No AI connectors are configured. Please <a href="%s">configure an AI connector</a> in WordPress settings first.', 'plugin-check' ),
-						esc_url( admin_url( 'options-general.php' ) )
+						esc_url( admin_url( 'options-connectors.php' ) )
 					);
 
 					echo wp_kses(

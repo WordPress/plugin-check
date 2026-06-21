@@ -23,9 +23,12 @@ final class OffloadingUnitTest extends AbstractSniffUnitTest {
 	 */
 	public function getErrorList() {
 		return array(
-			1 => 1,
-			3 => 1,
-			5 => 1,
+			1  => 1,
+			3  => 1,
+			5  => 1,
+			11 => 1,
+			17 => 1,
+			21 => 1,
 		);
 	}
 

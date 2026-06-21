@@ -56,7 +56,7 @@ jobs:
 
       - name: Expose built artifact as a public URL
         id: expose
-        uses: WordPress/action-wp-playground-pr-preview/.github/actions/expose-artifact-on-public-url@v2
+        uses: WordPress/action-wp-playground-pr-preview/.github/actions/expose-artifact-on-public-url@v3
         with:
           artifact-name:              plugin-check-zip
           artifact-filename:          plugin-check.zip
@@ -101,7 +101,7 @@ jobs:
           NODE
 
       - name: Post Playground Preview Button
-        uses: WordPress/action-wp-playground-pr-preview@v2
+        uses: WordPress/action-wp-playground-pr-preview@v3
         with:
           mode:         append-to-description
           blueprint:    ${{ steps.blueprint.outputs.blueprint }}
