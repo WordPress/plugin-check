@@ -115,6 +115,19 @@ class Trademarks_Check_Tests extends WP_UnitTestCase {
 		$this->assertSame( 0, $check_result->get_warning_count() );
 	}
 
+	public function test_trademarks_with_for_woocommerce_exception_in_middle_of_name() {
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-trademarks-plugin-header-for-woocommerce-middle/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check = new Trademarks_Check( Trademarks_Check::TYPE_NAME );
+		$check->run( $check_result );
+
+		$warnings = $check_result->get_warnings();
+
+		$this->assertEmpty( $warnings );
+		$this->assertSame( 0, $check_result->get_warning_count() );
+	}
+
 	public function test_single_file_plugin_without_error_for_trademarks() {
 		$trademarks_check = new Trademarks_Check();
 		$check_context    = new Check_Context( WP_PLUGIN_DIR . '/single-file-plugin.php' );
