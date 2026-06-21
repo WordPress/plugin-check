@@ -5,11 +5,22 @@
  * @package plugin-check
  */
 
+use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Checks\Performance\Unclosed_Ob_Start_Check;
 
 class Unclosed_Ob_Start_Check_Tests extends WP_UnitTestCase {
+
+	public function test_get_categories() {
+		$check      = new Unclosed_Ob_Start_Check();
+		$categories = $check->get_categories();
+
+		$this->assertIsArray( $categories );
+		$this->assertContains( Check_Categories::CATEGORY_PERFORMANCE, $categories );
+		$this->assertContains( Check_Categories::CATEGORY_PLUGIN_REPO, $categories );
+		$this->assertCount( 2, $categories );
+	}
 
 	public function test_run_with_errors() {
 		$check         = new Unclosed_Ob_Start_Check();

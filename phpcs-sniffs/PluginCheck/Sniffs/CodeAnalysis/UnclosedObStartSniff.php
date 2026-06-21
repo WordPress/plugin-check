@@ -14,14 +14,14 @@ use WordPressCS\WordPress\Sniff;
  * Detects calls to ob_start() that are not paired with a corresponding buffer-closing
  * function within the same logical scope.
  *
- * @since 1.4.0
+ * @since 2.1.0
  */
 final class UnclosedObStartSniff extends Sniff {
 
 	/**
 	 * Buffer-closing functions that pair with ob_start().
 	 *
-	 * @since 1.4.0
+	 * @since 2.1.0
 	 *
 	 * @var array<string, true>
 	 */
@@ -38,7 +38,7 @@ final class UnclosedObStartSniff extends Sniff {
 	 * Populated during the token walk and evaluated once the file has been
 	 * fully processed.
 	 *
-	 * @since 1.4.0
+	 * @since 2.1.0
 	 *
 	 * @var array<int, array{starts: array<int, array{ptr: int, line: int, conditions: array}>, closes: array<int, array{ptr: int, line: int, conditions: array}>}>
 	 */
@@ -47,7 +47,7 @@ final class UnclosedObStartSniff extends Sniff {
 	/**
 	 * Ordered list of scope start pointers, used to process scopes in source order.
 	 *
-	 * @since 1.4.0
+	 * @since 2.1.0
 	 *
 	 * @var array<int, int>
 	 */
@@ -56,7 +56,7 @@ final class UnclosedObStartSniff extends Sniff {
 	/**
 	 * Whether the current file has been finalized (scopes evaluated).
 	 *
-	 * @since 1.4.0
+	 * @since 2.1.0
 	 *
 	 * @var bool
 	 */
@@ -65,7 +65,7 @@ final class UnclosedObStartSniff extends Sniff {
 	/**
 	 * Returns an array of tokens this test wants to listen for.
 	 *
-	 * @since 1.4.0
+	 * @since 2.1.0
 	 *
 	 * @return array<int>
 	 */
@@ -83,7 +83,7 @@ final class UnclosedObStartSniff extends Sniff {
 	/**
 	 * Processes this test, when one of its tokens is encountered.
 	 *
-	 * @since 1.4.0
+	 * @since 2.1.0
 	 *
 	 * @param int $stackPtr The position of the current token in the stack.
 	 * @return int|void Integer stack pointer to skip forward or void to continue normal file processing.
@@ -114,7 +114,7 @@ final class UnclosedObStartSniff extends Sniff {
 	 * soon as no further registered tokens remain ahead, ensuring all collected calls
 	 * are available before pairing.
 	 *
-	 * @since 1.4.0
+	 * @since 2.1.0
 	 *
 	 * @param int $stackPtr The position of the current token in the stack.
 	 */
@@ -139,7 +139,7 @@ final class UnclosedObStartSniff extends Sniff {
 	 * single T_NAME_FULLY_QUALIFIED token (PHP >= 8.0) so that \ob_start() in namespaced
 	 * code is detected consistently.
 	 *
-	 * @since 1.4.0
+	 * @since 2.1.0
 	 *
 	 * @param int $stackPtr The position of the current token in the stack.
 	 * @return string|null The lowercased function name, or null when not a global call.
@@ -205,7 +205,7 @@ final class UnclosedObStartSniff extends Sniff {
 	 * The file scope is represented by a pointer of -1. Function, method and closure
 	 * scopes use the pointer of their opening condition token.
 	 *
-	 * @since 1.4.0
+	 * @since 2.1.0
 	 *
 	 * @param int  $stackPtr The position of the call.
 	 * @param bool $is_start Whether this is an ob_start() (true) or a closing call (false).
@@ -245,7 +245,7 @@ final class UnclosedObStartSniff extends Sniff {
 	 * Returns the pointer of the nearest enclosing function, method or closure, or -1
 	 * for the file (top-level) scope.
 	 *
-	 * @since 1.4.0
+	 * @since 2.1.0
 	 *
 	 * @param int $stackPtr The position of the token.
 	 * @return int The scope pointer, or -1 for the file scope.
@@ -271,7 +271,7 @@ final class UnclosedObStartSniff extends Sniff {
 	 * Called once when the end of the file is reached so that the full scope contents
 	 * are available for pairing.
 	 *
-	 * @since 1.4.0
+	 * @since 2.1.0
 	 */
 	private function finalize_file() {
 		$this->finalized = true;
@@ -315,7 +315,7 @@ final class UnclosedObStartSniff extends Sniff {
 	 * ob_start() calls that remain after all closes have been consumed are returned as
 	 * unpaired.
 	 *
-	 * @since 1.4.0
+	 * @since 2.1.0
 	 *
 	 * @param array<int, array{ptr: int, line: int, conditions: array}> $starts The ob_start() calls.
 	 * @param array<int, array{ptr: int, line: int, conditions: array}> $closes The closing calls.
@@ -352,7 +352,7 @@ final class UnclosedObStartSniff extends Sniff {
 	 * that two calls in different conditional branches (same depth, different blocks)
 	 * are not treated as nested identically.
 	 *
-	 * @since 1.4.0
+	 * @since 2.1.0
 	 *
 	 * @param array $a The first set of conditions (token pointer => token code).
 	 * @param array $b The second set of conditions (token pointer => token code).
@@ -376,7 +376,7 @@ final class UnclosedObStartSniff extends Sniff {
 	 * unclosed buffers. Resolving the registered callback and verifying it closes the
 	 * buffer is out of scope for static analysis.
 	 *
-	 * @since 1.4.0
+	 * @since 2.1.0
 	 *
 	 * @param int $start_ptr The position of the ob_start() call.
 	 * @return bool True when the buffer appears to be closed via an adjacent hook callback.

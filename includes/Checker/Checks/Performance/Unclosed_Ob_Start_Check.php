@@ -15,7 +15,7 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
 /**
  * Check for unclosed ob_start() calls.
  *
- * @since 1.4.0
+ * @since 2.1.0
  */
 class Unclosed_Ob_Start_Check extends Abstract_PHP_CodeSniffer_Check {
 
@@ -26,18 +26,21 @@ class Unclosed_Ob_Start_Check extends Abstract_PHP_CodeSniffer_Check {
 	 *
 	 * Every check must have at least one category.
 	 *
-	 * @since 1.4.0
+	 * @since 2.1.0
 	 *
 	 * @return array The categories for the check.
 	 */
 	public function get_categories() {
-		return array( Check_Categories::CATEGORY_PERFORMANCE );
+		return array(
+			Check_Categories::CATEGORY_PERFORMANCE,
+			Check_Categories::CATEGORY_PLUGIN_REPO,
+		);
 	}
 
 	/**
 	 * Returns an associative array of arguments to pass to PHPCS.
 	 *
-	 * @since 1.4.0
+	 * @since 2.1.0
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 * @return array An associative array of PHPCS CLI arguments.
@@ -55,7 +58,7 @@ class Unclosed_Ob_Start_Check extends Abstract_PHP_CodeSniffer_Check {
 	 *
 	 * Every check must have a short description explaining what the check does.
 	 *
-	 * @since 1.4.0
+	 * @since 2.1.0
 	 *
 	 * @return string Description.
 	 */
@@ -68,7 +71,7 @@ class Unclosed_Ob_Start_Check extends Abstract_PHP_CodeSniffer_Check {
 	 *
 	 * Every check must have a URL with further information about the check.
 	 *
-	 * @since 1.4.0
+	 * @since 2.1.0
 	 *
 	 * @return string The documentation URL.
 	 */
@@ -80,7 +83,7 @@ class Unclosed_Ob_Start_Check extends Abstract_PHP_CodeSniffer_Check {
 	 * Amends the given result with a message for the specified file, including the
 	 * documentation URL for this check.
 	 *
-	 * @since 1.4.0
+	 * @since 2.1.0
 	 *
 	 * @param Check_Result $result   The check result to amend, including the plugin context to check.
 	 * @param bool         $error    Whether it is an error or notice.
@@ -93,7 +96,9 @@ class Unclosed_Ob_Start_Check extends Abstract_PHP_CodeSniffer_Check {
 	 * @param int          $severity Severity level. Default is 5.
 	 */
 	protected function add_result_message_for_file( Check_Result $result, $error, $message, $code, $file, $line = 0, $column = 0, string $docs = '', $severity = 5 ) {
-		$docs = __( 'https://make.wordpress.org/core/2025/11/18/wordpress-6-9-frontend-performance-field-guide/#introduce-the-template-enhancement-output-buffer', 'plugin-check' );
+		if ( '' === $docs ) {
+			$docs = $this->get_documentation_url();
+		}
 
 		parent::add_result_message_for_file( $result, $error, $message, $code, $file, $line, $column, $docs, $severity );
 	}
