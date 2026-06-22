@@ -613,7 +613,12 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 			'too_many_tags'                => array(
 				'message' => sprintf(
 					/* translators: %d: maximum tags limit */
-					__( 'One or more tags were ignored. Please limit your plugin to %d tags.', 'plugin-check' ),
+					_n(
+						'One or more tags were ignored. Please limit your plugin to %d tag.',
+						'One or more tags were ignored. Please limit your plugin to %d tags.',
+						5,
+						'plugin-check'
+					),
 					5
 				),
 			),
