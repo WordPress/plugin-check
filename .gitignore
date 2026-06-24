@@ -65,3 +65,4 @@ temp/
 
 .wp-env.override.json
 .wp-env.tests.override.json
+wp-tests-config.php

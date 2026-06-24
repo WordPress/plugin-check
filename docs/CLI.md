@@ -56,6 +56,17 @@ By default, `.git`, `vendor`, `vendor_prefixed`, `vendor-prefixed` and `node_mod
 [--exclude-files=<files>]
 : Additional files to exclude from checks.
 
+[--include-files=<files>]
+: Specific files to include in checks (comma-separated). Mutually exclusive with --exclude-files.
+When specified, only the listed files will be checked.
+
+[--include-directories=<directories>]
+: Specific directories to include in checks (comma-separated, recursive). Mutually exclusive with --exclude-directories.
+When specified, only files within the listed directories will be checked.
+
+[--use-config]
+: Load `.plugin-check.json` and `.distignore` from the plugin root. Off by default to keep the scanner behavior predictable.
+
 [--severity=<severity>]
 : Severity level.
 
@@ -90,6 +101,10 @@ wp plugin check akismet --checks=late_escaping
 wp plugin check akismet --format=json
 wp plugin check akismet --format=ctrf
 wp plugin check akismet --mode=update
+wp plugin check akismet --include-files=akismet.php,class.akismet.php
+wp plugin check akismet --include-directories=includes,views
+wp plugin check akismet --exclude-directories=tests,vendor
+wp plugin check akismet --use-config
 ```
 
 # wp plugin list-checks
