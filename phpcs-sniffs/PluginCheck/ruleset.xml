@@ -8,6 +8,7 @@
 	<rule ref="PluginCheck.CodeAnalysis.Heredoc" />
 	<rule ref="PluginCheck.CodeAnalysis.Localhost" />
 	<rule ref="PluginCheck.CodeAnalysis.Offloading" />
+	<rule ref="PluginCheck.CodeAnalysis.PHPErrorReporting" />
 	<rule ref="PluginCheck.CodeAnalysis.RequiredFunctionParameters" />
 	<rule ref="PluginCheck.CodeAnalysis.SettingSanitization" />
 	<rule ref="PluginCheck.CodeAnalysis.WriteFile" />
