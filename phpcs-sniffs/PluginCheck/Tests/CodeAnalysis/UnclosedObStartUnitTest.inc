@@ -19,7 +19,7 @@ function multiple_ob_start() {
 	ob_end_clean();
 }
 
-$closure = function() {
+$closure = static function() {
 	ob_start();
 	echo 'hello';
 	ob_get_clean();
