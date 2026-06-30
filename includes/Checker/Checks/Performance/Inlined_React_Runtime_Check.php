@@ -121,6 +121,7 @@ class Inlined_React_Runtime_Check extends Abstract_File_Check {
 	 */
 	private function look_for_removed_react_apis( Check_Result $result, $file, $contents ) {
 		// These identifiers are React-specific and were removed in React 19.
+		$matched  = '';
 		$position = $this->find_first_match( '/\b(?:unmountComponentAtNode|findDOMNode|ReactCurrentOwner)\b/', $contents, $matched );
 
 		if ( false === $position ) {
