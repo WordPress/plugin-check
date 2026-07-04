@@ -20,7 +20,17 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
  * Scans code-like files for indicators that functionality shipped with the plugin
  * is gated behind license keys, trials, payment checks, quotas, or "pro" plan gates.
  *
- * @since 1.4.0
+ * All result codes produced by this check are AI-review candidates, not confirmed
+ * violations: regex matches are inherently prone to false positives (a separate premium
+ * product, an external service API key, harmless update-checker license wording, etc).
+ * Running Plugin Check with the `--ai` flag (or the AI toggle in the admin UI) triggers
+ * `AI_Analyzer::analyze_results_with_ai()` from
+ * {@see \WordPress\Plugin_Check\Checker\Abstract_Check_Runner::run()}, which reviews each
+ * `trialware_*` candidate against `prompts/ai-review-trialware.md` and tags it as a false
+ * positive when appropriate. This check intentionally does not call the AI client itself;
+ * it only produces candidates for that existing shared AI-review pass.
+ *
+ * @since 2.1.0
  */
 class Trialware_Check extends Abstract_File_Check {
 
@@ -35,7 +45,7 @@ class Trialware_Check extends Abstract_File_Check {
 	 * - 'code':     result code for matches in this group.
 	 * - 'message':  human-readable description of what was detected.
 	 *
-	 * @since 1.4.0
+	 * @since 2.1.0
 	 * @var array
 	 */
 	const PATTERN_GROUPS = array(
@@ -44,6 +54,7 @@ class Trialware_Check extends Abstract_File_Check {
 				'/(?:is_licensed|has_license|license_valid|check_license|verify_license)\s*\(/i',
 				'/(?:if\s*\(\s*!?\s*(?:license_key|license|license_status))/i',
 				'/license_key\s*(?:===|!==|==|!=)\s*[\'"](?:[a-zA-Z0-9_-]{10,}|FREE|TRIAL)[\'"]/i',
+				'/(?:activation_code|activation_key)\s*(?:===|!==|==|!=)/i',
 			),
 			'code'     => 'trialware_license_gate_candidate',
 			'message'  => 'Detected possible license key gate on plugin functionality.',
@@ -53,6 +64,8 @@ class Trialware_Check extends Abstract_File_Check {
 				'/if\s*\(\s*!?\s*(?:is_pro|is_premium|has_pro|has_premium|pro_user|premium_user|is_paid)\s*\(/i',
 				'/if\s*\(\s*(?:!\s*)?(?:\\$this->|self::|static::)?(?:is_pro|is_premium|can_use_pro|pro_enabled|premium_enabled)\b/i',
 				'/(?:current_plan|user_plan|subscription_plan)\s*(?:===|!==|==|!=)\s*[\'"](?:pro|premium|business|enterprise)[\'"]/i',
+				'/if\s*\(\s*(?:!\s*)?(?:is_lite|is_free_version|free_version)\s*\(/i',
+				'/(?:only\s+available|available\s+only)\s+in\s+(?:the\s+)?(?:pro|premium)\s+version/i',
 			),
 			'code'     => 'trialware_pro_premium_gate_candidate',
 			'message'  => 'Detected possible pro/premium gate on plugin functionality.',
@@ -62,6 +75,7 @@ class Trialware_Check extends Abstract_File_Check {
 				'/if\s*\(\s*(?:!\s*)?(?:trial_expired|is_trial_over|trial_active|has_trial|in_trial|trial_days)\s*\(/i',
 				'/trial_(?:days|period|expires?|end|remaining)\s*(?:<=|>=|<|>|===|!==|==|!=)\s*\d/i',
 				'/(?:free_trial|trial_limit|trial_usage|trial_count)\s*(?:<=|>=|<|>|===|!==|==|!=)/i',
+				'/free\s+trial\s+(?:has\s+)?(?:ended|expired|is\s+over)/i',
 			),
 			'code'     => 'trialware_trial_gate_candidate',
 			'message'  => 'Detected possible trial period gate on plugin functionality.',
@@ -71,6 +85,7 @@ class Trialware_Check extends Abstract_File_Check {
 				'/if\s*\(\s*(?:!\s*)?(?:quota_exceeded|limit_reached|usage_limit|over_quota|at_limit|exceeds_limit)\s*\(/i',
 				'/if\s*\(\s*\\$\w*(?:usage|count|quota|limit)\s*(?:<=|>=|<|>|===|!==|==|!=)\s*\\$\w*(?:limit|max|quota|allowed)/i',
 				'/(?:upgrade_to|subscribe|purchase|buy)\s*\(\s*[\'"](?:pro|premium|paid|unlimited)[\'"]/i',
+				'/(?:plan|monthly|daily)\s+limit\s+(?:reached|exceeded)/i',
 			),
 			'code'     => 'trialware_quota_gate_candidate',
 			'message'  => 'Detected possible usage quota gate on plugin functionality.',
@@ -79,6 +94,7 @@ class Trialware_Check extends Abstract_File_Check {
 			'patterns' => array(
 				'/if\s*\(\s*(?:!\s*)?(?:has_paid|is_paid_user|payment_valid|subscription_active|is_subscribed)\s*\(/i',
 				'/(?:unlock|upgrade|go_pro|go_premium|get_pro|buy_pro)\s*\(\s*\)/i',
+				'/to\s+unlock\s+(?:this|all|full)\s+(?:feature|features|functionality)/i',
 			),
 			'code'     => 'trialware_payment_gate_candidate',
 			'message'  => 'Detected possible payment gate on plugin functionality.',
@@ -90,7 +106,7 @@ class Trialware_Check extends Abstract_File_Check {
 	 *
 	 * Every check must have at least one category.
 	 *
-	 * @since 1.4.0
+	 * @since 2.1.0
 	 *
 	 * @return array The categories for the check.
 	 */
@@ -101,7 +117,7 @@ class Trialware_Check extends Abstract_File_Check {
 	/**
 	 * Amends the given result by running the check on the given list of files.
 	 *
-	 * @since 1.4.0
+	 * @since 2.1.0
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 * @param array        $files  List of absolute file paths.
@@ -126,7 +142,7 @@ class Trialware_Check extends Abstract_File_Check {
 	 * Each pattern in the group is checked independently. Matches are de-duplicated
 	 * per file so the same file is not reported multiple times for the same group.
 	 *
-	 * @since 1.4.0
+	 * @since 2.1.0
 	 *
 	 * @param Check_Result $result      The check result to amend.
 	 * @param array        $code_files  List of absolute file paths.
@@ -171,7 +187,7 @@ class Trialware_Check extends Abstract_File_Check {
 	 *
 	 * Every check must have a short description explaining what the check does.
 	 *
-	 * @since 1.4.0
+	 * @since 2.1.0
 	 *
 	 * @return string Description.
 	 */
@@ -184,7 +200,7 @@ class Trialware_Check extends Abstract_File_Check {
 	 *
 	 * Every check must have a URL with further information about the check.
 	 *
-	 * @since 1.4.0
+	 * @since 2.1.0
 	 *
 	 * @return string The documentation URL.
 	 */
