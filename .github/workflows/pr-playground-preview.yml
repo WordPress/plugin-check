@@ -1,0 +1,76 @@
+name: PR Playground Preview Build
+
+# Builds a Plugin Check zip for every pull request. A separate workflow_run
+# publisher exposes the artifact and posts the Playground preview button, so
+# forked PRs can be supported without running untrusted PR code with write
+# permissions.
+#
+# References:
+# - https://github.com/WordPress/action-wp-playground-pr-preview/tree/v2
+# - https://wordpress.github.io/wordpress-playground/guides/github-action-pr-preview/
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - edited
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Playground preview artifact
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v7
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: composer
+          coverage: none
+
+      - name: Install production Composer dependencies
+        run: composer install --no-dev --optimize-autoloader --no-interaction --no-progress
+
+      - name: Build plugin zip honouring .distignore
+        env:
+          PLUGIN_SLUG: plugin-check
+        run: |
+          mkdir -p "build/${PLUGIN_SLUG}"
+          rsync -a --delete \
+            --exclude-from='.distignore' \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='build' \
+            ./ "build/${PLUGIN_SLUG}/"
+          cd build
+          zip -qr "${PLUGIN_SLUG}.zip" "${PLUGIN_SLUG}"
+          ls -lh "${PLUGIN_SLUG}.zip"
+
+      - name: Write Playground preview metadata
+        run: |
+          mkdir -p build/playground-preview
+          printf '%s' '${{ github.event.pull_request.number }}' > build/playground-preview/pr-number
+          printf '%s' '${{ github.event.pull_request.head.sha }}' > build/playground-preview/head-sha
+
+      - name: Upload plugin zip artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: plugin-check-zip
+          path: build/plugin-check.zip
+          if-no-files-found: error
+          retention-days: 5
+
+      - name: Upload Playground preview metadata
+        uses: actions/upload-artifact@v7
+        with:
+          name: plugin-check-preview-metadata
+          path: build/playground-preview
+          if-no-files-found: error
+          retention-days: 5
