@@ -3,6 +3,7 @@
 
 	<description>Plugin Check Sniffs</description>
 
+	<rule ref="PluginCheck.CodeAnalysis.AIProvider" />
 	<rule ref="PluginCheck.CodeAnalysis.DiscouragedFunctions" />
 	<rule ref="PluginCheck.CodeAnalysis.EnqueuedResourceOffloading" />
 	<rule ref="PluginCheck.CodeAnalysis.Heredoc" />
