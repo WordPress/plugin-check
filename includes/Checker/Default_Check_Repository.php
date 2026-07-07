@@ -72,6 +72,7 @@ class Default_Check_Repository extends Empty_Check_Repository {
 			'wp_plugin_check_checks',
 			array(
 				'i18n_usage'                 => new Checks\General\I18n_Usage_Check(),
+				'php_error_reporting'        => new Checks\General\PHP_Error_Reporting_Check(),
 				'enqueued_scripts_size'      => new Checks\Performance\Enqueued_Scripts_Size_Check(),
 				'enqueued_styles_size'       => new Checks\Performance\Enqueued_Styles_Size_Check(),
 				'code_obfuscation'           => new Checks\Plugin_Repo\Code_Obfuscation_Check(),
@@ -103,6 +104,7 @@ class Default_Check_Repository extends Empty_Check_Repository {
 				'direct_file_access'         => new Checks\Plugin_Repo\Direct_File_Access_Check(),
 				'external_admin_menu_links'  => new Checks\Plugin_Repo\External_Admin_Menu_Links_Check(),
 				'wp_functions_compatibility' => new Checks\Plugin_Repo\WP_Functions_Compatibility_Check(),
+				'ai_provider'                => new Checks\General\AI_Provider_Check(),
 			)
 		);
 
