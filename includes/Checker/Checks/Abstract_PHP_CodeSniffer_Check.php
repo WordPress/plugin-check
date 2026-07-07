@@ -118,17 +118,19 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 			$runner->runPHPCS();
 			$reports = ob_get_clean();
 		} catch ( Exception $e ) {
-			$_SERVER['argv'] = $orig_cmd_args;
+			if ( ob_get_level() > 0 ) {
+				ob_end_clean();
+			}
 			throw $e;
 		} finally {
 			restore_error_handler();
+
+			// Reset installed_paths.
+			Config::setConfigData( 'installed_paths', $installed_paths, true );
+
+			// Restore original arguments.
+			$_SERVER['argv'] = $orig_cmd_args;
 		}
-
-		// Reset installed_paths.
-		Config::setConfigData( 'installed_paths', $installed_paths, true );
-
-		// Restore original arguments.
-		$_SERVER['argv'] = $orig_cmd_args;
 
 		// Parse the reports into data to add to the overall $result.
 		$reports = json_decode( trim( $reports ), true );
