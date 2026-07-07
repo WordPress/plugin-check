@@ -167,10 +167,16 @@ class Plugin_Review_PHPCS_Check_Tests extends WP_UnitTestCase {
 		$check_context             = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-review-phpcs-without-errors/load.php' );
 		$check_result              = new Check_Result( $check_context );
 
-		set_error_handler(
-			static function ( $errno, $errstr, $errfile, $errline ) {
+		$previous_error_handler = null;
+
+		$previous_error_handler = set_error_handler(
+			static function ( $errno, $errstr, $errfile, $errline ) use ( &$previous_error_handler ) {
 				if ( E_DEPRECATED === $errno && false !== strpos( $errstr, 'auto_detect_line_endings is deprecated' ) ) {
 					throw new ErrorException( $errstr, 0, $errno, $errfile, $errline );
+				}
+
+				if ( is_callable( $previous_error_handler ) ) {
+					return (bool) call_user_func( $previous_error_handler, $errno, $errstr, $errfile, $errline );
 				}
 
 				return false;
