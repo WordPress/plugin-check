@@ -342,9 +342,20 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @return bool True if AI analysis should be used, false otherwise.
 	 */
-	protected function should_use_ai() {
+	public function should_use_ai() {
 		// Check if explicitly set via setter (e.g., CLI flag or checkbox).
 		return $this->use_ai;
+	}
+
+	/**
+	 * Gets the AI model preference for analysis.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return string Model preference.
+	 */
+	final public function get_ai_model_preference() {
+		return $this->ai_model_preference;
 	}
 
 	/**

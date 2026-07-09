@@ -78,14 +78,12 @@ class Plugin_Main {
 		// Create the Settings page.
 		$settings_page = new Settings_Page();
 		$settings_page->add_hooks();
-
-		// Create the Plugin Check Namer tool page.
-		$namer_page_class = '\\WordPress\\Plugin_Check\\Admin\\Namer_Page';
-		$namer_page       = new $namer_page_class();
-		$namer_page->add_hooks();
+<<<<<<< HEAD
 
 		// Create the SVN Checker page.
 		$svn_checker_page = new SVN_Checker_Page();
 		$svn_checker_page->add_hooks();
+=======
+>>>>>>> 443d8a22 (feat: integrate Plugin Check Namer as standard AI Name Check static check)
 	}
 }
