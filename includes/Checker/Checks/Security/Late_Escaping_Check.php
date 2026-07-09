@@ -97,7 +97,14 @@ class Late_Escaping_Check extends Abstract_PHP_CodeSniffer_Check {
 	protected function add_result_message_for_file( Check_Result $result, $error, $message, $code, $file, $line = 0, $column = 0, string $docs = '', $severity = 5 ) {
 		switch ( $code ) {
 			case 'WordPress.Security.EscapeOutput.OutputNotEscaped':
-				$docs = __( 'https://developer.wordpress.org/apis/security/escaping/#escaping-functions', 'plugin-check' );
+				if ( $this->line_calls_save_dom_method( $file, $line ) ) {
+					// DOMDocument::saveHtml() and saveXML() return safe HTML/XML
+					// constructed through the DOM API — additional escaping is not needed.
+					$error = false;
+					$docs  = 'https://www.php.net/manual/en/domdocument.savehtml.php';
+				} else {
+					$docs = __( 'https://developer.wordpress.org/apis/security/escaping/#escaping-functions', 'plugin-check' );
+				}
 				break;
 
 			case 'WordPress.Security.EscapeOutput.UnsafePrintingFunction':
@@ -114,5 +121,40 @@ class Late_Escaping_Check extends Abstract_PHP_CodeSniffer_Check {
 		}
 
 		parent::add_result_message_for_file( $result, $error, $message, $code, $file, $line, $column, $docs, $severity );
+	}
+
+	/**
+	 * Checks whether the given file/line contains a call to a safe DOM output method.
+	 *
+	 * DOMDocument::saveHtml() and DOMDocument::saveXML() return HTML/XML
+	 * constructed through the DOM API. The output is already structured and
+	 * does not need to be passed through an escaping function, so the
+	 * WordPress.Security.EscapeOutput sniff reports a false positive here.
+	 *
+	 * @since 2.0.1
+	 *
+	 * @param string $file Absolute path to the file.
+	 * @param int    $line Line number to inspect.
+	 * @return bool True if the line contains a call to saveHtml() or saveXML().
+	 */
+	private function line_calls_save_dom_method( $file, $line ) {
+		if ( $line <= 0 || ! is_string( $file ) || '' === $file || ! file_exists( $file ) ) {
+			return false;
+		}
+
+		$contents = file_get_contents( $file ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		if ( false === $contents ) {
+			return false;
+		}
+
+		$lines = explode( "\n", $contents );
+		if ( ! isset( $lines[ $line - 1 ] ) ) {
+			return false;
+		}
+
+		$source = $lines[ $line - 1 ];
+
+		return ( false !== stripos( $source, 'saveHtml(' ) )
+			|| ( false !== stripos( $source, 'saveXML(' ) );
 	}
 }

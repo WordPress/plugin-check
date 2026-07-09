@@ -161,4 +161,48 @@ class Plugin_Review_PHPCS_Check_Tests extends WP_UnitTestCase {
 		$this->assertEquals( 0, $check_result->get_error_count() );
 		$this->assertEquals( 0, $check_result->get_warning_count() );
 	}
+
+	/**
+	 * Test for prepared SQL NotPrepared downgrade.
+	 *
+	 * Verifies WordPress.DB.PreparedSQL.NotPrepared is downgraded
+	 * from error to warning, reducing false positives.
+	 */
+	public function test_run_with_prepared_sql_errors() {
+		$plugin_review_phpcs_check = new Plugin_Review_PHPCS_Check();
+		$check_context             = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-prepared-sql-with-errors/load.php' );
+		$check_result              = new Check_Result( $check_context );
+
+		$plugin_review_phpcs_check->run( $check_result );
+
+		$errors   = $check_result->get_errors();
+		$warnings = $check_result->get_warnings();
+
+		$this->assertNotEmpty( $warnings );
+		$this->assertArrayHasKey( 'load.php', $warnings );
+
+		$found_not_prepared = false;
+		foreach ( $warnings['load.php'] as $line => $columns ) {
+			foreach ( $columns as $column => $messages ) {
+				foreach ( $messages as $message ) {
+					if ( 'WordPress.DB.PreparedSQL.NotPrepared' === $message['code'] ) {
+						$found_not_prepared = true;
+						break 3;
+					}
+				}
+			}
+		}
+
+		$this->assertTrue( $found_not_prepared, 'WordPress.DB.PreparedSQL.NotPrepared should be a warning.' );
+
+		if ( isset( $errors['load.php'] ) ) {
+			foreach ( $errors['load.php'] as $line => $columns ) {
+				foreach ( $columns as $column => $messages ) {
+					foreach ( $messages as $message ) {
+						$this->assertNotEquals( 'WordPress.DB.PreparedSQL.NotPrepared', $message['code'] );
+					}
+				}
+			}
+		}
+	}
 }
