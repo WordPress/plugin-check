@@ -221,3 +221,16 @@
 	color: #646970;
 	font-size: 0.9em;
 }
+
+/** Plugin Check Report Error/Warning Badge **/
+.plugin-check__results-row-type--ERROR span,
+.plugin-check__results-row-type--WARNING span {
+	background: #dc3545;
+	color: #fff;
+	padding: 4px 8px;
+	border-radius: 2px;
+}
+
+.plugin-check__results-row-type--WARNING span {
+	background: #ffc107;
+}
