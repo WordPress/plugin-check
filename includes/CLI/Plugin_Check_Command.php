@@ -788,14 +788,14 @@ final class Plugin_Check_Command {
 			WP_CLI::line(
 				sprintf(
 					/* translators: %d: Number of issues analyzed. */
-					__( 'Issues analyzed: %d', 'plugin-check' ),
+					_n( 'Issue analyzed: %d', 'Issues analyzed: %d', $issues_analyzed, 'plugin-check' ),
 					$issues_analyzed
 				)
 			);
 			WP_CLI::line(
 				sprintf(
 					/* translators: %d: Number of possible false positives detected. */
-					__( 'Possible false positives detected: %d', 'plugin-check' ),
+					_n( 'Possible false positive detected: %d', 'Possible false positives detected: %d', $false_positives, 'plugin-check' ),
 					$false_positives
 				)
 			);
@@ -804,7 +804,7 @@ final class Plugin_Check_Command {
 				WP_CLI::line(
 					sprintf(
 						/* translators: %s: Number of tokens spent. */
-						__( 'Tokens spent: %s', 'plugin-check' ),
+						_n( 'Token spent: %s', 'Tokens spent: %s', $tokens_spent, 'plugin-check' ),
 						number_format_i18n( $tokens_spent )
 					)
 				);

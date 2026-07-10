@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Checkout plugin-check
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Resolve latest stable WordPress version
         id: wp
@@ -29,7 +29,7 @@ jobs:
           echo "Using WordPress $VERSION (latest stable from WordPress.org)"
 
       - name: Checkout WordPress core
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: WordPress/WordPress
           ref: ${{ steps.wp.outputs.version }}

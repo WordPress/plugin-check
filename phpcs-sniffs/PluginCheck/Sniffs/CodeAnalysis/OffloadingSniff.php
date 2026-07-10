@@ -65,19 +65,21 @@ final class OffloadingSniff extends Sniff {
 			return;
 		}
 
-		// Only match HTML markup not arbitrary strings, as those could be covered by EnqueuedResourceOffloadingSniff already.
-
-		if (
-			false === strpos( $content, '<img' ) &&
-			false === strpos( $content, '<video' ) &&
-			false === strpos( $content, '<audio' ) &&
-			false === strpos( $content, '<source' ) &&
-			false === strpos( $content, '<link' ) &&
-			false === strpos( $content, '<script' )
-		) {
-			return;
+		// Skip check if the string is within wp_enqueue_script/etc function calls,
+		// as EnqueuedResourceOffloadingSniff already handles those and we want to avoid double reporting.
+		if ( isset( $this->tokens[ $stackPtr ]['nested_parenthesis'] ) ) {
+			foreach ( $this->tokens[ $stackPtr ]['nested_parenthesis'] as $opener => $closer ) {
+				$prev = $this->phpcsFile->findPrevious( Tokens::$emptyTokens, ( $opener - 1 ), null, true );
+				if ( false !== $prev && \T_STRING === $this->tokens[ $prev ]['code'] ) {
+					$function_name = $this->tokens[ $prev ]['content'];
+					if ( in_array( $function_name, array( 'wp_enqueue_script', 'wp_enqueue_style', 'wp_register_script', 'wp_register_style' ), true ) ) {
+						return ( $end_ptr + 1 );
+					}
+				}
+			}
 		}
 
+		// First check: Always check against known offloading services pattern for all strings.
 		$pattern = $this->get_offloading_services_pattern();
 
 		$matches = array();
@@ -89,6 +91,20 @@ final class OffloadingSniff extends Sniff {
 					'OffloadedContent'
 				);
 			}
+			return ( $end_ptr + 1 );
+		}
+
+		// Second check: For HTML markup strings only, also check file extension-based patterns.
+		// This is limited to HTML context to avoid false positives on arbitrary URLs.
+
+		if (
+			false === strpos( $content, '<img' ) &&
+			false === strpos( $content, '<video' ) &&
+			false === strpos( $content, '<audio' ) &&
+			false === strpos( $content, '<source' ) &&
+			false === strpos( $content, '<link' ) &&
+			false === strpos( $content, '<script' )
+		) {
 			return ( $end_ptr + 1 );
 		}
 

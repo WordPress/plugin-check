@@ -35,6 +35,17 @@ class WP_Functions_Compatibility_Check_Tests extends WP_UnitTestCase {
 		$this->assertEmpty( wp_list_filter( $errors['uses-compatible-function.php'][8][0] ?? array(), array( 'code' => 'wp_function_not_compatible_with_requires_wp' ) ) );
 	}
 
+	public function test_run_with_function_exists_guard_without_errors() {
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-wp-functions-compatibility-with-function-exists-guard/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check = new WP_Functions_Compatibility_Check();
+		$check->run( $check_result );
+
+		$errors = $check_result->get_errors();
+		$this->assertArrayNotHasKey( 'uses-guarded-function.php', $errors );
+	}
+
 	public function test_run_with_php_serialize_without_errors() {
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-wp-functions-compatibility-with-php-serialize/load.php' );
 		$check_result  = new Check_Result( $check_context );
