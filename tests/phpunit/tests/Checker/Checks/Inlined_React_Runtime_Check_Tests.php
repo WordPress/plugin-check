@@ -22,13 +22,18 @@ class Inlined_React_Runtime_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertNotEmpty( $warnings );
 		$this->assertEmpty( $check_result->get_errors() );
-		$this->assertSame( 2, $check_result->get_warning_count() );
+		$this->assertSame( 3, $check_result->get_warning_count() );
 
 		$this->assertArrayHasKey( 'index.js', $warnings );
 		$this->assertArrayHasKey( 'legacy.js', $warnings );
+		$this->assertArrayHasKey( 'asset-declared.js', $warnings );
 
 		$this->assertSame( 'inlined_jsx_runtime', $this->get_first_code( $warnings['index.js'] ) );
 		$this->assertSame( 'react_removed_api', $this->get_first_code( $warnings['legacy.js'] ) );
+
+		// A declared react-jsx-runtime dependency in the sibling asset file must
+		// not suppress the inlined pre-19 runtime marker found in the JavaScript.
+		$this->assertSame( 'inlined_jsx_runtime', $this->get_first_code( $warnings['asset-declared.js'] ) );
 	}
 
 	public function test_run_without_errors() {
