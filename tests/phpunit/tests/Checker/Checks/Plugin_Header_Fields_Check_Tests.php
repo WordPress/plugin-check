@@ -37,7 +37,8 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 		$this->assertCount( 1, wp_list_filter( $warnings['load.php'][0][0], array( 'code' => 'plugin_header_nonexistent_domain_path' ) ) );
 
 		if ( is_wp_version_compatible( '6.5' ) ) {
-			$this->assertCount( 1, wp_list_filter( $errors['load.php'][0][0], array( 'code' => 'plugin_header_invalid_requires_plugins' ) ) );
+			// Fixture declares "Example Plugin, OtherPlugin", neither of which is a valid slug.
+			$this->assertCount( 2, wp_list_filter( $errors['load.php'][0][0], array( 'code' => 'plugin_header_invalid_requires_plugins' ) ) );
 		}
 	}
 
@@ -103,6 +104,83 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 			// For WordPress < 6.5, the check doesn't run.
 			$this->assertTrue( true );
 		}
+	}
+
+	public function test_run_with_multiple_invalid_requires_plugins_slugs_reported_individually() {
+		/*
+		 * Test plugin has following header, with both slugs invalid.
+		 * Requires Plugins: Example Plugin, OtherPlugin
+		 */
+
+		$check         = new Plugin_Header_Fields_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-header-fields-with-errors/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check->run( $check_result );
+
+		$errors = $check_result->get_errors();
+
+		if ( ! is_wp_version_compatible( '6.5' ) ) {
+			$this->assertTrue( true );
+			return;
+		}
+
+		$messages = wp_list_pluck( wp_list_filter( $errors['load.php'][0][0], array( 'code' => 'plugin_header_invalid_requires_plugins' ) ), 'message' );
+
+		$this->assertCount( 2, $messages, 'Each invalid slug should be reported as its own error.' );
+
+		$example_plugin_messages = array_filter(
+			$messages,
+			static function ( $message ) {
+				return str_contains( $message, 'Example Plugin' );
+			}
+		);
+		$other_plugin_messages   = array_filter(
+			$messages,
+			static function ( $message ) {
+				return str_contains( $message, 'OtherPlugin' );
+			}
+		);
+
+		$this->assertCount( 1, $example_plugin_messages, 'Exactly one error should name "Example Plugin".' );
+		$this->assertStringNotContainsString( 'OtherPlugin', reset( $example_plugin_messages ) );
+
+		$this->assertCount( 1, $other_plugin_messages, 'Exactly one error should name "OtherPlugin".' );
+		$this->assertStringNotContainsString( 'Example Plugin', reset( $other_plugin_messages ) );
+	}
+
+	public function test_run_with_requires_plugins_dependency_status() {
+		/*
+		 * Test plugin has following header.
+		 * Requires Plugins: plugin-check, hello-dolly, not-installed-plugin
+		 *
+		 * "plugin-check" is installed and active, "hello-dolly" is installed
+		 * but inactive, and "not-installed-plugin" is not installed at all.
+		 */
+
+		$check         = new Plugin_Header_Fields_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-requires-plugins-status/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check->run( $check_result );
+
+		$errors   = $check_result->get_errors();
+		$warnings = $check_result->get_warnings();
+
+		if ( ! is_wp_version_compatible( '6.5' ) ) {
+			$this->assertTrue( true );
+			return;
+		}
+
+		$this->assertCount( 0, wp_list_filter( $errors['load.php'][0][0] ?? array(), array( 'code' => 'plugin_header_invalid_requires_plugins' ) ) );
+
+		$not_active_items = wp_list_filter( $warnings['load.php'][0][0], array( 'code' => 'plugin_header_requires_plugins_not_active' ) );
+		$this->assertCount( 1, $not_active_items );
+		$this->assertStringContainsString( 'hello-dolly', reset( $not_active_items )['message'] );
+
+		$not_installed_items = wp_list_filter( $warnings['load.php'][0][0], array( 'code' => 'plugin_header_requires_plugins_not_installed' ) );
+		$this->assertCount( 1, $not_installed_items );
+		$this->assertStringContainsString( 'not-installed-plugin', reset( $not_installed_items )['message'] );
 	}
 
 	public function test_run_with_mismatched_tested_up_to() {

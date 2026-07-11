@@ -372,22 +372,7 @@ class Plugin_Header_Fields_Check implements Static_Check {
 		}
 
 		if ( ! empty( $plugin_header['RequiresPlugins'] ) ) {
-			if ( ! preg_match( '/^[a-z0-9-]+(?:,\s*[a-z0-9-]+)*$/', $plugin_header['RequiresPlugins'] ) ) {
-				$this->add_result_error_for_file(
-					$result,
-					sprintf(
-						/* translators: %s: plugin header field */
-						__( 'The "%s" header in the plugin file must contain a comma-separated list of WordPress.org-formatted slugs.', 'plugin-check' ),
-						esc_html( $labels['RequiresPlugins'] )
-					),
-					'plugin_header_invalid_requires_plugins',
-					$plugin_main_file,
-					0,
-					0,
-					'',
-					7
-				);
-			}
+			$this->check_requires_plugins_header( $result, $plugin_header['RequiresPlugins'], $labels['RequiresPlugins'], $plugin_main_file );
 		}
 
 		if ( empty( $plugin_header['License'] ) ) {
@@ -534,6 +519,131 @@ class Plugin_Header_Fields_Check implements Static_Check {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Validates each slug declared in the "Requires Plugins" header individually.
+	 *
+	 * Reports an error per malformed slug, and a warning per validly formatted
+	 * slug that is not installed or not active in the environment the check
+	 * is running in.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param Check_Result $result             The check result to amend.
+	 * @param string       $requires_plugins   Raw value of the "Requires Plugins" header.
+	 * @param string       $label              Label of the "Requires Plugins" header.
+	 * @param string       $plugin_main_file   Absolute path to the main plugin file.
+	 */
+	private function check_requires_plugins_header( Check_Result $result, string $requires_plugins, string $label, string $plugin_main_file ) {
+		$slugs = array_map( 'trim', explode( ',', $requires_plugins ) );
+
+		foreach ( $slugs as $slug ) {
+			if ( '' === $slug ) {
+				continue;
+			}
+
+			if ( ! preg_match( '/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $slug ) ) {
+				$this->add_result_error_for_file(
+					$result,
+					sprintf(
+						/* translators: 1: plugin header field, 2: dependency slug */
+						__( 'The "%1$s" header in the plugin file contains "%2$s", which is not a valid WordPress.org-formatted slug.', 'plugin-check' ),
+						esc_html( $label ),
+						esc_html( $slug )
+					),
+					'plugin_header_invalid_requires_plugins',
+					$plugin_main_file,
+					0,
+					0,
+					'',
+					7
+				);
+				continue;
+			}
+
+			$this->check_requires_plugins_slug_status( $result, $slug, $plugin_main_file );
+		}
+	}
+
+	/**
+	 * Checks whether a single declared plugin dependency is installed and active.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param Check_Result $result           The check result to amend.
+	 * @param string       $slug             The dependency's WordPress.org slug.
+	 * @param string       $plugin_main_file Absolute path to the main plugin file.
+	 */
+	private function check_requires_plugins_slug_status( Check_Result $result, string $slug, string $plugin_main_file ) {
+		$dependency_filepath = $this->get_installed_plugin_file_by_slug( $slug );
+
+		if ( false === $dependency_filepath ) {
+			$this->add_result_warning_for_file(
+				$result,
+				sprintf(
+					/* translators: %s: dependency slug */
+					__( 'The plugin declares "%s" as a required plugin, but it is not installed in this environment.', 'plugin-check' ),
+					esc_html( $slug )
+				),
+				'plugin_header_requires_plugins_not_installed',
+				$plugin_main_file,
+				0,
+				0,
+				'',
+				3
+			);
+			return;
+		}
+
+		if ( is_plugin_inactive( $dependency_filepath ) ) {
+			$this->add_result_warning_for_file(
+				$result,
+				sprintf(
+					/* translators: %s: dependency slug */
+					__( 'The plugin declares "%s" as a required plugin, but it is not active in this environment.', 'plugin-check' ),
+					esc_html( $slug )
+				),
+				'plugin_header_requires_plugins_not_active',
+				$plugin_main_file,
+				0,
+				0,
+				'',
+				3
+			);
+		}
+	}
+
+	/**
+	 * Finds the installed plugin file matching a WordPress.org slug.
+	 *
+	 * Mirrors the slug derivation used by WP_Plugin_Dependencies::convert_to_slug(),
+	 * but looks up any installed plugin rather than only those already registered
+	 * as a dependency of another plugin.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param string $slug The plugin's WordPress.org slug.
+	 * @return string|false The plugin file relative to the plugins directory, or false if not installed.
+	 */
+	private function get_installed_plugin_file_by_slug( string $slug ) {
+		if ( ! function_exists( 'get_plugins' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+
+		foreach ( array_keys( get_plugins() ) as $plugin_file ) {
+			$plugin_slug = str_contains( $plugin_file, '/' ) ? dirname( $plugin_file ) : str_replace( '.php', '', $plugin_file );
+
+			if ( 'hello.php' === $plugin_file ) {
+				$plugin_slug = 'hello-dolly';
+			}
+
+			if ( $plugin_slug === $slug ) {
+				return $plugin_file;
+			}
+		}
+
+		return false;
 	}
 
 	/**
