@@ -90,6 +90,9 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 		 * Requires Plugins: woocommerce, contact-form-7
 		 */
 
+		set_transient( 'wp_plugin_check_requires_plugin_woocommerce', 'yes' );
+		set_transient( 'wp_plugin_check_requires_plugin_contact-form-7', 'yes' );
+
 		$check         = new Plugin_Header_Fields_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-unfiltered-uploads-with-errors/load.php' );
 		$check_result  = new Check_Result( $check_context );
@@ -97,6 +100,9 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 		$check->run( $check_result );
 
 		$errors = $check_result->get_errors();
+
+		delete_transient( 'wp_plugin_check_requires_plugin_woocommerce' );
+		delete_transient( 'wp_plugin_check_requires_plugin_contact-form-7' );
 
 		if ( is_wp_version_compatible( '6.5' ) ) {
 			$this->assertCount( 0, wp_list_filter( $errors['load.php'][0][0], array( 'code' => 'plugin_header_invalid_requires_plugins' ) ) );
@@ -154,9 +160,14 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 		 * Test plugin has following header.
 		 * Requires Plugins: plugin-check, hello-dolly, not-installed-plugin
 		 *
-		 * "plugin-check" is installed and active, "hello-dolly" is installed
-		 * but inactive, and "not-installed-plugin" is not installed at all.
+		 * "plugin-check" and "hello-dolly" are seeded as published in the
+		 * WordPress.org plugin directory; "not-installed-plugin" is seeded
+		 * as not found there.
 		 */
+
+		set_transient( 'wp_plugin_check_requires_plugin_plugin-check', 'yes' );
+		set_transient( 'wp_plugin_check_requires_plugin_hello-dolly', 'yes' );
+		set_transient( 'wp_plugin_check_requires_plugin_not-installed-plugin', 'no' );
 
 		$check         = new Plugin_Header_Fields_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-requires-plugins-status/load.php' );
@@ -167,6 +178,10 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 		$errors   = $check_result->get_errors();
 		$warnings = $check_result->get_warnings();
 
+		delete_transient( 'wp_plugin_check_requires_plugin_plugin-check' );
+		delete_transient( 'wp_plugin_check_requires_plugin_hello-dolly' );
+		delete_transient( 'wp_plugin_check_requires_plugin_not-installed-plugin' );
+
 		if ( ! is_wp_version_compatible( '6.5' ) ) {
 			$this->assertTrue( true );
 			return;
@@ -174,13 +189,9 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertCount( 0, wp_list_filter( $errors['load.php'][0][0] ?? array(), array( 'code' => 'plugin_header_invalid_requires_plugins' ) ) );
 
-		$not_active_items = wp_list_filter( $warnings['load.php'][0][0], array( 'code' => 'plugin_header_requires_plugins_not_active' ) );
-		$this->assertCount( 1, $not_active_items );
-		$this->assertStringContainsString( 'hello-dolly', reset( $not_active_items )['message'] );
-
-		$not_installed_items = wp_list_filter( $warnings['load.php'][0][0], array( 'code' => 'plugin_header_requires_plugins_not_installed' ) );
-		$this->assertCount( 1, $not_installed_items );
-		$this->assertStringContainsString( 'not-installed-plugin', reset( $not_installed_items )['message'] );
+		$not_in_directory_items = wp_list_filter( $warnings['load.php'][0][0], array( 'code' => 'plugin_header_requires_plugins_not_in_directory' ) );
+		$this->assertCount( 1, $not_in_directory_items, 'Only the dependency missing from the directory should get a warning.' );
+		$this->assertStringContainsString( 'not-installed-plugin', reset( $not_in_directory_items )['message'] );
 	}
 
 	public function test_run_with_mismatched_tested_up_to() {

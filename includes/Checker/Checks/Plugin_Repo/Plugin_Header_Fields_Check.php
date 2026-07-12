@@ -525,8 +525,7 @@ class Plugin_Header_Fields_Check implements Static_Check {
 	 * Validates each slug declared in the "Requires Plugins" header individually.
 	 *
 	 * Reports an error per malformed slug, and a warning per validly formatted
-	 * slug that is not installed or not active in the environment the check
-	 * is running in.
+	 * slug that could not be found in the WordPress.org plugin directory.
 	 *
 	 * @since 2.1.0
 	 *
@@ -567,7 +566,7 @@ class Plugin_Header_Fields_Check implements Static_Check {
 	}
 
 	/**
-	 * Checks whether a single declared plugin dependency is installed and active.
+	 * Checks whether a single declared plugin dependency exists in the WordPress.org plugin directory.
 	 *
 	 * @since 2.1.0
 	 *
@@ -576,74 +575,57 @@ class Plugin_Header_Fields_Check implements Static_Check {
 	 * @param string       $plugin_main_file Absolute path to the main plugin file.
 	 */
 	private function check_requires_plugins_slug_status( Check_Result $result, string $slug, string $plugin_main_file ) {
-		$dependency_filepath = $this->get_installed_plugin_file_by_slug( $slug );
+		$exists = $this->plugin_exists_in_directory( $slug );
 
-		if ( false === $dependency_filepath ) {
-			$this->add_result_warning_for_file(
-				$result,
-				sprintf(
-					/* translators: %s: dependency slug */
-					__( 'The plugin declares "%s" as a required plugin, but it is not installed in this environment.', 'plugin-check' ),
-					esc_html( $slug )
-				),
-				'plugin_header_requires_plugins_not_installed',
-				$plugin_main_file,
-				0,
-				0,
-				'',
-				3
-			);
+		// Unknown due to an unreachable API; skip rather than risk a false positive.
+		if ( null === $exists || $exists ) {
 			return;
 		}
 
-		if ( is_plugin_inactive( $dependency_filepath ) ) {
-			$this->add_result_warning_for_file(
-				$result,
-				sprintf(
-					/* translators: %s: dependency slug */
-					__( 'The plugin declares "%s" as a required plugin, but it is not active in this environment.', 'plugin-check' ),
-					esc_html( $slug )
-				),
-				'plugin_header_requires_plugins_not_active',
-				$plugin_main_file,
-				0,
-				0,
-				'',
-				3
-			);
-		}
+		$this->add_result_warning_for_file(
+			$result,
+			sprintf(
+				/* translators: %s: dependency slug */
+				__( 'The plugin declares "%s" as a required plugin, but it could not be found in the WordPress.org plugin directory.', 'plugin-check' ),
+				esc_html( $slug )
+			),
+			'plugin_header_requires_plugins_not_in_directory',
+			$plugin_main_file,
+			0,
+			0,
+			'',
+			3
+		);
 	}
 
 	/**
-	 * Finds the installed plugin file matching a WordPress.org slug.
-	 *
-	 * Mirrors the slug derivation used by WP_Plugin_Dependencies::convert_to_slug(),
-	 * but looks up any installed plugin rather than only those already registered
-	 * as a dependency of another plugin.
+	 * Checks whether a plugin slug exists in the WordPress.org plugin directory.
 	 *
 	 * @since 2.1.0
 	 *
 	 * @param string $slug The plugin's WordPress.org slug.
-	 * @return string|false The plugin file relative to the plugins directory, or false if not installed.
+	 * @return bool|null True if found, false if not found, null if the API could not be reached.
 	 */
-	private function get_installed_plugin_file_by_slug( string $slug ) {
-		if ( ! function_exists( 'get_plugins' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	private function plugin_exists_in_directory( string $slug ) {
+		$transient_key = 'wp_plugin_check_requires_plugin_' . $slug;
+		$exists        = get_transient( $transient_key );
+
+		if ( false !== $exists ) {
+			return 'yes' === $exists;
 		}
 
-		foreach ( array_keys( get_plugins() ) as $plugin_file ) {
-			$plugin_slug = str_contains( $plugin_file, '/' ) ? dirname( $plugin_file ) : str_replace( '.php', '', $plugin_file );
+		$response = wp_remote_get( "https://api.wordpress.org/plugins/info/1.0/{$slug}.json" );
 
-			if ( 'hello.php' === $plugin_file ) {
-				$plugin_slug = 'hello-dolly';
-			}
-
-			if ( $plugin_slug === $slug ) {
-				return $plugin_file;
-			}
+		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+			return null;
 		}
 
-		return false;
+		$body   = json_decode( wp_remote_retrieve_body( $response ), true );
+		$exists = isset( $body['slug'] ) && ! isset( $body['error'] );
+
+		set_transient( $transient_key, $exists ? 'yes' : 'no', DAY_IN_SECONDS );
+
+		return $exists;
 	}
 
 	/**
