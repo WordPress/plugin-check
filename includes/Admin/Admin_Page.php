@@ -204,6 +204,7 @@ final class Admin_Page {
 					'actionExportResults'             => Admin_AJAX::ACTION_EXPORT_RESULTS,
 					'successMessage'                  => __( 'No errors found.', 'plugin-check' ),
 					'errorMessage'                    => __( 'Errors were found.', 'plugin-check' ),
+					'settingsPageUrl'                 => admin_url( 'options-general.php?page=plugin-check-settings' ),
 					/* translators: %d: Number of errors found. */
 					'errorString'                     => __( '%d error', 'plugin-check' ),
 					/* translators: %d: Number of errors found. */
@@ -385,6 +386,17 @@ final class Admin_Page {
 			$results_row_template,
 			array(
 				'id'   => 'tmpl-plugin-check-results-row',
+				'type' => 'text/template',
+			)
+		);
+
+		ob_start();
+		require WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'templates/results-false-positives.php';
+		$results_false_positives_template = ob_get_clean();
+		wp_print_inline_script_tag(
+			$results_false_positives_template,
+			array(
+				'id'   => 'tmpl-plugin-check-results-false-positives',
 				'type' => 'text/template',
 			)
 		);

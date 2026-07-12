@@ -29,6 +29,7 @@
 	}
 
 	let aggregatedResults = createEmptyAggregatedResults();
+	let falsePositiveResults = createEmptyAggregatedResults();
 	let checksCompleted = false;
 	exportContainer.classList.add( 'is-hidden' );
 	exportContainer.addEventListener( 'click', onExportContainerClick );
@@ -36,6 +37,7 @@
 	const includeExperimental = document.getElementById(
 		'plugin-check__include-experimental'
 	);
+	const useAi = document.getElementById( 'plugin-check__use-ai' );
 
 	// Handle disabling the Check it button when a plugin is not selected.
 	function canRunChecks() {
@@ -87,6 +89,12 @@
 		for ( let i = 0; i < typesList.length; i++ ) {
 			typesList[ i ].disabled = true;
 		}
+		if ( useAi ) {
+			useAi.disabled = true;
+		}
+		if ( includeExperimental ) {
+			includeExperimental.disabled = true;
+		}
 
 		getChecksToRun()
 			.then( setUpEnvironment )
@@ -133,6 +141,12 @@
 		for ( let i = 0; i < typesList.length; i++ ) {
 			typesList[ i ].disabled = false;
 		}
+		if ( useAi ) {
+			useAi.disabled = false;
+		}
+		if ( includeExperimental ) {
+			includeExperimental.disabled = false;
+		}
 	}
 
 	function createEmptyAggregatedResults() {
@@ -144,14 +158,35 @@
 
 	function resetAggregatedResults() {
 		aggregatedResults = createEmptyAggregatedResults();
+		falsePositiveResults = createEmptyAggregatedResults();
 	}
 
 	function mergeAggregatedResults( results ) {
-		if ( results.errors ) {
-			mergeResultTree( aggregatedResults.errors, results.errors );
+		const splitResults = splitResultsByFalsePositive( results );
+
+		if ( splitResults.actionable.errors ) {
+			mergeResultTree(
+				aggregatedResults.errors,
+				splitResults.actionable.errors
+			);
 		}
-		if ( results.warnings ) {
-			mergeResultTree( aggregatedResults.warnings, results.warnings );
+		if ( splitResults.actionable.warnings ) {
+			mergeResultTree(
+				aggregatedResults.warnings,
+				splitResults.actionable.warnings
+			);
+		}
+		if ( splitResults.falsePositive.errors ) {
+			mergeResultTree(
+				falsePositiveResults.errors,
+				splitResults.falsePositive.errors
+			);
+		}
+		if ( splitResults.falsePositive.warnings ) {
+			mergeResultTree(
+				falsePositiveResults.warnings,
+				splitResults.falsePositive.warnings
+			);
 		}
 	}
 
@@ -189,6 +224,106 @@
 		}
 	}
 
+	function splitResultsByFalsePositive( results ) {
+		const splitResults = {
+			actionable: createEmptyAggregatedResults(),
+			falsePositive: createEmptyAggregatedResults(),
+		};
+		const aiAnalysis =
+			results && results.ai_analysis ? results.ai_analysis : {};
+
+		splitResultType(
+			results && results.errors ? results.errors : {},
+			splitResults.actionable.errors,
+			splitResults.falsePositive.errors,
+			aiAnalysis
+		);
+		splitResultType(
+			results && results.warnings ? results.warnings : {},
+			splitResults.actionable.warnings,
+			splitResults.falsePositive.warnings,
+			aiAnalysis
+		);
+
+		return splitResults;
+	}
+
+	function splitResultType( results, actionable, falsePositive, aiAnalysis ) {
+		for ( const file of Object.keys( results ) ) {
+			const lines = results[ file ] || {};
+
+			for ( const line of Object.keys( lines ) ) {
+				const columns = lines[ line ] || {};
+
+				for ( const column of Object.keys( columns ) ) {
+					for ( const entry of columns[ column ] || [] ) {
+						const aiData = findAiAnalysisForIssue(
+							file,
+							line,
+							column,
+							entry.code,
+							aiAnalysis
+						);
+						const target =
+							aiData && aiData.is_false_positive
+								? falsePositive
+								: actionable;
+						const targetEntry = cloneResultEntry( entry );
+
+						if ( aiData ) {
+							targetEntry.ai_analysis = aiData;
+						}
+
+						addResultEntry(
+							target,
+							file,
+							line,
+							column,
+							targetEntry
+						);
+					}
+				}
+			}
+		}
+	}
+
+	function addResultEntry( target, file, line, column, entry ) {
+		if ( ! hasOwn( target, file ) ) {
+			target[ file ] = {};
+		}
+		if ( ! hasOwn( target[ file ], line ) ) {
+			target[ file ][ line ] = {};
+		}
+		if ( ! hasOwn( target[ file ][ line ], column ) ) {
+			target[ file ][ line ][ column ] = [];
+		}
+
+		target[ file ][ line ][ column ].push( entry );
+	}
+
+	function findAiAnalysisForIssue( file, line, column, code, aiAnalysis ) {
+		if ( ! aiAnalysis || typeof aiAnalysis !== 'object' ) {
+			return null;
+		}
+
+		const analysisEntries = Object.values( aiAnalysis );
+		return (
+			analysisEntries.find( function ( analysis ) {
+				if ( ! analysis || typeof analysis !== 'object' ) {
+					return false;
+				}
+
+				return (
+					String( analysis.file || '' ) === String( file || '' ) &&
+					parseInt( analysis.line, 10 ) === parseInt( line, 10 ) &&
+					parseInt( analysis.column, 10 ) ===
+						parseInt( column, 10 ) &&
+					String( analysis.code || '' ) === String( code || '' )
+				);
+			} ) || null
+		);
+	}
+
 	function cloneResultEntry( entry ) {
 		return { ...entry };
 	}
@@ -196,8 +331,24 @@
 	function hasAggregatedResults() {
 		return (
 			hasEntries( aggregatedResults.errors ) ||
-			hasEntries( aggregatedResults.warnings )
+			hasEntries( aggregatedResults.warnings ) ||
+			hasEntries( falsePositiveResults.errors ) ||
+			hasEntries( falsePositiveResults.warnings )
 		);
+	}
+
+	function getExportResults() {
+		const exportResults = createEmptyAggregatedResults();
+
+		mergeResultTree( exportResults.errors, aggregatedResults.errors );
+		mergeResultTree( exportResults.warnings, aggregatedResults.warnings );
+		mergeResultTree( exportResults.errors, falsePositiveResults.errors );
+		mergeResultTree(
+			exportResults.warnings,
+			falsePositiveResults.warnings
+		);
+
+		return exportResults;
 	}
 
 	function hasEntries( tree ) {
@@ -369,7 +520,7 @@
 			payload.append( 'plugin', pluginsList.value );
 		}
 		payload.append( 'plugin_label', getSelectedPluginLabel() );
-		payload.append( 'results', JSON.stringify( aggregatedResults ) );
+		payload.append( 'results', JSON.stringify( getExportResults() ) );
 
 		return fetch( ajaxurl, {
 			method: 'POST',
@@ -444,6 +595,7 @@
 			'include-experimental',
 			includeExperimental && includeExperimental.checked ? 1 : 0
 		);
+		pluginCheckData.append( 'use-ai', useAi && useAi.checked ? 1 : 0 );
 
 		for ( let i = 0; i < data.checks.length; i++ ) {
 			pluginCheckData.append( 'checks[]', data.checks[ i ] );
@@ -516,6 +668,7 @@
 			'include-experimental',
 			includeExperimental && includeExperimental.checked ? 1 : 0
 		);
+		pluginCheckData.append( 'use-ai', useAi && useAi.checked ? 1 : 0 );
 
 		for ( let i = 0; i < categoriesList.length; i++ ) {
 			if ( categoriesList[ i ].checked ) {
@@ -559,11 +712,17 @@
 	 */
 	async function runChecks( data ) {
 		let isSuccessMessage = true;
+		let aiStats = null;
 		for ( let i = 0; i < data.checks.length; i++ ) {
 			try {
 				const results = await runCheck( data.plugin, data.checks[ i ] );
-				const errorsLength = Object.values( results.errors ).length;
-				const warningsLength = Object.values( results.warnings ).length;
+				const splitResults = splitResultsByFalsePositive( results );
+				const errorsLength = countResultTree(
+					splitResults.actionable.errors
+				);
+				const warningsLength = countResultTree(
+					splitResults.actionable.warnings
+				);
 				if (
 					isSuccessMessage &&
 					( errorsLength > 0 || warningsLength > 0 )
@@ -572,12 +731,44 @@
 				}
 				mergeAggregatedResults( results );
 				renderResults( results );
+
+				// Collect AI stats across checks.
+				if ( results.ai_stats ) {
+					if ( ! aiStats ) {
+						aiStats = {
+							tokens_spent: 0,
+							input_tokens: 0,
+							output_tokens: 0,
+							false_positives: 0,
+							issues_analyzed: 0,
+							models_used: [],
+							providers_used: [],
+						};
+					}
+					aiStats.tokens_spent += results.ai_stats.tokens_spent || 0;
+					aiStats.input_tokens += results.ai_stats.input_tokens || 0;
+					aiStats.output_tokens +=
+						results.ai_stats.output_tokens || 0;
+					aiStats.false_positives +=
+						results.ai_stats.false_positives || 0;
+					aiStats.issues_analyzed +=
+						results.ai_stats.issues_analyzed || 0;
+					if ( results.ai_stats.model_used ) {
+						aiStats.models_used.push( results.ai_stats.model_used );
+					}
+					if ( results.ai_stats.provider_used ) {
+						aiStats.providers_used.push(
+							results.ai_stats.provider_used
+						);
+					}
+				}
 			} catch {
 				// Ignore for now.
 			}
 		}
 
-		renderResultsMessage( isSuccessMessage );
+		renderFalsePositiveResults();
+		renderResultsMessage( isSuccessMessage, aiStats );
 	}
 
 	/**
@@ -586,8 +777,9 @@
 	 * @since 1.0.0
 	 *
 	 * @param {boolean} isSuccessMessage Whether the message is a success message.
+	 * @param {Object}  aiStats          AI statistics.
 	 */
-	function renderResultsMessage( isSuccessMessage ) {
+	function renderResultsMessage( isSuccessMessage, aiStats ) {
 		// Count errors and warnings to determine notice severity and compose the message.
 		const { errorCount, warningCount } = isSuccessMessage
 			? { errorCount: 0, warningCount: 0 }
@@ -674,6 +866,67 @@
 			}
 		}
 
+		if ( aiStats ) {
+			const aiParts = [];
+			const modelsUsed = [
+				...new Set( aiStats.models_used.filter( Boolean ) ),
+			];
+			const providersUsed = [
+				...new Set( aiStats.providers_used.filter( Boolean ) ),
+			];
+
+			if ( aiStats.false_positives > 0 ) {
+				aiParts.push(
+					'AI detected ' +
+						aiStats.false_positives +
+						' ' +
+						( 1 === aiStats.false_positives
+							? 'possible false positive'
+							: 'possible false positives' )
+				);
+			}
+			if ( aiStats.input_tokens > 0 ) {
+				aiParts.push(
+					'Input tokens: ' + aiStats.input_tokens.toLocaleString()
+				);
+			}
+			if ( aiStats.output_tokens > 0 ) {
+				aiParts.push(
+					'Output tokens: ' + aiStats.output_tokens.toLocaleString()
+				);
+			}
+			if ( aiStats.tokens_spent > 0 ) {
+				aiParts.push(
+					'Tokens spent: ' + aiStats.tokens_spent.toLocaleString()
+				);
+			}
+			if ( modelsUsed.length > 0 || providersUsed.length > 0 ) {
+				if ( 1 === modelsUsed.length && 1 === providersUsed.length ) {
+					aiParts.push(
+						'Model: ' + providersUsed[ 0 ] + ' ' + modelsUsed[ 0 ]
+					);
+				} else if (
+					modelsUsed.length > 0 &&
+					providersUsed.length > 0
+				) {
+					aiParts.push(
+						'Model: ' +
+							providersUsed.join( ', ' ) +
+							' ' +
+							modelsUsed.join( ', ' )
+					);
+				} else if ( modelsUsed.length > 0 ) {
+					aiParts.push( 'Model: ' + modelsUsed.join( ', ' ) );
+				} else {
+					aiParts.push( 'Model: ' + providersUsed.join( ', ' ) );
+				}
+			}
+			if ( aiParts.length > 0 ) {
+				messageText += /[.!?]\s*$/.test( messageText ) ? ' ' : '. ';
+				messageText += aiParts.join( '. ' );
+			}
+		}
+
 		resultsContainer.innerHTML =
 			renderTemplate( 'plugin-check-results-complete', {
 				type: messageType,
@@ -703,6 +956,7 @@
 			'include-experimental',
 			includeExperimental && includeExperimental.checked ? 1 : 0
 		);
+		pluginCheckData.append( 'use-ai', useAi && useAi.checked ? 1 : 0 );
 
 		for ( let i = 0; i < typesList.length; i++ ) {
 			if ( typesList[ i ].checked ) {
@@ -723,6 +977,20 @@
 				// If the response is successful and there is no message in the response.
 				if ( ! responseData.data || ! responseData.data.message ) {
 					throw new Error( 'Response contains no data' );
+				}
+
+				// Debug: Log AI data if present.
+				if ( responseData.data.ai_analysis ) {
+					console.log(
+						'AI Analysis received:',
+						responseData.data.ai_analysis
+					);
+				}
+				if ( responseData.data.ai_stats ) {
+					console.log(
+						'AI Stats received:',
+						responseData.data.ai_stats
+					);
 				}
 
 				return responseData.data;
@@ -763,20 +1031,29 @@
 	 * @param {Object} results The results object.
 	 */
 	function renderResults( results ) {
-		const { errors, warnings } = results;
+		const { ai_analysis: aiAnalysis } = results || {};
+		const splitResults = splitResultsByFalsePositive( results );
+		const errors = splitResults.actionable.errors;
+		const warnings = splitResults.actionable.warnings;
+
 		// Render errors and warnings for files.
 		for ( const file in errors ) {
 			if ( warnings[ file ] ) {
-				renderFileResults( file, errors[ file ], warnings[ file ] );
+				renderFileResults(
+					file,
+					errors[ file ],
+					warnings[ file ],
+					aiAnalysis
+				);
 				delete warnings[ file ];
 			} else {
-				renderFileResults( file, errors[ file ], [] );
+				renderFileResults( file, errors[ file ], [], aiAnalysis );
 			}
 		}
 
 		// Render remaining files with only warnings.
 		for ( const file in warnings ) {
-			renderFileResults( file, [], warnings[ file ] );
+			renderFileResults( file, [], warnings[ file ], aiAnalysis );
 		}
 	}
 
@@ -785,11 +1062,19 @@
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param {string} file     The file name for the results.
-	 * @param {Object} errors   The file errors.
-	 * @param {Object} warnings The file warnings.
+	 * @param {string} file       The file name for the results.
+	 * @param {Object} errors     The file errors.
+	 * @param {Object} warnings   The file warnings.
+	 * @param {Object} aiAnalysis AI analysis results.
 	 */
-	function renderFileResults( file, errors, warnings ) {
+	function renderFileResults( file, errors, warnings, aiAnalysis ) {
+		if (
+			! hasEntries( { [ file ]: errors } ) &&
+			! hasEntries( { [ file ]: warnings } )
+		) {
+			return;
+		}
+
 		const index =
 			Date.now().toString( 36 ) +
 			Math.random().toString( 36 ).substr( 2 );
@@ -808,8 +1093,196 @@
 		);
 
 		// Render results to the table.
-		renderResultRows( 'ERROR', errors, resultsTable, hasLinks );
-		renderResultRows( 'WARNING', warnings, resultsTable, hasLinks );
+		renderResultRows(
+			'ERROR',
+			errors,
+			resultsTable,
+			hasLinks,
+			aiAnalysis,
+			file
+		);
+		renderResultRows(
+			'WARNING',
+			warnings,
+			resultsTable,
+			hasLinks,
+			aiAnalysis,
+			file
+		);
+	}
+
+	/**
+	 * Renders the possible false positives at the end of the results.
+	 *
+	 * @since 2.0.0
+	 */
+	function renderFalsePositiveResults() {
+		if (
+			! hasEntries( falsePositiveResults.errors ) &&
+			! hasEntries( falsePositiveResults.warnings )
+		) {
+			return;
+		}
+
+		const index =
+			Date.now().toString( 36 ) +
+			Math.random().toString( 36 ).substr( 2 );
+		const falsePositiveCount =
+			countResultTree( falsePositiveResults.errors ) +
+			countResultTree( falsePositiveResults.warnings );
+
+		resultsContainer.innerHTML += renderTemplate(
+			'plugin-check-results-false-positives',
+			{
+				index,
+				count: falsePositiveCount,
+			}
+		);
+
+		const falsePositiveContainer = document.getElementById(
+			'plugin-check__false-positive-results-' + index
+		);
+
+		if ( ! falsePositiveContainer ) {
+			return;
+		}
+
+		renderResultCollection(
+			falsePositiveResults.errors,
+			falsePositiveResults.warnings,
+			falsePositiveContainer
+		);
+	}
+
+	/**
+	 * Renders a result collection into a specific container.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param {Object} containerErrors   Error results.
+	 * @param {Object} containerWarnings Warning results.
+	 * @param {Object} container         Container element.
+	 */
+	function renderResultCollection(
+		containerErrors,
+		containerWarnings,
+		container
+	) {
+		const errors = cloneResultTree( containerErrors );
+		const warnings = cloneResultTree( containerWarnings );
+
+		for ( const file in errors ) {
+			if ( warnings[ file ] ) {
+				renderFileResultsInContainer(
+					file,
+					errors[ file ],
+					warnings[ file ],
+					container
+				);
+				delete warnings[ file ];
+			} else {
+				renderFileResultsInContainer(
+					file,
+					errors[ file ],
+					[],
+					container
+				);
+			}
+		}
+
+		for ( const file in warnings ) {
+			renderFileResultsInContainer(
+				file,
+				[],
+				warnings[ file ],
+				container
+			);
+		}
+	}
+
+	/**
+	 * Renders one file's results into a specific container.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param {string} file      File name.
+	 * @param {Object} errors    Error results.
+	 * @param {Object} warnings  Warning results.
+	 * @param {Object} container Container element.
+	 */
+	function renderFileResultsInContainer( file, errors, warnings, container ) {
+		if (
+			! hasEntries( { [ file ]: errors } ) &&
+			! hasEntries( { [ file ]: warnings } )
+		) {
+			return;
+		}
+
+		const index =
+			Date.now().toString( 36 ) +
+			Math.random().toString( 36 ).substr( 2 );
+		const hasLinks =
+			hasLinksInResults( errors ) || hasLinksInResults( warnings );
+
+		container.innerHTML += renderTemplate( 'plugin-check-results-table', {
+			file,
+			index,
+			hasLinks,
+		} );
+
+		const resultsTable = document.getElementById(
+			'plugin-check__results-body-' + index
+		);
+
+		renderResultRows( 'ERROR', errors, resultsTable, hasLinks, {}, file );
+		renderResultRows(
+			'WARNING',
+			warnings,
+			resultsTable,
+			hasLinks,
+			{},
+			file
+		);
+	}
+
+	/**
+	 * Clones a result tree.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param {Object} tree Result tree.
+	 * @return {Object} Cloned result tree.
+	 */
+	function cloneResultTree( tree ) {
+		const clone = {};
+		mergeResultTree( clone, tree || {} );
+		return clone;
+	}
+
+	/**
+	 * Counts all results in a result tree.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param {Object} tree Result tree.
+	 * @return {number} Result count.
+	 */
+	function countResultTree( tree ) {
+		let count = 0;
+
+		for ( const file of Object.keys( tree || {} ) ) {
+			const lines = tree[ file ] || {};
+
+			for ( const line of Object.keys( lines ) ) {
+				const columns = lines[ line ] || {};
+
+				for ( const column of Object.keys( columns ) ) {
+					count += ( columns[ column ] || [] ).length;
+				}
+			}
+		}
+
+		return count;
 	}
 
 	/**
@@ -838,12 +1311,21 @@
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param {string}  type     The result type. Either ERROR or WARNING.
-	 * @param {Object}  results  The results object.
-	 * @param {Object}  table    The HTML table to append a result row to.
-	 * @param {boolean} hasLinks Whether any result has links.
+	 * @param {string}  type       The result type. Either ERROR or WARNING.
+	 * @param {Object}  results    The results object.
+	 * @param {Object}  table      The HTML table to append a result row to.
+	 * @param {boolean} hasLinks   Whether any result has links.
+	 * @param {Object}  aiAnalysis AI analysis results.
+	 * @param {string}  file       The file path.
 	 */
-	function renderResultRows( type, results, table, hasLinks ) {
+	function renderResultRows(
+		type,
+		results,
+		table,
+		hasLinks,
+		aiAnalysis,
+		file
+	) {
 		// Loop over each result by the line, column and messages.
 		for ( const line in results ) {
 			for ( const column in results[ line ] ) {
@@ -852,19 +1334,39 @@
 					const docs = results[ line ][ column ][ i ].docs;
 					const code = results[ line ][ column ][ i ].code;
 					const link = results[ line ][ column ][ i ].link;
+					const storedAiData =
+						results[ line ][ column ][ i ].ai_analysis || null;
+
+					// Find AI analysis for this issue.
+					const aiData =
+						storedAiData ||
+						findAiAnalysisForIssue(
+							file,
+							line,
+							column,
+							code,
+							aiAnalysis
+						);
+
+					const rowData = {
+						line,
+						column,
+						type,
+						message,
+						docs,
+						code,
+						link,
+						hasLinks,
+					};
+
+					// Add AI analysis data if available.
+					if ( aiData ) {
+						rowData.ai_analysis = aiData;
+					}
 
 					table.innerHTML += renderTemplate(
 						'plugin-check-results-row',
-						{
-							line,
-							column,
-							type,
-							message,
-							docs,
-							code,
-							link,
-							hasLinks,
-						}
+						rowData
 					);
 				}
 			}

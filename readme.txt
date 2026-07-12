@@ -2,7 +2,7 @@
 
 Contributors:      wordpressdotorg
 Tested up to:      7.0
-Stable tag:        1.9.0
+Stable tag:        2.0.0
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 Tags:              plugin best practices, testing, accessibility, performance, security
@@ -40,6 +40,10 @@ Plugin Check now includes an AI-powered Plugin Namer tool (accessible via _Tools
 The Plugin Namer provides instant feedback with actionable suggestions, helping you choose a clear, unique, and policy-compliant name that stands out in the plugin directory. This feature requires WordPress 7.0+ and configured AI connectors.
 
 **Important:** The Plugin Namer tool provides guidance only and is not definitive. All plugin name decisions are subject to final review and approval by the WordPress.org Plugins team reviewers.
+
+= Checks reviewed by AI =
+
+When AI analysis is enabled, Plugin Check can review selected results to help identify likely false positives. Related issues are grouped and analyzed with prompts tailored to the type of check, using the surrounding code as context. The AI review does not remove or change the original results, but adds an additional summary that highlights which findings may need human review before taking action.
 
 == Installation ==
 
@@ -80,6 +84,30 @@ To be approved in the WordPress.org plugin directory, a plugin must typically pa
 In any case, passing the checks in this tool likely helps to achieve a smooth plugin review process, but is no guarantee that a plugin will be approved in the WordPress.org plugin directory.
 
 == Changelog ==
+
+= 2.0.0 =
+
+* Enhancement - Add WordPress functions compatibility check to flag usage of functions unavailable in a plugin's declared minimum WordPress version.
+* Enhancement - Add Write File check to detect plugins saving data in the plugin folder instead of the uploads directory or database.
+* Enhancement - Add batched AI false positive detection with check-specific prompts and AI model selection for WP-CLI.
+* Enhancement - Add CTRF export support for check results.
+* Enhancement - Add an error count summary to the Plugin Check UI.
+* Enhancement - Improve Direct File Access detection for library-style files.
+* Enhancement - Adjust checks for update mode.
+* Fix - Relax Update URI header validation for WordPress.org plugin URLs.
+* Fix - Improve WordPress functions compatibility detection to avoid PHP serialization false positives.
+* Fix - Respect `wp_supports_ai()` and text-capable model filtering in the Plugin Namer.
+* Fix - Show Plugin Namer token usage in results.
+* Fix - Recognize EUPL as a GPL-compatible license.
+* Fix - Improve internationalization for emoji-prefixed labels.
+* Fix - Update PHPCS sniffer repository links.
+* Tweak - Update WP-CLI runtime checks documentation.
+* Chore - Add automated WordPress function compatibility data generation.
+* Chore - Add AI usage disclosure to the pull request template.
+* Chore - Add AI coding agent instructions.
+* Chore - Clean up wp-env development and test configuration warnings.
+* Chore - Show a WordPress Playground preview button on pull requests.
+* Chore - Update development and CI dependencies.
 
 = 1.9.0 =
 
