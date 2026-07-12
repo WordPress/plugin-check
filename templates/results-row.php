@@ -5,7 +5,7 @@
 	<td data-label="<?php esc_attr_e( 'Column', 'plugin-check' ); ?>">
 		{{data.column}}
 	</td>
-	<td data-label="<?php esc_attr_e( 'Type', 'plugin-check' ); ?>" class="plugin-check__results-row-type plugin-check__results-row-type--{{data.type}}">
+	<td data-label="<?php esc_attr_e( 'Type', 'plugin-check' ); ?>" class="plugin-check__results-row-type plugin-check__results-row-type--{{data.type.toLowerCase()}}">
 		<span>{{data.type}}</span>
 	</td>
 	<td data-label="<?php esc_attr_e( 'Code', 'plugin-check' ); ?>">
