@@ -35,6 +35,7 @@ final class UnclosedObStartUnitTest extends AbstractSniffUnitTest {
 			14 => 1, // Case: ob_start() at file scope with no closing call.
 			17 => 1, // Case: multiple ob_start() in the same scope, only one closed.
 			29 => 1, // Case: ob_start() closed only conditionally via an if block.
+			45 => 1, // Case: arrow function (T_FN) with unpaired ob_start().
 		);
 	}
 

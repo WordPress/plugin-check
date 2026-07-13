@@ -51,3 +51,9 @@ function hook_paired() {
 function test_plugin_unclosed_ob_start_close() {
 	ob_end_clean();
 }
+
+// 8. Arrow function (T_FN) with unpaired ob_start() → issue (T_FN must form its own scope).
+$arrow_unpaired = fn() => ob_start();
+
+// 9. Arrow function (T_FN) with paired ob_start()/ob_get_clean() → no issue.
+$arrow_paired = static fn() => ob_start() && ob_get_clean();

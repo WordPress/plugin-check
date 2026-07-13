@@ -257,7 +257,10 @@ final class UnclosedObStartSniff extends Sniff {
 
 		$conditions = array_reverse( $this->tokens[ $stackPtr ]['conditions'], true );
 		foreach ( $conditions as $condition_ptr => $condition_code ) {
-			if ( in_array( $condition_code, array( T_FUNCTION, T_CLOSURE ), true ) ) {
+			// T_FN (arrow functions, PHP 7.4+) creates its own scope in the PHPCS
+			// conditions stack and must be treated like a function/closure for the
+			// purposes of pairing ob_start() with its closing call.
+			if ( in_array( $condition_code, array( T_FUNCTION, T_CLOSURE, T_FN ), true ) ) {
 				return $condition_ptr;
 			}
 		}

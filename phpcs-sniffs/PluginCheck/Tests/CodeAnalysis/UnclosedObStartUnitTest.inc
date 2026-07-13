@@ -40,3 +40,9 @@ function hook_paired() {
 function hook_paired_callback() {
 	ob_end_clean();
 }
+
+// 8. Arrow function with unpaired ob_start() — T_FN must form its own scope.
+$arrow_unpaired = fn() => ob_start();
+
+// 9. Arrow function with paired ob_start()/ob_get_clean() — T_FN scope, no warning.
+$arrow_paired = static fn() => ob_start() && ob_get_clean();

@@ -33,18 +33,41 @@ class Unclosed_Ob_Start_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertNotEmpty( $warnings );
 		$this->assertArrayHasKey( 'load.php', $warnings );
-		$this->assertEquals( 3, $check_result->get_warning_count() );
+		$this->assertEquals( 4, $check_result->get_warning_count() );
+
+		$expected_code = 'PluginCheck.CodeAnalysis.UnclosedObStart.UnclosedObStart';
 
 		// 14: ob_start() at the top of the file with no closing call.
 		$this->assertArrayHasKey( 14, $warnings['load.php'] );
-		$this->assertEquals( 'PluginCheck.CodeAnalysis.UnclosedObStart.UnclosedObStart', $warnings['load.php'][14][1][0]['code'] );
+		$this->assertWarningCodeOnLine( $warnings['load.php'][14], $expected_code );
 
 		// 18: Multiple ob_start() in the same scope, only one closed.
 		$this->assertArrayHasKey( 18, $warnings['load.php'] );
-		$this->assertEquals( 'PluginCheck.CodeAnalysis.UnclosedObStart.UnclosedObStart', $warnings['load.php'][18][2][0]['code'] );
+		$this->assertWarningCodeOnLine( $warnings['load.php'][18], $expected_code );
 
 		// 32: ob_start() inside a function, closed only conditionally (if).
 		$this->assertArrayHasKey( 32, $warnings['load.php'] );
-		$this->assertEquals( 'PluginCheck.CodeAnalysis.UnclosedObStart.UnclosedObStart', $warnings['load.php'][32][2][0]['code'] );
+		$this->assertWarningCodeOnLine( $warnings['load.php'][32], $expected_code );
+
+		// 56: Arrow function (T_FN) with unpaired ob_start().
+		$this->assertArrayHasKey( 56, $warnings['load.php'] );
+		$this->assertWarningCodeOnLine( $warnings['load.php'][56], $expected_code );
+	}
+
+	/**
+	 * Asserts that the line's first warning carries the expected error code.
+	 *
+	 * Avoids brittle direct access into deeply nested array offsets whose indices
+	 * shift when other warnings are added on the same line.
+	 *
+	 * @param array<int, array<int, array<string, mixed>>> $line_warnings Warnings recorded for a single source line, keyed by column.
+	 * @param string                                       $expected_code The expected error code.
+	 */
+	private function assertWarningCodeOnLine( $line_warnings, $expected_code ) {
+		$first_column = reset( $line_warnings );
+		$this->assertIsArray( $first_column );
+		$this->assertArrayHasKey( 0, $first_column );
+		$this->assertArrayHasKey( 'code', $first_column[0] );
+		$this->assertEquals( $expected_code, $first_column[0]['code'] );
 	}
 }
