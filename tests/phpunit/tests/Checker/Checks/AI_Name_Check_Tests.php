@@ -1,12 +1,12 @@
-<?php
+ <?php
 
 namespace phpunit\tests\Checker\Checks;
 
 use WordPress\Plugin_Check\Checker\Checks\Plugin_Repo\AI_Name_Check;
+use WordPress\Plugin_Check\Checker\AJAX_Runner;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
-use WordPress\Plugin_Check\Checker\AJAX_Runner;
 
 class AI_Name_Check_Tests extends \WP_UnitTestCase {
 

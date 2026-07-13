@@ -7,15 +7,15 @@
 
 namespace WordPress\Plugin_Check\Checker\Checks\Plugin_Repo;
 
+use WordPress\Plugin_Check\Admin\Settings_Page;
 use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Static_Check;
-use WordPress\Plugin_Check\Traits\Amend_Check_Result;
-use WordPress\Plugin_Check\Traits\Stable_Check;
 use WordPress\Plugin_Check\Traits\AI_Check_Names;
 use WordPress\Plugin_Check\Traits\AI_Utils;
+use WordPress\Plugin_Check\Traits\Amend_Check_Result;
+use WordPress\Plugin_Check\Traits\Stable_Check;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
-use WordPress\Plugin_Check\Admin\Settings_Page;
 
 /**
  * Check for plugin name issues using AI.
@@ -98,7 +98,7 @@ class AI_Name_Check implements Static_Check {
 
 		$parsed = $this->parse_analysis( $analysis );
 
-		// If there is a verdict indicating issues:
+		// If there is a verdict indicating issues.
 		if ( isset( $parsed['processed_data'] ) ) {
 			$data = $parsed['processed_data'];
 
