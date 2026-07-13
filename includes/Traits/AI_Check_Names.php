@@ -27,14 +27,16 @@ trait AI_Check_Names {
 	 * @return array|WP_Error Array with 'text' and 'token_usage' keys, or WP_Error.
 	 */
 	protected function run_name_analysis( $model_preference, $name, $author = '' ) {
+		$directory_matches = $this->query_wordpress_org_directory( $name );
+
 		// First query: Similar name search.
 		$similar_name_result = $this->run_similar_name_query( $model_preference, $name );
 		if ( is_wp_error( $similar_name_result ) ) {
 			return $similar_name_result;
 		}
 
-		// Build additional context from similar name results.
-		$additional_context = $this->build_similar_name_context( $similar_name_result['text'] );
+		// Build additional context from similar name results and live directory matches.
+		$additional_context = $this->build_similar_name_context( $similar_name_result['text'], $directory_matches );
 
 		// Second query: Pre-review with similar name results as context.
 		$prereview_result = $this->run_prereview_query( $model_preference, $name, $additional_context, $author );
@@ -42,10 +44,101 @@ trait AI_Check_Names {
 			return $prereview_result;
 		}
 
-		// Combine token usage from both queries.
+		/*
+		 * Workaround: Merge live directory matches from the WordPress.org Plugin Directory API with the AI
+		 * similar_name output so that known existing plugins are reliably presented in the UI and pre-review context.
+		 */
 		$prereview_result['token_usage']['similar_name'] = $similar_name_result['token_usage'];
 
+		$similar_data = $this->parse_json_response( $similar_name_result['text'] );
+		$ai_plugins   = ! empty( $similar_data['confusion_existing_plugins'] ) && is_array( $similar_data['confusion_existing_plugins'] ) ? $similar_data['confusion_existing_plugins'] : array();
+		$ai_others    = ! empty( $similar_data['confusion_existing_others'] ) && is_array( $similar_data['confusion_existing_others'] ) ? $similar_data['confusion_existing_others'] : array();
+
+		$prereview_result['confusion_existing_plugins'] = array_merge( $directory_matches, $ai_plugins );
+		$prereview_result['confusion_existing_others']  = $ai_others;
+
 		return $prereview_result;
+	}
+
+	/**
+	 * Programmatically queries the WordPress.org Plugin Directory API for existing plugins with similar or exact names and slugs.
+	 *
+	 * @since 1.10.0
+	 *
+	 * @param string $name Plugin name to check.
+	 * @return array Array of matching existing plugins.
+	 */
+	protected function query_wordpress_org_directory( $name ) {
+		if ( ! function_exists( 'plugins_api' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
+		}
+
+		$matches        = array();
+		$candidate_slug = sanitize_title_with_dashes( $name );
+		$slug_parts     = explode( '-', $candidate_slug );
+		$slugs_to_check = array_unique(
+			array_filter(
+				array(
+					$candidate_slug,
+					implode( '-', array_slice( $slug_parts, 0, 2 ) ),
+					implode( '-', array_slice( $slug_parts, 0, 3 ) ),
+				)
+			)
+		);
+
+		/*
+		 * Workaround: Since AI models may not reliably detect exact or near-exact existing plugin names/slugs
+		 * from training data alone, programmatically query the WordPress.org Plugin Directory API (`plugins_api`)
+		 * for exact candidate slugs and top search matches.
+		 */
+		foreach ( $slugs_to_check as $slug ) {
+			$info = plugins_api( 'plugin_information', array( 'slug' => $slug ) );
+			if ( ! is_wp_error( $info ) && ! empty( $info->name ) ) {
+				$is_exact               = ( $info->slug === $candidate_slug || 0 === strcasecmp( trim( (string) $info->name ), trim( $name ) ) );
+				$matches[ $info->slug ] = array(
+					'name'                 => (string) $info->name,
+					'similarity_level'     => $is_exact ? 'Exact Match' : 'High',
+					'explanation'          => __( 'Existing plugin found directly in the WordPress.org Plugin Directory.', 'plugin-check' ),
+					'active_installations' => isset( $info->active_installs ) ? (string) $info->active_installs : '0',
+					'link'                 => 'https://wordpress.org/plugins/' . $info->slug . '/',
+					'is_exact_match'       => $is_exact,
+				);
+			}
+		}
+
+		$search_results = plugins_api(
+			'query_plugins',
+			array(
+				'search'   => $name,
+				'per_page' => 5,
+			)
+		);
+
+		if ( ! is_wp_error( $search_results ) && ! empty( $search_results->plugins ) && is_array( $search_results->plugins ) ) {
+			foreach ( $search_results->plugins as $plugin ) {
+				$p_slug = is_object( $plugin ) ? $plugin->slug : ( $plugin['slug'] ?? '' );
+				$p_name = is_object( $plugin ) ? $plugin->name : ( $plugin['name'] ?? '' );
+				$p_inst = is_object( $plugin ) && isset( $plugin->active_installs ) ? $plugin->active_installs : ( $plugin['active_installs'] ?? '0' );
+
+				if ( empty( $p_slug ) ) {
+					continue;
+				}
+
+				if ( ! isset( $matches[ $p_slug ] ) ) {
+					$is_exact           = ( $p_slug === $candidate_slug || 0 === strcasecmp( trim( (string) $p_name ), trim( $name ) ) );
+					$matches[ $p_slug ] = array(
+						'name'                 => (string) $p_name,
+						'similarity_level'     => $is_exact ? 'Exact Match' : 'High',
+						'explanation'          => __( 'Similar plugin detected via WordPress.org directory search.', 'plugin-check' ),
+						'active_installations' => (string) $p_inst,
+						'link'                 => 'https://wordpress.org/plugins/' . $p_slug . '/',
+						'is_exact_match'       => $is_exact,
+					);
+				}
+			}
+		}
+
+		return array_values( $matches );
 	}
 
 	/**
@@ -252,16 +345,34 @@ trait AI_Check_Names {
 	 * @since 1.8.0
 	 *
 	 * @param string $similar_name_result Similar name query result.
+	 * @param array  $directory_matches   Optional directory matches from plugins_api.
 	 * @return string Additional context text.
 	 */
-	protected function build_similar_name_context( $similar_name_result ) {
-		if ( empty( $similar_name_result ) ) {
+	protected function build_similar_name_context( $similar_name_result, $directory_matches = array() ) {
+		if ( empty( $similar_name_result ) && empty( $directory_matches ) ) {
 			return '';
 		}
 
-		$context  = "# Possible similarity to other plugins, trademarks and project names.\n\n";
-		$context .= "We've detected the following possible similarities. Check them and determine if there is a high similarity. This is not an exhaustive list. It is only the result of an internet search, so you need to check its validity for this case. Do not mention them in your reply.\n\n";
-		$context .= $similar_name_result;
+		$context = "# Possible similarity to other plugins, trademarks and project names.\n\n";
+
+		if ( ! empty( $directory_matches ) ) {
+			$context .= "We have confirmed via WordPress.org Plugin Directory API that the following existing plugins ALREADY EXIST on WordPress.org:\n";
+			foreach ( $directory_matches as $match ) {
+				$context .= sprintf(
+					"- %1\$s (slug: %2\$s, active installations: %3\$s, link: %4\$s)\n",
+					$match['name'],
+					basename( rtrim( $match['link'], '/' ) ),
+					$match['active_installations'],
+					$match['link']
+				);
+			}
+			$context .= "\nIf the evaluated plugin name exactly matches or is nearly identical/confusingly similar to any of the above existing plugins or their slugs, you MUST set possible_naming_issues to true and explain the conflict in naming_explanation.\n\n";
+		}
+
+		if ( ! empty( $similar_name_result ) ) {
+			$context .= "We've detected the following possible similarities. Check them and determine if there is a high similarity. This is not an exhaustive list. It is only the result of an internet search, so you need to check its validity for this case. Do not mention them in your reply.\n\n";
+			$context .= $similar_name_result;
+		}
 
 		return $context;
 	}
@@ -324,11 +435,35 @@ trait AI_Check_Names {
 		}
 
 		if ( ! empty( $parsed_data ) && isset( $parsed_data['possible_naming_issues'] ) ) {
+			if ( is_array( $analysis ) && ! empty( $analysis['confusion_existing_plugins'] ) && is_array( $analysis['confusion_existing_plugins'] ) ) {
+				foreach ( $analysis['confusion_existing_plugins'] as $plugin ) {
+					if ( ! empty( $plugin['is_exact_match'] ) ) {
+						$parsed_data['possible_naming_issues'] = true;
+						if ( empty( $parsed_data['naming_explanation'] ) || false === strpos( (string) $parsed_data['naming_explanation'], 'WordPress.org Plugin Directory' ) ) {
+							$link                              = isset( $plugin['link'] ) ? (string) $plugin['link'] : '';
+							$parsed_data['naming_explanation'] = sprintf(
+								/* translators: %s: plugin directory link */
+								__( 'An existing plugin with an exact or nearly identical name/slug exists in the WordPress.org Plugin Directory (%s).', 'plugin-check' ),
+								$link
+							);
+						}
+						break;
+					}
+				}
+			}
+
 			$result = $this->parse_prereview_response( $parsed_data );
 
 			// Add token usage info if available.
 			if ( is_array( $analysis ) && isset( $analysis['token_usage'] ) ) {
 				$result['token_usage'] = $analysis['token_usage'];
+			}
+
+			if ( is_array( $analysis ) && isset( $analysis['confusion_existing_plugins'] ) ) {
+				$result['confusion_existing_plugins'] = $analysis['confusion_existing_plugins'];
+			}
+			if ( is_array( $analysis ) && isset( $analysis['confusion_existing_others'] ) ) {
+				$result['confusion_existing_others'] = $analysis['confusion_existing_others'];
 			}
 
 			return $result;
