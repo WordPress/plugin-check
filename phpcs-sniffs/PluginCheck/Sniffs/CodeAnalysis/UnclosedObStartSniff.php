@@ -138,9 +138,9 @@ final class UnclosedObStartSniff extends Sniff {
 		// Cache the last registered token pointer on first call to avoid
 		// scanning the entire token stack on every matching token visit.
 		if ( null === $this->last_registered_ptr ) {
-			$tokens                   = $this->register();
+			$tokens                    = $this->register();
 			$this->last_registered_ptr = $this->phpcsFile->findNext( $tokens, 0 );
-			$next_ptr                 = $this->last_registered_ptr;
+			$next_ptr                  = $this->last_registered_ptr;
 			while ( false !== $next_ptr ) {
 				$this->last_registered_ptr = $next_ptr;
 				$next_ptr                  = $this->phpcsFile->findNext( $tokens, ( $next_ptr + 1 ) );
