@@ -97,61 +97,104 @@ class AI_Name_Check implements Static_Check {
 		}
 
 		$parsed = $this->parse_analysis( $analysis );
+		$this->process_analysis_results( $result, $parsed, $plugin_main_file );
+	}
 
-		// If there is a verdict indicating issues.
-		if ( isset( $parsed['processed_data'] ) ) {
-			$data = $parsed['processed_data'];
+	/**
+	 * Process analysis results and add appropriate warnings/errors.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param Check_Result $result           The check result.
+	 * @param array        $parsed           The parsed analysis data.
+	 * @param string       $plugin_main_file The plugin main file path.
+	 */
+	private function process_analysis_results( Check_Result $result, array $parsed, string $plugin_main_file ) {
+		if ( ! isset( $parsed['processed_data'] ) ) {
+			return;
+		}
 
-			// 1. If disallowed:
-			if ( ! empty( $data['disallowed'] ) ) {
-				$msg = isset( $data['disallowed_explanation'] ) ? $data['disallowed_explanation'] : __( 'The plugin name is disallowed.', 'plugin-check' );
-				$this->add_result_error_for_file(
-					$result,
-					$msg,
-					'plugin_name_disallowed',
-					$plugin_main_file
-				);
+		$data = $parsed['processed_data'];
+
+		$this->check_disallowed_name( $result, $data, $plugin_main_file );
+		$this->check_naming_issues( $result, $data, $plugin_main_file );
+		$this->check_owner_issues( $result, $data, $plugin_main_file );
+		$this->check_similar_plugins( $result, $parsed, $plugin_main_file );
+	}
+
+	/**
+	 * Check if the plugin name is disallowed.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param Check_Result $result           The check result.
+	 * @param array        $data             The parsed analysis data.
+	 * @param string       $plugin_main_file The plugin main file path.
+	 */
+	private function check_disallowed_name( Check_Result $result, array $data, string $plugin_main_file ) {
+		if ( ! empty( $data['disallowed'] ) ) {
+			$msg = isset( $data['disallowed_explanation'] ) ? $data['disallowed_explanation'] : __( 'The plugin name is disallowed.', 'plugin-check' );
+			$this->add_result_error_for_file( $result, $msg, 'plugin_name_disallowed', $plugin_main_file );
+		}
+	}
+
+	/**
+	 * Check for possible naming issues.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param Check_Result $result           The check result.
+	 * @param array        $data             The parsed analysis data.
+	 * @param string       $plugin_main_file The plugin main file path.
+	 */
+	private function check_naming_issues( Check_Result $result, array $data, string $plugin_main_file ) {
+		if ( ! empty( $data['possible_naming_issues'] ) ) {
+			$msg = isset( $data['naming_explanation'] ) ? $data['naming_explanation'] : __( 'The plugin name has possible naming issues.', 'plugin-check' );
+			$this->add_result_warning_for_file( $result, $msg, 'plugin_name_issue', $plugin_main_file );
+		}
+	}
+
+	/**
+	 * Check for possible owner issues.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param Check_Result $result           The check result.
+	 * @param array        $data             The parsed analysis data.
+	 * @param string       $plugin_main_file The plugin main file path.
+	 */
+	private function check_owner_issues( Check_Result $result, array $data, string $plugin_main_file ) {
+		if ( ! empty( $data['possible_owner_issues'] ) ) {
+			$msg = isset( $data['owner_explanation'] ) ? $data['owner_explanation'] : __( 'The plugin name has possible trademark or ownership issues.', 'plugin-check' );
+			$this->add_result_warning_for_file( $result, $msg, 'plugin_name_trademark_issue', $plugin_main_file );
+		}
+	}
+
+	/**
+	 * Check for similar plugins.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param Check_Result $result           The check result.
+	 * @param array        $parsed           The parsed analysis data.
+	 * @param string       $plugin_main_file The plugin main file path.
+	 */
+	private function check_similar_plugins( Check_Result $result, array $parsed, string $plugin_main_file ) {
+		if ( ! empty( $parsed['confusion_existing_plugins'] ) && is_array( $parsed['confusion_existing_plugins'] ) ) {
+			$plugins_list = array();
+			foreach ( $parsed['confusion_existing_plugins'] as $plugin ) {
+				$plugins_list[] = sprintf( '%s (%s, %s active installs)', $plugin['name'], $plugin['similarity_level'], $plugin['active_installations'] );
 			}
-
-			// 2. If possible naming issues:
-			if ( ! empty( $data['possible_naming_issues'] ) ) {
-				$msg = isset( $data['naming_explanation'] ) ? $data['naming_explanation'] : __( 'The plugin name has possible naming issues.', 'plugin-check' );
-				$this->add_result_warning_for_file(
-					$result,
-					$msg,
-					'plugin_name_issue',
-					$plugin_main_file
-				);
-			}
-
-			// 3. If possible owner/trademark issues:
-			if ( ! empty( $data['possible_owner_issues'] ) ) {
-				$msg = isset( $data['owner_explanation'] ) ? $data['owner_explanation'] : __( 'The plugin name has possible trademark or ownership issues.', 'plugin-check' );
-				$this->add_result_warning_for_file(
-					$result,
-					$msg,
-					'plugin_name_trademark_issue',
-					$plugin_main_file
-				);
-			}
-
-			// 4. Group list of similar plugins/trademarks into recommendations:
-			if ( ! empty( $parsed['confusion_existing_plugins'] ) && is_array( $parsed['confusion_existing_plugins'] ) ) {
-				$plugins_list = array();
-				foreach ( $parsed['confusion_existing_plugins'] as $plugin ) {
-					$plugins_list[] = sprintf( '%s (%s, %s active installs)', $plugin['name'], $plugin['similarity_level'], $plugin['active_installations'] );
-				}
-				$this->add_result_warning_for_file(
-					$result,
-					sprintf(
-						/* translators: %s: List of similar plugins. */
-						__( 'Plugin name is similar to existing plugins: %s', 'plugin-check' ),
-						implode( '; ', $plugins_list )
-					),
-					'plugin_name_similarity',
-					$plugin_main_file
-				);
-			}
+			$this->add_result_warning_for_file(
+				$result,
+				sprintf(
+					/* translators: %s: List of similar plugins. */
+					__( 'Plugin name is similar to existing plugins: %s', 'plugin-check' ),
+					implode( '; ', $plugins_list )
+				),
+				'plugin_name_similarity',
+				$plugin_main_file
+			);
 		}
 	}
 
