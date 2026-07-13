@@ -54,6 +54,18 @@ final class UnclosedObStartSniff extends Sniff {
 	private $scope_order = array();
 
 	/**
+	 * Cached last registered token pointer for the current file.
+	 *
+	 * Populated on the first maybe_finalize() call so subsequent calls can
+	 * avoid repeated findNext() scans over the full token stack.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @var int|null
+	 */
+	private $last_registered_ptr = null;
+
+	/**
 	 * Whether the current file has been finalized (scopes evaluated).
 	 *
 	 * @since 2.1.0
@@ -123,8 +135,19 @@ final class UnclosedObStartSniff extends Sniff {
 			return;
 		}
 
-		$next = $this->phpcsFile->findNext( $this->register(), ( $stackPtr + 1 ) );
-		if ( false !== $next ) {
+		// Cache the last registered token pointer on first call to avoid
+		// scanning the entire token stack on every matching token visit.
+		if ( null === $this->last_registered_ptr ) {
+			$tokens                   = $this->register();
+			$this->last_registered_ptr = $this->phpcsFile->findNext( $tokens, 0 );
+			$next_ptr                 = $this->last_registered_ptr;
+			while ( false !== $next_ptr ) {
+				$this->last_registered_ptr = $next_ptr;
+				$next_ptr                  = $this->phpcsFile->findNext( $tokens, ( $next_ptr + 1 ) );
+			}
+		}
+
+		if ( $stackPtr < $this->last_registered_ptr ) {
 			return;
 		}
 
@@ -142,7 +165,7 @@ final class UnclosedObStartSniff extends Sniff {
 	 * @since 2.1.0
 	 *
 	 * @param int $stackPtr The position of the current token in the stack.
-	 * @return string|null The lowercased function name, or null when not a global call.
+	 * @return string|null The function name, or null when not a global call.
 	 */
 	private function get_global_function_name( $stackPtr ) {
 		$token_code = $this->tokens[ $stackPtr ]['code'];
@@ -293,7 +316,7 @@ final class UnclosedObStartSniff extends Sniff {
 				}
 
 				$this->phpcsFile->addWarning(
-					'ob_start() was found without a corresponding closing call (ob_get_clean(), ob_end_clean(), ob_get_flush() or ob_end_flush()) in the same scope. Output buffering is a valid technique, but a buffer must not be left open. WordPress is a shared environment where core, themes and other plugins may also open or close buffers, and a misaligned buffer stack causes unpredictable behaviour (headers already sent, lost output, broken redirects, etc.). Please ensure every ob_start() is paired with a closing function within the same function scope, and that nothing (including hooks or early returns) can bypass that closing logic. If you need to modify the full response output, use the new template enhancement output buffer available since WordPress 6.9.',
+					'ob_start() was found without a reliably-executed corresponding closing call (ob_get_clean(), ob_end_clean(), ob_get_flush() or ob_end_flush()) in the same scope. Output buffering is a valid technique, but a buffer must not be left open. WordPress is a shared environment where core, themes and other plugins may also open or close buffers, and a misaligned buffer stack causes unpredictable behaviour (headers already sent, lost output, broken redirects, etc.). Please ensure every ob_start() is paired with a closing function within the same function scope, and that nothing (including hooks or early returns) can bypass that closing logic. If you need to modify the full response output, use the new template enhancement output buffer available since WordPress 6.9.',
 					$start['ptr'],
 					'UnclosedObStart'
 				);
@@ -301,9 +324,10 @@ final class UnclosedObStartSniff extends Sniff {
 		}
 
 		// Reset state so the sniff can be reused across multiple files.
-		$this->scopes      = array();
-		$this->scope_order = array();
-		$this->finalized   = false;
+		$this->scopes              = array();
+		$this->scope_order         = array();
+		$this->last_registered_ptr = null;
+		$this->finalized           = false;
 	}
 
 	/**

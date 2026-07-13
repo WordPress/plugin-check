@@ -36,4 +36,5 @@
 | enqueued_styles_scope | performance | Checks whether any stylesheets are loaded on all pages, which is usually not desirable and can lead to performance issues. | [Learn more](https://developer.wordpress.org/plugins/) |
 | enqueued_scripts_scope | performance | Checks whether any scripts are loaded on all pages, which is usually not desirable and can lead to performance issues. | [Learn more](https://developer.wordpress.org/plugins/) |
 | non_blocking_scripts | performance | Checks whether scripts and styles are enqueued using a recommended loading strategy. | [Learn more](https://developer.wordpress.org/plugins/) |
+| unclosed_ob_start | performance, plugin_repo | Detects calls to ob_start() that are not paired with a corresponding buffer-closing function within the same logical scope. | [Learn more](https://make.wordpress.org/core/2025/11/18/wordpress-6-9-frontend-performance-field-guide/#introduce-the-template-enhancement-output-buffer) |
 | ai_provider | general | Recommends the WordPress AI Client when a plugin integrates directly with a third-party AI provider. | [Learn more](https://developer.wordpress.org/plugins/) |
