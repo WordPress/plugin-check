@@ -93,14 +93,21 @@ trait AI_Check_Names {
 		 */
 		foreach ( $slugs_to_check as $slug ) {
 			$info = plugins_api( 'plugin_information', array( 'slug' => $slug ) );
-			if ( ! is_wp_error( $info ) && ! empty( $info->name ) ) {
-				$is_exact               = ( $info->slug === $candidate_slug || 0 === strcasecmp( trim( (string) $info->name ), trim( $name ) ) );
-				$matches[ $info->slug ] = array(
-					'name'                 => (string) $info->name,
+			if ( is_wp_error( $info ) || empty( $info ) ) {
+				continue;
+			}
+
+			$info_slug = is_object( $info ) && isset( $info->slug ) ? (string) $info->slug : ( is_array( $info ) && isset( $info['slug'] ) ? (string) $info['slug'] : '' );
+			$info_name = is_object( $info ) && isset( $info->name ) ? (string) $info->name : ( is_array( $info ) && isset( $info['name'] ) ? (string) $info['name'] : '' );
+
+			if ( ! empty( $info_slug ) && ! empty( $info_name ) ) {
+				$is_exact              = ( $info_slug === $candidate_slug || 0 === strcasecmp( trim( $info_name ), trim( $name ) ) );
+				$matches[ $info_slug ] = array(
+					'name'                 => $info_name,
 					'similarity_level'     => $is_exact ? 'Exact Match' : 'High',
 					'explanation'          => __( 'Existing plugin found directly in the WordPress.org Plugin Directory.', 'plugin-check' ),
-					'active_installations' => isset( $info->active_installs ) ? (string) $info->active_installs : '0',
-					'link'                 => 'https://wordpress.org/plugins/' . $info->slug . '/',
+					'active_installations' => is_object( $info ) && isset( $info->active_installs ) ? (string) $info->active_installs : ( is_array( $info ) && isset( $info['active_installs'] ) ? (string) $info['active_installs'] : '0' ),
+					'link'                 => 'https://wordpress.org/plugins/' . $info_slug . '/',
 					'is_exact_match'       => $is_exact,
 				);
 			}
@@ -116,21 +123,21 @@ trait AI_Check_Names {
 
 		if ( ! is_wp_error( $search_results ) && ! empty( $search_results->plugins ) && is_array( $search_results->plugins ) ) {
 			foreach ( $search_results->plugins as $plugin ) {
-				$p_slug = is_object( $plugin ) ? $plugin->slug : ( $plugin['slug'] ?? '' );
-				$p_name = is_object( $plugin ) ? $plugin->name : ( $plugin['name'] ?? '' );
-				$p_inst = is_object( $plugin ) && isset( $plugin->active_installs ) ? $plugin->active_installs : ( $plugin['active_installs'] ?? '0' );
+				$p_slug = is_object( $plugin ) && isset( $plugin->slug ) ? (string) $plugin->slug : ( is_array( $plugin ) && isset( $plugin['slug'] ) ? (string) $plugin['slug'] : '' );
+				$p_name = is_object( $plugin ) && isset( $plugin->name ) ? (string) $plugin->name : ( is_array( $plugin ) && isset( $plugin['name'] ) ? (string) $plugin['name'] : '' );
+				$p_inst = is_object( $plugin ) && isset( $plugin->active_installs ) ? (string) $plugin->active_installs : ( is_array( $plugin ) && isset( $plugin['active_installs'] ) ? (string) $plugin['active_installs'] : '0' );
 
 				if ( empty( $p_slug ) ) {
 					continue;
 				}
 
 				if ( ! isset( $matches[ $p_slug ] ) ) {
-					$is_exact           = ( $p_slug === $candidate_slug || 0 === strcasecmp( trim( (string) $p_name ), trim( $name ) ) );
+					$is_exact           = ( $p_slug === $candidate_slug || 0 === strcasecmp( trim( $p_name ), trim( $name ) ) );
 					$matches[ $p_slug ] = array(
-						'name'                 => (string) $p_name,
+						'name'                 => $p_name,
 						'similarity_level'     => $is_exact ? 'Exact Match' : 'High',
 						'explanation'          => __( 'Similar plugin detected via WordPress.org directory search.', 'plugin-check' ),
-						'active_installations' => (string) $p_inst,
+						'active_installations' => $p_inst,
 						'link'                 => 'https://wordpress.org/plugins/' . $p_slug . '/',
 						'is_exact_match'       => $is_exact,
 					);
