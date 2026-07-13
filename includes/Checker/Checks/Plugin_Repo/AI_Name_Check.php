@@ -49,39 +49,105 @@ class AI_Name_Check implements Static_Check {
 	 */
 	public function run( Check_Result $result ) {
 		$runner = Plugin_Request_Utility::get_runner();
-
-		// Only run when AI analysis is enabled.
-		if ( ! $runner || ! method_exists( $runner, 'should_use_ai' ) || ! $runner->should_use_ai() ) {
+		if ( ! $this->should_run_ai_check( $runner ) ) {
 			return;
 		}
 
-		if ( is_wp_error( $this->check_ai_prerequisites() ) || is_wp_error( $this->check_ai_connectors() ) ) {
+		$model_preference = $this->get_model_preference( $runner );
+		$plugin_data      = $this->get_plugin_name_and_author( $result );
+		if ( ! $plugin_data ) {
 			return;
 		}
 
-		// Retrieve model preference.
-		$model_preference = '';
-		if ( method_exists( $runner, 'get_ai_model_preference' ) ) {
-			$model_preference = $runner->get_ai_model_preference();
-		}
-		if ( empty( $model_preference ) && class_exists( Settings_Page::class ) ) {
-			$model_preference = Settings_Page::get_model_preference();
-		}
+		$analysis = $this->run_name_analysis( $model_preference, $plugin_data['name'], $plugin_data['author'] );
+		$this->handle_analysis_response( $result, $analysis, $plugin_data['file'] );
+	}
 
+	/**
+	 * Determines if the AI check should run.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param mixed $runner The active runner.
+	 * @return bool True if the check should run, false otherwise.
+	 */
+	private function should_run_ai_check( $runner ) {
+		if ( ! $runner ) {
+			return false;
+		}
+		if ( ! method_exists( $runner, 'should_use_ai' ) ) {
+			return false;
+		}
+		if ( ! $runner->should_use_ai() ) {
+			return false;
+		}
+		if ( is_wp_error( $this->check_ai_prerequisites() ) ) {
+			return false;
+		}
+		if ( is_wp_error( $this->check_ai_connectors() ) ) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Gets the selected AI model preference.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param mixed $runner The active runner.
+	 * @return string The model preference.
+	 */
+	private function get_model_preference( $runner ) {
+		$model = '';
+		if ( $runner && method_exists( $runner, 'get_ai_model_preference' ) ) {
+			$model = $runner->get_ai_model_preference();
+		}
+		if ( empty( $model ) && class_exists( Settings_Page::class ) ) {
+			$model = Settings_Page::get_model_preference();
+		}
+		return $model;
+	}
+
+	/**
+	 * Gets the plugin name and author from headers.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param Check_Result $result The check result.
+	 * @return array|null Name and author if found, null otherwise.
+	 */
+	private function get_plugin_name_and_author( Check_Result $result ) {
 		if ( ! function_exists( 'get_plugin_data' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
 
-		$plugin_main_file = $result->plugin()->main_file();
-		$plugin_header    = get_plugin_data( $plugin_main_file );
-		$plugin_name      = isset( $plugin_header['Name'] ) ? $plugin_header['Name'] : '';
-		$author_name      = isset( $plugin_header['AuthorName'] ) ? $plugin_header['AuthorName'] : '';
+		$file   = $result->plugin()->main_file();
+		$header = get_plugin_data( $file );
+		$name   = isset( $header['Name'] ) ? $header['Name'] : '';
+		$author = isset( $header['AuthorName'] ) ? $header['AuthorName'] : '';
 
-		if ( empty( $plugin_name ) ) {
-			return;
+		if ( empty( $name ) ) {
+			return null;
 		}
 
-		$analysis = $this->run_name_analysis( $model_preference, $plugin_name, $author_name );
+		return array(
+			'name'   => $name,
+			'author' => $author,
+			'file'   => $file,
+		);
+	}
+
+	/**
+	 * Handles the AI analysis response and parses results.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param Check_Result $result           The check result.
+	 * @param mixed        $analysis         The analysis response or WP_Error.
+	 * @param string       $plugin_main_file The plugin main file path.
+	 */
+	private function handle_analysis_response( Check_Result $result, $analysis, string $plugin_main_file ) {
 		if ( is_wp_error( $analysis ) ) {
 			$this->add_result_warning_for_file(
 				$result,
