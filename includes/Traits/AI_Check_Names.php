@@ -144,6 +144,37 @@ trait AI_Check_Names {
 	 * @param array  $matches        Reference to matching plugins array.
 	 */
 	protected function check_directory_search_matches( $name, $candidate_slug, &$matches ) {
+		$search_queries = $this->build_search_queries( $name, $candidate_slug );
+
+		foreach ( array_unique( $search_queries ) as $search_query ) {
+			$search_results = plugins_api(
+				'query_plugins',
+				array(
+					'search'   => $search_query,
+					'per_page' => 5,
+				)
+			);
+
+			if ( is_wp_error( $search_results ) || empty( $search_results->plugins ) || ! is_array( $search_results->plugins ) ) {
+				continue;
+			}
+
+			foreach ( $search_results->plugins as $plugin ) {
+				$this->process_search_result_plugin( $plugin, $candidate_slug, $name, $matches );
+			}
+		}
+	}
+
+	/**
+	 * Builds the list of search queries from a plugin name and candidate slug.
+	 *
+	 * @since 1.10.0
+	 *
+	 * @param string $name           Plugin name.
+	 * @param string $candidate_slug Base candidate slug.
+	 * @return array List of search query strings.
+	 */
+	protected function build_search_queries( $name, $candidate_slug ) {
 		$search_queries = array( $name );
 		$slug_parts     = explode( '-', $candidate_slug );
 		$generic_words  = array( 'wp', 'wordpress', 'simple', 'easy', 'custom', 'plugin', 'advanced', 'pro', 'woo', 'ultimate', 'best', 'free', 'new', 'all', 'super', 'smart', 'fast', 'quick', 'contact', 'form', 'forms', 'image', 'video', 'post', 'posts', 'page', 'pages', 'user', 'users' );
@@ -162,38 +193,36 @@ trait AI_Check_Names {
 			}
 		}
 
-		foreach ( array_unique( $search_queries ) as $search_query ) {
-			$search_results = plugins_api(
-				'query_plugins',
-				array(
-					'search'   => $search_query,
-					'per_page' => 5,
-				)
-			);
+		return $search_queries;
+	}
 
-			if ( is_wp_error( $search_results ) || empty( $search_results->plugins ) || ! is_array( $search_results->plugins ) ) {
-				continue;
-			}
+	/**
+	 * Processes a single plugin from the directory search results.
+	 *
+	 * @since 1.10.0
+	 *
+	 * @param object|array $plugin        Plugin data from the search results.
+	 * @param string       $candidate_slug Base candidate slug.
+	 * @param string       $name           Evaluated plugin name.
+	 * @param array        $matches        Reference to matching plugins array.
+	 */
+	protected function process_search_result_plugin( $plugin, $candidate_slug, $name, &$matches ) {
+		$p_slug = $this->get_item_property( $plugin, 'slug' );
+		$p_name = $this->get_item_property( $plugin, 'name' );
 
-			foreach ( $search_results->plugins as $plugin ) {
-				$p_slug = $this->get_item_property( $plugin, 'slug' );
-				$p_name = $this->get_item_property( $plugin, 'name' );
-
-				if ( empty( $p_slug ) || isset( $matches[ $p_slug ] ) ) {
-					continue;
-				}
-
-				$is_exact           = $this->is_directory_item_exact_match( $p_slug, $p_name, $candidate_slug, $name );
-				$matches[ $p_slug ] = array(
-					'name'                 => html_entity_decode( $p_name, ENT_QUOTES | ENT_HTML5, 'UTF-8' ),
-					'similarity_level'     => $is_exact ? 'Exact Match' : 'High',
-					'explanation'          => __( 'Similar plugin detected via WordPress.org directory search.', 'plugin-check' ),
-					'active_installations' => $this->get_item_property( $plugin, 'active_installs', '0' ),
-					'link'                 => 'https://wordpress.org/plugins/' . $p_slug . '/',
-					'is_exact_match'       => $is_exact,
-				);
-			}
+		if ( empty( $p_slug ) || isset( $matches[ $p_slug ] ) ) {
+			return;
 		}
+
+		$is_exact           = $this->is_directory_item_exact_match( $p_slug, $p_name, $candidate_slug, $name );
+		$matches[ $p_slug ] = array(
+			'name'                 => html_entity_decode( $p_name, ENT_QUOTES | ENT_HTML5, 'UTF-8' ),
+			'similarity_level'     => $is_exact ? 'Exact Match' : 'High',
+			'explanation'          => __( 'Similar plugin detected via WordPress.org directory search.', 'plugin-check' ),
+			'active_installations' => $this->get_item_property( $plugin, 'active_installs', '0' ),
+			'link'                 => 'https://wordpress.org/plugins/' . $p_slug . '/',
+			'is_exact_match'       => $is_exact,
+		);
 	}
 
 	/**
