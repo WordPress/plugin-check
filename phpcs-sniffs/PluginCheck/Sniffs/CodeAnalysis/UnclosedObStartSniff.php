@@ -316,7 +316,7 @@ final class UnclosedObStartSniff extends Sniff {
 				}
 
 				$this->phpcsFile->addWarning(
-					'ob_start() was found without a reliably-executed corresponding closing call (ob_get_clean(), ob_end_clean(), ob_get_flush() or ob_end_flush()) in the same scope. Output buffering is a valid technique, but a buffer must not be left open. WordPress is a shared environment where core, themes and other plugins may also open or close buffers, and a misaligned buffer stack causes unpredictable behaviour (headers already sent, lost output, broken redirects, etc.). Please ensure every ob_start() is paired with a closing function within the same function scope, and that nothing (including hooks or early returns) can bypass that closing logic. If you need to modify the full response output, use the new template enhancement output buffer available since WordPress 6.9.',
+					'ob_start() has no corresponding closing call (ob_get_clean, ob_end_clean, ob_get_flush, or ob_end_flush) in the same scope. Pair every ob_start() with a closing function to prevent open buffer issues.',
 					$start['ptr'],
 					'UnclosedObStart'
 				);
