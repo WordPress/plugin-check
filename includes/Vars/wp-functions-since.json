@@ -1,7 +1,7 @@
 {
     "metadata": {
         "source": "wordpress-core",
-        "wordpress_version": "7.0"
+        "wordpress_version": "7.0.1"
     },
     "function_since": {
         "_": "0.71",
@@ -559,12 +559,12 @@
         "block_core_navigation_maybe_use_classic_menu_fallback": "6.2.0",
         "block_core_navigation_overlay_html_has_close_block": "7.0.0",
         "block_core_navigation_parse_blocks_from_menu_items": "5.9.0",
-        "block_core_navigation_render_submenu_icon": "5.9.0",
         "block_core_navigation_set_overlay_image_fetch_priority": "7.0.0",
         "block_core_navigation_sort_menu_items_by_parent_id": "5.9.0",
         "block_core_navigation_submenu_build_css_colors": "5.9.0",
         "block_core_navigation_submenu_build_css_font_sizes": "5.9.0",
         "block_core_navigation_submenu_get_submenu_visibility": "6.9.0",
+        "block_core_navigation_submenu_render_submenu_icon": "5.9.0",
         "block_core_navigation_typographic_presets_backcompatibility": "5.9.0",
         "block_core_page_list_build_css_colors": "5.8.0",
         "block_core_page_list_build_css_font_sizes": "5.8.0",
