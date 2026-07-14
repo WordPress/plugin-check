@@ -80,6 +80,7 @@ trait AI_Check_Names {
 			array_filter(
 				array(
 					$candidate_slug,
+					implode( '-', array_slice( $slug_parts, 0, 1 ) ),
 					implode( '-', array_slice( $slug_parts, 0, 2 ) ),
 					implode( '-', array_slice( $slug_parts, 0, 3 ) ),
 				)
@@ -121,7 +122,7 @@ trait AI_Check_Names {
 				continue;
 			}
 
-			$is_exact              = ( $info_slug === $candidate_slug || 0 === strcasecmp( trim( $info_name ), trim( $name ) ) );
+			$is_exact              = $this->is_directory_item_exact_match( $info_slug, $info_name, $candidate_slug, $name );
 			$matches[ $info_slug ] = array(
 				'name'                 => $info_name,
 				'similarity_level'     => $is_exact ? 'Exact Match' : 'High',
@@ -143,36 +144,78 @@ trait AI_Check_Names {
 	 * @param array  $matches        Reference to matching plugins array.
 	 */
 	protected function check_directory_search_matches( $name, $candidate_slug, &$matches ) {
-		$search_results = plugins_api(
-			'query_plugins',
-			array(
-				'search'   => $name,
-				'per_page' => 5,
-			)
-		);
+		$search_queries = array( $name );
+		$slug_parts     = explode( '-', $candidate_slug );
+		$generic_words  = array( 'wp', 'wordpress', 'simple', 'easy', 'custom', 'plugin', 'advanced', 'pro', 'woo', 'ultimate', 'best', 'free', 'new', 'all', 'super', 'smart', 'fast', 'quick', 'contact', 'form', 'forms', 'image', 'video', 'post', 'posts', 'page', 'pages', 'user', 'users' );
 
-		if ( is_wp_error( $search_results ) || empty( $search_results->plugins ) || ! is_array( $search_results->plugins ) ) {
-			return;
+		foreach ( $slug_parts as $part ) {
+			if ( strlen( $part ) >= 4 && ! in_array( $part, $generic_words, true ) && $part !== $candidate_slug ) {
+				$search_queries[] = $part;
+			}
 		}
 
-		foreach ( $search_results->plugins as $plugin ) {
-			$p_slug = $this->get_item_property( $plugin, 'slug' );
-			$p_name = $this->get_item_property( $plugin, 'name' );
+		foreach ( array_unique( $search_queries ) as $search_query ) {
+			$search_results = plugins_api(
+				'query_plugins',
+				array(
+					'search'   => $search_query,
+					'per_page' => 5,
+				)
+			);
 
-			if ( empty( $p_slug ) || isset( $matches[ $p_slug ] ) ) {
+			if ( is_wp_error( $search_results ) || empty( $search_results->plugins ) || ! is_array( $search_results->plugins ) ) {
 				continue;
 			}
 
-			$is_exact           = ( $p_slug === $candidate_slug || 0 === strcasecmp( trim( $p_name ), trim( $name ) ) );
-			$matches[ $p_slug ] = array(
-				'name'                 => $p_name,
-				'similarity_level'     => $is_exact ? 'Exact Match' : 'High',
-				'explanation'          => __( 'Similar plugin detected via WordPress.org directory search.', 'plugin-check' ),
-				'active_installations' => $this->get_item_property( $plugin, 'active_installs', '0' ),
-				'link'                 => 'https://wordpress.org/plugins/' . $p_slug . '/',
-				'is_exact_match'       => $is_exact,
-			);
+			foreach ( $search_results->plugins as $plugin ) {
+				$p_slug = $this->get_item_property( $plugin, 'slug' );
+				$p_name = $this->get_item_property( $plugin, 'name' );
+
+				if ( empty( $p_slug ) || isset( $matches[ $p_slug ] ) ) {
+					continue;
+				}
+
+				$is_exact           = $this->is_directory_item_exact_match( $p_slug, $p_name, $candidate_slug, $name );
+				$matches[ $p_slug ] = array(
+					'name'                 => $p_name,
+					'similarity_level'     => $is_exact ? 'Exact Match' : 'High',
+					'explanation'          => __( 'Similar plugin detected via WordPress.org directory search.', 'plugin-check' ),
+					'active_installations' => $this->get_item_property( $plugin, 'active_installs', '0' ),
+					'link'                 => 'https://wordpress.org/plugins/' . $p_slug . '/',
+					'is_exact_match'       => $is_exact,
+				);
+			}
 		}
+	}
+
+	/**
+	 * Determines if a directory plugin item is an exact or near-exact match for the evaluated name/slug.
+	 *
+	 * @since 1.10.0
+	 *
+	 * @param string $info_slug      Slug of the directory item.
+	 * @param string $info_name      Name of the directory item.
+	 * @param string $candidate_slug Evaluated candidate slug.
+	 * @param string $name           Evaluated plugin name.
+	 * @return bool True if exact or near-exact match, false otherwise.
+	 */
+	protected function is_directory_item_exact_match( $info_slug, $info_name, $candidate_slug, $name ) {
+		if ( empty( $info_slug ) || empty( $candidate_slug ) ) {
+			return false;
+		}
+
+		// Same slug or same name (case-insensitive).
+		if ( $info_slug === $candidate_slug || 0 === strcasecmp( trim( $info_name ), trim( $name ) ) ) {
+			return true;
+		}
+
+		// Name normalizes to same slug (handles special characters like em-dashes).
+		if ( 0 === strcasecmp( sanitize_title_with_dashes( $info_name ), $candidate_slug ) ) {
+			return true;
+		}
+
+		// Dash-stripped comparison (e.g. "less-flux" vs "lessflux").
+		return str_replace( '-', '', $info_slug ) === str_replace( '-', '', $candidate_slug );
 	}
 
 	/**
