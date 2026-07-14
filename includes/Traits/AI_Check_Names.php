@@ -148,9 +148,17 @@ trait AI_Check_Names {
 		$slug_parts     = explode( '-', $candidate_slug );
 		$generic_words  = array( 'wp', 'wordpress', 'simple', 'easy', 'custom', 'plugin', 'advanced', 'pro', 'woo', 'ultimate', 'best', 'free', 'new', 'all', 'super', 'smart', 'fast', 'quick', 'contact', 'form', 'forms', 'image', 'video', 'post', 'posts', 'page', 'pages', 'user', 'users' );
 
+		// Cap additional word queries to avoid excessive HTTP requests for long plugin names.
+		$max_word_queries = 3;
+		$word_count       = 0;
+
 		foreach ( $slug_parts as $part ) {
+			if ( $word_count >= $max_word_queries ) {
+				break;
+			}
 			if ( strlen( $part ) >= 4 && ! in_array( $part, $generic_words, true ) && $part !== $candidate_slug ) {
 				$search_queries[] = $part;
+				++$word_count;
 			}
 		}
 
@@ -641,7 +649,7 @@ trait AI_Check_Names {
 		// Try to decode as JSON.
 		$decoded = json_decode( $json_text, true );
 
-		if ( JSON_ERROR_NONE === json_last_error() && is_array( $decoded ) && isset( $decoded['possible_naming_issues'] ) ) {
+		if ( JSON_ERROR_NONE === json_last_error() && is_array( $decoded ) ) {
 			return $decoded;
 		}
 
