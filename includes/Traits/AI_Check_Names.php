@@ -124,7 +124,7 @@ trait AI_Check_Names {
 
 			$is_exact              = $this->is_directory_item_exact_match( $info_slug, $info_name, $candidate_slug, $name );
 			$matches[ $info_slug ] = array(
-				'name'                 => $info_name,
+				'name'                 => html_entity_decode( $info_name, ENT_QUOTES | ENT_HTML5, 'UTF-8' ),
 				'similarity_level'     => $is_exact ? 'Exact Match' : 'High',
 				'explanation'          => __( 'Existing plugin found directly in the WordPress.org Plugin Directory.', 'plugin-check' ),
 				'active_installations' => $this->get_item_property( $info, 'active_installs', '0' ),
@@ -177,7 +177,7 @@ trait AI_Check_Names {
 
 				$is_exact           = $this->is_directory_item_exact_match( $p_slug, $p_name, $candidate_slug, $name );
 				$matches[ $p_slug ] = array(
-					'name'                 => $p_name,
+					'name'                 => html_entity_decode( $p_name, ENT_QUOTES | ENT_HTML5, 'UTF-8' ),
 					'similarity_level'     => $is_exact ? 'Exact Match' : 'High',
 					'explanation'          => __( 'Similar plugin detected via WordPress.org directory search.', 'plugin-check' ),
 					'active_installations' => $this->get_item_property( $plugin, 'active_installs', '0' ),
