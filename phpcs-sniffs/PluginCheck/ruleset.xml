@@ -14,6 +14,7 @@
 	<rule ref="PluginCheck.CodeAnalysis.SettingSanitization" />
 	<rule ref="PluginCheck.CodeAnalysis.WriteFile" />
 	<rule ref="PluginCheck.Security.VerifyNonce" />
+<rule ref="PluginCheck.Security.NonceVerification" />
 	<rule ref="PluginCheck.Security.DirectDB" />
 
 	<!-- Minified PHP files are not allowed without the original source -->
