@@ -234,6 +234,7 @@ final class Admin_AJAX {
 			$this->configure_runner( $runner );
 			$runner->set_categories( $categories );
 			$runner->set_use_ai( $use_ai );
+			$runner->set_use_ai_name( $use_ai_name );
 
 			$checks_to_run = $runner->get_checks_to_run();
 		} catch ( Exception $error ) {
