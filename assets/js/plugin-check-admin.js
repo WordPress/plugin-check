@@ -38,6 +38,7 @@
 		'plugin-check__include-experimental'
 	);
 	const useAi = document.getElementById( 'plugin-check__use-ai' );
+	const useAiName = document.getElementById( 'plugin-check__use-ai-name' );
 
 	// Handle disabling the Check it button when a plugin is not selected.
 	function canRunChecks() {
@@ -92,6 +93,9 @@
 		if ( useAi ) {
 			useAi.disabled = true;
 		}
+		if ( useAiName ) {
+			useAiName.disabled = true;
+		}
 		if ( includeExperimental ) {
 			includeExperimental.disabled = true;
 		}
@@ -143,6 +147,9 @@
 		}
 		if ( useAi ) {
 			useAi.disabled = false;
+		}
+		if ( useAiName ) {
+			useAiName.disabled = false;
 		}
 		if ( includeExperimental ) {
 			includeExperimental.disabled = false;
@@ -596,6 +603,10 @@
 			includeExperimental && includeExperimental.checked ? 1 : 0
 		);
 		pluginCheckData.append( 'use-ai', useAi && useAi.checked ? 1 : 0 );
+		pluginCheckData.append(
+			'use-ai-name',
+			useAiName && useAiName.checked ? 1 : 0
+		);
 
 		for ( let i = 0; i < data.checks.length; i++ ) {
 			pluginCheckData.append( 'checks[]', data.checks[ i ] );
@@ -669,6 +680,10 @@
 			includeExperimental && includeExperimental.checked ? 1 : 0
 		);
 		pluginCheckData.append( 'use-ai', useAi && useAi.checked ? 1 : 0 );
+		pluginCheckData.append(
+			'use-ai-name',
+			useAiName && useAiName.checked ? 1 : 0
+		);
 
 		for ( let i = 0; i < categoriesList.length; i++ ) {
 			if ( categoriesList[ i ].checked ) {
@@ -957,6 +972,10 @@
 			includeExperimental && includeExperimental.checked ? 1 : 0
 		);
 		pluginCheckData.append( 'use-ai', useAi && useAi.checked ? 1 : 0 );
+		pluginCheckData.append(
+			'use-ai-name',
+			useAiName && useAiName.checked ? 1 : 0
+		);
 
 		for ( let i = 0; i < typesList.length; i++ ) {
 			if ( typesList[ i ].checked ) {

@@ -85,6 +85,9 @@
 						<p>
 							<label><input type="checkbox" value="use-ai" id="plugin-check__use-ai" /> <?php esc_html_e( 'Enable AI Analysis', 'plugin-check' ); ?></label>
 						</p>
+						<p>
+							<label><input type="checkbox" value="use-ai-name" id="plugin-check__use-ai-name" /> <?php esc_html_e( 'Enable AI Name Check', 'plugin-check' ); ?></label>
+						</p>
 					</div>
 				</div>
 				<span id="plugin-check__spinner" class="spinner" style="float: none;"></span>

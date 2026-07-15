@@ -20,7 +20,7 @@ use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 /**
  * Check for plugin name issues using AI.
  *
- * @since 2.1.0
+ * @since x.x.x
  */
 class AI_Name_Check implements Static_Check {
 
@@ -32,7 +32,7 @@ class AI_Name_Check implements Static_Check {
 	/**
 	 * Gets the categories for the check.
 	 *
-	 * @since 2.1.0
+	 * @since x.x.x
 	 *
 	 * @return array The categories for the check.
 	 */
@@ -43,7 +43,7 @@ class AI_Name_Check implements Static_Check {
 	/**
 	 * Runs the AI Name Check.
 	 *
-	 * @since 2.1.0
+	 * @since x.x.x
 	 *
 	 * @param Check_Result $result The check result to amend.
 	 */
@@ -66,7 +66,7 @@ class AI_Name_Check implements Static_Check {
 	/**
 	 * Determines if the AI check should run.
 	 *
-	 * @since 2.1.0
+	 * @since x.x.x
 	 *
 	 * @param mixed $runner The active runner.
 	 * @return bool True if the check should run, false otherwise.
@@ -75,10 +75,10 @@ class AI_Name_Check implements Static_Check {
 		if ( ! $runner ) {
 			return false;
 		}
-		if ( ! method_exists( $runner, 'should_use_ai' ) ) {
+		if ( ! method_exists( $runner, 'should_use_ai_name' ) ) {
 			return false;
 		}
-		if ( ! $runner->should_use_ai() ) {
+		if ( ! $runner->should_use_ai_name() ) {
 			return false;
 		}
 		if ( is_wp_error( $this->check_ai_prerequisites() ) ) {
@@ -93,7 +93,7 @@ class AI_Name_Check implements Static_Check {
 	/**
 	 * Gets the selected AI model preference.
 	 *
-	 * @since 2.1.0
+	 * @since x.x.x
 	 *
 	 * @param mixed $runner The active runner.
 	 * @return string The model preference.
@@ -112,7 +112,7 @@ class AI_Name_Check implements Static_Check {
 	/**
 	 * Gets the plugin name and author from headers.
 	 *
-	 * @since 2.1.0
+	 * @since x.x.x
 	 *
 	 * @param Check_Result $result The check result.
 	 * @return array|null Name and author if found, null otherwise.
@@ -141,7 +141,7 @@ class AI_Name_Check implements Static_Check {
 	/**
 	 * Handles the AI analysis response and parses results.
 	 *
-	 * @since 2.1.0
+	 * @since x.x.x
 	 *
 	 * @param Check_Result $result           The check result.
 	 * @param mixed        $analysis         The analysis response or WP_Error.
@@ -169,7 +169,7 @@ class AI_Name_Check implements Static_Check {
 	/**
 	 * Process analysis results and add appropriate warnings/errors.
 	 *
-	 * @since 2.1.0
+	 * @since x.x.x
 	 *
 	 * @param Check_Result $result           The check result.
 	 * @param array        $parsed           The parsed analysis data.
@@ -191,7 +191,7 @@ class AI_Name_Check implements Static_Check {
 	/**
 	 * Check if the plugin name is disallowed.
 	 *
-	 * @since 2.1.0
+	 * @since x.x.x
 	 *
 	 * @param Check_Result $result           The check result.
 	 * @param array        $data             The parsed analysis data.
@@ -207,7 +207,7 @@ class AI_Name_Check implements Static_Check {
 	/**
 	 * Check for possible naming issues.
 	 *
-	 * @since 2.1.0
+	 * @since x.x.x
 	 *
 	 * @param Check_Result $result           The check result.
 	 * @param array        $data             The parsed analysis data.
@@ -223,7 +223,7 @@ class AI_Name_Check implements Static_Check {
 	/**
 	 * Check for possible owner issues.
 	 *
-	 * @since 2.1.0
+	 * @since x.x.x
 	 *
 	 * @param Check_Result $result           The check result.
 	 * @param array        $data             The parsed analysis data.
@@ -239,7 +239,7 @@ class AI_Name_Check implements Static_Check {
 	/**
 	 * Check for similar plugins.
 	 *
-	 * @since 2.1.0
+	 * @since x.x.x
 	 *
 	 * @param Check_Result $result           The check result.
 	 * @param array        $parsed           The parsed analysis data.
@@ -267,7 +267,7 @@ class AI_Name_Check implements Static_Check {
 	/**
 	 * Gets the description for the check.
 	 *
-	 * @since 2.1.0
+	 * @since x.x.x
 	 *
 	 * @return string Description.
 	 */
@@ -278,7 +278,7 @@ class AI_Name_Check implements Static_Check {
 	/**
 	 * Gets the documentation URL for the check.
 	 *
-	 * @since 2.1.0
+	 * @since x.x.x
 	 *
 	 * @return string The documentation URL.
 	 */
