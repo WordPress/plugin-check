@@ -53,6 +53,18 @@ final class AIConnectorAPIKeySniff extends AbstractFunctionParameterSniff {
 	);
 
 	/**
+	 * Parameter names for supported functions.
+	 *
+	 * @var array<string, string>
+	 */
+	private $param_names = array(
+		'get_option'         => 'option',
+		'get_site_option'    => 'option',
+		'get_network_option' => 'option',
+		'get_options'        => 'options',
+	);
+
+	/**
 	 * Process the parameters of a matched function.
 	 *
 	 * Checks whether the requested option name matches the
@@ -71,10 +83,14 @@ final class AIConnectorAPIKeySniff extends AbstractFunctionParameterSniff {
 			? $this->param_positions[ $matched_content ]
 			: 1;
 
+		$param_name = isset( $this->param_names[ $matched_content ] )
+			? $this->param_names[ $matched_content ]
+			: 'option';
+
 		$option_param = PassedParameters::getParameterFromStack(
 			$parameters,
 			$param_position,
-			array()
+			$param_name
 		);
 
 		if ( false === $option_param ) {

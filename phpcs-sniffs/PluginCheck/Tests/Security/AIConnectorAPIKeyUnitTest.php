@@ -28,6 +28,10 @@ final class AIConnectorAPIKeyUnitTest extends AbstractSniffUnitTest {
 			5  => 1, // get_network_option() reading Connector API key.
 			7  => 1, // get_options() reading Connector API key (single quotes).
 			14 => 1, // get_options() reading Connector API key (double quotes).
+			24 => 1, // get_option() with named arg.
+			25 => 1, // get_site_option() with named arg.
+			26 => 1, // get_network_option() with named arg.
+			27 => 1, // get_options() with named arg.
 		);
 	}
 

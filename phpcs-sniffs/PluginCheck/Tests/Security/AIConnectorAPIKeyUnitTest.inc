@@ -20,3 +20,12 @@ get_options(
 get_option( 'siteurl' ); // Good.
 get_site_option( 'blogname' ); // Good.
 get_network_option( null, 'admin_email' ); // Good.
+
+get_option( option: 'connectors_ai_openai_api_key' ); // Error.
+get_site_option( option: 'connectors_ai_anthropic_api_key' ); // Error.
+get_network_option( network_id: null, option: 'connectors_ai_grok_api_key' ); // Error.
+get_options( options: array( 'connectors_ai_openai_api_key' ) ); // Error.
+
+get_option( option: 'siteurl' ); // Good.
+get_site_option( option: 'blogname' ); // Good.
+get_network_option( network_id: null, option: 'admin_email' ); // Good.
