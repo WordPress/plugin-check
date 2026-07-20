@@ -1,7 +1,7 @@
 {
     "metadata": {
         "source": "wordpress-core",
-        "wordpress_version": "7.0.1"
+        "wordpress_version": "7.0.2"
     },
     "function_since": {
         "_": "0.71",
@@ -2781,7 +2781,6 @@
         "wp_clear_scheduled_hook": "2.1.0",
         "wp_clearcookie": "1.5.0",
         "wp_clone": "2.7.0",
-        "wp_collaboration_inject_setting": "7.0.0",
         "wp_color_scheme_settings": "3.8.0",
         "wp_comment_form_unfiltered_html_nonce": "2.1.3",
         "wp_comment_reply": "2.7.0",
@@ -3237,8 +3236,6 @@
         "wp_is_auto_update_enabled_for_type": "5.5.0",
         "wp_is_auto_update_forced_for_item": "5.6.0",
         "wp_is_block_theme": "5.9.0",
-        "wp_is_collaboration_allowed": "7.0.0",
-        "wp_is_collaboration_enabled": "7.0.0",
         "wp_is_connector_registered": "7.0.0",
         "wp_is_development_mode": "6.3.0",
         "wp_is_fatal_error_handler_enabled": "5.2.0",
