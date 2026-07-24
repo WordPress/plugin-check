@@ -35,11 +35,29 @@ foreach ( $scan_dirs as $scan_dir ) {
 
 $function_since = array();
 
+$scan_targets = array();
+
 foreach ( $scan_dirs as $scan_dir ) {
-	$iterator = new RecursiveIteratorIterator(
+	$scan_targets[] = new RecursiveIteratorIterator(
 		new RecursiveDirectoryIterator( $scan_dir, FilesystemIterator::SKIP_DOTS )
 	);
+}
 
+// Root-level core files (e.g. wp-signup.php, wp-cron.php, xmlrpc.php).
+// Scanned non-recursively so wp-content plugins/themes are excluded.
+$root_files = glob( $wordpress_dir . '/*.php' );
+if ( is_array( $root_files ) && array() !== $root_files ) {
+	$scan_targets[] = new ArrayIterator(
+		array_map(
+			static function ( string $path ): SplFileInfo {
+				return new SplFileInfo( $path );
+			},
+			$root_files
+		)
+	);
+}
+
+foreach ( $scan_targets as $iterator ) {
 	foreach ( $iterator as $file_info ) {
 		/** @var SplFileInfo $file_info */
 		if ( 'php' !== strtolower( $file_info->getExtension() ) ) {
@@ -203,7 +221,9 @@ function extract_since_version( string $doc_comment ): string {
 		return '';
 	}
 
-	if ( preg_match( '/@since\s+([0-9]+(?:\.[0-9]+){1,2})/i', $doc_comment, $matches ) ) {
+	// Matches a plain "@since 3.0.0" tag or the frozen "@since MU (3.0.0)" form used by
+	// functions ported from WordPress MU (per the core inline documentation standards).
+	if ( preg_match( '/@since\s+(?:MU\s+\()?([0-9]+(?:\.[0-9]+){1,2})/i', $doc_comment, $matches ) ) {
 		return $matches[1];
 	}
 
