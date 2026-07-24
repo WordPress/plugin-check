@@ -43,10 +43,20 @@ foreach ( $scan_dirs as $scan_dir ) {
 	);
 }
 
-// Root-level core files (e.g. wp-signup.php, wp-cron.php, xmlrpc.php).
-// Scanned non-recursively so wp-content plugins/themes are excluded.
-$root_files = glob( $wordpress_dir . '/*.php' );
-if ( is_array( $root_files ) && array() !== $root_files ) {
+// Root-level core entrypoints (e.g. wp-signup.php, wp-cron.php, xmlrpc.php).
+// Restricted to core file names and scanned non-recursively so site-specific
+// files (wp-config.php, custom root scripts, wp-content) do not pollute the dataset.
+$root_files = array_merge(
+	glob( $wordpress_dir . '/wp-*.php' ) ?: array(),
+	glob( $wordpress_dir . '/xmlrpc.php' ) ?: array()
+);
+$root_files = array_filter(
+	$root_files,
+	static function ( string $path ): bool {
+		return 'wp-config.php' !== basename( $path );
+	}
+);
+if ( array() !== $root_files ) {
 	$scan_targets[] = new ArrayIterator(
 		array_map(
 			static function ( string $path ): SplFileInfo {
