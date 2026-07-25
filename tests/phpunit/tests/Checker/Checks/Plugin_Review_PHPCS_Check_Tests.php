@@ -142,7 +142,7 @@ class Plugin_Review_PHPCS_Check_Tests extends WP_UnitTestCase {
 		$this->assertSame( $forbidden_found, $errors['load.php'][60][1][0]['code'] );
 
 		// Check for PluginCheck.CodeAnalysis.ShortURL.Found warning on Line no 70 and column no at 14.
-		$this->assertArrayHasKey(70, $warnings['load.php'] );
+		$this->assertArrayHasKey( 70, $warnings['load.php'] );
 		$this->assertArrayHasKey( 14, $warnings['load.php'][70] );
 		$this->assertArrayHasKey( 'code', $warnings['load.php'][70][14][0] );
 		$this->assertEquals( 'PluginCheck.CodeAnalysis.ShortURL.Found', $warnings['load.php'][70][14][0]['code'] );
