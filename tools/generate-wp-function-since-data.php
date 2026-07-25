@@ -43,19 +43,32 @@ foreach ( $scan_dirs as $scan_dir ) {
 	);
 }
 
-// Root-level core entrypoints (e.g. wp-signup.php, wp-cron.php, xmlrpc.php).
-// Restricted to core file names and scanned non-recursively so site-specific
-// files (wp-config.php, custom root scripts, wp-content) do not pollute the dataset.
-$root_files = array_merge(
-	glob( $wordpress_dir . '/wp-*.php' ) ?: array(),
-	glob( $wordpress_dir . '/xmlrpc.php' ) ?: array()
+// Root-level core entrypoints. An explicit allowlist keeps site-specific root
+// files (wp-config.php, custom wp-*.php scripts) out of the core dataset.
+$root_entrypoints = array(
+	'index.php',
+	'wp-activate.php',
+	'wp-blog-header.php',
+	'wp-comments-post.php',
+	'wp-cron.php',
+	'wp-links-opml.php',
+	'wp-load.php',
+	'wp-login.php',
+	'wp-mail.php',
+	'wp-settings.php',
+	'wp-signup.php',
+	'wp-trackback.php',
+	'xmlrpc.php',
 );
-$root_files = array_filter(
-	$root_files,
-	static function ( string $path ): bool {
-		return 'wp-config.php' !== basename( $path );
+
+$root_files = array();
+foreach ( $root_entrypoints as $entrypoint ) {
+	$path = $wordpress_dir . '/' . $entrypoint;
+	if ( is_file( $path ) ) {
+		$root_files[] = $path;
 	}
-);
+}
+
 if ( array() !== $root_files ) {
 	$scan_targets[] = new ArrayIterator(
 		array_map(
