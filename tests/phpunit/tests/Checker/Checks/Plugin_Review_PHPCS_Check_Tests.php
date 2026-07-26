@@ -60,8 +60,8 @@ class Plugin_Review_PHPCS_Check_Tests extends WP_UnitTestCase {
 		// There should not be WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents error on Line no 39 and column no 1.
 		$this->assertCount( 0, wp_list_filter( $errors['load.php'][39][1], array( 'code' => 'WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents' ) ) );
 
-		// There should not be WordPress.WP.AlternativeFunctions.file_system_operations_fclose error.
-		$this->assertCount( 0, wp_list_filter( $errors['load.php'], array( 'code' => 'WordPress.WP.AlternativeFunctions.file_system_operations_fclose' ) ) );
+		// There should not be WordPress.WP.AlternativeFunctions.file_system_operations_fclose error on Line no 40 and column no 1.
+		$this->assertCount( 0, wp_list_filter( $errors['load.php'][40][1], array( 'code' => 'WordPress.WP.AlternativeFunctions.file_system_operations_fclose' ) ) );
 
 		// Check for existing forbidden functions.
 		$forbidden_found = 'Generic.PHP.ForbiddenFunctions.Found';
