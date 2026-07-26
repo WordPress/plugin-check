@@ -200,17 +200,31 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 
 		$plugin_scripts     = array();
 		$plugin_script_size = 0;
+		$dep_scripts        = array();
+		$dep_script_size    = 0;
 
 		foreach ( wp_scripts()->done as $handle ) {
 			$script = wp_scripts()->registered[ $handle ];
 
-			if ( ! $script->src || strpos( $script->src, $result->plugin()->url() ) !== 0 ) {
+			if ( ! $script->src ) {
 				continue;
 			}
 
+			$is_plugin_owned = strpos( $script->src, $result->plugin()->url() ) === 0;
+
 			// Get size of script src.
-			$script_path = str_replace( $result->plugin()->url(), $result->plugin()->path(), $script->src );
-			$script_size = function_exists( 'wp_filesize' ) ? wp_filesize( $script_path ) : filesize( $script_path );
+			if ( $is_plugin_owned ) {
+				$script_path = $this->script_src_to_path( $script->src, $result );
+			} else {
+				$script_path = $this->script_src_to_path( $script->src, $result, false );
+			}
+
+			$script_size = ( $script_path && file_exists( $script_path ) )
+				? ( function_exists( 'wp_filesize' ) ? wp_filesize( $script_path ) : filesize( $script_path ) )
+				: 0;
+
+			// Guard against wp_filesize/filesize returning false on read failure.
+			$script_size = (int) $script_size;
 
 			// Get size of additional inline scripts.
 			if ( ! empty( $script->extra['after'] ) ) {
@@ -225,29 +239,96 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 				}
 			}
 
-			$plugin_scripts[]    = array(
-				'path' => $script_path,
-				'size' => $script_size,
-			);
-			$plugin_script_size += $script_size;
+			if ( $is_plugin_owned ) {
+				$plugin_scripts[]    = array(
+					'path' => $script_path,
+					'size' => $script_size,
+				);
+				$plugin_script_size += $script_size;
+			} else {
+				$dep_scripts[]    = array(
+					'src'  => $script->src,
+					'size' => $script_size,
+				);
+				$dep_script_size += $script_size;
+			}
 		}
+
+		$total_script_size = $plugin_script_size + $dep_script_size;
 
 		if ( $plugin_script_size > $this->threshold_size ) {
 			foreach ( $plugin_scripts as $plugin_script ) {
 				$this->add_result_warning_for_file(
 					$result,
 					sprintf(
-						/* translators: 1: style file size. 2: tested URL. 3: threshold file size. */
+						/* translators: 1: script file size. 2: tested URL. 3: threshold file size. */
 						__( 'This script has a size of %1$s which in combination with the other scripts enqueued on %2$s exceeds the script size threshold of %3$s.', 'plugin-check' ),
 						size_format( $plugin_script['size'] ),
 						$url,
 						size_format( $this->threshold_size )
 					),
 					'EnqueuedScriptsSize.ScriptSizeGreaterThanThreshold',
-					$plugin_script['path']
+					$plugin_script['path'] ?? ''
 				);
 			}
 		}
+
+		if ( $dep_script_size > 0 && $total_script_size > $this->threshold_size ) {
+			$this->add_result_warning_for_file(
+				$result,
+				sprintf(
+					/* translators: 1: total script size including dependencies. 2: formatted dependency size. 3: dependency script count. 4: tested URL. */
+					__( 'The total size of scripts enqueued for the page is %1$s with dependencies adding %2$s (from %3$d script(s)) on %4$s, exceeding the script size threshold.', 'plugin-check' ),
+					size_format( $total_script_size ),
+					size_format( $dep_script_size ),
+					count( $dep_scripts ),
+					$url
+				),
+				'EnqueuedScriptsSize.ExternalDependencySize',
+				$result->plugin()->path()
+			);
+		}
+	}
+
+	/**
+	 * Resolves a script source URL to a local filesystem path if possible.
+	 *
+	 * Returns null when the URL points to an external/CDN host that cannot be
+	 * measured locally. Supports plugin-owned URLs, includes URL, and content URL.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string       $src    Script source URL.
+	 * @param Check_Result $result The check result providing plugin context.
+	 * @param bool         $allow_plugin Whether to allow resolving under the plugin path. Default true.
+	 * @return string|null Absolute filesystem path, or null when not resolvable.
+	 */
+	protected function script_src_to_path( $src, Check_Result $result, $allow_plugin = true ) {
+		// Strip query string version payload before resolving.
+		$src_clean = strstr( $src, '?', true );
+		if ( false === $src_clean ) {
+			$src_clean = $src;
+		}
+
+		if ( $allow_plugin && strpos( $src_clean, $result->plugin()->url() ) === 0 ) {
+			return wp_normalize_path(
+				str_replace( $result->plugin()->url(), $result->plugin()->path(), $src_clean )
+			);
+		}
+
+		if ( strpos( $src_clean, includes_url() ) === 0 ) {
+			$relative = substr( $src_clean, strlen( includes_url() ) );
+			$path     = ABSPATH . WPINC . '/' . ltrim( $relative, '/' );
+			return file_exists( $path ) ? wp_normalize_path( $path ) : null;
+		}
+
+		if ( strpos( $src_clean, content_url() ) === 0 ) {
+			$relative = substr( $src_clean, strlen( content_url() ) );
+			$path     = trailingslashit( WP_CONTENT_DIR ) . ltrim( $relative, '/' );
+			return file_exists( $path ) ? wp_normalize_path( $path ) : null;
+		}
+
+		return null;
 	}
 
 	/**
