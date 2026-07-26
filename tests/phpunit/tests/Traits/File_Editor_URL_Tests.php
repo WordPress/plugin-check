@@ -31,6 +31,16 @@ class File_Editor_URL_Tests extends WP_UnitTestCase {
 	private $cap_callbacks = array();
 
 	/**
+	 * User IDs granted super-admin status, so tear_down can revoke them.
+	 *
+	 * Multisite `map_meta_cap('edit_plugins')` requires `is_super_admin()`,
+	 * which a `user_has_cap` filter bypass cannot satisfy.
+	 *
+	 * @var int[]
+	 */
+	private $super_admin_ids = array();
+
+	/**
 	 * Symlink path inside WP_PLUGIN_DIR for the testdata fixture.
 	 *
 	 * @var string|null
@@ -71,6 +81,11 @@ class File_Editor_URL_Tests extends WP_UnitTestCase {
 		}
 		$this->cap_callbacks = array();
 
+		foreach ( $this->super_admin_ids as $id ) {
+			revoke_super_admin( $id );
+		}
+		$this->super_admin_ids = array();
+
 		parent::tear_down();
 	}
 
@@ -102,6 +117,32 @@ class File_Editor_URL_Tests extends WP_UnitTestCase {
 	private function add_cap_filter( $callback ) {
 		add_filter( 'user_has_cap', $callback, 10, 1 );
 		$this->cap_callbacks[] = $callback;
+	}
+
+	/**
+	 * Sets the current user so `current_user_can('edit_plugins')` returns true.
+	 *
+	 * On multisite, WP core requires `is_super_admin()` for the `edit_plugins`
+	 * cap (see WP capabilities.php `map_meta_cap`). A `user_has_cap` filter
+	 * bypasses that check on single-site only, so the test must escalate the
+	 * user with `grant_super_admin()` when multisite is active.
+	 */
+	private function switch_to_editor_user() {
+		$user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
+
+		if ( is_multisite() ) {
+			grant_super_admin( $user_id );
+			$this->super_admin_ids[] = $user_id;
+		} else {
+			$this->add_cap_filter(
+				static function ( $caps ) {
+					$caps['edit_plugins'] = true;
+					return $caps;
+				}
+			);
+		}
+
+		wp_set_current_user( $user_id );
 	}
 
 	/**
@@ -201,12 +242,7 @@ class File_Editor_URL_Tests extends WP_UnitTestCase {
 	 * When `$line === 0`, the fallback URL must omit the `line` query arg entirely.
 	 */
 	public function test_fallback_to_plugin_editor_when_no_filter() {
-		$this->add_cap_filter(
-			static function ( $caps ) {
-				$caps['edit_plugins'] = true;
-				return $caps;
-			}
-		);
+		$this->switch_to_editor_user();
 
 		$context = new Check_Context( $this->single_file_plugin_basename() );
 		$result  = new Check_Result( $context );
@@ -225,12 +261,7 @@ class File_Editor_URL_Tests extends WP_UnitTestCase {
 	 * Plugin-editor fallback includes `line` query arg when line is set.
 	 */
 	public function test_fallback_to_plugin_editor_includes_line_when_set() {
-		$this->add_cap_filter(
-			static function ( $caps ) {
-				$caps['edit_plugins'] = true;
-				return $caps;
-			}
-		);
+		$this->switch_to_editor_user();
 
 		$context = new Check_Context( $this->single_file_plugin_basename() );
 		$result  = new Check_Result( $context );
