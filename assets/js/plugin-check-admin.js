@@ -1091,10 +1091,36 @@
 		const hasLinks =
 			hasLinksInResults( errors ) || hasLinksInResults( warnings );
 
+		const errorCount = countResultTree( { [ file ]: errors } );
+		const warningCount = countResultTree( { [ file ]: warnings } );
+
+		const errorLabel =
+			errorCount > 0
+				? ( errorCount === 1
+						? pluginCheck.errorString
+						: pluginCheck.errorsString
+				  ).replace( '%d', errorCount )
+				: '';
+		const warningLabel =
+			warningCount > 0
+				? ( warningCount === 1
+						? pluginCheck.warningString
+						: pluginCheck.warningsString
+				  ).replace( '%d', warningCount )
+				: '';
+
 		// Render the file table.
 		resultsContainer.innerHTML += renderTemplate(
 			'plugin-check-results-table',
-			{ file, index, hasLinks }
+			{
+				file,
+				index,
+				hasLinks,
+				errorCount,
+				warningCount,
+				errorLabel,
+				warningLabel,
+			}
 		);
 		const resultsTable = document.getElementById(
 			'plugin-check__results-body-' + index
@@ -1232,10 +1258,32 @@
 		const hasLinks =
 			hasLinksInResults( errors ) || hasLinksInResults( warnings );
 
+		const errorCount = countResultTree( { [ file ]: errors } );
+		const warningCount = countResultTree( { [ file ]: warnings } );
+
+		const errorLabel =
+			errorCount > 0
+				? ( errorCount === 1
+						? pluginCheck.errorString
+						: pluginCheck.errorsString
+				  ).replace( '%d', errorCount )
+				: '';
+		const warningLabel =
+			warningCount > 0
+				? ( warningCount === 1
+						? pluginCheck.warningString
+						: pluginCheck.warningsString
+				  ).replace( '%d', warningCount )
+				: '';
+
 		container.innerHTML += renderTemplate( 'plugin-check-results-table', {
 			file,
 			index,
 			hasLinks,
+			errorCount,
+			warningCount,
+			errorLabel,
+			warningLabel,
 		} );
 
 		const resultsTable = document.getElementById(

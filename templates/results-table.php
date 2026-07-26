@@ -2,7 +2,10 @@
 	<button type="button" class="plugin-check__file-section-header" aria-expanded="false" aria-controls="plugin-check__file-section-content-{{data.index}}">
 		<span class="plugin-check__file-section-title">
 			<span class="plugin-check__file-section-icon dashicons dashicons-media-document" aria-hidden="true"></span>
-			<?php esc_html_e( 'FILE:', 'plugin-check' ); ?> {{ data.file }}
+			<?php esc_html_e( 'FILE:', 'plugin-check' ); ?> {{ data.file }}<#
+			if ( data.errorLabel || data.warningLabel ) { #><span class="plugin-check__file-section-counts"><#
+				if ( data.errorLabel ) { #><span class="plugin-check__file-section-count plugin-check__file-section-count--error">{{ data.errorLabel }}</span><# }
+				if ( data.warningLabel ) { #><span class="plugin-check__file-section-count plugin-check__file-section-count--warning">{{ data.warningLabel }}</span><# } #></span><# } #>
 		</span>
 		<span class="plugin-check__file-section-chevron dashicons dashicons-arrow-down-alt2" aria-hidden="true"></span>
 	</button>
