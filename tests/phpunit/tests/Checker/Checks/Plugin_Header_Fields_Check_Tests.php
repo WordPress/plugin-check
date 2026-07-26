@@ -162,7 +162,9 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 		 *
 		 * "plugin-check" and "hello-dolly" are seeded as published in the
 		 * WordPress.org plugin directory; "not-installed-plugin" is seeded
-		 * as not found there.
+		 * as 'no' — the value cached when api.wordpress.org returns HTTP 404,
+		 * consumed here to confirm the same key the production code writes
+		 * leads to the expected warning.
 		 */
 
 		set_transient( 'wp_plugin_check_requires_plugin_plugin-check', 'yes' );
@@ -192,6 +194,43 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 		$not_in_directory_items = wp_list_filter( $warnings['load.php'][0][0], array( 'code' => 'plugin_header_requires_plugins_not_in_directory' ) );
 		$this->assertCount( 1, $not_in_directory_items, 'Only the dependency missing from the directory should get a warning.' );
 		$this->assertStringContainsString( 'not-installed-plugin', reset( $not_in_directory_items )['message'] );
+	}
+
+	public function test_run_with_empty_entry_in_requires_plugins_header() {
+		/*
+		 * Test plugin declares: Requires Plugins: Example ,,OtherPlugin
+		 *
+		 * Expect 3 errors: one empty-entry error and two malformed-slug errors
+		 * ("Example" and "OtherPlugin" both contain uppercase characters, so
+		 * they fail the lowercase slug format check).
+		 */
+
+		$check         = new Plugin_Header_Fields_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-requires-plugins-empty-entry/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check->run( $check_result );
+
+		$errors = $check_result->get_errors();
+
+		if ( ! is_wp_version_compatible( '6.5' ) ) {
+			$this->assertTrue( true );
+			return;
+		}
+
+		$items = ! empty( $errors['load.php'][0][0] )
+			? wp_list_filter( $errors['load.php'][0][0], array( 'code' => 'plugin_header_invalid_requires_plugins' ) )
+			: array();
+
+		$this->assertCount( 3, $items, 'Empty entry plus two uppercase slugs → 3 distinct errors.' );
+
+		$empty_messages = array_filter(
+			wp_list_pluck( $items, 'message' ),
+			static function ( $message ) {
+				return str_contains( $message, 'empty entry' );
+			}
+		);
+		$this->assertCount( 1, $empty_messages, 'Empty entry must be reported.' );
 	}
 
 	public function test_run_with_mismatched_tested_up_to() {

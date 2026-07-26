@@ -539,6 +539,20 @@ class Plugin_Header_Fields_Check implements Static_Check {
 
 		foreach ( $slugs as $slug ) {
 			if ( '' === $slug ) {
+				$this->add_result_error_for_file(
+					$result,
+					sprintf(
+						/* translators: %s: plugin header field */
+						__( 'The "%s" header in the plugin file contains an empty entry.', 'plugin-check' ),
+						esc_html( $label )
+					),
+					'plugin_header_invalid_requires_plugins',
+					$plugin_main_file,
+					0,
+					0,
+					'',
+					7
+				);
 				continue;
 			}
 
@@ -577,7 +591,7 @@ class Plugin_Header_Fields_Check implements Static_Check {
 	private function check_requires_plugins_slug_status( Check_Result $result, string $slug, string $plugin_main_file ) {
 		$exists = $this->plugin_exists_in_directory( $slug );
 
-		// Unknown due to an unreachable API; skip rather than risk a false positive.
+		// null = transport failure (silent skip). true = exists in directory.
 		if ( null === $exists || $exists ) {
 			return;
 		}
@@ -611,17 +625,30 @@ class Plugin_Header_Fields_Check implements Static_Check {
 		$exists        = get_transient( $transient_key );
 
 		if ( false !== $exists ) {
-			return 'yes' === $exists;
+			return 'no' !== $exists;
 		}
 
 		$response = wp_remote_get( "https://api.wordpress.org/plugins/info/1.0/{$slug}.json" );
 
-		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+		if ( is_wp_error( $response ) ) {
+			return null;
+		}
+
+		$code = (int) wp_remote_retrieve_response_code( $response );
+
+		if ( 404 === $code ) {
+			// Slug confirmed absent from the directory; cache so we don't retry within the day.
+			set_transient( $transient_key, 'no', DAY_IN_SECONDS );
+			return false;
+		}
+
+		if ( 200 !== $code ) {
+			// Transport/server failure; do not cache, try next run.
 			return null;
 		}
 
 		$body   = json_decode( wp_remote_retrieve_body( $response ), true );
-		$exists = isset( $body['slug'] ) && ! isset( $body['error'] );
+		$exists = is_array( $body ) && ! isset( $body['error'] );
 
 		set_transient( $transient_key, $exists ? 'yes' : 'no', DAY_IN_SECONDS );
 
