@@ -31,9 +31,36 @@ class File_Editor_URL_Tests extends WP_UnitTestCase {
 	private $cap_callbacks = array();
 
 	/**
-	 * Removes only the filter callbacks this test class registered.
+	 * Symlink path inside WP_PLUGIN_DIR for the testdata fixture.
+	 *
+	 * @var string|null
+	 */
+	private $fixture_symlink = null;
+
+	/**
+	 * Sets up the test fixture symlink so file_exists passes inside wp-env.
+	 */
+	public function set_up() {
+		parent::set_up();
+
+		$this->fixture_symlink = WP_PLUGIN_DIR . '/test-plugin-external-admin-menu-links-without-errors';
+		$target                = UNIT_TESTS_PLUGIN_DIR . 'test-plugin-external-admin-menu-links-without-errors';
+
+		if ( ! file_exists( $this->fixture_symlink ) && is_dir( $target ) ) {
+			symlink( $target, $this->fixture_symlink );
+		}
+	}
+
+	/**
+	 * Removes the test fixture symlink and filter callbacks.
 	 */
 	public function tear_down() {
+		// Remove symlink created in set_up.
+		if ( null !== $this->fixture_symlink && file_exists( $this->fixture_symlink ) && is_link( $this->fixture_symlink ) ) {
+			unlink( $this->fixture_symlink );
+		}
+		$this->fixture_symlink = null;
+
 		foreach ( $this->url_callbacks as $cb ) {
 			remove_filter( 'wp_plugin_check_validation_error_source_url', $cb, 10 );
 		}
@@ -48,12 +75,12 @@ class File_Editor_URL_Tests extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Single-file test plugin fixture basename (load.php in fixture dir).
+	 * Absolute path to the single-file test plugin fixture (load.php in fixture dir).
 	 *
 	 * @return string
 	 */
 	private function single_file_plugin_basename() {
-		return 'test-plugin-external-admin-menu-links-without-errors/load.php';
+		return WP_PLUGIN_DIR . '/test-plugin-external-admin-menu-links-without-errors/load.php';
 	}
 
 	/**
@@ -191,7 +218,7 @@ class File_Editor_URL_Tests extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'plugin', $query_args );
 		$this->assertArrayHasKey( 'file', $query_args );
 		$this->assertArrayNotHasKey( 'line', $query_args );
-		$this->assertSame( 'plugin-editor.php', wp_parse_url( $url, PHP_URL_PATH ) );
+		$this->assertSame( 'plugin-editor.php', basename( (string) wp_parse_url( $url, PHP_URL_PATH ) ) );
 	}
 
 	/**
@@ -213,6 +240,6 @@ class File_Editor_URL_Tests extends WP_UnitTestCase {
 		$this->assertIsString( $url );
 		parse_str( (string) wp_parse_url( $url, PHP_URL_QUERY ), $query_args );
 		$this->assertSame( '42', $query_args['line'] );
-		$this->assertSame( 'plugin-editor.php', wp_parse_url( $url, PHP_URL_PATH ) );
+		$this->assertSame( 'plugin-editor.php', basename( (string) wp_parse_url( $url, PHP_URL_PATH ) ) );
 	}
 }
