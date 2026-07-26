@@ -213,11 +213,7 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 			$is_plugin_owned = strpos( $script->src, $result->plugin()->url() ) === 0;
 
 			// Get size of script src.
-			if ( $is_plugin_owned ) {
-				$script_path = $this->script_src_to_path( $script->src, $result );
-			} else {
-				$script_path = $this->script_src_to_path( $script->src, $result, false );
-			}
+			$script_path = $this->script_src_to_path( $script->src, $result );
 
 			$script_size = ( $script_path && file_exists( $script_path ) )
 				? ( function_exists( 'wp_filesize' ) ? wp_filesize( $script_path ) : filesize( $script_path ) )
@@ -227,17 +223,7 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 			$script_size = (int) $script_size;
 
 			// Get size of additional inline scripts.
-			if ( ! empty( $script->extra['after'] ) ) {
-				foreach ( $script->extra['after'] as $extra ) {
-					$script_size += ( is_string( $extra ) ) ? mb_strlen( $extra, '8bit' ) : 0;
-				}
-			}
-
-			if ( ! empty( $script->extra['before'] ) ) {
-				foreach ( $script->extra['before'] as $extra ) {
-					$script_size += ( is_string( $extra ) ) ? mb_strlen( $extra, '8bit' ) : 0;
-				}
-			}
+			$script_size += $this->get_inline_script_size( $script );
 
 			if ( $is_plugin_owned ) {
 				$plugin_scripts[]    = array(
@@ -300,17 +286,16 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	 *
 	 * @param string       $src    Script source URL.
 	 * @param Check_Result $result The check result providing plugin context.
-	 * @param bool         $allow_plugin Whether to allow resolving under the plugin path. Default true.
 	 * @return string|null Absolute filesystem path, or null when not resolvable.
 	 */
-	protected function script_src_to_path( $src, Check_Result $result, $allow_plugin = true ) {
+	protected function script_src_to_path( $src, Check_Result $result ) {
 		// Strip query string version payload before resolving.
 		$src_clean = strstr( $src, '?', true );
 		if ( false === $src_clean ) {
 			$src_clean = $src;
 		}
 
-		if ( $allow_plugin && strpos( $src_clean, $result->plugin()->url() ) === 0 ) {
+		if ( strpos( $src_clean, $result->plugin()->url() ) === 0 ) {
 			return wp_normalize_path(
 				str_replace( $result->plugin()->url(), $result->plugin()->path(), $src_clean )
 			);
@@ -344,6 +329,30 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 		}
 
 		return $this->viewable_post_types;
+	}
+
+	/**
+	 * Sums the byte length of inline script payloads attached to a script dependency.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param object $script Script dependency whose extras are summed.
+	 * @return int Total byte length of inline payloads.
+	 */
+	private function get_inline_script_size( $script ) {
+		$size = 0;
+
+		foreach ( array( 'after', 'before' ) as $position ) {
+			if ( empty( $script->extra[ $position ] ) ) {
+				continue;
+			}
+
+			foreach ( $script->extra[ $position ] as $extra ) {
+				$size += is_string( $extra ) ? mb_strlen( $extra, '8bit' ) : 0;
+			}
+		}
+
+		return $size;
 	}
 
 	/**
