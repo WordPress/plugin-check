@@ -185,6 +185,7 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	 *                   the check).
 	 *
 	 * @SuppressWarnings(PHPMD.NPathComplexity)
+	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
 	 */
 	protected function check_url( Check_Result $result, $url ) {
 		// Reset the WP_Scripts instance.
@@ -203,7 +204,12 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 		$dep_scripts        = array();
 		$dep_script_size    = 0;
 
-		foreach ( wp_scripts()->done as $handle ) {
+		// Walk only scripts reachable from the plugin's own dependency graph so
+		// unrelated scripts enqueued by the theme, core, or other plugins are
+		// not attributed to the audited plugin.
+		$relevant = $this->collect_relevant_handles( $result );
+
+		foreach ( array_keys( $relevant ) as $handle ) {
 			$script = wp_scripts()->registered[ $handle ];
 
 			if ( ! $script->src ) {
@@ -314,6 +320,61 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 		}
 
 		return null;
+	}
+
+	/**
+	 * Collects script handles reachable from the plugin's own dependency graph.
+	 *
+	 * Starts from plugin-owned handles in `wp_scripts()->done` and BFS-walks
+	 * their `$script->deps` transitively, restricted to handles that loaded.
+	 * Cycles guarded via a `$seen` set.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param Check_Result $result The check result providing plugin context.
+	 * @return array Map of relevant handle => true.
+	 */
+	private function collect_relevant_handles( Check_Result $result ) {
+		$done_handles = array_flip( wp_scripts()->done );
+		$plugin_url   = $result->plugin()->url();
+		$relevant     = array();
+		$seen         = array();
+
+		foreach ( wp_scripts()->done as $seed ) {
+			$seed_script = wp_scripts()->registered[ $seed ] ?? null;
+			if ( ! $seed_script || empty( $seed_script->src ) ) {
+				continue;
+			}
+			if ( strpos( $seed_script->src, $plugin_url ) !== 0 ) {
+				continue;
+			}
+
+			$queue = array( $seed );
+
+			while ( $queue ) {
+				$current              = array_shift( $queue );
+				$relevant[ $current ] = true;
+				$seen[ $current ]     = true;
+
+				$current_script = wp_scripts()->registered[ $current ] ?? null;
+				if ( ! $current_script || empty( $current_script->deps ) ) {
+					continue;
+				}
+
+				foreach ( $current_script->deps as $dep ) {
+					if ( isset( $seen[ $dep ] ) ) {
+						continue;
+					}
+					$seen[ $dep ] = true;
+					if ( ! isset( $done_handles[ $dep ] ) ) {
+						continue;
+					}
+					$queue[] = $dep;
+				}
+			}
+		}
+
+		return $relevant;
 	}
 
 	/**
