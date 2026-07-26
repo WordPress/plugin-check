@@ -113,7 +113,6 @@ final class Admin_AJAX {
 	 * @since 1.8.0
 	 *
 	 * @param AJAX_Runner $runner The runner to configure.
-	 * @return array The configuration used.
 	 */
 	private function configure_runner( $runner ) {
 		$checks               = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
@@ -124,11 +123,6 @@ final class Admin_AJAX {
 		$runner->set_experimental_flag( $include_experimental );
 		$runner->set_check_slugs( $checks );
 		$runner->set_plugin( $plugin );
-
-		return array(
-			'checks' => $checks,
-			'plugin' => $plugin,
-		);
 	}
 
 	/**
@@ -167,7 +161,7 @@ final class Admin_AJAX {
 		}
 
 		try {
-			$config = $this->configure_runner( $runner );
+			$this->configure_runner( $runner );
 
 			$checks_to_run = $runner->get_checks_to_run();
 		} catch ( Exception $error ) {
@@ -188,8 +182,6 @@ final class Admin_AJAX {
 		wp_send_json_success(
 			array(
 				'message' => $message,
-				'plugin'  => $config['plugin'],
-				'checks'  => $config['checks'],
 			)
 		);
 	}

@@ -31,6 +31,7 @@
 	let aggregatedResults = createEmptyAggregatedResults();
 	let falsePositiveResults = createEmptyAggregatedResults();
 	let checksCompleted = false;
+	let currentChecks = [];
 	exportContainer.classList.add( 'is-hidden' );
 	exportContainer.addEventListener( 'click', onExportContainerClick );
 
@@ -46,6 +47,47 @@
 		} else {
 			checkItButton.disabled = false;
 		}
+	}
+
+	/**
+	 * Gets the values of checked inputs from a list.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param {NodeList} list Inputs to read from.
+	 * @return {Array} Selected values.
+	 */
+	function getSelectedValues( list ) {
+		const values = [];
+		for ( let i = 0; i < list.length; i++ ) {
+			if ( list[ i ].checked ) {
+				values.push( list[ i ].value );
+			}
+		}
+		return values;
+	}
+
+	/**
+	 * Posts FormData to the plugin's AJAX endpoint.
+	 *
+	 * Wraps fetch with the standard options (ajaxurl, POST, same-origin
+	 * credentials, nonce in body) and parses the JSON response, surfacing
+	 * server errors via handleDataErrors.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param {FormData} formData Form data to send. Must include 'action' and 'nonce'.
+	 * @return {Promise<Object>} Resolves with the response data on success.
+	 */
+	function fetchAJAX( formData ) {
+		return fetch( ajaxurl, {
+			method: 'POST',
+			credentials: 'same-origin',
+			body: formData,
+		} )
+			.then( ( response ) => response.json() )
+			.then( handleDataErrors )
+			.then( ( responseData ) => responseData.data );
 	}
 
 	// Run on page load to test if dropdown is auto populated.
@@ -96,13 +138,39 @@
 			includeExperimental.disabled = true;
 		}
 
-		getChecksToRun()
-			.then( setUpEnvironment )
-			.then( runChecks )
-			.then( cleanUpEnvironment )
-			.then( ( data ) => {
-				console.log( data.message );
+		const plugin = pluginsList.value;
+		const categories = getSelectedValues( categoriesList );
+		const types = getSelectedValues( typesList );
+		const useAiChecked = useAi && useAi.checked ? 1 : 0;
+		const includeExperimentalChecked =
+			includeExperimental && includeExperimental.checked ? 1 : 0;
 
+		getChecksToRun(
+			plugin,
+			categories,
+			includeExperimentalChecked,
+			useAiChecked
+		)
+			.then( ( data ) => {
+				currentChecks = data.checks;
+				return setUpEnvironment(
+					plugin,
+					currentChecks,
+					includeExperimentalChecked,
+					useAiChecked
+				);
+			} )
+			.then( () =>
+				runChecks(
+					plugin,
+					currentChecks,
+					types,
+					includeExperimentalChecked,
+					useAiChecked
+				)
+			)
+			.then( () => cleanUpEnvironment() )
+			.then( () => {
 				resetForm();
 			} )
 			.catch( ( error ) => {
@@ -522,37 +590,12 @@
 		payload.append( 'plugin_label', getSelectedPluginLabel() );
 		payload.append( 'results', JSON.stringify( getExportResults() ) );
 
-		return fetch( ajaxurl, {
-			method: 'POST',
-			credentials: 'same-origin',
-			body: payload,
-		} )
-			.then( ( response ) => response.json() )
-			.then( ( responseData ) => {
-				if ( ! responseData ) {
-					throw new Error( 'Response contains no data' );
-				}
-
-				if ( ! responseData.success ) {
-					const defaultExportErrorMessage =
-						defaultString( 'exportError' );
-					let message = defaultExportErrorMessage;
-					if ( responseData.data && responseData.data.message ) {
-						message = responseData.data.message;
-					}
-					throw new Error( message );
-				}
-
-				if (
-					! responseData.data ||
-					! responseData.data.content ||
-					! responseData.data.filename
-				) {
-					throw new Error( 'Export payload is incomplete' );
-				}
-
-				return responseData.data;
-			} );
+		return fetchAJAX( payload ).then( ( data ) => {
+			if ( ! data || ! data.content || ! data.filename ) {
+				throw new Error( 'Export payload is incomplete' );
+			}
+			return data;
+		} );
 	}
 
 	function downloadExport( exportPayload ) {
@@ -581,44 +624,44 @@
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param {Object} data Data object with props passed to form data.
+	 * @param {string} plugin                   Plugin basename to check.
+	 * @param {Array}  checks                   Check slugs that will run.
+	 * @param {number} includeExperimentalInput Whether to include experimental checks.
+	 * @param {number} useAiInput               Whether to enable AI analysis.
+	 * @return {Promise<Object>} Resolves with the response message.
 	 */
-	function setUpEnvironment( data ) {
+	function setUpEnvironment(
+		plugin,
+		checks,
+		includeExperimentalInput,
+		useAiInput
+	) {
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
-		pluginCheckData.append( 'plugin', data.plugin );
+		pluginCheckData.append( 'plugin', plugin );
 		pluginCheckData.append(
 			'action',
 			pluginCheck.actionSetUpRuntimeEnvironment
 		);
 		pluginCheckData.append(
 			'include-experimental',
-			includeExperimental && includeExperimental.checked ? 1 : 0
+			includeExperimentalInput
 		);
-		pluginCheckData.append( 'use-ai', useAi && useAi.checked ? 1 : 0 );
+		pluginCheckData.append( 'use-ai', useAiInput );
 
-		for ( let i = 0; i < data.checks.length; i++ ) {
-			pluginCheckData.append( 'checks[]', data.checks[ i ] );
+		for ( let i = 0; i < checks.length; i++ ) {
+			pluginCheckData.append( 'checks[]', checks[ i ] );
 		}
 
-		return fetch( ajaxurl, {
-			method: 'POST',
-			credentials: 'same-origin',
-			body: pluginCheckData,
-		} )
-			.then( ( response ) => {
-				return response.json();
-			} )
-			.then( handleDataErrors )
-			.then( ( responseData ) => {
-				if ( ! responseData.data || ! responseData.data.message ) {
-					throw new Error( 'Response contains no data.' );
-				}
+		return fetchAJAX( pluginCheckData ).then( ( data ) => {
+			if ( ! data.message ) {
+				throw new Error( 'Response contains no data.' );
+			}
 
-				console.log( responseData.data.message );
+			console.log( data.message );
 
-				return responseData.data;
-			} );
+			return data;
+		} );
 	}
 
 	/**
@@ -626,7 +669,7 @@
 	 *
 	 * @since 1.0.0
 	 *
-	 * @return {Object} The response data.
+	 * @return {Promise<Object>} Resolves with the response message.
 	 */
 	function cleanUpEnvironment() {
 		const pluginCheckData = new FormData();
@@ -636,71 +679,53 @@
 			pluginCheck.actionCleanUpRuntimeEnvironment
 		);
 
-		return fetch( ajaxurl, {
-			method: 'POST',
-			credentials: 'same-origin',
-			body: pluginCheckData,
-		} )
-			.then( ( response ) => {
-				return response.json();
-			} )
-			.then( handleDataErrors )
-			.then( ( responseData ) => {
-				if ( ! responseData.data || ! responseData.data.message ) {
-					throw new Error( 'Response contains no data.' );
-				}
+		return fetchAJAX( pluginCheckData ).then( ( data ) => {
+			if ( ! data.message ) {
+				throw new Error( 'Response contains no data.' );
+			}
 
-				return responseData.data;
-			} );
+			return data;
+		} );
 	}
 
 	/**
 	 * Get the Checks to run.
 	 *
 	 * @since 1.0.0
+	 *
+	 * @param {string} plugin                   Plugin basename to evaluate.
+	 * @param {Array}  categories               Selected category slugs.
+	 * @param {number} includeExperimentalInput Whether to include experimental checks.
+	 * @param {number} useAiInput               Whether to enable AI analysis.
+	 * @return {Promise<Object>} Resolves with the response containing plugin and checks.
 	 */
-	function getChecksToRun() {
+	function getChecksToRun(
+		plugin,
+		categories,
+		includeExperimentalInput,
+		useAiInput
+	) {
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
-		pluginCheckData.append( 'plugin', pluginsList.value );
+		pluginCheckData.append( 'plugin', plugin );
 		pluginCheckData.append( 'action', pluginCheck.actionGetChecksToRun );
 		pluginCheckData.append(
 			'include-experimental',
-			includeExperimental && includeExperimental.checked ? 1 : 0
+			includeExperimentalInput
 		);
-		pluginCheckData.append( 'use-ai', useAi && useAi.checked ? 1 : 0 );
+		pluginCheckData.append( 'use-ai', useAiInput );
 
-		for ( let i = 0; i < categoriesList.length; i++ ) {
-			if ( categoriesList[ i ].checked ) {
-				pluginCheckData.append(
-					'categories[]',
-					categoriesList[ i ].value
-				);
-			}
+		for ( let i = 0; i < categories.length; i++ ) {
+			pluginCheckData.append( 'categories[]', categories[ i ] );
 		}
 
-		return fetch( ajaxurl, {
-			method: 'POST',
-			credentials: 'same-origin',
-			body: pluginCheckData,
-		} )
-			.then( ( response ) => {
-				return response.json();
-			} )
-			.then( handleDataErrors )
-			.then( ( responseData ) => {
-				if (
-					! responseData.data ||
-					! responseData.data.plugin ||
-					! responseData.data.checks
-				) {
-					throw new Error(
-						'Plugin and Checks are missing from the response.'
-					);
-				}
+		return fetchAJAX( pluginCheckData ).then( ( data ) => {
+			if ( ! data.checks ) {
+				throw new Error( 'Checks are missing from the response.' );
+			}
 
-				return responseData.data;
-			} );
+			return data;
+		} );
 	}
 
 	/**
@@ -708,14 +733,30 @@
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param {Object} data The response data.
+	 * @param {string} plugin                   Plugin basename to check.
+	 * @param {Array}  checks                   Check slugs to run.
+	 * @param {Array}  types                    Result types to include (error, warning).
+	 * @param {number} includeExperimentalInput Whether to include experimental checks.
+	 * @param {number} useAiInput               Whether to enable AI analysis.
 	 */
-	async function runChecks( data ) {
+	async function runChecks(
+		plugin,
+		checks,
+		types,
+		includeExperimentalInput,
+		useAiInput
+	) {
 		let isSuccessMessage = true;
 		let aiStats = null;
-		for ( let i = 0; i < data.checks.length; i++ ) {
+		for ( let i = 0; i < checks.length; i++ ) {
 			try {
-				const results = await runCheck( data.plugin, data.checks[ i ] );
+				const results = await runCheck(
+					plugin,
+					checks[ i ],
+					types,
+					includeExperimentalInput,
+					useAiInput
+				);
 				const splitResults = splitResultsByFalsePositive( results );
 				const errorsLength = countResultTree(
 					splitResults.actionable.errors
@@ -942,11 +983,20 @@
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param {string} plugin The plugin to check.
-	 * @param {string} check  The check to run.
-	 * @return {Object} The check results.
+	 * @param {string} plugin                   The plugin to check.
+	 * @param {string} check                    The check to run.
+	 * @param {Array}  types                    Result types to include (error, warning).
+	 * @param {number} includeExperimentalInput Whether to include experimental checks.
+	 * @param {number} useAiInput               Whether to enable AI analysis.
+	 * @return {Promise<Object>} The check results.
 	 */
-	function runCheck( plugin, check ) {
+	function runCheck(
+		plugin,
+		check,
+		types,
+		includeExperimentalInput,
+		useAiInput
+	) {
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append( 'plugin', plugin );
@@ -954,47 +1004,29 @@
 		pluginCheckData.append( 'action', pluginCheck.actionRunChecks );
 		pluginCheckData.append(
 			'include-experimental',
-			includeExperimental && includeExperimental.checked ? 1 : 0
+			includeExperimentalInput
 		);
-		pluginCheckData.append( 'use-ai', useAi && useAi.checked ? 1 : 0 );
+		pluginCheckData.append( 'use-ai', useAiInput );
 
-		for ( let i = 0; i < typesList.length; i++ ) {
-			if ( typesList[ i ].checked ) {
-				pluginCheckData.append( 'types[]', typesList[ i ].value );
-			}
+		for ( let i = 0; i < types.length; i++ ) {
+			pluginCheckData.append( 'types[]', types[ i ] );
 		}
 
-		return fetch( ajaxurl, {
-			method: 'POST',
-			credentials: 'same-origin',
-			body: pluginCheckData,
-		} )
-			.then( ( response ) => {
-				return response.json();
-			} )
-			.then( handleDataErrors )
-			.then( ( responseData ) => {
-				// If the response is successful and there is no message in the response.
-				if ( ! responseData.data || ! responseData.data.message ) {
-					throw new Error( 'Response contains no data' );
-				}
+		return fetchAJAX( pluginCheckData ).then( ( data ) => {
+			if ( ! data.message ) {
+				throw new Error( 'Response contains no data' );
+			}
 
-				// Debug: Log AI data if present.
-				if ( responseData.data.ai_analysis ) {
-					console.log(
-						'AI Analysis received:',
-						responseData.data.ai_analysis
-					);
-				}
-				if ( responseData.data.ai_stats ) {
-					console.log(
-						'AI Stats received:',
-						responseData.data.ai_stats
-					);
-				}
+			// Debug: Log AI data if present.
+			if ( data.ai_analysis ) {
+				console.log( 'AI Analysis received:', data.ai_analysis );
+			}
+			if ( data.ai_stats ) {
+				console.log( 'AI Stats received:', data.ai_stats );
+			}
 
-				return responseData.data;
-			} );
+			return data;
+		} );
 	}
 
 	/**
