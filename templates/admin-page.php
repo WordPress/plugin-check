@@ -39,6 +39,7 @@
 
 				<input type="submit" value="<?php esc_attr_e( 'Check it!', 'plugin-check' ); ?>" id="plugin-check__submit" class="button button-primary" />
 				<span id="plugin-check__spinner" class="spinner" style="float: none;"></span>
+				<div class="notice notice-error is-hidden" id="plugin-check__client-error"></div>
 				<div class="plugin-check__options">
 					<div>
 						<h4><?php esc_attr_e( 'Categories', 'plugin-check' ); ?></h4>

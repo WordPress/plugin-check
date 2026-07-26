@@ -5,6 +5,7 @@
 		'plugin-check__export-controls'
 	);
 	const spinner = document.getElementById( 'plugin-check__spinner' );
+	const clientError = document.getElementById( 'plugin-check__client-error' );
 	const pluginsList = document.getElementById(
 		'plugin-check__plugins-dropdown'
 	);
@@ -21,6 +22,7 @@
 		! resultsContainer ||
 		! exportContainer ||
 		! spinner ||
+		! clientError ||
 		! categoriesList.length ||
 		! typesList.length
 	) {
@@ -83,6 +85,9 @@
 		checkItButton.disabled = true;
 		pluginsList.disabled = true;
 		spinner.classList.add( 'is-active' );
+		clientError.innerText = '';
+		clientError.classList.add("is-hidden");
+
 		for ( let i = 0; i < categoriesList.length; i++ ) {
 			categoriesList[ i ].disabled = true;
 		}
@@ -106,6 +111,8 @@
 				resetForm();
 			} )
 			.catch( ( error ) => {
+				clientError.innerText = error.message;
+				clientError.classList.remove("is-hidden");
 				console.error( error );
 
 				resetForm();
