@@ -32,8 +32,8 @@ final class AutoLoadedOptionsSniff extends AbstractFunctionParameterSniff {
 	/**
 	 * Position of the $autoload parameter for each target function.
 	 *
-	 * add_option() is `add_option( $option, $value, $deprecated, $autoload )`
-	 * update_option() is `update_option( $option, $value, $autoload )`.
+	 * Add_option() is `add_option( $option, $value, $deprecated, $autoload )`.
+	 * Update_option() is `update_option( $option, $value, $autoload )`.
 	 *
 	 * @since 2.1.0
 	 *
