@@ -33,67 +33,65 @@ trait File_Editor_URL {
 		$plugin_path = $result->plugin()->path( '/' );
 		$plugin_slug = $result->plugin()->slug();
 		$filename    = str_replace( $plugin_path, '', $filename );
-		/**
-		 * Filters the template for the URL for linking to an external editor to open a file for editing.
-		 *
-		 * Users of IDEs that support opening files in via web protocols can use this filter to override
-		 * the edit link to result in their editor opening rather than the plugin editor.
-		 *
-		 * The initial filtered value is null, requiring extension plugins to supply the URL template
-		 * string themselves. If no template string is provided, links to the plugin editors will
-		 * be provided if available. For example, for an extension plugin to cause file edit links to
-		 * open in an IDE, the following filters can be used:
-		 *
-		 * # PhpStorm
-		 * add_filter( 'wp_plugin_check_validation_error_source_file_editor_url_template', function () {
-		 *     return 'phpstorm://open?file={{file}}&line={{line}}';
-		 * } );
-		 *
-		 * # VS Code
-		 * add_filter( 'wp_plugin_check_validation_error_source_file_editor_url_template', function () {
-		 *     return 'vscode://file/{{file}}:{{line}}';
-		 * } );
-		 *
-		 * For a template to be considered, the string '{{file}}' must be present in the filtered value.
-		 *
-		 * @since 1.0.0
-		 *
-		 * @param string|null $editor_url_template Editor URL template. default null.
-		 */
-		$editor_url_template = apply_filters( 'wp_plugin_check_validation_error_source_file_editor_url_template', null );
 
-		// Supply the file path to the editor template.
-		if ( is_string( $editor_url_template ) && str_contains( $editor_url_template, '{{file}}' ) ) {
-			$file_path = WP_PLUGIN_DIR . '/' . $plugin_slug;
-			if ( $plugin_slug !== $filename ) {
-				$file_path .= '/' . $filename;
-			}
+		$file_path = WP_PLUGIN_DIR . '/' . $plugin_slug;
+		if ( $plugin_slug !== $filename ) {
+			$file_path .= '/' . $filename;
+		}
 
-			if ( file_exists( $file_path ) ) {
-				/**
-				 * Filters the file path to be opened in an external editor for a given PHPCS error source.
-				 *
-				 * This is useful to map the file path from inside of a Docker container or VM to the host machine.
-				 *
-				 * @since 1.0.0
-				 *
-				 * @param string|null $editor_url_template Editor URL template.
-				 * @param array       $source              Source information.
-				 */
-				$file_path = apply_filters( 'wp_plugin_check_validation_error_source_file_path', $file_path, array( $plugin_slug, $filename, $line ) );
-				if ( $file_path ) {
-					$edit_url = str_replace(
-						array(
-							'{{file}}',
-							'{{line}}',
-						),
-						array(
-							rawurlencode( $file_path ),
-							$line,
-						),
-						$editor_url_template
-					);
-				}
+		if ( file_exists( $file_path ) ) {
+			/**
+			 * Filters the URL for linking to an external editor to open a file for editing.
+			 *
+			 * Users of IDEs that support opening files via web protocols can use this filter to
+			 * override the edit link so it opens in their editor rather than the plugin editor.
+			 *
+			 * The initial filtered value is null, requiring extension plugins to supply the URL
+			 * themselves. If no URL is provided, links to the plugin editor are used if available.
+			 * Returning a string that contains `{{file}}` or `{{line}}` placeholders causes them
+			 * to be substituted with the raw filesystem path and the integer line number
+			 * respectively. Returning a string without placeholders uses it verbatim.
+			 *
+			 * For example, to cause file edit links to open in an IDE:
+			 *
+			 * # PhpStorm
+			 * add_filter( 'wp_plugin_check_validation_error_source_url', function ( $url, $source ) {
+			 *     return 'phpstorm://open?file=' . rawurlencode( $source['file'] ) . '&line=' . (int) $source['line'];
+			 * }, 10, 2 );
+			 *
+			 * # VS Code (using placeholders)
+			 * add_filter( 'wp_plugin_check_validation_error_source_url', function ( $url ) {
+			 *     return 'vscode://file/{{file}}:{{line}}';
+			 * } );
+			 *
+			 * @since 2.0.0
+			 *
+			 * @param string|null $url    Editor URL. Default null.
+			 * @param array       $source Source information: file, line, plugin, filename.
+			 */
+			$url = apply_filters(
+				'wp_plugin_check_validation_error_source_url',
+				null,
+				array(
+					'file'     => $file_path,
+					'line'     => $line,
+					'plugin'   => $plugin_slug,
+					'filename' => $filename,
+				)
+			);
+
+			if ( is_string( $url ) && '' !== $url ) {
+				$edit_url = str_replace(
+					array(
+						'{{file}}',
+						'{{line}}',
+					),
+					array(
+						$file_path,
+						(int) $line,
+					),
+					$url
+				);
 			}
 		}
 
