@@ -430,6 +430,8 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @since 1.0.0
 	 *
 	 * @return Check_Result An object containing all check results.
+	 *
+	 * @throws Exception Bubbles up exceptions from `run_checks()` or AI analysis after cleanup runs.
 	 */
 	final public function run() {
 		$checks       = $this->get_checks_to_run();
@@ -442,35 +444,42 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 			$cleanups[] = $instance->prepare();
 		}
 
-		$results = $this->get_checks_instance()->run_checks( $this->get_check_context(), $checks, $this );
+		try {
+			$results = $this->get_checks_instance()->run_checks( $this->get_check_context(), $checks, $this );
 
-		$ai_analysis = array();
-		$ai_stats    = array();
+			$ai_analysis = array();
+			$ai_stats    = array();
 
-		// Run AI analysis if enabled.
-		if ( $this->should_use_ai() ) {
-			// Use CLI model preference, or fall back to saved settings.
-			$model_preference = $this->ai_model_preference;
-			if ( empty( $model_preference ) && class_exists( Settings_Page::class ) ) {
-				$model_preference = Settings_Page::get_model_preference();
+			// Run AI analysis if enabled.
+			if ( $this->should_use_ai() ) {
+				// Use CLI model preference, or fall back to saved settings.
+				$model_preference = $this->ai_model_preference;
+				if ( empty( $model_preference ) && class_exists( Settings_Page::class ) ) {
+					$model_preference = Settings_Page::get_model_preference();
+				}
+				$ai_result = $this->analyze_results_with_ai( $results, $this->get_check_context(), $model_preference );
+				if ( ! is_wp_error( $ai_result ) ) {
+					$ai_analysis = isset( $ai_result['analysis'] ) ? $ai_result['analysis'] : array();
+					$ai_stats    = isset( $ai_result['stats'] ) ? $ai_result['stats'] : array();
+				}
 			}
-			$ai_result = $this->analyze_results_with_ai( $results, $this->get_check_context(), $model_preference );
-			if ( ! is_wp_error( $ai_result ) ) {
-				$ai_analysis = isset( $ai_result['analysis'] ) ? $ai_result['analysis'] : array();
-				$ai_stats    = isset( $ai_result['stats'] ) ? $ai_result['stats'] : array();
-			}
-		}
 
-		$results->set_ai_analysis( $ai_analysis );
-		$results->set_ai_stats( $ai_stats );
+			$results->set_ai_analysis( $ai_analysis );
+			$results->set_ai_stats( $ai_stats );
 
-		if ( ! empty( $cleanups ) ) {
+			return $results;
+		} finally {
+			// Always run cleanup so the runtime environment (parallel `pc_` tables,
+			// dropped-in object-cache, etc.) does not leak if `run_checks` threw.
 			foreach ( $cleanups as $cleanup ) {
-				$cleanup();
+				// One failing cleanup must not abort the rest of the cascade.
+				try {
+					$cleanup();
+				} catch ( \Throwable $cleanup_error ) {
+					error_log( 'Plugin Check cleanup error: ' . $cleanup_error->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				}
 			}
 		}
-
-		return $results;
 	}
 
 	/**

@@ -101,11 +101,46 @@ class Runtime_Environment_Setup_Tests extends WP_UnitTestCase {
 		$runtime_setup->set_up();
 
 		// Simulate file exists by setting constant found in object-cache.php.
-		define( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION', 1 );
+		if ( ! defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) ) {
+			define( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION', 1 );
+		}
 
 		$runtime_setup->clean_up();
 
 		$this->assertTrue( 0 <= strpos( $wpdb->last_query, $table_prefix . 'pc_' ) );
+		$this->assertFalse( $wp_filesystem->exists( WP_CONTENT_DIR . '/object-cache.php' ) );
+	}
+
+	public function test_clean_up_is_idempotent() {
+		global $wp_filesystem, $wpdb, $table_prefix;
+
+		$this->set_up_mock_filesystem();
+
+		$runtime_setup = new Runtime_Environment_Setup();
+		$runtime_setup->set_up();
+
+		if ( ! defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) ) {
+			define( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION', 1 );
+		}
+
+		// First cleanup removes tables and the drop-in.
+		$runtime_setup->clean_up();
+		$this->assertFalse( $wp_filesystem->exists( WP_CONTENT_DIR . '/object-cache.php' ) );
+
+		// Second cleanup must be a no-op and not raise on missing drop-in / tables.
+		$runtime_setup->clean_up();
+		$this->assertTrue( 0 <= strpos( $wpdb->last_query, $table_prefix . 'pc_' ) );
+		$this->assertFalse( $wp_filesystem->exists( WP_CONTENT_DIR . '/object-cache.php' ) );
+	}
+
+	public function test_cleanup_helper_no_op_when_not_set_up() {
+		global $wp_filesystem;
+
+		$this->set_up_mock_filesystem();
+
+		// Without a prior set_up, the helper must not touch the drop-in or raise.
+		Runtime_Environment_Setup::cleanup_if_set_up();
+
 		$this->assertFalse( $wp_filesystem->exists( WP_CONTENT_DIR . '/object-cache.php' ) );
 	}
 }

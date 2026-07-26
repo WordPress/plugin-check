@@ -174,7 +174,7 @@ final class Runtime_Environment_Setup {
 	public function is_set_up() {
 		global $wpdb;
 
-		if ( defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) ) {
+		if ( defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) && WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION ) {
 			return true;
 		}
 
@@ -187,6 +187,22 @@ final class Runtime_Environment_Setup {
 		$prefix_cleanup();
 
 		return $tables_present;
+	}
+
+	/**
+	 * Cleans up the runtime environment if it is currently set up.
+	 *
+	 * Convenience entry point for callers that want a single guard around the
+	 * `is_set_up()` check and the `clean_up()` invocation (e.g. uninstall and
+	 * deactivation hooks).
+	 *
+	 * @since 2.1.0
+	 */
+	public static function cleanup_if_set_up(): void {
+		$runtime = new self();
+		if ( $runtime->is_set_up() ) {
+			$runtime->clean_up();
+		}
 	}
 
 	/**

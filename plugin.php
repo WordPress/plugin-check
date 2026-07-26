@@ -14,6 +14,7 @@
  * @package plugin-check
  */
 
+use WordPress\Plugin_Check\Checker\Runtime_Environment_Setup;
 use WordPress\Plugin_Check\Plugin_Main;
 
 define( 'WP_PLUGIN_CHECK_VERSION', '2.0.0' );
@@ -47,6 +48,22 @@ function wp_plugin_check_load() {
 	$instance = new Plugin_Main( WP_PLUGIN_CHECK_MAIN_FILE );
 	$instance->add_hooks();
 }
+
+register_deactivation_hook(
+	__FILE__,
+	static function () {
+		$autoload = WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'vendor/autoload.php';
+		if ( ! file_exists( $autoload ) ) {
+			return;
+		}
+
+		require_once $autoload;
+
+		if ( class_exists( Runtime_Environment_Setup::class ) ) {
+			Runtime_Environment_Setup::cleanup_if_set_up();
+		}
+	}
+);
 
 /**
  * Displays admin notice about unmet PHP version requirement.
