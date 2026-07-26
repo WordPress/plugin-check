@@ -86,7 +86,7 @@
 		pluginsList.disabled = true;
 		spinner.classList.add( 'is-active' );
 		clientError.innerText = '';
-		clientError.classList.add("is-hidden");
+		clientError.classList.add( 'is-hidden' );
 
 		for ( let i = 0; i < categoriesList.length; i++ ) {
 			categoriesList[ i ].disabled = true;
@@ -112,7 +112,7 @@
 			} )
 			.catch( ( error ) => {
 				clientError.innerText = error.message;
-				clientError.classList.remove("is-hidden");
+				clientError.classList.remove( 'is-hidden' );
 				console.error( error );
 
 				resetForm();
