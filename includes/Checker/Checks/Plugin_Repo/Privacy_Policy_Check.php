@@ -130,6 +130,8 @@ class Privacy_Policy_Check extends Abstract_File_Check {
 	 * @param array                 $files           List of absolute file paths.
 	 * @param array<string, string> $function_names Map of function names (lowercase) to human-readable labels.
 	 * @return string|false Human-readable label of the first matched function, or false if none found.
+	 *
+	 * @SuppressWarnings(PHPMD.NPathComplexity)
 	 */
 	private function find_function_in_files( array $files, array $function_names ) {
 		$lowercase_names = array();
