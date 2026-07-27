@@ -583,7 +583,7 @@ class Parser {
 		}
 
 		// Apply the length restriction without counting html entities.
-		$str_length = mb_strlen( html_entity_decode( $desc ) ?: $desc );
+		$str_length = mb_strlen( html_entity_decode( $desc, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401 ) ?: $desc );
 
 		if ( $str_length > $length ) {
 			$desc = mb_substr( $desc, 0, $length );

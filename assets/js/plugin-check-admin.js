@@ -80,6 +80,7 @@
 		e.preventDefault();
 
 		resetResults();
+		announce( defaultString( 'checkingPlugin' ) );
 		checkItButton.disabled = true;
 		pluginsList.disabled = true;
 		spinner.classList.add( 'is-active' );
@@ -102,11 +103,17 @@
 			.then( cleanUpEnvironment )
 			.then( ( data ) => {
 				console.log( data.message );
+				if ( data && data.message ) {
+					announce( data.message );
+				}
 
 				resetForm();
 			} )
 			.catch( ( error ) => {
 				console.error( error );
+				const errorMsg =
+					error && error.message ? error.message : String( error );
+				announce( errorMsg );
 
 				resetForm();
 			} );
@@ -119,7 +126,7 @@
 	 */
 	function resetResults() {
 		// Empty the results container.
-		resultsContainer.innerText = '';
+		resultsContainer.textContent = '';
 		exportContainer.innerHTML = '';
 		exportContainer.classList.add( 'is-hidden' );
 		resetAggregatedResults();
