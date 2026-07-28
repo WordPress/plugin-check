@@ -200,7 +200,8 @@ final class Results_Exporter {
 			'results'      => $grouped_results,
 		);
 
-		return wp_json_encode( $payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
+		return wp_json_encode( $payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+
 	}
 
 	/**
@@ -236,7 +237,8 @@ final class Results_Exporter {
 			),
 		);
 
-		return wp_json_encode( $payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
+		return wp_json_encode( $payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+
 	}
 
 	/**
