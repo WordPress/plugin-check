@@ -82,6 +82,12 @@ options:
   - new
   - update
 ---
+
+[--ai]
+: Enable AI-based analysis to detect false positives in check results. Requires WordPress 7.0+ and active AI connectors.
+
+[--ai-model=<model>]
+: AI model preference for analysis (e.g., 'openai::gpt-4o' or 'anthropic::claude-3-5-sonnet-20241022'). Requires --ai.
 ```
 ## EXAMPLES
 ```
@@ -90,6 +96,8 @@ wp plugin check akismet --checks=late_escaping
 wp plugin check akismet --format=json
 wp plugin check akismet --format=ctrf
 wp plugin check akismet --mode=update
+wp plugin check akismet --ai
+wp plugin check akismet --ai --ai-model=openai::gpt-4o
 ```
 
 # wp plugin list-checks
