@@ -163,8 +163,13 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	 * @since n.e.x.t
 	 */
 	protected function run_php_codesniffer() {
-
+		/*
+		 * PHPStan cannot infer the class_exists() check performed by run().
+		 *
+		 * @phpstan-ignore-next-line
+		 */
 		$runner = new Runner();
+		/* @phpstan-ignore-next-line */
 		$runner->runPHPCS();
 	}
 
@@ -262,6 +267,11 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 				return true;
 			}
 
+			/*
+			 * PHPStan cannot infer the deferred assignment after the closure is created.
+			 *
+			 * @phpstan-ignore-next-line
+			 */
 			if ( is_callable( $previous_error_handler ) ) {
 				return (bool) call_user_func( $previous_error_handler, $errno, $errstr, $errfile, $errline );
 			}
