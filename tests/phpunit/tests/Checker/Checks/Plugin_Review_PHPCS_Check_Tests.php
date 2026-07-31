@@ -192,4 +192,36 @@ class Plugin_Review_PHPCS_Check_Tests extends WP_UnitTestCase {
 		$this->assertEquals( 0, $check_result->get_error_count() );
 		$this->assertEquals( 0, $check_result->get_warning_count() );
 	}
+
+	public function test_run_restores_original_error_handler_when_phpcs_throws() {
+		$plugin_review_phpcs_check = new class() extends Plugin_Review_PHPCS_Check {
+			protected function run_php_codesniffer() {
+				set_error_handler( static function () {} );
+				throw new Exception( 'Test exception after PHP_CodeSniffer registers its error handler.' );
+			}
+		};
+		$check_context             = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-review-phpcs-without-errors/load.php' );
+		$check_result              = new Check_Result( $check_context );
+		$original_error_handler    = static function () {
+			return false;
+		};
+
+		set_error_handler( $original_error_handler );
+
+		try {
+			try {
+				$plugin_review_phpcs_check->run( $check_result );
+				$this->fail( 'Expected PHP_CodeSniffer to throw an exception.' );
+			} catch ( Exception $e ) {
+				$this->assertSame( 'Test exception after PHP_CodeSniffer registers its error handler.', $e->getMessage() );
+			}
+
+			$current_error_handler = set_error_handler( static function () {} );
+			restore_error_handler();
+
+			$this->assertSame( $original_error_handler, $current_error_handler );
+		} finally {
+			restore_error_handler();
+		}
+	}
 }

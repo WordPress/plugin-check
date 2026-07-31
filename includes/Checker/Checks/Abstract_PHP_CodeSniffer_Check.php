@@ -110,12 +110,11 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		$_SERVER['argv'] = $this->parse_argv( $args, $defaults );
 
 		// Run PHPCS.
-		$this->register_php_codesniffer_error_handler();
+		$php_codesniffer_error_handler = $this->register_php_codesniffer_error_handler();
 
 		try {
 			ob_start();
-			$runner = new Runner();
-			$runner->runPHPCS();
+			$this->run_php_codesniffer();
 			$reports = ob_get_clean();
 		} catch ( Exception $e ) {
 			if ( ob_get_level() > 0 ) {
@@ -123,7 +122,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 			}
 			throw $e;
 		} finally {
-			restore_error_handler();
+			$this->restore_php_codesniffer_error_handler( $php_codesniffer_error_handler );
 
 			// Reset installed_paths.
 			Config::setConfigData( 'installed_paths', $installed_paths, true );
@@ -158,6 +157,16 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 				);
 			}
 		}
+	}
+
+	/**
+	 * Runs PHP_CodeSniffer.
+	 *
+	 * @since n.e.x.t
+	 */
+	protected function run_php_codesniffer() {
+		$runner = new Runner();
+		$runner->runPHPCS();
 	}
 
 	/**
@@ -243,8 +252,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	private function register_php_codesniffer_error_handler() {
 		$previous_error_handler = null;
 
-		$previous_error_handler = set_error_handler(
-			static function ( $errno, $errstr, $errfile, $errline ) use ( &$previous_error_handler ) {
+		$error_handler = static function ( $errno, $errstr, $errfile, $errline ) use ( &$previous_error_handler ) {
 				$normalized_file = wp_normalize_path( $errfile );
 
 				if (
@@ -260,8 +268,33 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 				}
 
 				return false;
-			}
-		);
+			};
+
+		$previous_error_handler = set_error_handler( $error_handler );
+
+		return $error_handler;
+	}
+
+	/**
+	 * Restores the error handler that was active before running PHP_CodeSniffer.
+	 *
+	 * PHP_CodeSniffer registers its own error handler while processing files. If
+	 * processing throws, PHP_CodeSniffer does not restore that handler, so it must
+	 * be removed before the temporary deprecation handler can be restored.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param callable $php_codesniffer_error_handler The temporary error handler registered before running PHP_CodeSniffer.
+	 */
+	private function restore_php_codesniffer_error_handler( $php_codesniffer_error_handler ) {
+		$current_error_handler = set_error_handler( $php_codesniffer_error_handler );
+		restore_error_handler();
+
+		if ( $current_error_handler !== $php_codesniffer_error_handler ) {
+			restore_error_handler();
+		}
+
+		restore_error_handler();
 	}
 
 	/**
