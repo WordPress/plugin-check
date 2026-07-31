@@ -163,6 +163,7 @@ class Plugin_Review_PHPCS_Check_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_run_suppresses_phpcs_auto_detect_line_endings_deprecation() {
+
 		$plugin_review_phpcs_check = new Plugin_Review_PHPCS_Check();
 		$check_context             = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-review-phpcs-without-errors/load.php' );
 		$check_result              = new Check_Result( $check_context );
@@ -196,7 +197,11 @@ class Plugin_Review_PHPCS_Check_Tests extends WP_UnitTestCase {
 	public function test_run_restores_original_error_handler_when_phpcs_throws() {
 		$plugin_review_phpcs_check = new class() extends Plugin_Review_PHPCS_Check {
 			protected function run_php_codesniffer() {
-				set_error_handler( static function () {} );
+				set_error_handler(
+					static function () {
+						return false;
+					}
+				);
 				throw new Exception( 'Test exception after PHP_CodeSniffer registers its error handler.' );
 			}
 		};
@@ -216,7 +221,11 @@ class Plugin_Review_PHPCS_Check_Tests extends WP_UnitTestCase {
 				$this->assertSame( 'Test exception after PHP_CodeSniffer registers its error handler.', $e->getMessage() );
 			}
 
-			$current_error_handler = set_error_handler( static function () {} );
+			$current_error_handler = set_error_handler(
+				static function () {
+					return false;
+				}
+			);
 			restore_error_handler();
 
 			$this->assertSame( $original_error_handler, $current_error_handler );
