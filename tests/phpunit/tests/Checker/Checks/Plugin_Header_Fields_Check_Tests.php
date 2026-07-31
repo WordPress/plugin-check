@@ -37,7 +37,8 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 		$this->assertCount( 1, wp_list_filter( $warnings['load.php'][0][0], array( 'code' => 'plugin_header_nonexistent_domain_path' ) ) );
 
 		if ( is_wp_version_compatible( '6.5' ) ) {
-			$this->assertCount( 1, wp_list_filter( $errors['load.php'][0][0], array( 'code' => 'plugin_header_invalid_requires_plugins' ) ) );
+			// Fixture declares "Example Plugin, OtherPlugin", neither of which is a valid slug.
+			$this->assertCount( 2, wp_list_filter( $errors['load.php'][0][0], array( 'code' => 'plugin_header_invalid_requires_plugins' ) ) );
 		}
 	}
 
@@ -89,6 +90,9 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 		 * Requires Plugins: woocommerce, contact-form-7
 		 */
 
+		set_transient( 'wp_plugin_check_requires_plugin_woocommerce', 'yes' );
+		set_transient( 'wp_plugin_check_requires_plugin_contact-form-7', 'yes' );
+
 		$check         = new Plugin_Header_Fields_Check();
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-unfiltered-uploads-with-errors/load.php' );
 		$check_result  = new Check_Result( $check_context );
@@ -97,12 +101,136 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 
 		$errors = $check_result->get_errors();
 
+		delete_transient( 'wp_plugin_check_requires_plugin_woocommerce' );
+		delete_transient( 'wp_plugin_check_requires_plugin_contact-form-7' );
+
 		if ( is_wp_version_compatible( '6.5' ) ) {
 			$this->assertCount( 0, wp_list_filter( $errors['load.php'][0][0], array( 'code' => 'plugin_header_invalid_requires_plugins' ) ) );
 		} else {
 			// For WordPress < 6.5, the check doesn't run.
 			$this->assertTrue( true );
 		}
+	}
+
+	public function test_run_with_multiple_invalid_requires_plugins_slugs_reported_individually() {
+		/*
+		 * Test plugin has following header, with both slugs invalid.
+		 * Requires Plugins: Example Plugin, OtherPlugin
+		 */
+
+		$check         = new Plugin_Header_Fields_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-header-fields-with-errors/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check->run( $check_result );
+
+		$errors = $check_result->get_errors();
+
+		if ( ! is_wp_version_compatible( '6.5' ) ) {
+			$this->assertTrue( true );
+			return;
+		}
+
+		$messages = wp_list_pluck( wp_list_filter( $errors['load.php'][0][0], array( 'code' => 'plugin_header_invalid_requires_plugins' ) ), 'message' );
+
+		$this->assertCount( 2, $messages, 'Each invalid slug should be reported as its own error.' );
+
+		$example_plugin_messages = array_filter(
+			$messages,
+			static function ( $message ) {
+				return str_contains( $message, 'Example Plugin' );
+			}
+		);
+		$other_plugin_messages   = array_filter(
+			$messages,
+			static function ( $message ) {
+				return str_contains( $message, 'OtherPlugin' );
+			}
+		);
+
+		$this->assertCount( 1, $example_plugin_messages, 'Exactly one error should name "Example Plugin".' );
+		$this->assertStringNotContainsString( 'OtherPlugin', reset( $example_plugin_messages ) );
+
+		$this->assertCount( 1, $other_plugin_messages, 'Exactly one error should name "OtherPlugin".' );
+		$this->assertStringNotContainsString( 'Example Plugin', reset( $other_plugin_messages ) );
+	}
+
+	public function test_run_with_requires_plugins_dependency_status() {
+		/*
+		 * Test plugin has following header.
+		 * Requires Plugins: plugin-check, hello-dolly, not-installed-plugin
+		 *
+		 * "plugin-check" and "hello-dolly" are seeded as published in the
+		 * WordPress.org plugin directory; "not-installed-plugin" is seeded
+		 * as 'no' — the value cached when api.wordpress.org returns HTTP 404,
+		 * consumed here to confirm the same key the production code writes
+		 * leads to the expected warning.
+		 */
+
+		set_transient( 'wp_plugin_check_requires_plugin_plugin-check', 'yes' );
+		set_transient( 'wp_plugin_check_requires_plugin_hello-dolly', 'yes' );
+		set_transient( 'wp_plugin_check_requires_plugin_not-installed-plugin', 'no' );
+
+		$check         = new Plugin_Header_Fields_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-requires-plugins-status/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check->run( $check_result );
+
+		$errors   = $check_result->get_errors();
+		$warnings = $check_result->get_warnings();
+
+		delete_transient( 'wp_plugin_check_requires_plugin_plugin-check' );
+		delete_transient( 'wp_plugin_check_requires_plugin_hello-dolly' );
+		delete_transient( 'wp_plugin_check_requires_plugin_not-installed-plugin' );
+
+		if ( ! is_wp_version_compatible( '6.5' ) ) {
+			$this->assertTrue( true );
+			return;
+		}
+
+		$this->assertCount( 0, wp_list_filter( $errors['load.php'][0][0] ?? array(), array( 'code' => 'plugin_header_invalid_requires_plugins' ) ) );
+
+		$not_in_directory_items = wp_list_filter( $warnings['load.php'][0][0], array( 'code' => 'plugin_header_requires_plugins_not_in_directory' ) );
+		$this->assertCount( 1, $not_in_directory_items, 'Only the dependency missing from the directory should get a warning.' );
+		$this->assertStringContainsString( 'not-installed-plugin', reset( $not_in_directory_items )['message'] );
+	}
+
+	public function test_run_with_empty_entry_in_requires_plugins_header() {
+		/*
+		 * Test plugin declares: Requires Plugins: Example ,,OtherPlugin
+		 *
+		 * Expect 3 errors: one empty-entry error and two malformed-slug errors
+		 * ("Example" and "OtherPlugin" both contain uppercase characters, so
+		 * they fail the lowercase slug format check).
+		 */
+
+		$check         = new Plugin_Header_Fields_Check();
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-requires-plugins-empty-entry/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check->run( $check_result );
+
+		$errors = $check_result->get_errors();
+
+		if ( ! is_wp_version_compatible( '6.5' ) ) {
+			$this->assertTrue( true );
+			return;
+		}
+
+		$items = ! empty( $errors['load.php'][0][0] )
+			? wp_list_filter( $errors['load.php'][0][0], array( 'code' => 'plugin_header_invalid_requires_plugins' ) )
+			: array();
+
+		$this->assertCount( 3, $items, 'Empty entry plus two uppercase slugs → 3 distinct errors.' );
+
+		$empty_messages = array_filter(
+			wp_list_pluck( $items, 'message' ),
+			static function ( $message ) {
+				return str_contains( $message, 'empty entry' );
+			}
+		);
+		$this->assertCount( 1, $empty_messages, 'Empty entry must be reported.' );
 	}
 
 	public function test_run_with_mismatched_tested_up_to() {
