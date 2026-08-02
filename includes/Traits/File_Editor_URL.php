@@ -25,6 +25,9 @@ trait File_Editor_URL {
 	 * @param string       $filename Error file name.
 	 * @param int          $line     Optional. Line number of error. Default 0 (no specific line).
 	 * @return string|null File editor URL or null if not available.
+	 *
+	 * @SuppressWarnings(PHPMD.NPathComplexity)
+	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
 	 */
 	protected function get_file_editor_url( Check_Result $result, $filename, $line = 0 ) {
 

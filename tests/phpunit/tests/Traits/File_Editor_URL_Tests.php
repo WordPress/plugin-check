@@ -337,6 +337,9 @@ class File_Editor_URL_Tests extends WP_UnitTestCase {
 	 * Registers the old `..._file_editor_url_template` and `..._file_path` filters
 	 * and asserts the URL is computed from the remapped path and the line number,
 	 * matching the pre-refactor behavior.
+	 *
+	 * @expectedDeprecated wp_plugin_check_validation_error_source_file_editor_url_template
+	 * @expectedDeprecated wp_plugin_check_validation_error_source_file_path
 	 */
 	public function test_legacy_filters_work_via_deprecated_shim() {
 		$this->require_fixture_symlink();
