@@ -41,11 +41,25 @@ class File_Editor_URL_Tests extends WP_UnitTestCase {
 	private $super_admin_ids = array();
 
 	/**
+	 * Legacy filter callbacks registered by each test, removed in tear_down.
+	 *
+	 * @var array[]
+	 */
+	private $legacy_callbacks = array();
+
+	/**
 	 * Symlink path inside WP_PLUGIN_DIR for the testdata fixture.
 	 *
 	 * @var string|null
 	 */
 	private $fixture_symlink = null;
+
+	/**
+	 * Whether the testdata fixture symlink could be created inside WP_PLUGIN_DIR.
+	 *
+	 * @var bool
+	 */
+	private $fixture_symlink_ready = false;
 
 	/**
 	 * Sets up the test fixture symlink so file_exists passes inside wp-env.
@@ -56,8 +70,23 @@ class File_Editor_URL_Tests extends WP_UnitTestCase {
 		$this->fixture_symlink = WP_PLUGIN_DIR . '/test-plugin-external-admin-menu-links-without-errors';
 		$target                = UNIT_TESTS_PLUGIN_DIR . 'test-plugin-external-admin-menu-links-without-errors';
 
-		if ( ! file_exists( $this->fixture_symlink ) && is_dir( $target ) ) {
-			symlink( $target, $this->fixture_symlink );
+		if ( is_link( $this->fixture_symlink ) ) {
+			$this->fixture_symlink_ready = true;
+		} elseif ( is_dir( $target ) && ! file_exists( $this->fixture_symlink ) && symlink( $target, $this->fixture_symlink ) ) {
+			$this->fixture_symlink_ready = true;
+		}
+	}
+
+	/**
+	 * Skips the test when the fixture symlink could not be created.
+	 *
+	 * The symlink is required so the trait's `file_exists()` check passes for the
+	 * external-editor filter branch. Without it the related tests error out in a
+	 * confusing way instead of skipping cleanly.
+	 */
+	private function require_fixture_symlink() {
+		if ( ! $this->fixture_symlink_ready ) {
+			$this->markTestSkipped( 'Fixture symlink unavailable; cannot place plugin fixture under WP_PLUGIN_DIR.' );
 		}
 	}
 
@@ -75,6 +104,13 @@ class File_Editor_URL_Tests extends WP_UnitTestCase {
 			remove_filter( 'wp_plugin_check_validation_error_source_url', $cb, 10 );
 		}
 		$this->url_callbacks = array();
+
+		foreach ( $this->legacy_callbacks as $legacy ) {
+			remove_filter( $legacy['hook'], $legacy['callback'], 10 );
+		}
+		$this->legacy_callbacks = array();
+
+		remove_filter( 'deprecated_hook_trigger_error', '__return_false' );
 
 		foreach ( $this->cap_callbacks as $cb ) {
 			remove_filter( 'user_has_cap', $cb, 10 );
@@ -107,6 +143,21 @@ class File_Editor_URL_Tests extends WP_UnitTestCase {
 	private function add_url_filter( $callback, $accepted_args = 1 ) {
 		add_filter( 'wp_plugin_check_validation_error_source_url', $callback, 10, $accepted_args );
 		$this->url_callbacks[] = $callback;
+	}
+
+	/**
+	 * Registers a legacy (deprecated) filter callback and tracks it for cleanup.
+	 *
+	 * @param string   $hook     Legacy filter hook.
+	 * @param callable $callback Filter callback.
+	 * @param int      $args     Number of accepted args.
+	 */
+	private function add_legacy_filter( $hook, $callback, $args = 1 ) {
+		add_filter( $hook, $callback, 10, $args );
+		$this->legacy_callbacks[] = array(
+			'hook'     => $hook,
+			'callback' => $callback,
+		);
 	}
 
 	/**
@@ -167,6 +218,8 @@ class File_Editor_URL_Tests extends WP_UnitTestCase {
 	 * correctly. `{{line}}` is replaced with the integer line number.
 	 */
 	public function test_filter_url_with_placeholders_substituted() {
+		$this->require_fixture_symlink();
+
 		$this->add_url_filter(
 			static function ( $url ) {
 				return 'vscode://file/{{file}}:{{line}}';
@@ -188,6 +241,8 @@ class File_Editor_URL_Tests extends WP_UnitTestCase {
 	 * Filter returning a string without placeholders is used verbatim.
 	 */
 	public function test_filter_url_without_placeholders_used_verbatim() {
+		$this->require_fixture_symlink();
+
 		$this->add_url_filter(
 			static function ( $url, $source ) {
 				return 'phpstorm://open?file=' . rawurlencode( $source['file'] ) . '&line=' . (int) $source['line'];
@@ -210,6 +265,8 @@ class File_Editor_URL_Tests extends WP_UnitTestCase {
 	 * Filter receives the $source array with file, line, plugin, filename keys.
 	 */
 	public function test_filter_receives_source_array() {
+		$this->require_fixture_symlink();
+
 		$captured = null;
 
 		$this->add_url_filter(
@@ -272,5 +329,41 @@ class File_Editor_URL_Tests extends WP_UnitTestCase {
 		parse_str( (string) wp_parse_url( $url, PHP_URL_QUERY ), $query_args );
 		$this->assertSame( '42', $query_args['line'] );
 		$this->assertSame( 'plugin-editor.php', basename( (string) wp_parse_url( $url, PHP_URL_PATH ) ) );
+	}
+
+	/**
+	 * Legacy two-filter chain still works through the deprecation shims.
+	 *
+	 * Registers the old `..._file_editor_url_template` and `..._file_path` filters
+	 * and asserts the URL is computed from the remapped path and the line number,
+	 * matching the pre-refactor behavior.
+	 */
+	public function test_legacy_filters_work_via_deprecated_shim() {
+		$this->require_fixture_symlink();
+		add_filter( 'deprecated_hook_trigger_error', '__return_false' );
+
+		$this->add_legacy_filter(
+			'wp_plugin_check_validation_error_source_file_editor_url_template',
+			static function () {
+				return 'vscode://file/{{file}}:{{line}}';
+			}
+		);
+		$this->add_legacy_filter(
+			'wp_plugin_check_validation_error_source_file_path',
+			static function ( $path, $source ) {
+				return '/host/mapped' . $path;
+			},
+			2
+		);
+
+		$context = new Check_Context( $this->single_file_plugin_basename() );
+		$result  = new Check_Result( $context );
+
+		$root = WP_PLUGIN_DIR . '/test-plugin-external-admin-menu-links-without-errors/load.php';
+
+		$this->assertSame(
+			'vscode://file/' . rawurlencode( '/host/mapped' . $root ) . ':9',
+			$this->get_file_editor_url( $result, 'load.php', 9 )
+		);
 	}
 }
