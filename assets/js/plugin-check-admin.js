@@ -1043,13 +1043,20 @@
 		}
 
 		if ( ! data.success ) {
+			// Error payloads come in two shapes: WP_Error responses are
+			// arrays ( [{ code, message }, ...] ), everything else is
+			// passed through as-is ( e.g. { message: ... } ).
+			const firstError = Array.isArray( data.data )
+				? data.data[ 0 ]
+				: data.data;
+
 			// If not successful and no message in the response.
-			if ( ! data.data || ! data.data[ 0 ].message ) {
+			if ( ! firstError || ! firstError.message ) {
 				throw new Error( 'Response contains no data' );
 			}
 
 			// If not successful and there is a message in the response.
-			throw new Error( data.data[ 0 ].message );
+			throw new Error( firstError.message );
 		}
 
 		return data;
