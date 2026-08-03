@@ -52,7 +52,7 @@
 	/**
 	 * Gets the values of checked inputs from a list.
 	 *
-	 * @since 1.0.0
+	 * @since 2.1.0
 	 *
 	 * @param {NodeList} list Inputs to read from.
 	 * @return {Array} Selected values.
@@ -74,7 +74,7 @@
 	 * credentials, nonce in body) and parses the JSON response, surfacing
 	 * server errors via handleDataErrors.
 	 *
-	 * @since 1.0.0
+	 * @since 2.1.0
 	 *
 	 * @param {FormData} formData Form data to send. Must include 'action' and 'nonce'.
 	 * @return {Promise<Object>} Resolves with the response data on success.
