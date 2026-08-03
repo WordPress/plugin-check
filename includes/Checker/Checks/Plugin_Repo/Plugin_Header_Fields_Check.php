@@ -372,22 +372,7 @@ class Plugin_Header_Fields_Check implements Static_Check {
 		}
 
 		if ( ! empty( $plugin_header['RequiresPlugins'] ) ) {
-			if ( ! preg_match( '/^[a-z0-9-]+(?:,\s*[a-z0-9-]+)*$/', $plugin_header['RequiresPlugins'] ) ) {
-				$this->add_result_error_for_file(
-					$result,
-					sprintf(
-						/* translators: %s: plugin header field */
-						__( 'The "%s" header in the plugin file must contain a comma-separated list of WordPress.org-formatted slugs.', 'plugin-check' ),
-						esc_html( $labels['RequiresPlugins'] )
-					),
-					'plugin_header_invalid_requires_plugins',
-					$plugin_main_file,
-					0,
-					0,
-					'',
-					7
-				);
-			}
+			$this->check_requires_plugins_header( $result, $plugin_header['RequiresPlugins'], $labels['RequiresPlugins'], $plugin_main_file );
 		}
 
 		if ( empty( $plugin_header['License'] ) ) {
@@ -534,6 +519,140 @@ class Plugin_Header_Fields_Check implements Static_Check {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Validates each slug declared in the "Requires Plugins" header individually.
+	 *
+	 * Reports an error per malformed slug, and a warning per validly formatted
+	 * slug that could not be found in the WordPress.org plugin directory.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param Check_Result $result             The check result to amend.
+	 * @param string       $requires_plugins   Raw value of the "Requires Plugins" header.
+	 * @param string       $label              Label of the "Requires Plugins" header.
+	 * @param string       $plugin_main_file   Absolute path to the main plugin file.
+	 */
+	private function check_requires_plugins_header( Check_Result $result, string $requires_plugins, string $label, string $plugin_main_file ) {
+		$slugs = array_map( 'trim', explode( ',', $requires_plugins ) );
+
+		foreach ( $slugs as $slug ) {
+			if ( '' === $slug ) {
+				$this->add_result_error_for_file(
+					$result,
+					sprintf(
+						/* translators: %s: plugin header field */
+						__( 'The "%s" header in the plugin file contains an empty entry.', 'plugin-check' ),
+						esc_html( $label )
+					),
+					'plugin_header_invalid_requires_plugins',
+					$plugin_main_file,
+					0,
+					0,
+					'',
+					7
+				);
+				continue;
+			}
+
+			if ( ! preg_match( '/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $slug ) ) {
+				$this->add_result_error_for_file(
+					$result,
+					sprintf(
+						/* translators: 1: plugin header field, 2: dependency slug */
+						__( 'The "%1$s" header in the plugin file contains "%2$s", which is not a valid WordPress.org-formatted slug.', 'plugin-check' ),
+						esc_html( $label ),
+						esc_html( $slug )
+					),
+					'plugin_header_invalid_requires_plugins',
+					$plugin_main_file,
+					0,
+					0,
+					'',
+					7
+				);
+				continue;
+			}
+
+			$this->check_requires_plugins_slug_status( $result, $slug, $plugin_main_file );
+		}
+	}
+
+	/**
+	 * Checks whether a single declared plugin dependency exists in the WordPress.org plugin directory.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param Check_Result $result           The check result to amend.
+	 * @param string       $slug             The dependency's WordPress.org slug.
+	 * @param string       $plugin_main_file Absolute path to the main plugin file.
+	 */
+	private function check_requires_plugins_slug_status( Check_Result $result, string $slug, string $plugin_main_file ) {
+		$exists = $this->plugin_exists_in_directory( $slug );
+
+		// null = transport failure (silent skip). true = exists in directory.
+		if ( null === $exists || $exists ) {
+			return;
+		}
+
+		$this->add_result_warning_for_file(
+			$result,
+			sprintf(
+				/* translators: %s: dependency slug */
+				__( 'The plugin declares "%s" as a required plugin, but it could not be found in the WordPress.org plugin directory.', 'plugin-check' ),
+				esc_html( $slug )
+			),
+			'plugin_header_requires_plugins_not_in_directory',
+			$plugin_main_file,
+			0,
+			0,
+			'',
+			3
+		);
+	}
+
+	/**
+	 * Checks whether a plugin slug exists in the WordPress.org plugin directory.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param string $slug The plugin's WordPress.org slug.
+	 * @return bool|null True if found, false if not found, null if the API could not be reached.
+	 */
+	private function plugin_exists_in_directory( string $slug ) {
+		$transient_key = 'wp_plugin_check_requires_plugin_' . $slug;
+		$exists        = get_transient( $transient_key );
+
+		if ( false !== $exists ) {
+			return 'no' !== $exists;
+		}
+
+		$response = wp_remote_get( "https://api.wordpress.org/plugins/info/1.0/{$slug}.json" );
+
+		if ( is_wp_error( $response ) ) {
+			return null;
+		}
+
+		$code = (int) wp_remote_retrieve_response_code( $response );
+
+		if ( 404 === $code ) {
+			// Slug confirmed absent from the directory; cache so we don't retry within the day.
+			set_transient( $transient_key, 'no', DAY_IN_SECONDS );
+			return false;
+		}
+
+		if ( 200 !== $code ) {
+			// Transport/server failure; do not cache, try next run.
+			return null;
+		}
+
+		$body   = json_decode( wp_remote_retrieve_body( $response ), true );
+		$exists = is_array( $body ) && ! isset( $body['error'] );
+
+		set_transient( $transient_key, $exists ? 'yes' : 'no', DAY_IN_SECONDS );
+
+		return $exists;
 	}
 
 	/**
