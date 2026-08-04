@@ -114,7 +114,7 @@
 				clientError.innerText = error.message;
 				clientError.classList.remove( 'is-hidden' );
 				clientError.focus();
-				
+
 				console.error( error );
 
 				resetForm();
