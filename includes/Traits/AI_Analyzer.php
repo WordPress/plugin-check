@@ -84,6 +84,7 @@ trait AI_Analyzer {
 			'PluginCheck.CodeAnalysis.Obfuscation'         => 'ai-review-code-obfuscation.md',
 			'PluginCheck.CodeAnalysis.SettingSanitization' => 'ai-review-setting-sanitization.md',
 			'PluginCheck.CodeAnalysis.PluginUpdater'       => 'ai-review-plugin-updater.md',
+			'trialware_'                                   => 'ai-review-trialware.md',
 		);
 	}
 
