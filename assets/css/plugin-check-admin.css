@@ -130,12 +130,123 @@
 	padding: 0 14px 14px;
 }
 
-#plugin-check__results .plugin-check__false-positive-results h4:first-child {
-	margin-top: 12px;
-}
-
 .plugin-check__false-positive-results table.plugin-check__results-table {
 	margin-bottom: 1em;
+}
+
+/* Expand/collapse: animation + layout */
+#plugin-check__results,
+.plugin-check__false-positive-results {
+	interpolate-size: allow-keywords;
+}
+
+.plugin-check__results-toolbar {
+	margin-top: 8px;
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.plugin-check__results-toolbar.is-hidden {
+	display: none;
+}
+
+.plugin-check__toolbar-button {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	border-color: #2271b1;
+	color: #2271b1;
+	background: #fff;
+}
+
+.wp-core-ui .button.plugin-check__toolbar-button .dashicons {
+	width: 18px;
+	height: 18px;
+	font-size: 18px;
+	line-height: 0.9;
+	vertical-align: middle;
+}
+
+.plugin-check__file-results {
+	margin-bottom: 12px;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+}
+
+.plugin-check__file-results-header {
+	border-left: 4px solid #2271b1;
+	border-bottom: 1px solid #c3c4c7;
+}
+
+.plugin-check__file-results-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	width: 100%;
+	margin: 0;
+	padding: 12px 14px;
+	border: 0;
+	background: transparent;
+	color: #1d2327;
+	font-size: 14px;
+	font-weight: 600;
+	text-align: left;
+	cursor: pointer;
+}
+
+.plugin-check__file-results-leading {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	min-width: 0;
+}
+
+.plugin-check__file-results-toggle .dashicons {
+	flex-shrink: 0;
+	width: 20px;
+	height: 20px;
+	font-size: 20px;
+}
+
+.plugin-check__file-results-file-icon,
+.plugin-check__file-results-toggle-icon {
+	color: #2271b1;
+}
+
+.plugin-check__file-results-toggle-icon {
+	transition: transform 300ms ease;
+}
+
+.plugin-check__file-results:not(:has(.plugin-check__file-results-panel.open))
+	.plugin-check__file-results-toggle-icon {
+	transform: rotate(-90deg);
+}
+
+.plugin-check__file-results-label {
+	overflow-wrap: anywhere;
+}
+
+.plugin-check__file-results-panel {
+	height: 0;
+	overflow: hidden;
+	transition: height 300ms ease;
+}
+
+.plugin-check__file-results-panel.open {
+	height: auto;
+}
+
+.plugin-check__file-results-panel .plugin-check__results-table {
+	margin: 0;
+	border: 0;
+}
+
+@supports not (interpolate-size: allow-keywords) {
+	.plugin-check__file-results-panel {
+		transition: none;
+	}
 }
 
 .plugin-check__options {

@@ -4,6 +4,15 @@
 	const exportContainer = document.getElementById(
 		'plugin-check__export-controls'
 	);
+	const resultsToolbar = document.getElementById(
+		'plugin-check__results-toolbar'
+	);
+	const expandAllButton = document.getElementById(
+		'plugin-check__expand-all'
+	);
+	const collapseAllButton = document.getElementById(
+		'plugin-check__collapse-all'
+	);
 	const spinner = document.getElementById( 'plugin-check__spinner' );
 	const pluginsList = document.getElementById(
 		'plugin-check__plugins-dropdown'
@@ -32,7 +41,75 @@
 	let falsePositiveResults = createEmptyAggregatedResults();
 	let checksCompleted = false;
 	exportContainer.classList.add( 'is-hidden' );
+	if ( resultsToolbar ) {
+		resultsToolbar.classList.add( 'is-hidden' );
+	}
 	exportContainer.addEventListener( 'click', onExportContainerClick );
+
+	if ( expandAllButton && collapseAllButton ) {
+		expandAllButton.addEventListener( 'click', () => {
+			setAllFileResultsExpanded( true );
+		} );
+		collapseAllButton.addEventListener( 'click', () => {
+			setAllFileResultsExpanded( false );
+		} );
+		resultsContainer.addEventListener( 'click', onFileResultsToggleClick );
+	}
+
+	/**
+	 * Sets expanded/collapsed state for one file results section.
+	 *
+	 * @param {HTMLElement} section   File results wrapper.
+	 * @param {boolean}     expanded  Whether the section is expanded.
+	 */
+	function setFileResultsExpanded( section, expanded ) {
+		const toggle = section.querySelector(
+			'.plugin-check__file-results-toggle'
+		);
+		const panel = section.querySelector( '.plugin-check__file-results-panel' );
+
+		if ( toggle ) {
+			toggle.setAttribute( 'aria-expanded', expanded ? 'true' : 'false' );
+		}
+		if ( panel ) {
+			panel.classList.toggle( 'open', expanded );
+		}
+	}
+
+	/**
+	 * Expands or collapses every file results section.
+	 *
+	 * @param {boolean} expanded Whether sections should be expanded.
+	 */
+	function setAllFileResultsExpanded( expanded ) {
+		resultsContainer
+			.querySelectorAll( '.plugin-check__file-results' )
+			.forEach( ( section ) => {
+				setFileResultsExpanded( section, expanded );
+			} );
+	}
+
+	/**
+	 * Toggles one file results section.
+	 *
+	 * @param {Event} event Click event.
+	 */
+	function onFileResultsToggleClick( event ) {
+		const toggle = event.target.closest(
+			'.plugin-check__file-results-toggle'
+		);
+		if ( ! toggle ) {
+			return;
+		}
+
+		const section = toggle.closest( '.plugin-check__file-results' );
+		if ( ! section ) {
+			return;
+		}
+
+		const isExpanded = toggle.getAttribute( 'aria-expanded' ) === 'true';
+		setFileResultsExpanded( section, ! isExpanded );
+	}
 
 	const includeExperimental = document.getElementById(
 		'plugin-check__include-experimental'
@@ -122,6 +199,9 @@
 		resultsContainer.innerText = '';
 		exportContainer.innerHTML = '';
 		exportContainer.classList.add( 'is-hidden' );
+		if ( resultsToolbar ) {
+			resultsToolbar.classList.add( 'is-hidden' );
+		}
 		resetAggregatedResults();
 		checksCompleted = false;
 	}
@@ -420,14 +500,29 @@
 		return '';
 	}
 
+	function updateResultsToolbarVisibility() {
+		if ( ! resultsToolbar ) {
+			return;
+		}
+
+		const hasFileResults = resultsContainer.querySelector(
+			'.plugin-check__file-results'
+		);
+		resultsToolbar.classList.toggle( 'is-hidden', ! hasFileResults );
+	}
+
 	function renderExportButtons() {
 		exportContainer.innerHTML = '';
 		if ( ! checksCompleted ) {
 			exportContainer.classList.add( 'is-hidden' );
+			if ( resultsToolbar ) {
+				resultsToolbar.classList.add( 'is-hidden' );
+			}
 			return;
 		}
 
 		exportContainer.classList.remove( 'is-hidden' );
+		updateResultsToolbarVisibility();
 
 		const exportButtonConfigs = [
 			{
