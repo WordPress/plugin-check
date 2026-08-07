@@ -31,7 +31,6 @@
 	let aggregatedResults = createEmptyAggregatedResults();
 	let falsePositiveResults = createEmptyAggregatedResults();
 	let checksCompleted = false;
-	let currentChecks = [];
 	exportContainer.classList.add( 'is-hidden' );
 	exportContainer.addEventListener( 'click', onExportContainerClick );
 
@@ -71,19 +70,26 @@
 	 * Posts FormData to the plugin's AJAX endpoint.
 	 *
 	 * Wraps fetch with the standard options (ajaxurl, POST, same-origin
-	 * credentials, nonce in body) and parses the JSON response, surfacing
-	 * server errors via handleDataErrors.
+	 * credentials) and parses the JSON response, surfacing server errors
+	 * via handleDataErrors. The wrapper automatically appends the shared
+	 * `pluginCheck.nonce` to the request body, so callers do not need to.
 	 *
 	 * @since 2.1.0
 	 *
-	 * @param {FormData} formData Form data to send. Must include 'action' and 'nonce'.
+	 * @param {FormData} formData Form data to send. Must include 'action'.
 	 * @return {Promise<Object>} Resolves with the response data on success.
 	 */
 	function fetchAJAX( formData ) {
+		const requestBody = new FormData();
+		for ( const pair of formData.entries() ) {
+			requestBody.append( pair[ 0 ], pair[ 1 ] );
+		}
+		requestBody.append( 'nonce', pluginCheck.nonce );
+
 		return fetch( ajaxurl, {
 			method: 'POST',
 			credentials: 'same-origin',
-			body: formData,
+			body: requestBody,
 		} )
 			.then( ( response ) => response.json() )
 			.then( handleDataErrors )
@@ -144,6 +150,7 @@
 		const useAiChecked = useAi && useAi.checked ? 1 : 0;
 		const includeExperimentalChecked =
 			includeExperimental && includeExperimental.checked ? 1 : 0;
+		let currentChecks;
 
 		getChecksToRun(
 			plugin,
@@ -170,7 +177,8 @@
 				)
 			)
 			.then( () => cleanUpEnvironment() )
-			.then( () => {
+			.then( ( data ) => {
+				console.log( data.message );
 				resetForm();
 			} )
 			.catch( ( error ) => {
@@ -581,7 +589,6 @@
 
 	function requestExport( format ) {
 		const payload = new FormData();
-		payload.append( 'nonce', pluginCheck.nonce );
 		payload.append( 'action', pluginCheck.actionExportResults );
 		payload.append( 'format', format );
 		if ( pluginsList.value ) {
@@ -637,7 +644,6 @@
 		useAiInput
 	) {
 		const pluginCheckData = new FormData();
-		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append( 'plugin', plugin );
 		pluginCheckData.append(
 			'action',
@@ -654,7 +660,7 @@
 		}
 
 		return fetchAJAX( pluginCheckData ).then( ( data ) => {
-			if ( ! data.message ) {
+			if ( ! data || ! data.message ) {
 				throw new Error( 'Response contains no data.' );
 			}
 
@@ -673,14 +679,13 @@
 	 */
 	function cleanUpEnvironment() {
 		const pluginCheckData = new FormData();
-		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append(
 			'action',
 			pluginCheck.actionCleanUpRuntimeEnvironment
 		);
 
 		return fetchAJAX( pluginCheckData ).then( ( data ) => {
-			if ( ! data.message ) {
+			if ( ! data || ! data.message ) {
 				throw new Error( 'Response contains no data.' );
 			}
 
@@ -706,7 +711,6 @@
 		useAiInput
 	) {
 		const pluginCheckData = new FormData();
-		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append( 'plugin', plugin );
 		pluginCheckData.append( 'action', pluginCheck.actionGetChecksToRun );
 		pluginCheckData.append(
@@ -720,7 +724,7 @@
 		}
 
 		return fetchAJAX( pluginCheckData ).then( ( data ) => {
-			if ( ! data.checks ) {
+			if ( ! data || ! data.checks ) {
 				throw new Error( 'Checks are missing from the response.' );
 			}
 
@@ -998,7 +1002,6 @@
 		useAiInput
 	) {
 		const pluginCheckData = new FormData();
-		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append( 'plugin', plugin );
 		pluginCheckData.append( 'checks[]', check );
 		pluginCheckData.append( 'action', pluginCheck.actionRunChecks );
@@ -1013,7 +1016,7 @@
 		}
 
 		return fetchAJAX( pluginCheckData ).then( ( data ) => {
-			if ( ! data.message ) {
+			if ( ! data || ! data.message ) {
 				throw new Error( 'Response contains no data' );
 			}
 
