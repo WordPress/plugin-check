@@ -94,6 +94,7 @@ class Default_Check_Repository extends Empty_Check_Repository {
 				'localhost'                  => new Checks\Plugin_Repo\Localhost_Check(),
 				'no_unfiltered_uploads'      => new Checks\Plugin_Repo\No_Unfiltered_Uploads_Check(),
 				'trademarks'                 => new Checks\Plugin_Repo\Trademarks_Check(),
+				'public_content_export'      => new Checks\Security\Public_Content_Export_Check(),
 				'non_blocking_scripts'       => new Checks\Performance\Non_Blocking_Scripts_Check(),
 				'offloading_files'           => new Checks\Plugin_Repo\Offloading_Files_Check(),
 				'write_file'                 => new Checks\Plugin_Repo\Write_File_Check(),

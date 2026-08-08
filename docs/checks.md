@@ -19,6 +19,7 @@
 | plugin_review_phpcs | plugin_repo | Runs PHP_CodeSniffer to detect certain best practices plugins should follow for submission on WordPress.org, including heredoc usage detection. | [Learn more](https://developer.wordpress.org/plugins/plugin-basics/best-practices/) |
 | direct_db_queries | security, plugin_repo | Checks the usage of direct database queries, which should be avoided. | [Learn more](https://developer.wordpress.org/apis/database/) |
 | direct_db | security, plugin_repo | Checks the escaping in direct database queries. | [Learn more](https://developer.wordpress.org/apis/database/) |
+| public_content_export | security | Detects when post content is exported through a public surface without an apparent access-control guard. | [Learn more](https://developer.wordpress.org/plugins/wordpress-org/plugin-guidelines/) |
 | performant_wp_query_params | performance | Checks for potentially slow database queries when using <code>WP_Query</code> | [Learn more](https://developer.wordpress.org/apis/database/) |
 | enqueued_scripts_in_footer | performance | Checks whether a loading strategy is explicitly set for JavaScript files, as loading scripts in the footer is usually desired. | [Learn more](https://developer.wordpress.org/plugins/) |
 | enqueued_resources | plugin_repo, performance | Checks whether scripts and styles are properly enqueued using the recommended way. | [Learn more](https://developer.wordpress.org/plugins/) |
