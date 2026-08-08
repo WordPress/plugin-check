@@ -6,6 +6,7 @@
 * [Available Checks](checks.md)
 * [AI-Powered Features & Configuration](ai-features.md)
 * [WordPress Functions Compatibility Data](wp-functions-compatibility-data.md)
+* [Plugin Check manifest](plugin-check-info.md)
 * [CLI Commands](CLI.md)
 * [Running Unit tests](running-unit-tests.md)
 * [Releasing a New Version of Plugin](releasing.md)

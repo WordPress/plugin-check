@@ -10,6 +10,7 @@ use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Test_Data\Empty_Check;
 use WordPress\Plugin_Check\Test_Data\Error_Check;
 use WordPress\Plugin_Check\Test_Data\Runtime_Check;
+use WordPress\Plugin_Check\Test_Data\Warning_Check;
 use WordPress\Plugin_Check\Test_Utils\Traits\With_Mock_Filesystem;
 
 class CLI_Runner_Tests extends WP_UnitTestCase {
@@ -203,6 +204,32 @@ class CLI_Runner_Tests extends WP_UnitTestCase {
 		$this->assertInstanceOf( Check_Result::class, $results );
 		$this->assertEmpty( $results->get_warnings() );
 		$this->assertNotEmpty( $results->get_errors() );
+	}
+
+	public function test_run_filters_third_party_warnings() {
+		$_SERVER['argv'] = array(
+			'wp',
+			'plugin',
+			'check',
+			UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-check-info',
+			'--checks=warning-check',
+		);
+
+		add_filter(
+			'wp_plugin_check_checks',
+			function () {
+				return array( 'warning-check' => new Warning_Check() );
+			}
+		);
+
+		$runner           = new CLI_Runner();
+		$cleanup          = $runner->prepare();
+		$this->cleanups[] = $cleanup;
+		$results          = $runner->run();
+
+		$this->assertArrayNotHasKey( 'vendor/phpseclib/file.php', $results->get_warnings() );
+		$this->assertArrayHasKey( 'includes/file.php', $results->get_warnings() );
+		$this->assertArrayHasKey( 'vendor/phpseclib/file.php', $results->get_errors() );
 	}
 
 	public function test_runner_initialized_early_throws_plugin_basename_exception() {

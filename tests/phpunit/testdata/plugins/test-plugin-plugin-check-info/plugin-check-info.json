@@ -1,0 +1,6 @@
+{
+    "third_parties": [
+        "vendor\\phpseclib",
+        " /libraries/legacy/ "
+    ]
+}

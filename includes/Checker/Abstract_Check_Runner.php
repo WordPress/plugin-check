@@ -12,6 +12,7 @@ use WordPress\Plugin_Check\Admin\Settings_Page;
 use WordPress\Plugin_Check\Checker\Exception\Invalid_Check_Slug_Exception;
 use WordPress\Plugin_Check\Checker\Preparations\Universal_Runtime_Preparation;
 use WordPress\Plugin_Check\Traits\AI_Analyzer;
+use WordPress\Plugin_Check\Utilities\Plugin_Config;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 
 /**
@@ -443,6 +444,19 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		}
 
 		$results = $this->get_checks_instance()->run_checks( $this->get_check_context(), $checks, $this );
+
+		$third_party_paths = Plugin_Config::get_third_party_paths( $this->get_check_context()->path() );
+		if ( ! empty( $third_party_paths ) ) {
+			$results->transform_messages(
+				function ( $message, $is_error, $file ) use ( $third_party_paths ) {
+					if ( ! $is_error && Plugin_Config::is_third_party_file( $file, $third_party_paths ) ) {
+						return false;
+					}
+
+					return $message;
+				}
+			);
+		}
 
 		$ai_analysis = array();
 		$ai_stats    = array();

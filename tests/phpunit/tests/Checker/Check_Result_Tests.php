@@ -188,4 +188,32 @@ class Check_Result_Tests extends WP_UnitTestCase {
 
 		$this->assertEquals( 1, $this->check_result->get_error_count() );
 	}
+
+	public function test_transform_messages_removes_messages_and_updates_counts() {
+		$this->check_result->add_message(
+			false,
+			'Third-party warning',
+			array(
+				'file' => 'test-plugin/vendor/library/file.php',
+			)
+		);
+		$this->check_result->add_message(
+			true,
+			'Third-party error',
+			array(
+				'file' => 'test-plugin/vendor/library/file.php',
+			)
+		);
+
+		$this->check_result->transform_messages(
+			function ( $message, $is_error, $file ) {
+				return $is_error || 0 !== strpos( $file, 'vendor/library/' ) ? $message : false;
+			}
+		);
+
+		$this->assertSame( 0, $this->check_result->get_warning_count() );
+		$this->assertSame( 1, $this->check_result->get_error_count() );
+		$this->assertEmpty( $this->check_result->get_warnings() );
+		$this->assertNotEmpty( $this->check_result->get_errors() );
+	}
 }
