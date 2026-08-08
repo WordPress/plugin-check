@@ -445,18 +445,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 
 		$results = $this->get_checks_instance()->run_checks( $this->get_check_context(), $checks, $this );
 
-		$third_party_paths = Plugin_Config::get_third_party_paths( $this->get_check_context()->path() );
-		if ( ! empty( $third_party_paths ) ) {
-			$results->transform_messages(
-				function ( $message, $is_error, $file ) use ( $third_party_paths ) {
-					if ( ! $is_error && Plugin_Config::is_third_party_file( $file, $third_party_paths ) ) {
-						return false;
-					}
-
-					return $message;
-				}
-			);
-		}
+		$this->filter_third_party_warnings( $results );
 
 		$ai_analysis = array();
 		$ai_stats    = array();
@@ -485,6 +474,33 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 		}
 
 		return $results;
+	}
+
+	/**
+	 * Removes warning-level findings from declared third-party paths.
+	 *
+	 * Errors and findings outside declared paths are kept unchanged.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param Check_Result $results Check results to filter, modified in place.
+	 */
+	private function filter_third_party_warnings( Check_Result $results ) {
+		$third_party_paths = Plugin_Config::get_third_party_paths( $this->get_check_context()->path() );
+
+		if ( empty( $third_party_paths ) ) {
+			return;
+		}
+
+		$results->transform_messages(
+			function ( $message, $is_error, $file ) use ( $third_party_paths ) {
+				if ( ! $is_error && Plugin_Config::is_third_party_file( $file, $third_party_paths ) ) {
+					return false;
+				}
+
+				return $message;
+			}
+		);
 	}
 
 	/**
