@@ -1,0 +1,91 @@
+.plugin-check-svn-checker-wrap {
+	max-width: 1200px;
+}
+.plugin-check-svn-checker-wrap .plugin-check-svn-checker-inner {
+	margin-top: 10px;
+}
+
+/* ---------- Search form ---------- */
+.plugin-check-svn-checker-form {
+	margin-bottom: 20px;
+}
+.plugin-check-svn-checker-search-row {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+}
+.plugin-check-svn-checker-search-row .spinner {
+	float: none;
+	margin: 0;
+}
+.plugin-check-svn-checker-slug-input {
+	flex: 1;
+	max-width: 400px;
+}
+
+/* ---------- Plugin name ---------- */
+.plugin-check-svn-checker-plugin-name {
+	font-size: 16px;
+	font-weight: 600;
+	margin-bottom: 16px;
+}
+
+/* ---------- SVN external link in section heading ---------- */
+.plugin-check-svn-checker-svn-link {
+	vertical-align: middle;
+	text-decoration: none;
+}
+.plugin-check-svn-checker-svn-link .dashicons {
+	font-size: 20px;
+	width: 20px;
+	height: 20px;
+}
+
+/* ---------- Inline checks (root section) ---------- */
+.plugin-check-svn-checker-inline-checks {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+	margin-bottom: 20px;
+}
+
+/* ---------- Checks table ---------- */
+.plugin-check-svn-checker-col-status {
+	width: 90px;
+}
+.plugin-check-svn-checker-col-check {
+	width: 40%;
+}
+
+.plugin-check-svn-checker-row-warn td {
+	background: #fffcf0 !important;
+}
+.plugin-check-svn-checker-row-fail td {
+	background: #fff5f5 !important;
+}
+
+/* ---------- Status badge ---------- */
+.plugin-check-svn-checker-badge-pass {
+	color: #00a32a;
+}
+.plugin-check-svn-checker-badge-warn {
+	color: #c07a00;
+}
+.plugin-check-svn-checker-badge-fail {
+	color: #d63638;
+}
+.plugin-check-svn-checker-badge-info {
+	color: #2271b1;
+}
+
+/* ---------- Detail text ---------- */
+.plugin-check-svn-checker-detail-text {
+	font-size: 13px;
+	font-family: monospace;
+}
+
+@media (max-width: 782px) {
+	.plugin-check-svn-checker-col-detail {
+		display: none;
+	}
+}
