@@ -118,6 +118,9 @@ class Menu_Image_Icon_Check extends Abstract_File_Check {
 	 *
 	 * @since 2.1.0
 	 *
+	 * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+	 * @SuppressWarnings(PHPMD.NPathComplexity)
+	 *
 	 * @param array $php_files List of absolute PHP file paths.
 	 * @return array List of matches containing the file, line, column, and icon string.
 	 */
