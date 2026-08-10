@@ -26,7 +26,7 @@ use WordPress\Plugin_Check\Traits\Experimental_Check;
  * settings, caches) and may produce false positives on real plugins. Opt in
  * with `--include-experimental`.
  *
- * @since 2.0.0
+ * @since 2.1.0
  * @link https://developer.wordpress.org/plugins/privacy/adding-the-personal-data-exporter-to-your-plugin/
  */
 class Personal_Data_Exporter_Check extends Abstract_File_Check {
@@ -37,7 +37,7 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 	/**
 	 * Personal-data storage function names that trigger the check.
 	 *
-	 * @since 2.0.0
+	 * @since 2.1.0
 	 * @var string[]
 	 */
 	const PERSONAL_DATA_FUNCTIONS = array(
@@ -50,7 +50,7 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 	/**
 	 * `$wpdb` method names that trigger the check.
 	 *
-	 * @since 2.0.0
+	 * @since 2.1.0
 	 * @var string[]
 	 */
 	const WPDB_METHODS = array( 'insert', 'update', 'replace' );
@@ -58,7 +58,7 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 	/**
 	 * Filter name that registers a personal data exporter.
 	 *
-	 * @since 2.0.0
+	 * @since 2.1.0
 	 * @var string
 	 */
 	const EXPORTER_FILTER = 'wp_privacy_personal_data_exporters';
@@ -68,7 +68,7 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 	 *
 	 * Every check must have at least one category.
 	 *
-	 * @since 2.0.0
+	 * @since 2.1.0
 	 *
 	 * @return array The categories for the check.
 	 */
@@ -79,7 +79,7 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 	/**
 	 * Amends the given result by running the check on the given list of files.
 	 *
-	 * @since 2.0.0
+	 * @since 2.1.0
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 * @param array        $files  List of absolute file paths.
@@ -100,7 +100,7 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 	 *
 	 * This avoids false positives for plugins that do not touch personal data at all.
 	 *
-	 * @since 2.0.0
+	 * @since 2.1.0
 	 *
 	 * @param Check_Result $result    The check result to amend.
 	 * @param array        $php_files List of absolute PHP file paths.
@@ -143,7 +143,7 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 	 * The match is anchored to the plugin root so a host project's
 	 * `tests/phpunit/...` test runner is not affected.
 	 *
-	 * @since 2.0.0
+	 * @since 2.1.0
 	 *
 	 * @param array  $php_files     Absolute file paths.
 	 * @param string $plugin_root   Absolute path to the plugin's main file.
@@ -183,7 +183,7 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 	 * function/variable call rather than text inside a string literal or
 	 * docblock.
 	 *
-	 * @since 2.0.0
+	 * @since 2.1.0
 	 *
 	 * @param array $php_files Absolute file paths.
 	 * @return string|null First matching file path, or null if none found.
@@ -215,7 +215,7 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 	/**
 	 * Checks if the token at the given index is a personal data function call.
 	 *
-	 * @since 2.0.0
+	 * @since 2.1.0
 	 *
 	 * @param array $tokens Token stream.
 	 * @param int   $index  Current token index.
@@ -243,7 +243,7 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 	/**
 	 * Checks if the token at the given index is a `$wpdb` method call (insert, update, replace).
 	 *
-	 * @since 2.0.0
+	 * @since 2.1.0
 	 *
 	 * @param array $tokens Token stream.
 	 * @param int   $index  Current token index.
@@ -276,7 +276,7 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 	 * Looks for `add_filter( 'wp_privacy_personal_data_exporters', … )` using
 	 * the PHP tokenizer to avoid matching commented-out registrations.
 	 *
-	 * @since 2.0.0
+	 * @since 2.1.0
 	 *
 	 * @param array $php_files Absolute file paths.
 	 * @return bool True if the filter is registered.
@@ -305,7 +305,7 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 	 * Checks if the token at the given index is an `add_filter` call registering
 	 * the personal data exporter filter.
 	 *
-	 * @since 2.0.0
+	 * @since 2.1.0
 	 *
 	 * @param array $tokens Token stream.
 	 * @param int   $index  Current token index.
@@ -342,7 +342,7 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 	 * method calls (`->method`), static calls (`Class::method`), and
 	 * namespaced calls (`\My\function`).
 	 *
-	 * @since 2.0.0
+	 * @since 2.1.0
 	 *
 	 * @param array $tokens Token stream.
 	 * @param int   $index  Current token index.
@@ -380,7 +380,7 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 	/**
 	 * Finds the next significant token index.
 	 *
-	 * @since 2.0.0
+	 * @since 2.1.0
 	 *
 	 * @param array $tokens Token stream.
 	 * @param int   $index  Current token index.
@@ -403,7 +403,7 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 	/**
 	 * Finds the previous significant token index.
 	 *
-	 * @since 2.0.0
+	 * @since 2.1.0
 	 *
 	 * @param array $tokens Token stream.
 	 * @param int   $index  Current token index.
@@ -428,7 +428,7 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 	 *
 	 * Every check must have a short description explaining what the check does.
 	 *
-	 * @since 2.0.0
+	 * @since 2.1.0
 	 *
 	 * @return string Description.
 	 */
@@ -441,7 +441,7 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 	 *
 	 * Every check must have a URL with further information about the check.
 	 *
-	 * @since 2.0.0
+	 * @since 2.1.0
 	 *
 	 * @return string The documentation URL.
 	 */
