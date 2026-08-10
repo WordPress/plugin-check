@@ -3,13 +3,16 @@
 
 	<description>Plugin Check Sniffs</description>
 
+	<rule ref="PluginCheck.CodeAnalysis.AIProvider" />
 	<rule ref="PluginCheck.CodeAnalysis.DiscouragedFunctions" />
 	<rule ref="PluginCheck.CodeAnalysis.EnqueuedResourceOffloading" />
 	<rule ref="PluginCheck.CodeAnalysis.Heredoc" />
 	<rule ref="PluginCheck.CodeAnalysis.Localhost" />
 	<rule ref="PluginCheck.CodeAnalysis.Offloading" />
+	<rule ref="PluginCheck.CodeAnalysis.PHPErrorReporting" />
 	<rule ref="PluginCheck.CodeAnalysis.RequiredFunctionParameters" />
 	<rule ref="PluginCheck.CodeAnalysis.SettingSanitization" />
+	<rule ref="PluginCheck.CodeAnalysis.WriteFile" />
 	<rule ref="PluginCheck.Security.VerifyNonce" />
 	<rule ref="PluginCheck.Security.DirectDB" />
 

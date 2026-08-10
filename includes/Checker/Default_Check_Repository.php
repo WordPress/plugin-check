@@ -72,6 +72,7 @@ class Default_Check_Repository extends Empty_Check_Repository {
 			'wp_plugin_check_checks',
 			array(
 				'i18n_usage'                 => new Checks\General\I18n_Usage_Check(),
+				'php_error_reporting'        => new Checks\General\PHP_Error_Reporting_Check(),
 				'enqueued_scripts_size'      => new Checks\Performance\Enqueued_Scripts_Size_Check(),
 				'enqueued_styles_size'       => new Checks\Performance\Enqueued_Styles_Size_Check(),
 				'code_obfuscation'           => new Checks\Plugin_Repo\Code_Obfuscation_Check(),
@@ -95,6 +96,7 @@ class Default_Check_Repository extends Empty_Check_Repository {
 				'trademarks'                 => new Checks\Plugin_Repo\Trademarks_Check(),
 				'non_blocking_scripts'       => new Checks\Performance\Non_Blocking_Scripts_Check(),
 				'offloading_files'           => new Checks\Plugin_Repo\Offloading_Files_Check(),
+				'write_file'                 => new Checks\Plugin_Repo\Write_File_Check(),
 				'setting_sanitization'       => new Checks\Plugin_Repo\Setting_Sanitization_Check(),
 				'prefixing'                  => new Checks\Plugin_Repo\Prefixing_Check(),
 				'direct_db'                  => new Checks\Security\Direct_DB_Check(),
@@ -103,6 +105,7 @@ class Default_Check_Repository extends Empty_Check_Repository {
 				'external_admin_menu_links'  => new Checks\Plugin_Repo\External_Admin_Menu_Links_Check(),
 				'wp_functions_compatibility' => new Checks\Plugin_Repo\WP_Functions_Compatibility_Check(),
 				'personal_data_exporter'     => new Checks\Plugin_Repo\Personal_Data_Exporter_Check(),
+				'ai_provider'                => new Checks\General\AI_Provider_Check(),
 			)
 		);
 

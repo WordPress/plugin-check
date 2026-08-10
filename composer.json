@@ -29,7 +29,7 @@
     "wp-cli/language-command": "^2.0",
     "wp-cli/i18n-command": "^2.6",
     "wp-cli/entity-command": "^2.8",
-    "wp-phpunit/wp-phpunit": "^6.3",
+    "wp-phpunit/wp-phpunit": "^7.0",
     "yoast/phpunit-polyfills": "^4.0.0"
   },
   "repositories": [

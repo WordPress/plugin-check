@@ -11,6 +11,8 @@ namespace WordPress\Plugin_Check\Checker;
  * Result for running checks on a plugin.
  *
  * @since 1.0.0
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 final class Check_Result {
 
@@ -53,6 +55,22 @@ final class Check_Result {
 	 * @var int
 	 */
 	protected $warning_count = 0;
+
+	/**
+	 * AI analysis results for false positives.
+	 *
+	 * @since 2.0.0
+	 * @var array
+	 */
+	protected $ai_analysis = array();
+
+	/**
+	 * AI statistics (tokens spent, false positives count, etc.).
+	 *
+	 * @since 2.0.0
+	 * @var array
+	 */
+	protected $ai_stats = array();
 
 	/**
 	 * Sets the context for the plugin to check.
@@ -145,6 +163,60 @@ final class Check_Result {
 	}
 
 	/**
+	 * Transforms existing messages.
+	 *
+	 * The callback receives the message data and location. Return an array with
+	 * updated data to keep the message, or false/null to remove it. The returned
+	 * array may include `error`, `file`, `line`, or `column` to move the message.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param callable $callback Callback to transform each message.
+	 */
+	public function transform_messages( callable $callback ) {
+		$collections = array(
+			true  => $this->errors,
+			false => $this->warnings,
+		);
+
+		$this->errors        = array();
+		$this->warnings      = array();
+		$this->error_count   = 0;
+		$this->warning_count = 0;
+
+		foreach ( $collections as $is_error => $collection ) {
+			foreach ( $collection as $file => $lines ) {
+				foreach ( $lines as $line => $columns ) {
+					foreach ( $columns as $column => $messages ) {
+						foreach ( $messages as $message ) {
+							$updated = $callback( $message, (bool) $is_error, $file, $line, $column );
+							if ( empty( $updated ) || ! is_array( $updated ) ) {
+								continue;
+							}
+
+							if ( empty( $updated['message'] ) ) {
+								continue;
+							}
+
+							$new_error  = array_key_exists( 'error', $updated ) ? (bool) $updated['error'] : (bool) $is_error;
+							$new_file   = array_key_exists( 'file', $updated ) ? (string) $updated['file'] : (string) $file;
+							$new_line   = array_key_exists( 'line', $updated ) ? (int) $updated['line'] : (int) $line;
+							$new_column = array_key_exists( 'column', $updated ) ? (int) $updated['column'] : (int) $column;
+
+							unset( $updated['error'], $updated['file'], $updated['line'], $updated['column'] );
+							$updated['file']   = $new_file;
+							$updated['line']   = $new_line;
+							$updated['column'] = $new_column;
+
+							$this->add_message( $new_error, $updated['message'], $updated );
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
 	 * Returns all errors.
 	 *
 	 * @since 1.0.0
@@ -186,5 +258,49 @@ final class Check_Result {
 	 */
 	public function get_warning_count() {
 		return $this->warning_count;
+	}
+
+	/**
+	 * Sets AI analysis results.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param array $analysis AI analysis results.
+	 */
+	public function set_ai_analysis( array $analysis ) {
+		$this->ai_analysis = $analysis;
+	}
+
+	/**
+	 * Returns AI analysis results.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @return array AI analysis results.
+	 */
+	public function get_ai_analysis() {
+		return $this->ai_analysis;
+	}
+
+	/**
+	 * Sets AI statistics.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param array $stats AI statistics.
+	 */
+	public function set_ai_stats( array $stats ) {
+		$this->ai_stats = $stats;
+	}
+
+	/**
+	 * Returns AI statistics.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @return array AI statistics.
+	 */
+	public function get_ai_stats() {
+		return $this->ai_stats;
 	}
 }
