@@ -110,6 +110,9 @@ final class Plugin_Check_Command {
 	 * [--ignore-errors]
 	 * : Limit displayed results to exclude errors.
 	 *
+	 * [--ignore-third-party-warnings]
+	 * : Do not suppress warnings from paths declared in plugin-check-info.json.
+	 *
 	 * [--include-experimental]
 	 * : Include experimental checks.
 	 *
@@ -190,6 +193,7 @@ final class Plugin_Check_Command {
 				'format'                        => 'table',
 				'ignore-warnings'               => false,
 				'ignore-errors'                 => false,
+				'ignore-third-party-warnings'   => false,
 				'include-experimental'          => false,
 				'severity'                      => '',
 				'error-severity'                => '',
@@ -262,6 +266,7 @@ final class Plugin_Check_Command {
 			$runner->set_slug( $options['slug'] );
 			$runner->set_mode( $options['mode'] );
 			$runner->set_use_ai( $options['ai'] );
+			$runner->set_ignore_third_party_warnings( (bool) $options['ignore-third-party-warnings'] );
 			if ( ! empty( $options['ai-model'] ) ) {
 				$runner->set_ai_model_preference( $options['ai-model'] );
 			}
@@ -280,6 +285,25 @@ final class Plugin_Check_Command {
 		}
 
 		Plugin_Request_Utility::destroy_runner();
+
+		// Warn about third-party warnings suppressed by the manifest in human-readable table output.
+		if ( $result && 'table' === $options['format'] && empty( $options['ignore-third-party-warnings'] ) ) {
+			$filtered_count = $result->get_third_party_warning_filtered_count();
+			if ( $filtered_count > 0 ) {
+				WP_CLI::warning(
+					sprintf(
+						/* translators: %d: number of suppressed warnings. */
+						_n(
+							'%d warning was suppressed from paths declared in plugin-check-info.json (use --ignore-third-party-warnings to show it).',
+							'%d warnings were suppressed from paths declared in plugin-check-info.json (use --ignore-third-party-warnings to show them).',
+							$filtered_count,
+							'plugin-check'
+						),
+						$filtered_count
+					)
+				);
+			}
+		}
 
 		// Get errors and warnings from the results.
 		$errors = array();

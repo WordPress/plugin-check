@@ -295,6 +295,7 @@ final class Admin_AJAX {
 
 		$include_experimental = 1 === filter_input( INPUT_POST, 'include-experimental', FILTER_VALIDATE_INT );
 		$use_ai               = 1 === filter_input( INPUT_POST, 'use-ai', FILTER_VALIDATE_INT );
+		$ignore_third_party   = 1 === filter_input( INPUT_POST, 'ignore-third-party-warnings', FILTER_VALIDATE_INT );
 		$types                = filter_input( INPUT_POST, 'types', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
 		$types                = is_null( $types ) ? array( 'error', 'warning' ) : $types;
 
@@ -303,6 +304,7 @@ final class Admin_AJAX {
 			$runner->set_check_slugs( $checks );
 			$runner->set_plugin( $plugin );
 			$runner->set_use_ai( $use_ai );
+			$runner->set_ignore_third_party_warnings( $ignore_third_party );
 			$results = $runner->run();
 		} catch ( Exception $error ) {
 			wp_send_json_error(
@@ -339,9 +341,10 @@ final class Admin_AJAX {
 	 */
 	private function prepare_results_response( $results, array $types ) {
 		$response = array(
-			'message'  => __( 'Checks run successfully', 'plugin-check' ),
-			'errors'   => array(),
-			'warnings' => array(),
+			'message'             => __( 'Checks run successfully', 'plugin-check' ),
+			'errors'              => array(),
+			'warnings'            => array(),
+			'suppressed_warnings' => $results->get_third_party_warning_filtered_count(),
 		);
 
 		if ( in_array( 'error', $types, true ) ) {

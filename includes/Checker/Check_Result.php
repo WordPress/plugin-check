@@ -57,6 +57,14 @@ final class Check_Result {
 	protected $warning_count = 0;
 
 	/**
+	 * Number of warnings suppressed from declared third-party paths.
+	 *
+	 * @since 2.1.0
+	 * @var int
+	 */
+	protected $third_party_warning_filtered_count = 0;
+
+	/**
 	 * AI analysis results for false positives.
 	 *
 	 * @since 2.0.0
@@ -258,6 +266,28 @@ final class Check_Result {
 	 */
 	public function get_warning_count() {
 		return $this->warning_count;
+	}
+
+	/**
+	 * Increments the number of warnings suppressed from declared third-party paths.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param int $count Number of suppressed warnings to add. Default 1.
+	 */
+	public function increment_third_party_warning_filtered_count( $count = 1 ) {
+		$this->third_party_warning_filtered_count += (int) $count;
+	}
+
+	/**
+	 * Returns the number of warnings suppressed from declared third-party paths.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return int Number of suppressed warnings.
+	 */
+	public function get_third_party_warning_filtered_count() {
+		return $this->third_party_warning_filtered_count;
 	}
 
 	/**

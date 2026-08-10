@@ -230,6 +230,65 @@ class CLI_Runner_Tests extends WP_UnitTestCase {
 		$this->assertArrayNotHasKey( 'vendor/phpseclib/file.php', $results->get_warnings() );
 		$this->assertArrayHasKey( 'includes/file.php', $results->get_warnings() );
 		$this->assertArrayHasKey( 'vendor/phpseclib/file.php', $results->get_errors() );
+		$this->assertSame( 1, $results->get_third_party_warning_filtered_count() );
+	}
+
+	public function test_run_ignores_third_party_filter_with_setter() {
+		$_SERVER['argv'] = array(
+			'wp',
+			'plugin',
+			'check',
+			UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-check-info',
+			'--checks=warning-check',
+		);
+
+		add_filter(
+			'wp_plugin_check_checks',
+			function () {
+				return array( 'warning-check' => new Warning_Check() );
+			}
+		);
+
+		$runner           = new CLI_Runner();
+		$cleanup          = $runner->prepare();
+		$this->cleanups[] = $cleanup;
+
+		$runner->set_ignore_third_party_warnings( true );
+		$results = $runner->run();
+
+		$this->assertArrayHasKey( 'vendor/phpseclib/file.php', $results->get_warnings() );
+		$this->assertArrayHasKey( 'includes/file.php', $results->get_warnings() );
+		$this->assertArrayHasKey( 'vendor/phpseclib/file.php', $results->get_errors() );
+		$this->assertSame( 0, $results->get_third_party_warning_filtered_count() );
+	}
+
+	public function test_run_ignores_third_party_filter_with_hook() {
+		$_SERVER['argv'] = array(
+			'wp',
+			'plugin',
+			'check',
+			UNIT_TESTS_PLUGIN_DIR . 'test-plugin-plugin-check-info',
+			'--checks=warning-check',
+		);
+
+		add_filter(
+			'wp_plugin_check_checks',
+			function () {
+				return array( 'warning-check' => new Warning_Check() );
+			}
+		);
+
+		add_filter( 'wp_plugin_check_ignore_third_party_warnings', '__return_true' );
+
+		$runner           = new CLI_Runner();
+		$cleanup          = $runner->prepare();
+		$this->cleanups[] = $cleanup;
+		$results          = $runner->run();
+
+		$this->assertArrayHasKey( 'vendor/phpseclib/file.php', $results->get_warnings() );
+		$this->assertArrayHasKey( 'includes/file.php', $results->get_warnings() );
+		$this->assertArrayHasKey( 'vendor/phpseclib/file.php', $results->get_errors() );
+		$this->assertSame( 0, $results->get_third_party_warning_filtered_count() );
 	}
 
 	public function test_runner_initialized_early_throws_plugin_basename_exception() {

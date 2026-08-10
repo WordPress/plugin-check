@@ -44,6 +44,14 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	protected $use_ai = false;
 
 	/**
+	 * Whether to ignore manifest-based suppression of third-party warnings.
+	 *
+	 * @since 2.1.0
+	 * @var bool
+	 */
+	protected $ignore_third_party_warnings = false;
+
+	/**
 	 * AI model preference for analysis.
 	 *
 	 * @since 2.0.0
@@ -326,6 +334,17 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	}
 
 	/**
+	 * Sets whether to ignore manifest-based suppression of third-party warnings.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param bool $ignore True to ignore the suppression and show all warnings, false to apply it.
+	 */
+	final public function set_ignore_third_party_warnings( $ignore ) {
+		$this->ignore_third_party_warnings = (bool) $ignore;
+	}
+
+	/**
 	 * Sets the AI model preference for analysis.
 	 *
 	 * @since 2.0.0
@@ -486,21 +505,47 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @param Check_Result $results Check results to filter, modified in place.
 	 */
 	private function filter_third_party_warnings( Check_Result $results ) {
+		if ( $this->get_ignore_third_party_warnings() ) {
+			return;
+		}
+
 		$third_party_paths = Plugin_Config::get_third_party_paths( $this->get_check_context()->path() );
 
 		if ( empty( $third_party_paths ) ) {
 			return;
 		}
 
+		$filtered = 0;
+
 		$results->transform_messages(
-			function ( $message, $is_error, $file ) use ( $third_party_paths ) {
+			function ( $message, $is_error, $file ) use ( $third_party_paths, &$filtered ) {
 				if ( ! $is_error && Plugin_Config::is_third_party_file( $file, $third_party_paths ) ) {
+					++$filtered;
 					return false;
 				}
 
 				return $message;
 			}
 		);
+
+		if ( $filtered > 0 ) {
+			$results->increment_third_party_warning_filtered_count( $filtered );
+		}
+	}
+
+	/**
+	 * Determines whether manifest-based suppression of third-party warnings should be ignored.
+	 *
+	 * The suppression can be disabled via the runner setting or the
+	 * `wp_plugin_check_ignore_third_party_warnings` filter.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return bool True to ignore the suppression and show all warnings, false to apply it.
+	 */
+	private function get_ignore_third_party_warnings() {
+		return $this->ignore_third_party_warnings
+			|| (bool) apply_filters( 'wp_plugin_check_ignore_third_party_warnings', false );
 	}
 
 	/**

@@ -216,4 +216,13 @@ class Check_Result_Tests extends WP_UnitTestCase {
 		$this->assertEmpty( $this->check_result->get_warnings() );
 		$this->assertNotEmpty( $this->check_result->get_errors() );
 	}
+
+	public function test_third_party_warning_filtered_count_increments() {
+		$this->assertSame( 0, $this->check_result->get_third_party_warning_filtered_count() );
+
+		$this->check_result->increment_third_party_warning_filtered_count();
+		$this->check_result->increment_third_party_warning_filtered_count();
+
+		$this->assertSame( 2, $this->check_result->get_third_party_warning_filtered_count() );
+	}
 }
