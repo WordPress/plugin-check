@@ -146,11 +146,11 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 	 * @since 2.1.0
 	 *
 	 * @param array  $php_files     Absolute file paths.
-	 * @param string $plugin_root   Absolute path to the plugin's main file.
+	 * @param string $plugin_root   Absolute path to the plugin directory (with trailing slash).
 	 * @return array Filtered list.
 	 */
 	private function filter_out_test_paths( array $php_files, string $plugin_root ): array {
-		$plugin_dir = wp_normalize_path( dirname( $plugin_root ) );
+		$plugin_dir = wp_normalize_path( untrailingslashit( $plugin_root ) );
 
 		return array_values(
 			array_filter(
@@ -223,10 +223,10 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 	 */
 	private function is_personal_data_function_call( array $tokens, int $index ): bool {
 		$token = $tokens[ $index ];
-		if ( ! is_array( $token ) || T_STRING !== $token[0] ) {
+		if ( ! $this->is_name_token( $token ) ) {
 			return false;
 		}
-		$name = strtolower( $token[1] );
+		$name = strtolower( ltrim( $token[1], '\\' ) );
 		if ( ! in_array( $name, self::PERSONAL_DATA_FUNCTIONS, true ) ) {
 			return false;
 		}
@@ -255,19 +255,31 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 			return false;
 		}
 
-		$arrow_index  = $this->get_next_significant_token_index( $tokens, $index );
-		$method_index = $this->get_next_significant_token_index( $tokens, $arrow_index );
-
-		if ( null === $arrow_index || null === $method_index ) {
+		$arrow_index = $this->get_next_significant_token_index( $tokens, $index );
+		if ( null === $arrow_index ) {
 			return false;
 		}
 
-		$arrow_token  = $tokens[ $arrow_index ];
-		$method_token = $tokens[ $method_index ];
+		$arrow_token = $tokens[ $arrow_index ];
+		if ( ! is_array( $arrow_token ) || T_OBJECT_OPERATOR !== $arrow_token[0] ) {
+			return false;
+		}
 
-		return is_array( $arrow_token ) && T_OBJECT_OPERATOR === $arrow_token[0]
-			&& is_array( $method_token ) && T_STRING === $method_token[0]
-			&& in_array( strtolower( $method_token[1] ), self::WPDB_METHODS, true );
+		$method_index = $this->get_next_significant_token_index( $tokens, $arrow_index );
+		if ( null === $method_index ) {
+			return false;
+		}
+
+		$method_token = $tokens[ $method_index ];
+		if ( ! is_array( $method_token ) || T_STRING !== $method_token[0]
+			|| ! in_array( strtolower( $method_token[1] ), self::WPDB_METHODS, true ) ) {
+			return false;
+		}
+
+		// The method must actually be invoked, not read as a property.
+		$open_paren = $this->get_next_significant_token_index( $tokens, $method_index );
+
+		return null !== $open_paren && '(' === $tokens[ $open_paren ];
 	}
 
 	/**
@@ -313,7 +325,7 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 	 */
 	private function is_exporter_filter_registration( array $tokens, int $index ): bool {
 		$token = $tokens[ $index ];
-		if ( ! is_array( $token ) || T_STRING !== $token[0] || 'add_filter' !== strtolower( $token[1] ) ) {
+		if ( ! $this->is_name_token( $token ) || 'add_filter' !== strtolower( ltrim( $token[1], '\\' ) ) ) {
 			return false;
 		}
 		if ( ! $this->is_global_function_call( $tokens, $index ) ) {
@@ -321,9 +333,12 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 		}
 
 		$open_paren = $this->get_next_significant_token_index( $tokens, $index );
-		$arg_index  = $this->get_next_significant_token_index( $tokens, $open_paren );
+		if ( null === $open_paren || '(' !== $tokens[ $open_paren ] ) {
+			return false;
+		}
 
-		if ( null === $open_paren || '(' !== $tokens[ $open_paren ] || null === $arg_index ) {
+		$arg_index = $this->get_next_significant_token_index( $tokens, $open_paren );
+		if ( null === $arg_index ) {
 			return false;
 		}
 
@@ -333,6 +348,34 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 		}
 
 		return trim( $arg[1], "\"' \t\n\r\0\x0B" ) === self::EXPORTER_FILTER;
+	}
+
+	/**
+	 * Checks whether the token is a function-name token across PHP versions.
+	 *
+	 * On PHP 8.0+, a fully-qualified global function call such as
+	 * `\update_user_meta()` is emitted as a single `T_NAME_FULLY_QUALIFIED`
+	 * token, whereas on PHP 7.4 the same code is `T_NS_SEPARATOR` + `T_STRING`.
+	 * The constant and the guard keep the comparison safe on both versions.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param array|string $token A `token_get_all()` token (array or single char).
+	 * @return bool
+	 */
+	private function is_name_token( $token ): bool {
+		if ( ! is_array( $token ) ) {
+			return false;
+		}
+		if ( T_STRING === $token[0] ) {
+			return true;
+		}
+
+		if ( defined( 'T_NAME_FULLY_QUALIFIED' ) && constant( 'T_NAME_FULLY_QUALIFIED' ) === $token[0] ) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -390,7 +433,7 @@ class Personal_Data_Exporter_Check extends Abstract_File_Check {
 		$count = count( $tokens );
 		for ( $i = $index + 1; $i < $count; $i++ ) {
 			$token = $tokens[ $i ];
-			if ( is_array( $token ) && T_WHITESPACE === $token[0] ) {
+			if ( is_array( $token ) && in_array( $token[0], array( T_WHITESPACE, T_COMMENT, T_DOC_COMMENT ), true ) ) {
 				continue;
 			}
 
