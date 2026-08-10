@@ -184,7 +184,7 @@ class Checker {
 	 * @return Section
 	 */
 	private function build_root_section( bool $tags_exists, bool $assets_exists ): Section {
-		$root_section = new Section( 'root', __( 'Main SVN Folder', 'plugin-check' ) );
+		$root_section = new Section( 'root', __( 'Root', 'plugin-check' ) );
 		$root_section->add_check( 'root_trunk_exists', __( 'trunk/ exists', 'plugin-check' ), 'pass', __( 'Found', 'plugin-check' ) );
 		$root_section->add_check( 'root_tags_exists', __( 'tags/ exists', 'plugin-check' ), $tags_exists ? 'pass' : 'fail', $tags_exists ? __( 'Found', 'plugin-check' ) : __( 'Missing', 'plugin-check' ) );
 		$root_section->add_check( 'root_assets_exists', __( 'assets/ exists', 'plugin-check' ), $assets_exists ? 'pass' : 'warn', $assets_exists ? __( 'Found', 'plugin-check' ) : __( 'Missing — optional but recommended', 'plugin-check' ) );

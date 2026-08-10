@@ -5,7 +5,6 @@
 	margin-top: 10px;
 }
 
-/* ---------- Search form ---------- */
 .plugin-check-svn-checker-form {
 	margin-bottom: 20px;
 }
@@ -23,14 +22,13 @@
 	max-width: 400px;
 }
 
-/* ---------- Plugin name ---------- */
 .plugin-check-svn-checker-plugin-name {
-	font-size: 16px;
+	font-size: 1.3em;
 	font-weight: 600;
+	color: #1d2327;
 	margin-bottom: 16px;
 }
 
-/* ---------- SVN external link in section heading ---------- */
 .plugin-check-svn-checker-svn-link {
 	vertical-align: middle;
 	text-decoration: none;
@@ -41,7 +39,6 @@
 	height: 20px;
 }
 
-/* ---------- Inline checks (root section) ---------- */
 .plugin-check-svn-checker-inline-checks {
 	display: flex;
 	flex-wrap: wrap;
@@ -49,7 +46,6 @@
 	margin-bottom: 20px;
 }
 
-/* ---------- Checks table ---------- */
 .plugin-check-svn-checker-col-status {
 	width: 90px;
 }
@@ -64,7 +60,6 @@
 	background: #fff5f5 !important;
 }
 
-/* ---------- Status badge ---------- */
 .plugin-check-svn-checker-badge-pass {
 	color: #00a32a;
 }
@@ -78,7 +73,6 @@
 	color: #2271b1;
 }
 
-/* ---------- Detail text ---------- */
 .plugin-check-svn-checker-detail-text {
 	font-size: 13px;
 	font-family: monospace;

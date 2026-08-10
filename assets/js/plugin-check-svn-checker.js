@@ -12,6 +12,7 @@
 	const spinner = document.getElementById(
 		'plugin-check-svn-checker-spinner'
 	);
+	const submitButton = form.querySelector( 'button[type="submit"]' );
 	const { i18n } = pluginCheckSvnChecker;
 
 	form.addEventListener( 'submit', async ( e ) => {
@@ -23,6 +24,7 @@
 
 		result.innerHTML = '';
 		spinner.classList.add( 'is-active' );
+		submitButton.disabled = true;
 
 		try {
 			const params = new URLSearchParams();
@@ -54,6 +56,7 @@
 			) }</p></div>`;
 		} finally {
 			spinner.classList.remove( 'is-active' );
+			submitButton.disabled = false;
 		}
 	} );
 
