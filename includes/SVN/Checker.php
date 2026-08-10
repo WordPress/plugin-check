@@ -88,6 +88,9 @@ class Checker {
 			);
 		}
 
+		// Fetch the SVN base directory listing for the unexpected-files check.
+		$root_dir = $this->fetcher->fetch_directory( '' );
+
 		// Find main PHP file from the listing; returns content to avoid a second fetch.
 		[ 'file' => $plugin_file, 'content' => $php_content ] =
 			$this->find_main_plugin_file_with_content( $trunk_dir['items'] );
@@ -95,8 +98,9 @@ class Checker {
 			? $this->fetcher->parse_plugin_headers( $php_content )
 			: array();
 
-		// Check tags/ existence only — no need to parse the full listing.
-		$tags_exists = 200 === $this->fetcher->fetch_raw( 'tags/' )['code'];
+		// Fetch tags/ listing for existence check and unexpected-files scan (one request).
+		$tags_dir    = $this->fetcher->fetch_directory( 'tags/' );
+		$tags_exists = $tags_dir['exists'];
 
 		// Fetch assets/ listing for existence check and asset file scan (one request).
 		$assets_dir    = $this->fetcher->fetch_directory( 'assets/' );
@@ -108,8 +112,8 @@ class Checker {
 		$meta = $this->build_meta( $readme_data, $plugin_file, $stable_tag, $trunk_version );
 
 		$sections   = array();
-		$sections[] = $this->build_root_section( $tags_exists, $assets_exists );
-		$sections[] = $this->build_trunk_section( $readme_ok, $stable_tag, $plugin_file, $trunk_version );
+		$sections[] = $this->build_root_section( $root_dir['items'], $tags_dir['items'], $tags_exists, $assets_exists );
+		$sections[] = $this->build_trunk_section( $readme_ok, $stable_tag, $plugin_file, $trunk_version, $trunk_dir['items'] );
 
 		$stable_tag_section = $this->build_stable_tag_section( $stable_tag, $plugin_file, $trunk_version );
 		if ( $stable_tag_section ) {
@@ -179,17 +183,79 @@ class Checker {
 	 *
 	 * @since 2.1.0
 	 *
-	 * @param bool $tags_exists   Whether tags/ exists.
-	 * @param bool $assets_exists Whether assets/ exists.
+	 * @param array<int, array{name: string, href: string, is_dir: bool}> $root_items    Pre-fetched SVN root listing.
+	 * @param array<int, array{name: string, href: string, is_dir: bool}> $tags_items    Pre-fetched tags/ listing.
+	 * @param bool                                                        $tags_exists   Whether tags/ exists.
+	 * @param bool                                                        $assets_exists Whether assets/ exists.
 	 * @return Section
 	 */
-	private function build_root_section( bool $tags_exists, bool $assets_exists ): Section {
+	private function build_root_section( array $root_items, array $tags_items, bool $tags_exists, bool $assets_exists ): Section {
 		$root_section = new Section( 'root', __( 'Root', 'plugin-check' ) );
 		$root_section->add_check( 'root_trunk_exists', __( 'trunk/ exists', 'plugin-check' ), 'pass', __( 'Found', 'plugin-check' ) );
 		$root_section->add_check( 'root_tags_exists', __( 'tags/ exists', 'plugin-check' ), $tags_exists ? 'pass' : 'fail', $tags_exists ? __( 'Found', 'plugin-check' ) : __( 'Missing', 'plugin-check' ) );
 		$root_section->add_check( 'root_assets_exists', __( 'assets/ exists', 'plugin-check' ), $assets_exists ? 'pass' : 'warn', $assets_exists ? __( 'Found', 'plugin-check' ) : __( 'Missing — optional but recommended', 'plugin-check' ) );
 
+		$this->add_root_unexpected_files_check( $root_section, $root_items );
+		$this->add_root_tags_unexpected_files_check( $root_section, $tags_items );
+
 		return $root_section;
+	}
+
+	/**
+	 * Add the root_unexpected_files check.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param Section                                                     $section    Section to add the check to.
+	 * @param array<int, array{name: string, href: string, is_dir: bool}> $root_items Pre-fetched SVN root listing.
+	 */
+	private function add_root_unexpected_files_check( Section $section, array $root_items ): void {
+		$allowed    = array( 'assets', 'branches', 'tags', 'trunk' );
+		$unexpected = array();
+
+		foreach ( $root_items as $item ) {
+			if ( ! in_array( $item['name'], $allowed, true ) ) {
+				$unexpected[] = $item['name'];
+			}
+		}
+
+		$section->add_check(
+			'root_unexpected_files',
+			__( 'No unexpected files in SVN root', 'plugin-check' ),
+			empty( $unexpected ) ? 'pass' : 'fail',
+			empty( $unexpected )
+				? __( 'None found', 'plugin-check' )
+				/* translators: %s: comma-separated list of file/directory names. */
+				: sprintf( __( 'Unexpected: %s', 'plugin-check' ), implode( ', ', $unexpected ) )
+		);
+	}
+
+	/**
+	 * Add the root_tags_unexpected_files check.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param Section                                                     $section    Section to add the check to.
+	 * @param array<int, array{name: string, href: string, is_dir: bool}> $tags_items Pre-fetched tags/ listing.
+	 */
+	private function add_root_tags_unexpected_files_check( Section $section, array $tags_items ): void {
+		$unexpected = array();
+
+		foreach ( $tags_items as $item ) {
+			if ( ! $item['is_dir'] ) {
+				$unexpected[] = $item['name'];
+			}
+		}
+
+		$section->add_check(
+			'root_tags_unexpected_files',
+			__( 'No unexpected files in tags/', 'plugin-check' ),
+			empty( $unexpected ) ? 'pass' : 'fail',
+			empty( $unexpected )
+				? __( 'None found', 'plugin-check' )
+				/* translators: %s: comma-separated list of file names. */
+				: sprintf( __( 'Unexpected in tags/: %s', 'plugin-check' ), implode( ', ', $unexpected ) )
+		);
 	}
 
 	/**
@@ -197,13 +263,14 @@ class Checker {
 	 *
 	 * @since 2.1.0
 	 *
-	 * @param bool        $readme_ok     Whether a trunk readme was found.
-	 * @param string|null $stable_tag    Stable tag from trunk/readme.txt.
-	 * @param string|null $plugin_file   Main plugin PHP filename.
-	 * @param string|null $trunk_version Version from trunk PHP header.
+	 * @param bool                                                        $readme_ok     Whether a trunk readme was found.
+	 * @param string|null                                                 $stable_tag    Stable tag from trunk/readme.txt.
+	 * @param string|null                                                 $plugin_file   Main plugin PHP filename.
+	 * @param string|null                                                 $trunk_version Version from trunk PHP header.
+	 * @param array<int, array{name: string, href: string, is_dir: bool}> $trunk_items   Pre-fetched trunk/ listing.
 	 * @return Section
 	 */
-	private function build_trunk_section( bool $readme_ok, ?string $stable_tag, ?string $plugin_file, ?string $trunk_version ): Section {
+	private function build_trunk_section( bool $readme_ok, ?string $stable_tag, ?string $plugin_file, ?string $trunk_version, array $trunk_items ): Section {
 		$trunk_section = new Section( 'trunk', __( 'Trunk', 'plugin-check' ) );
 
 		$this->add_trunk_readme_check( $trunk_section, $readme_ok );
@@ -211,8 +278,31 @@ class Checker {
 		$this->add_trunk_main_php_check( $trunk_section, $plugin_file );
 		$this->add_trunk_version_check( $trunk_section, $trunk_version, $plugin_file );
 		$this->add_trunk_version_match_check( $trunk_section, $stable_tag, $trunk_version );
+		$this->add_trunk_unexpected_files_check( $trunk_section, $trunk_items );
 
 		return $trunk_section;
+	}
+
+	/**
+	 * Add the trunk_unexpected_files check.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param Section                                                     $section     Section to add the check to.
+	 * @param array<int, array{name: string, href: string, is_dir: bool}> $trunk_items Pre-fetched trunk/ listing.
+	 */
+	private function add_trunk_unexpected_files_check( Section $section, array $trunk_items ): void {
+		$unexpected = $this->find_files_with_extensions( $trunk_items, array( 'zip' ) );
+
+		$section->add_check(
+			'trunk_unexpected_files',
+			__( 'No unexpected files in trunk/', 'plugin-check' ),
+			empty( $unexpected ) ? 'pass' : 'fail',
+			empty( $unexpected )
+				? __( 'None found', 'plugin-check' )
+				/* translators: %s: comma-separated list of file names. */
+				: sprintf( __( 'Unexpected in trunk/: %s', 'plugin-check' ), implode( ', ', $unexpected ) )
+		);
 	}
 
 	/**
@@ -338,7 +428,8 @@ class Checker {
 
 		$stable_tag_section = new Section( 'stable_tag', "tags/{$stable_tag}/" );
 
-		$tag_exists = 200 === $this->fetcher->fetch_raw( "tags/{$stable_tag}/" )['code'];
+		$tag_dir    = $this->fetcher->fetch_directory( "tags/{$stable_tag}/" );
+		$tag_exists = $tag_dir['exists'];
 		$stable_tag_section->add_check(
 			'stable_tag_dir_exists',
 			/* translators: %s: SVN tag directory path. */
@@ -350,12 +441,38 @@ class Checker {
 				: sprintf( __( '%s not found', 'plugin-check' ), "tags/{$stable_tag}/" )
 		);
 
-		if ( $tag_exists && $plugin_file ) {
-			$this->add_tag_readme_checks( $stable_tag_section, $stable_tag, $stable_tag );
-			$this->add_tag_php_checks( $stable_tag_section, $stable_tag, $plugin_file, $trunk_version );
+		if ( $tag_exists ) {
+			$this->add_tag_unexpected_files_check( $stable_tag_section, $tag_dir['items'] );
+
+			if ( $plugin_file ) {
+				$this->add_tag_readme_checks( $stable_tag_section, $stable_tag, $stable_tag );
+				$this->add_tag_php_checks( $stable_tag_section, $stable_tag, $plugin_file, $trunk_version );
+			}
 		}
 
 		return $stable_tag_section;
+	}
+
+	/**
+	 * Add the tag_unexpected_files check.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param Section                                                     $section   Section to add the check to.
+	 * @param array<int, array{name: string, href: string, is_dir: bool}> $tag_items Pre-fetched tags/{tag}/ listing.
+	 */
+	private function add_tag_unexpected_files_check( Section $section, array $tag_items ): void {
+		$unexpected = $this->find_files_with_extensions( $tag_items, array( 'zip' ) );
+
+		$section->add_check(
+			'tag_unexpected_files',
+			__( 'No unexpected files', 'plugin-check' ),
+			empty( $unexpected ) ? 'pass' : 'fail',
+			empty( $unexpected )
+				? __( 'None found', 'plugin-check' )
+				/* translators: %s: comma-separated list of file names. */
+				: sprintf( __( 'Unexpected: %s', 'plugin-check' ), implode( ', ', $unexpected ) )
+		);
 	}
 
 	/**
@@ -493,6 +610,108 @@ class Checker {
 			/* translators: %s: file name pattern. */
 			$icon_file ?? sprintf( __( '%s not found — optional', 'plugin-check' ), 'icon-128x128.(png|jpg) or icon.svg' )
 		);
+
+		$this->add_assets_unexpected_files_check( $section, $items );
+		$this->add_assets_blueprint_check( $section, $items );
+	}
+
+	/**
+	 * Add the assets_unexpected_files check.
+	 *
+	 * Allowed: image files (jpg, png, svg, gif) and the optional blueprints/ folder.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param Section                                                     $section Section to add the check to.
+	 * @param array<int, array{name: string, href: string, is_dir: bool}> $items   Pre-fetched assets/ listing.
+	 */
+	private function add_assets_unexpected_files_check( Section $section, array $items ): void {
+		$allowed_extensions = array( 'jpg', 'png', 'svg', 'gif' );
+		$unexpected         = array();
+
+		foreach ( $items as $item ) {
+			if ( $item['is_dir'] ) {
+				if ( 'blueprints' !== strtolower( $item['name'] ) ) {
+					$unexpected[] = $item['name'];
+				}
+				continue;
+			}
+
+			$extension = strtolower( pathinfo( $item['name'], PATHINFO_EXTENSION ) );
+			if ( ! in_array( $extension, $allowed_extensions, true ) ) {
+				$unexpected[] = $item['name'];
+			}
+		}
+
+		$section->add_check(
+			'assets_unexpected_files',
+			__( 'No unexpected files', 'plugin-check' ),
+			empty( $unexpected ) ? 'pass' : 'fail',
+			empty( $unexpected )
+				? __( 'None found', 'plugin-check' )
+				/* translators: %s: comma-separated list of file/directory names. */
+				: sprintf( __( 'Unexpected: %s', 'plugin-check' ), implode( ', ', $unexpected ) )
+		);
+	}
+
+	/**
+	 * Add the assets_blueprint_present check, if a blueprints/ folder exists.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param Section                                                     $section Section to add the check to.
+	 * @param array<int, array{name: string, href: string, is_dir: bool}> $items   Pre-fetched assets/ listing.
+	 */
+	private function add_assets_blueprint_check( Section $section, array $items ): void {
+		$has_blueprints_dir = false;
+		foreach ( $items as $item ) {
+			if ( $item['is_dir'] && 'blueprints' === strtolower( $item['name'] ) ) {
+				$has_blueprints_dir = true;
+				break;
+			}
+		}
+
+		if ( ! $has_blueprints_dir ) {
+			return;
+		}
+
+		$blueprint_ok = 200 === $this->fetcher->fetch_raw( 'assets/blueprints/blueprint.json' )['code'];
+
+		$section->add_check(
+			'assets_blueprint_present',
+			__( 'Blueprint file present', 'plugin-check' ),
+			$blueprint_ok ? 'pass' : 'info',
+			$blueprint_ok
+				? 'assets/blueprints/blueprint.json'
+				/* translators: %s: file path. */
+				: sprintf( __( '%s not found — optional, needed for "Live Preview"', 'plugin-check' ), 'assets/blueprints/blueprint.json' )
+		);
+	}
+
+	/**
+	 * Find files (not directories) in a listing matching one of the given extensions.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param array<int, array{name: string, href: string, is_dir: bool}> $items      Directory listing items.
+	 * @param array<int, string>                                          $extensions Extensions to match (lowercase, no dot).
+	 * @return array<int, string> Matching file names.
+	 */
+	private function find_files_with_extensions( array $items, array $extensions ): array {
+		$matches = array();
+
+		foreach ( $items as $item ) {
+			if ( $item['is_dir'] ) {
+				continue;
+			}
+
+			$extension = strtolower( pathinfo( $item['name'], PATHINFO_EXTENSION ) );
+			if ( in_array( $extension, $extensions, true ) ) {
+				$matches[] = $item['name'];
+			}
+		}
+
+		return $matches;
 	}
 
 	/**
