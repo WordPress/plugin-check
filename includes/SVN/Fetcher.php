@@ -113,7 +113,7 @@ class Fetcher {
 
 		foreach ( $doc->getElementsByTagName( 'a' ) as $link ) {
 			$href = $link->getAttribute( 'href' );
-			$text = trim( $link->textContent ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+			$text = trim( $link->textContent );
 
 			if (
 				empty( $href )
@@ -128,7 +128,7 @@ class Fetcher {
 
 			$seen[ $href ] = true;
 			$items[]       = array(
-				'name'   => $text ? $text : rtrim( $href, '/' ),
+				'name'   => rtrim( $text ? $text : $href, '/' ),
 				'href'   => $href,
 				'is_dir' => '/' === substr( $href, -1 ),
 			);

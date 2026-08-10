@@ -95,4 +95,25 @@ PHP;
 
 		$this->assertSame( array(), $this->fetcher->parse_plugin_headers( $content ) );
 	}
+
+	public function test_fetch_directory_strips_trailing_slash_from_directory_names() {
+		add_filter(
+			'pre_http_request',
+			function () {
+				return array(
+					'response' => array( 'code' => 200 ),
+					'body'     => '<a href="trunk/">trunk/</a><a href="tags/">tags/</a><a href="readme.txt">readme.txt</a>',
+				);
+			}
+		);
+
+		$result = $this->fetcher->fetch_directory( '' );
+
+		$this->assertSame(
+			array( 'trunk', 'tags', 'readme.txt' ),
+			array_column( $result['items'], 'name' )
+		);
+		$this->assertTrue( $result['items'][0]['is_dir'] );
+		$this->assertFalse( $result['items'][2]['is_dir'] );
+	}
 }

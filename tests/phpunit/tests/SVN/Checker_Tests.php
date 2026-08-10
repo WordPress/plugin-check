@@ -86,7 +86,7 @@ class Checker_Tests extends WP_UnitTestCase {
 		$this->svn_mock_responses = array(
 			'example/'               => array(
 				'code' => 200,
-				'body' => '<a href="trunk/">trunk</a><a href="tags/">tags</a><a href="assets/">assets</a>',
+				'body' => '<a href="trunk/">trunk/</a><a href="tags/">tags/</a><a href="assets/">assets/</a>',
 			),
 			'trunk/readme.txt'       => array(
 				'code' => 200,
@@ -189,7 +189,7 @@ class Checker_Tests extends WP_UnitTestCase {
 		$this->svn_mock_responses = array(
 			'example/'         => array(
 				'code' => 200,
-				'body' => '<a href="trunk/">trunk</a><a href="tags/">tags</a><a href="assets/">assets</a><a href="license.txt">license.txt</a>',
+				'body' => '<a href="trunk/">trunk/</a><a href="tags/">tags/</a><a href="assets/">assets/</a><a href="license.txt">license.txt</a>',
 			),
 			'trunk/readme.txt' => array(
 				'code' => 200,
@@ -298,7 +298,7 @@ class Checker_Tests extends WP_UnitTestCase {
 			'tags/'            => array( 'code' => 200 ),
 			'assets/'          => array(
 				'code' => 200,
-				'body' => '<a href="banner-772x250.png">banner-772x250.png</a><a href="notes.pdf">notes.pdf</a><a href="blueprints/">blueprints</a>',
+				'body' => '<a href="banner-772x250.png">banner-772x250.png</a><a href="notes.pdf">notes.pdf</a><a href="blueprints/">blueprints/</a>',
 			),
 		);
 
@@ -323,7 +323,7 @@ class Checker_Tests extends WP_UnitTestCase {
 			'tags/'                            => array( 'code' => 200 ),
 			'assets/'                          => array(
 				'code' => 200,
-				'body' => '<a href="blueprints/">blueprints</a>',
+				'body' => '<a href="blueprints/">blueprints/</a>',
 			),
 			'assets/blueprints/blueprint.json' => array(
 				'code' => 200,
@@ -350,7 +350,7 @@ class Checker_Tests extends WP_UnitTestCase {
 			'tags/'            => array( 'code' => 200 ),
 			'assets/'          => array(
 				'code' => 200,
-				'body' => '<a href="blueprints/">blueprints</a>',
+				'body' => '<a href="blueprints/">blueprints/</a>',
 			),
 		);
 
