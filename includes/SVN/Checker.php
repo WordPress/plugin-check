@@ -18,6 +18,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * structured report data.
  *
  * @since 2.1.0
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class Checker {
 
