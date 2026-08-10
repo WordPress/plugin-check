@@ -49,6 +49,12 @@ add_menu_page( 'Plugin B', 'Plugin B', 'manage_options', 'plugin-b', 'plugin_b_p
 $icon_url = 'img/icon.png';
 add_menu_page( 'Plugin C', 'Plugin C', 'manage_options', 'plugin-c', 'plugin_c_page', $icon_url, 36 );
 
+// Method call with same name — not a WordPress function call.
+$obj->add_menu_page( 'Plugin D', 'Plugin D', 'manage_options', 'plugin-d', 'plugin_d_page', 'img/icon.png', 37 );
+
+// Static method call with same name — not a WordPress function call.
+Plugin_Manager::add_menu_page( 'Plugin E', 'Plugin E', 'manage_options', 'plugin-e', 'plugin_e_page', 'img/icon.png', 38 );
+
 /**
  * Callback functions for admin pages.
  */

@@ -113,8 +113,8 @@ class Menu_Image_Icon_Check extends Abstract_File_Check {
 	/**
 	 * Scans PHP files for add_menu_page() calls with a quoted string icon parameter.
 	 *
-	 * The icon URL is the sixth parameter of add_menu_page(). A regex is used to count
-	 * to the sixth parameter, capturing the icon string along with the file position.
+	 * The icon URL is the sixth parameter of add_menu_page(). A token-based parser tracks
+	 * argument nesting to extract the icon string along with the file position.
 	 *
 	 * @since 2.1.0
 	 *
@@ -149,6 +149,14 @@ class Menu_Image_Icon_Check extends Abstract_File_Check {
 					continue;
 				}
 
+				$previous = $index - 1;
+				while ( $previous >= 0 && in_array( $scanned[ $previous ]['id'], array( T_WHITESPACE, T_COMMENT, T_DOC_COMMENT ), true ) ) {
+					$previous -= 1;
+				}
+				if ( $previous >= 0 && ( '?->' === $scanned[ $previous ]['text'] || in_array( $scanned[ $previous ]['id'], array( T_OBJECT_OPERATOR, T_DOUBLE_COLON ), true ) ) ) {
+					continue;
+				}
+
 				$open = $index + 1;
 				while ( $open < $count && in_array( $scanned[ $open ]['id'], array( T_WHITESPACE, T_COMMENT, T_DOC_COMMENT ), true ) ) {
 					$open += 1;
@@ -157,8 +165,10 @@ class Menu_Image_Icon_Check extends Abstract_File_Check {
 					continue;
 				}
 
-				$args  = array( '' );
-				$depth = 1;
+				$args         = array( '' );
+				$depth        = 1;
+				$square_depth = 0;
+				$curly_depth  = 0;
 				for ( $cursor = $open + 1; $cursor < $count; $cursor++ ) {
 					$text = $scanned[ $cursor ]['text'];
 					if ( '(' === $text ) {
@@ -168,7 +178,15 @@ class Menu_Image_Icon_Check extends Abstract_File_Check {
 						if ( $depth < 1 ) {
 							break;
 						}
-					} elseif ( ',' === $text && 1 === $depth ) {
+					} elseif ( '[' === $text ) {
+						$square_depth += 1;
+					} elseif ( ']' === $text ) {
+						$square_depth -= 1;
+					} elseif ( '{' === $text ) {
+						$curly_depth += 1;
+					} elseif ( '}' === $text ) {
+						$curly_depth -= 1;
+					} elseif ( ',' === $text && 1 === $depth && 0 === $square_depth && 0 === $curly_depth ) {
 						$args[] = '';
 						continue;
 					}
@@ -232,7 +250,7 @@ class Menu_Image_Icon_Check extends Abstract_File_Check {
 	/**
 	 * Gets the contents of the given file.
 	 *
-	 * This is a caching wrapper around the native file_get_contents() function.
+	 * Reads the contents of the given file.
 	 *
 	 * @since 2.1.0
 	 *
@@ -241,7 +259,9 @@ class Menu_Image_Icon_Check extends Abstract_File_Check {
 	 */
 	private static function file_contents( $file ) {
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
-		return file_get_contents( $file );
+		$contents = file_get_contents( $file );
+
+		return false === $contents ? '' : $contents;
 	}
 
 	/**
