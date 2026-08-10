@@ -90,9 +90,6 @@ class Checker {
 			);
 		}
 
-		// Fetch the SVN base directory listing for the unexpected-files check.
-		$root_dir = $this->fetcher->fetch_directory( '' );
-
 		// Find main PHP file from the listing; returns content to avoid a second fetch.
 		[ 'file' => $plugin_file, 'content' => $php_content ] =
 			$this->find_main_plugin_file_with_content( $trunk_dir['items'] );
@@ -100,9 +97,8 @@ class Checker {
 			? $this->fetcher->parse_plugin_headers( $php_content )
 			: array();
 
-		// Fetch tags/ listing for existence check and unexpected-files scan (one request).
-		$tags_dir    = $this->fetcher->fetch_directory( 'tags/' );
-		$tags_exists = $tags_dir['exists'];
+		// Check tags/ existence only — no need to parse the full listing.
+		$tags_exists = 200 === $this->fetcher->fetch_raw( 'tags/' )['code'];
 
 		// Fetch assets/ listing for existence check and asset file scan (one request).
 		$assets_dir    = $this->fetcher->fetch_directory( 'assets/' );
@@ -114,7 +110,7 @@ class Checker {
 		$meta = $this->build_meta( $readme_data, $plugin_file, $stable_tag, $trunk_version );
 
 		$sections   = array();
-		$sections[] = $this->build_root_section( $root_dir['items'], $tags_dir['items'], $tags_exists, $assets_exists );
+		$sections[] = $this->build_root_section( $tags_exists, $assets_exists );
 		$sections[] = $this->build_trunk_section( $readme_ok, $stable_tag, $plugin_file, $trunk_version, $trunk_dir['items'] );
 
 		$stable_tag_section = $this->build_stable_tag_section( $stable_tag, $plugin_file, $trunk_version );
@@ -185,79 +181,17 @@ class Checker {
 	 *
 	 * @since 2.1.0
 	 *
-	 * @param array<int, array{name: string, href: string, is_dir: bool}> $root_items    Pre-fetched SVN root listing.
-	 * @param array<int, array{name: string, href: string, is_dir: bool}> $tags_items    Pre-fetched tags/ listing.
-	 * @param bool                                                        $tags_exists   Whether tags/ exists.
-	 * @param bool                                                        $assets_exists Whether assets/ exists.
+	 * @param bool $tags_exists   Whether tags/ exists.
+	 * @param bool $assets_exists Whether assets/ exists.
 	 * @return Section
 	 */
-	private function build_root_section( array $root_items, array $tags_items, bool $tags_exists, bool $assets_exists ): Section {
+	private function build_root_section( bool $tags_exists, bool $assets_exists ): Section {
 		$root_section = new Section( 'root', __( 'Root', 'plugin-check' ) );
 		$root_section->add_check( 'root_trunk_exists', __( 'trunk/ exists', 'plugin-check' ), 'pass', __( 'Found', 'plugin-check' ) );
 		$root_section->add_check( 'root_tags_exists', __( 'tags/ exists', 'plugin-check' ), $tags_exists ? 'pass' : 'fail', $tags_exists ? __( 'Found', 'plugin-check' ) : __( 'Missing', 'plugin-check' ) );
 		$root_section->add_check( 'root_assets_exists', __( 'assets/ exists', 'plugin-check' ), $assets_exists ? 'pass' : 'warn', $assets_exists ? __( 'Found', 'plugin-check' ) : __( 'Missing — optional but recommended', 'plugin-check' ) );
 
-		$this->add_root_unexpected_files_check( $root_section, $root_items );
-		$this->add_root_tags_unexpected_files_check( $root_section, $tags_items );
-
 		return $root_section;
-	}
-
-	/**
-	 * Add the root_unexpected_files check.
-	 *
-	 * @since 2.1.0
-	 *
-	 * @param Section                                                     $section    Section to add the check to.
-	 * @param array<int, array{name: string, href: string, is_dir: bool}> $root_items Pre-fetched SVN root listing.
-	 */
-	private function add_root_unexpected_files_check( Section $section, array $root_items ): void {
-		$allowed    = array( 'assets', 'branches', 'tags', 'trunk' );
-		$unexpected = array();
-
-		foreach ( $root_items as $item ) {
-			if ( ! in_array( $item['name'], $allowed, true ) ) {
-				$unexpected[] = $item['name'];
-			}
-		}
-
-		$section->add_check(
-			'root_unexpected_files',
-			__( 'No unexpected files in SVN root', 'plugin-check' ),
-			empty( $unexpected ) ? 'pass' : 'fail',
-			empty( $unexpected )
-				? __( 'None found', 'plugin-check' )
-				/* translators: %s: comma-separated list of file/directory names. */
-				: sprintf( __( 'Unexpected: %s', 'plugin-check' ), implode( ', ', $unexpected ) )
-		);
-	}
-
-	/**
-	 * Add the root_tags_unexpected_files check.
-	 *
-	 * @since 2.1.0
-	 *
-	 * @param Section                                                     $section    Section to add the check to.
-	 * @param array<int, array{name: string, href: string, is_dir: bool}> $tags_items Pre-fetched tags/ listing.
-	 */
-	private function add_root_tags_unexpected_files_check( Section $section, array $tags_items ): void {
-		$unexpected = array();
-
-		foreach ( $tags_items as $item ) {
-			if ( ! $item['is_dir'] ) {
-				$unexpected[] = $item['name'];
-			}
-		}
-
-		$section->add_check(
-			'root_tags_unexpected_files',
-			__( 'No unexpected files in tags/', 'plugin-check' ),
-			empty( $unexpected ) ? 'pass' : 'fail',
-			empty( $unexpected )
-				? __( 'None found', 'plugin-check' )
-				/* translators: %s: comma-separated list of file names. */
-				: sprintf( __( 'Unexpected in tags/: %s', 'plugin-check' ), implode( ', ', $unexpected ) )
-		);
 	}
 
 	/**
@@ -299,7 +233,7 @@ class Checker {
 		$section->add_check(
 			'trunk_unexpected_files',
 			__( 'No unexpected files in trunk/', 'plugin-check' ),
-			empty( $unexpected ) ? 'pass' : 'fail',
+			empty( $unexpected ) ? 'pass' : 'warn',
 			empty( $unexpected )
 				? __( 'None found', 'plugin-check' )
 				/* translators: %s: comma-separated list of file names. */
@@ -469,7 +403,7 @@ class Checker {
 		$section->add_check(
 			'tag_unexpected_files',
 			__( 'No unexpected files', 'plugin-check' ),
-			empty( $unexpected ) ? 'pass' : 'fail',
+			empty( $unexpected ) ? 'pass' : 'warn',
 			empty( $unexpected )
 				? __( 'None found', 'plugin-check' )
 				/* translators: %s: comma-separated list of file names. */
@@ -648,7 +582,7 @@ class Checker {
 		$section->add_check(
 			'assets_unexpected_files',
 			__( 'No unexpected files', 'plugin-check' ),
-			empty( $unexpected ) ? 'pass' : 'fail',
+			empty( $unexpected ) ? 'pass' : 'warn',
 			empty( $unexpected )
 				? __( 'None found', 'plugin-check' )
 				/* translators: %s: comma-separated list of file/directory names. */

@@ -113,7 +113,7 @@ class Fetcher {
 
 		foreach ( $doc->getElementsByTagName( 'a' ) as $link ) {
 			$href = $link->getAttribute( 'href' );
-			$text = trim( $link->textContent );
+			$text = trim( $link->textContent ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 
 			if (
 				empty( $href )
