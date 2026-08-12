@@ -26,8 +26,8 @@ class Menu_Image_Icon_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertNotEmpty( $warnings );
 		$this->assertArrayHasKey( 'load.php', $warnings );
-		// One warning per flagged icon in the fixture (png, jpg, gif, webp, ico, bmp, png?v=2).
-		$this->assertSame( 7, $check_result->get_warning_count() );
+		// One warning per flagged icon in the fixture (png, jpg, gif, webp, ico, bmp, png?v=2, fully-qualified png).
+		$this->assertSame( 8, $check_result->get_warning_count() );
 
 		// Confirm these are warnings, not errors.
 		$this->assertSame( 0, $check_result->get_error_count() );
@@ -62,6 +62,27 @@ class Menu_Image_Icon_Check_Tests extends WP_UnitTestCase {
 		$this->assertEmpty( $warnings );
 		$this->assertSame( 0, $check_result->get_warning_count() );
 		$this->assertSame( 0, $check_result->get_error_count() );
+	}
+
+	/**
+	 * Test that fully qualified global add_menu_page() calls are detected.
+	 *
+	 * On PHP 8+, a leading backslash makes the call tokenize as T_NAME_FULLY_QUALIFIED
+	 * instead of T_STRING, so it must be handled explicitly.
+	 */
+	public function test_fully_qualified_menu_icon_detected() {
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-menu-image-icon-fully-qualified/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check = new Menu_Image_Icon_Check();
+		$check->run( $check_result );
+
+		$warnings = $check_result->get_warnings();
+
+		$this->assertNotEmpty( $warnings );
+		$this->assertArrayHasKey( 'load.php', $warnings );
+		// Two warnings: the two fully qualified calls are both flagged.
+		$this->assertSame( 2, $check_result->get_warning_count() );
 	}
 
 	/**

@@ -114,7 +114,9 @@ class Menu_Image_Icon_Check extends Abstract_File_Check {
 	 * Scans PHP files for add_menu_page() calls with a quoted string icon parameter.
 	 *
 	 * The icon URL is the sixth parameter of add_menu_page(). A token-based parser tracks
-	 * argument nesting to extract the icon string along with the file position.
+	 * argument nesting to extract the icon string along with the file position. Both the
+	 * regular add_menu_page() call and the fully qualified global \add_menu_page() call
+	 * (tokenized as T_NAME_FULLY_QUALIFIED on PHP 8+) are detected.
 	 *
 	 * @since 2.1.0
 	 *
@@ -145,7 +147,15 @@ class Menu_Image_Icon_Check extends Abstract_File_Check {
 
 			$count = count( $scanned );
 			for ( $index = 0; $index < $count; $index++ ) {
-				if ( T_STRING !== $scanned[ $index ]['id'] || 'add_menu_page' !== strtolower( $scanned[ $index ]['text'] ) ) {
+				// Match add_menu_page() or the fully qualified \add_menu_page().
+				// On PHP 8+, a leading backslash makes the call tokenize as
+				// T_NAME_FULLY_QUALIFIED instead of T_STRING. Guard with defined()
+				// so the check stays compatible with PHP 7.4, where that token is
+				// not available. The leading backslash is normalized away.
+				$is_function_name_token = ( T_STRING === $scanned[ $index ]['id'] )
+					|| ( defined( 'T_NAME_FULLY_QUALIFIED' ) && constant( 'T_NAME_FULLY_QUALIFIED' ) === $scanned[ $index ]['id'] );
+
+				if ( ! $is_function_name_token || 'add_menu_page' !== ltrim( strtolower( $scanned[ $index ]['text'] ), '\\' ) ) {
 					continue;
 				}
 

@@ -56,6 +56,9 @@ add_menu_page( 'My Plugin', 'My Plugin', 'manage_options', 'my-plugin', 'my_plug
 // Exclamation: Image with a query string is still a raster image icon.
 add_menu_page( 'My Plugin', 'My Plugin', 'manage_options', 'my-plugin', 'my_plugin_page', 'img/icon.png?v=2', 36 );
 
+// Exclamation: Fully qualified call uses a raster image, even in global scope.
+\add_menu_page( 'My Plugin', 'My Plugin', 'manage_options', 'my-plugin', 'my_plugin_page', 'img/icon.png', 37 );
+
 /**
  * Callback function for admin pages.
  */
