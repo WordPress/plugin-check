@@ -326,4 +326,32 @@ class Checker_Tests extends WP_UnitTestCase {
 
 		$this->assertNull( $check );
 	}
+
+	public function test_run_skips_stable_tag_section_and_version_match_when_stable_tag_is_trunk() {
+		$this->svn_mock_responses = array(
+			'trunk/readme.txt'  => array(
+				'code' => 200,
+				'body' => "=== Example Plugin ===\nStable tag: trunk\n",
+			),
+			'trunk/'            => array(
+				'code' => 200,
+				'body' => '<a href="example.php">example.php</a>',
+			),
+			'trunk/example.php' => array(
+				'code' => 200,
+				'body' => "Plugin Name: Example Plugin\nVersion: 2.5.0\n",
+			),
+			'tags/'             => array( 'code' => 200 ),
+			'assets/'           => array( 'code' => 200 ),
+		);
+
+		$checker = new Checker( 'example' );
+		$report  = $checker->run();
+
+		$this->assertNull( $this->get_section_by_id( $report['sections'], 'stable_tag' ) );
+
+		$trunk_section = $this->get_section_by_id( $report['sections'], 'trunk' );
+		$this->assertSame( 'pass', $this->get_check_by_key( $trunk_section->get_checks(), 'trunk_stable_tag_declared' )['status'] );
+		$this->assertSame( 'pass', $this->get_check_by_key( $trunk_section->get_checks(), 'trunk_stable_tag_matches_version' )['status'] );
+	}
 }

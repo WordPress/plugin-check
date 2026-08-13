@@ -333,6 +333,16 @@ class Checker {
 	 * @param string|null $trunk_version Version from trunk PHP header.
 	 */
 	private function add_trunk_version_match_check( Section $section, ?string $stable_tag, ?string $trunk_version ): void {
+		if ( $this->is_trunk_stable_tag( $stable_tag ) ) {
+			$section->add_check(
+				'trunk_stable_tag_matches_version',
+				__( 'Stable tag matches PHP version', 'plugin-check' ),
+				'pass',
+				__( 'Stable tag is "trunk" — trunk/ is released directly, no version match needed', 'plugin-check' )
+			);
+			return;
+		}
+
 		if ( empty( $stable_tag ) || empty( $trunk_version ) ) {
 			$section->add_check( 'trunk_stable_tag_matches_version', __( 'Stable tag matches PHP version', 'plugin-check' ), 'warn', __( 'Cannot compare — one or both values missing', 'plugin-check' ) );
 			return;
@@ -358,7 +368,7 @@ class Checker {
 	 * @return Section|null
 	 */
 	private function build_stable_tag_section( ?string $stable_tag, ?string $plugin_file, ?string $trunk_version ): ?Section {
-		if ( ! $stable_tag ) {
+		if ( ! $stable_tag || $this->is_trunk_stable_tag( $stable_tag ) ) {
 			return null;
 		}
 
@@ -622,6 +632,21 @@ class Checker {
 				/* translators: %s: file path. */
 				: sprintf( __( '%s not found — optional, needed for "Live Preview"', 'plugin-check' ), 'assets/blueprints/blueprint.json' )
 		);
+	}
+
+	/**
+	 * Check whether the stable tag uses the "trunk" convention.
+	 *
+	 * WordPress.org allows `Stable tag: trunk`, meaning trunk/ itself is released
+	 * directly with no corresponding tags/{version}/ folder.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param string|null $stable_tag Stable tag from trunk/readme.txt.
+	 * @return bool
+	 */
+	private function is_trunk_stable_tag( ?string $stable_tag ): bool {
+		return null !== $stable_tag && 'trunk' === strtolower( $stable_tag );
 	}
 
 	/**
