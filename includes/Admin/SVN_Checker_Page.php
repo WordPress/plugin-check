@@ -58,8 +58,8 @@ class SVN_Checker_Page {
 	 */
 	public function add_page(): void {
 		$hook = add_management_page(
-			__( 'Plugin Check SVN Checker', 'plugin-check' ),
-			__( 'Plugin Check SVN Checker', 'plugin-check' ),
+			__( 'SVN Checker', 'plugin-check' ),
+			__( 'Plugin Check SVN', 'plugin-check' ),
 			'manage_options',
 			self::MENU_SLUG,
 			array( $this, 'render_page' )
