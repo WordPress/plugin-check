@@ -2,7 +2,7 @@
 
 Contributors:      wordpressdotorg
 Tested up to:      7.0
-Stable tag:        2.0.0
+Stable tag:        2.1.0
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 Tags:              plugin best practices, testing, accessibility, performance, security
@@ -84,6 +84,25 @@ To be approved in the WordPress.org plugin directory, a plugin must typically pa
 In any case, passing the checks in this tool likely helps to achieve a smooth plugin review process, but is no guarantee that a plugin will be approved in the WordPress.org plugin directory.
 
 == Changelog ==
+
+= 2.1.0 =
+
+* Enhancement - Add SVN Checker to detect unexpected files, folders, and zip archives in plugin SVN repositories.
+* Enhancement - Add PHP Error Reporting check to detect production-time changes to PHP error reporting settings.
+* Enhancement - Add AI Provider check to recommend the WordPress AI Client.
+* Enhancement - Validate each `Requires Plugins` dependency individually against the WordPress.org plugin directory.
+* Enhancement - Use distinct visual styles for different issue types in results.
+* Enhancement - Skip stable tag comparison when the readme declares `trunk`.
+* Fix - Preserve Unicode characters in exported results.
+* Fix - Fix silently dropped WordPress core functions in the since-data generator.
+* Fix - Decouple AJAX calls in the admin UI and remove unnecessary return values.
+* Fix - Exclude site-specific root files from the unexpected files scan.
+* Tweak - Change PHP error reporting check from error to warning severity.
+* Tweak - Use less aggressive colors for the error and warning badges.
+* Tweak - Shorten menu text.
+* Chore - Add AI features and configuration documentation.
+* Chore - Update WordPress function since dataset.
+* Chore - Update development and CI dependencies.
 
 = 2.0.0 =
 
