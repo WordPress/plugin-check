@@ -41,6 +41,10 @@ The Plugin Namer provides instant feedback with actionable suggestions, helping 
 
 **Important:** The Plugin Namer tool provides guidance only and is not definitive. All plugin name decisions are subject to final review and approval by the WordPress.org Plugins team reviewers.
 
+**SVN Checker Tool**
+
+Plugin Check also includes an SVN Checker tool (accessible via _Tools > Plugin Check SVN_) that scans a plugin's WordPress.org SVN repository for unexpected files, folders, and zip archives. This helps plugin authors and reviewers ensure that only the intended files are present in the plugin's `trunk`, `tags`, and `assets` directories before or after a release.
+
 = Checks reviewed by AI =
 
 When AI analysis is enabled, Plugin Check can review selected results to help identify likely false positives. Related issues are grouped and analyzed with prompts tailored to the type of check, using the surrounding code as context. The AI review does not remove or change the original results, but adds an additional summary that highlights which findings may need human review before taking action.
