@@ -100,10 +100,6 @@ In any case, passing the checks in this tool likely helps to achieve a smooth pl
 * Fix - Preserve Unicode characters in exported results.
 * Fix - Fix silently dropped WordPress core functions in the since-data generator.
 * Fix - Decouple AJAX calls in the admin UI and remove unnecessary return values.
-* Fix - Exclude site-specific root files from the unexpected files scan.
-* Tweak - Change PHP error reporting check from error to warning severity.
-* Tweak - Use less aggressive colors for the error and warning badges.
-* Tweak - Shorten menu text.
 * Chore - Add AI features and configuration documentation.
 * Chore - Update WordPress function since dataset.
 * Chore - Update development and CI dependencies.
