@@ -96,7 +96,6 @@ In any case, passing the checks in this tool likely helps to achieve a smooth pl
 * Enhancement - Add AI Provider check to recommend the WordPress AI Client.
 * Enhancement - Validate each `Requires Plugins` dependency individually against the WordPress.org plugin directory.
 * Enhancement - Use distinct visual styles for different issue types in results.
-* Enhancement - Skip stable tag comparison when the readme declares `trunk`.
 * Fix - Preserve Unicode characters in exported results.
 * Fix - Fix silently dropped WordPress core functions in the since-data generator.
 * Fix - Decouple AJAX calls in the admin UI and remove unnecessary return values.
