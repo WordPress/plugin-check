@@ -38,6 +38,26 @@
 | non_blocking_scripts | performance | Checks whether scripts and styles are enqueued using a recommended loading strategy. | [Learn more](https://developer.wordpress.org/plugins/) |
 | ai_provider | general | Recommends the WordPress AI Client when a plugin integrates directly with a third-party AI provider. | [Learn more](https://developer.wordpress.org/plugins/) |
 
+## Results and severity
+
+The check name in the table is a **check slug**. When a check finds a problem, it emits a separate **result code**. Result codes are the values accepted by `--ignore-codes` and are included in the CLI output alongside the result type and severity.
+
+Each result has a type (`ERROR` or `WARNING`) and a severity from 1 (lowest) to 10 (highest). A check can emit more than one result code, and the same code can be emitted for multiple files. Unless a check overrides it, a result uses the default severity of 5.
+
+For example, the `code_obfuscation` check reports the following result for supported obfuscation tools:
+
+| Check | Result code | Type | Severity | Detected tools |
+| --- | --- | --- | --- | --- |
+| code_obfuscation | `obfuscated_code_detected` | ERROR | 7 | Zend Guard, Source Guardian, ionCube |
+
+To see the result codes and severity values produced for a plugin, run:
+
+```bash
+wp plugin check <plugin> --format=csv --fields=code,type,severity,message
+```
+
+Use the check slug with `--checks` or `--exclude-checks`; use the result code with `--ignore-codes`. This distinction is important when filtering a check without suppressing a particular finding across other checks.
+
 ## Notes
 
 ### Escaping widget wrapper output
