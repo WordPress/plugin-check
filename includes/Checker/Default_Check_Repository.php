@@ -14,6 +14,7 @@ namespace WordPress\Plugin_Check\Checker;
  */
 class Default_Check_Repository extends Empty_Check_Repository {
 
+
 	/**
 	 * True if the class was fully initialized.
 	 *
@@ -105,6 +106,7 @@ class Default_Check_Repository extends Empty_Check_Repository {
 				'external_admin_menu_links'  => new Checks\Plugin_Repo\External_Admin_Menu_Links_Check(),
 				'wp_functions_compatibility' => new Checks\Plugin_Repo\WP_Functions_Compatibility_Check(),
 				'ai_provider'                => new Checks\General\AI_Provider_Check(),
+				'premium_only_function'      => new Checks\Plugin_Repo\Premium_Only_Function_Check(),
 			)
 		);
 
