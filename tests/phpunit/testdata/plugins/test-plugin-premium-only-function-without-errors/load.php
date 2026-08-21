@@ -2,7 +2,6 @@
 /**
  * Plugin Name: Premium Only Function Clean Test
  * Description: Test plugin containing standard functions without __premium_only suffix.
- * Author: Monzur Alam
  * Version: 1.0.0
  */
 

@@ -16,7 +16,7 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
 /**
  * Check to detect functions ending in __premium_only.
  *
- * @since 1.2.0
+ * @since x.x.x
  */
 class Premium_Only_Function_Check extends Abstract_File_Check {
 
@@ -28,7 +28,7 @@ class Premium_Only_Function_Check extends Abstract_File_Check {
 	 *
 	 * Every check must have at least one category.
 	 *
-	 * @since 1.2.0
+	 * @since x.x.x
 	 *
 	 * @return array The categories for the check.
 	 */
@@ -39,7 +39,7 @@ class Premium_Only_Function_Check extends Abstract_File_Check {
 	/**
 	 * Amends the given result by running the check on the given list of files.
 	 *
-	 * @since 1.2.0
+	 * @since x.x.x
 	 *
 	 * @param Check_Result $result The check result to amend.
 	 * @param array        $files  List of absolute file paths.
@@ -68,7 +68,7 @@ class Premium_Only_Function_Check extends Abstract_File_Check {
 	 *
 	 * Every check must have a short description explaining what the check does.
 	 *
-	 * @since 1.2.0
+	 * @since x.x.x
 	 *
 	 * @return string Description.
 	 */
@@ -81,7 +81,7 @@ class Premium_Only_Function_Check extends Abstract_File_Check {
 	 *
 	 * Every check must have a URL with further information about the check.
 	 *
-	 * @since 1.2.0
+	 * @since x.x.x
 	 *
 	 * @return string The documentation URL.
 	 */

@@ -2,7 +2,6 @@
 /**
  * Plugin Name: Premium Only Function Test
  * Description: Test plugin containing functions named with the __premium_only suffix.
- * Author: Monzur Alam
  * Version: 1.0.0
  */
 
