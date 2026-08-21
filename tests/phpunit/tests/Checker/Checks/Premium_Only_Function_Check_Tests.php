@@ -22,12 +22,12 @@ class Premium_Only_Function_Check_Tests extends WP_UnitTestCase {
 
 		$this->assertNotEmpty( $errors );
 		$this->assertArrayHasKey( 'load.php', $errors );
-		$this->assertEquals( 2, $check_result->get_error_count() );
+		$this->assertSame( 2, $check_result->get_error_count() );
 
-		$this->assertArrayHasKey( 13, $errors['load.php'] );
-		$this->assertArrayHasKey( 17, $errors['load.php'] );
-		$this->assertEquals( 'premium_only_function_found', $errors['load.php'][13][1][0]['code'] );
-		$this->assertEquals( 'premium_only_function_found', $errors['load.php'][17][1][0]['code'] );
+		$this->assertArrayHasKey( 12, $errors['load.php'] );
+		$this->assertArrayHasKey( 16, $errors['load.php'] );
+		$this->assertSame( 'premium_only_function_found', $errors['load.php'][12][1][0]['code'] );
+		$this->assertSame( 'premium_only_function_found', $errors['load.php'][16][1][0]['code'] );
 	}
 
 	public function test_run_without_errors() {
@@ -40,6 +40,6 @@ class Premium_Only_Function_Check_Tests extends WP_UnitTestCase {
 		$errors = $check_result->get_errors();
 
 		$this->assertEmpty( $errors );
-		$this->assertEquals( 0, $check_result->get_error_count() );
+		$this->assertSame( 0, $check_result->get_error_count() );
 	}
 }
