@@ -144,6 +144,21 @@ class Plugin_Request_Utility {
 	}
 
 	/**
+	 * Sets the Runner class for the current request.
+	 *
+	 * This is needed for requests (e.g. AJAX requests running only static checks)
+	 * where the runner is not registered early via the object-cache.php drop-in,
+	 * so that checks relying on get_runner() (such as AI_Name_Check) can access it.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param Abstract_Check_Runner $runner The runner instance for the current request.
+	 */
+	public static function set_runner( Abstract_Check_Runner $runner ) {
+		static::$runner = $runner;
+	}
+
+	/**
 	 * Runs the cleanup functions and destroys the runner.
 	 *
 	 * @since 1.0.0

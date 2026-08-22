@@ -81,12 +81,12 @@
 						<?php endif; ?>
 					</div>
 					<div id="plugin-check__ai-container">
-						<h4><?php esc_attr_e( 'AI Settings', 'plugin-check' ); ?></h4>
+						<h4><?php esc_attr_e( 'AI', 'plugin-check' ); ?></h4>
 						<p>
-							<label><input type="checkbox" value="use-ai" id="plugin-check__use-ai" /> <?php esc_html_e( 'Enable AI Analysis', 'plugin-check' ); ?></label>
+							<label><input type="checkbox" value="use-ai" id="plugin-check__use-ai" /> <?php esc_html_e( 'Analysis', 'plugin-check' ); ?></label>
 						</p>
 						<p>
-							<label><input type="checkbox" value="use-ai-name" id="plugin-check__use-ai-name" /> <?php esc_html_e( 'Enable AI Name Check', 'plugin-check' ); ?></label>
+							<label><input type="checkbox" value="use-ai-name" id="plugin-check__use-ai-name" /> <?php esc_html_e( 'Name Check', 'plugin-check' ); ?></label>
 						</p>
 					</div>
 				</div>

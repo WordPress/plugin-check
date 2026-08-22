@@ -143,6 +143,10 @@ final class Admin_AJAX {
 			return new WP_Error( 'invalid-runner', __( 'AJAX Runner was not initialized correctly.', 'plugin-check' ) );
 		}
 
+		// Register the runner so that checks relying on Plugin_Request_Utility::get_runner()
+		// (e.g. AI_Name_Check) can access it, even when no runtime checks are involved.
+		Plugin_Request_Utility::set_runner( $runner );
+
 		return $runner;
 	}
 
@@ -265,20 +269,6 @@ final class Admin_AJAX {
 
 		if ( is_wp_error( $runner ) ) {
 			wp_send_json_error( $runner, 500 );
-		}
-
-		$runner = Plugin_Request_Utility::get_runner();
-
-		if ( is_null( $runner ) ) {
-			$runner = new AJAX_Runner();
-		}
-
-		// Make sure we are using the correct runner instance.
-		if ( ! ( $runner instanceof AJAX_Runner ) ) {
-			wp_send_json_error(
-				new WP_Error( 'invalid-runner', __( 'AJAX Runner was not initialized correctly.', 'plugin-check' ) ),
-				500
-			);
 		}
 
 		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
