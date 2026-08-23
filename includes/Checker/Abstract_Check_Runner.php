@@ -508,7 +508,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 * @param array $checks An array of Check instances to run.
 	 * @return array An array of Preparations to run where each item is an array with keys `class` and `args`.
 	 */
-	private function get_shared_preparations( array $checks ) {
+	protected function get_shared_preparations( array $checks ) {
 		$shared_preparations = array();
 
 		foreach ( $checks as $check ) {
