@@ -770,7 +770,10 @@
 		}
 
 		renderFalsePositiveResults();
-		const resultsMessage = renderResultsMessage( isSuccessMessage, aiStats );
+		const resultsMessage = renderResultsMessage(
+			isSuccessMessage,
+			aiStats
+		);
 
 		// Announce the check results summary so screen-reader users know
 		// whether errors or warnings were found, rather than only the
