@@ -78,7 +78,10 @@ class Abstract_Check_Runner_Tests_Runner extends AJAX_Runner {
 					return ( $this->runner->do_run_callback )( $context );
 				}
 
-				return $context;
+				// Production run() calls set_ai_analysis()/set_ai_stats() on
+				// the return value, so it must be a real Check_Result and not
+				// the raw Check_Context.
+				return new \WordPress\Plugin_Check\Checker\Check_Result( $context );
 			}
 		};
 	}
