@@ -87,12 +87,23 @@ class Abstract_Check_Runner_Tests_Runner extends AJAX_Runner {
 		};
 	}
 
+	/**
+	 * Production run() only isolates failures between top-level preparation
+	 * entries (each entry's prepare() closure is wrapped in its own
+	 * try/catch in the cleanup cascade). To exercise that isolation, each
+	 * recorded cleanup must be registered as its own preparation entry
+	 * rather than bundled into a single closure that iterates all of them.
+	 */
 	protected function get_shared_preparations( array $checks ) {
-		return array(
-			array(
+		$preparations = array();
+
+		foreach ( $this->recorded_cleanups as $cleanup ) {
+			$preparations[] = array(
 				'class' => Abstract_Check_Runner_Tests_Preparation::class,
-				'args'  => array( $this->recorded_cleanups ),
-			),
-		);
+				'args'  => array( array( $cleanup ) ),
+			);
+		}
+
+		return $preparations;
 	}
 }
