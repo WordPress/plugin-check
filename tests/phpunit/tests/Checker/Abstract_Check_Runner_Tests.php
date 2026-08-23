@@ -11,6 +11,7 @@
  */
 
 use WordPress\Plugin_Check\Checker\Abstract_Check_Runner;
+use WordPress\Plugin_Check\Test_Data\Empty_Check;
 use WordPress\Plugin_Check\Test_Utils\Traits\With_Mock_Filesystem;
 
 class Abstract_Check_Runner_Tests extends WP_UnitTestCase {
@@ -20,6 +21,16 @@ class Abstract_Check_Runner_Tests extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 		$this->set_up_mock_filesystem();
+
+		// Register the "empty-check" slug used by Abstract_Check_Runner_Tests_Runner
+		// so Default_Check_Repository does not throw Invalid_Check_Slug_Exception.
+		add_filter(
+			'wp_plugin_check_checks',
+			function ( $checks ) {
+				$checks['empty-check'] = new Empty_Check();
+				return $checks;
+			}
+		);
 	}
 
 	public function test_runner_extends_abstract_check_runner() {

@@ -12,6 +12,10 @@ class Uninstall_Tests extends WP_UnitTestCase {
 
 	use With_Mock_Filesystem;
 
+	/**
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
 	public function test_uninstall_drops_runtime_tables_and_drop_in() {
 		global $wp_filesystem, $table_prefix;
 
@@ -38,6 +42,10 @@ class Uninstall_Tests extends WP_UnitTestCase {
 		$this->assertStringContainsString( $table_prefix . 'pc_', $GLOBALS['wpdb']->last_query );
 	}
 
+	/**
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 */
 	public function test_uninstall_no_op_when_runtime_not_set_up() {
 		global $wp_filesystem;
 
