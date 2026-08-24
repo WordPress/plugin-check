@@ -13,11 +13,15 @@ use PluginCheckCS\PluginCheck\Tests\AbstractSniffUnitTest;
 
 /**
  * Unit tests for AIConnectorAPIKeySniff.
+ *
+ * @since 2.2.0
  */
 final class AIConnectorAPIKeyUnitTest extends AbstractSniffUnitTest {
 
 	/**
 	 * Returns the lines where errors should occur.
+	 *
+	 * @since 2.2.0
 	 *
 	 * @return array <int line number> => <int number of errors>
 	 */
@@ -38,6 +42,8 @@ final class AIConnectorAPIKeyUnitTest extends AbstractSniffUnitTest {
 	/**
 	 * Returns the lines where warnings should occur.
 	 *
+	 * @since 2.2.0
+	 *
 	 * @return array <int line number> => <int number of warnings>
 	 */
 	public function getWarningList() {
@@ -47,6 +53,8 @@ final class AIConnectorAPIKeyUnitTest extends AbstractSniffUnitTest {
 	/**
 	 * Returns the fully qualified class name (FQCN) of the sniff.
 	 *
+	 * @since 2.2.0
+	 *
 	 * @return string
 	 */
 	protected function get_sniff_fqcn() {
@@ -55,6 +63,8 @@ final class AIConnectorAPIKeyUnitTest extends AbstractSniffUnitTest {
 
 	/**
 	 * Sets the parameters for the sniff.
+	 *
+	 * @since 2.2.0
 	 *
 	 * @param Sniff $sniff The sniff being tested.
 	 */
