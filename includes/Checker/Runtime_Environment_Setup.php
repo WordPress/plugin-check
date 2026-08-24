@@ -18,6 +18,17 @@ final class Runtime_Environment_Setup {
 	use Amend_DB_Base_Prefix;
 
 	/**
+	 * Name of the option that records which plugin-owned tables the runtime environment created.
+	 *
+	 * The record is what cleanup deletes, so that a table the runtime environment did not create can never be
+	 * dropped, even if its name happens to match the runtime environment's prefix.
+	 *
+	 * @since n.e.x.t
+	 * @var string
+	 */
+	const CUSTOM_TABLES_OPTION = 'plugin_check_runtime_custom_tables';
+
+	/**
 	 * Sets up the WordPress environment for runtime checks
 	 *
 	 * @since 1.0.0
@@ -42,8 +53,25 @@ final class Runtime_Environment_Setup {
 		// Get the existing permalink structure.
 		$permalink_structure = get_option( 'permalink_structure' );
 
+		// Get the actual site's base prefix, before it is amended below.
+		$base_prefix = $wpdb->base_prefix;
+
 		// Set the new prefix.
 		$prefix_cleanup = $this->amend_db_base_prefix();
+
+		/*
+		 * Duplicate the schema of any tables owned by other plugins.
+		 *
+		 * Installing WordPress below only creates the WordPress core tables. Plugins usually register their own tables
+		 * in an activation hook, which never runs in the runtime environment, so those tables would be missing even
+		 * though the same plugins are activated here and will query them.
+		 *
+		 * This has to happen before the install, because the install itself already triggers hooks such as
+		 * 'update_option' and 'user_register' that active plugins may respond to by querying their own tables.
+		 *
+		 * See https://github.com/WordPress/plugin-check/issues/234.
+		 */
+		$created_tables = $this->create_custom_tables( $base_prefix, $wpdb->base_prefix );
 
 		// Create and populate the test database tables if they do not exist.
 		if ( $wpdb->posts !== $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->posts ) ) ) {
@@ -80,6 +108,9 @@ final class Runtime_Environment_Setup {
 		// Restore the old prefix.
 		$prefix_cleanup();
 
+		// Record the created tables, so that cleanup only ever deletes those. Requires the actual site's prefix.
+		$this->record_custom_tables( $created_tables );
+
 		// Return early if the plugin check object cache already exists.
 		if ( defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) && WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION ) {
 			return;
@@ -107,6 +138,9 @@ final class Runtime_Environment_Setup {
 
 		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 
+		// Read the record of created tables while the actual site's prefix is still in place.
+		$custom_tables = (array) get_option( self::CUSTOM_TABLES_OPTION, array() );
+
 		$prefix_cleanup = $this->amend_db_base_prefix();
 		$tables         = $wpdb->tables();
 
@@ -116,8 +150,13 @@ final class Runtime_Environment_Setup {
 			$wpdb->query( "DROP TABLE IF EXISTS `$table`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		}
 
+		// Remove the tables that were duplicated for other plugins as well.
+		$this->drop_custom_tables( $wpdb->base_prefix, $custom_tables );
+
 		// Restore the old prefix.
 		$prefix_cleanup();
+
+		delete_option( self::CUSTOM_TABLES_OPTION );
 
 		// Return early if the plugin check object cache does not exist.
 		if ( ! defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) || ! WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION ) {
@@ -157,6 +196,204 @@ final class Runtime_Environment_Setup {
 			unset( $tables['usermeta'] );
 		}
 		return $tables;
+	}
+
+	/**
+	 * Returns the names of the database tables that installing WordPress creates.
+	 *
+	 * The `$wpdb->tables` property is deliberately not used here: it is a public property that plugins append their
+	 * own tables to, e.g. WooCommerce does so for its lookup and meta tables. Relying on it would classify exactly
+	 * those tables as core ones and therefore skip them. `wp_get_db_schema()` is WordPress's own definition of what
+	 * the install creates, and it stays accurate as core changes.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param string $base_prefix    The actual site's database table base prefix.
+	 * @param string $runtime_prefix The runtime environment's database table base prefix.
+	 * @return string[] List of table names, without any prefix.
+	 */
+	private function get_core_table_names( string $base_prefix, string $runtime_prefix ): array {
+		// The schema functions live in this file, which callers are not required to have loaded already.
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+
+		if ( ! preg_match_all( '/CREATE TABLE (?:IF NOT EXISTS )?`?([0-9a-zA-Z$_]+)`?/i', wp_get_db_schema( 'all' ), $matches ) ) {
+			return array();
+		}
+
+		$table_names = array();
+
+		foreach ( $matches[1] as $table ) {
+			/*
+			 * The schema uses whichever prefix is currently in place, so strip either one. The runtime prefix is
+			 * checked first because it starts with the base prefix.
+			 */
+			foreach ( array( $runtime_prefix, $base_prefix ) as $prefix ) {
+				if ( str_starts_with( $table, $prefix ) ) {
+					$table = substr( $table, strlen( $prefix ) );
+					break;
+				}
+			}
+
+			// Strip the site ID segment that Multisite tables carry, e.g. `3_posts`.
+			$table_names[] = preg_replace( '/^\d+_/', '', $table );
+		}
+
+		return $table_names;
+	}
+
+	/**
+	 * Returns the names of the database tables that belong to plugins rather than to WordPress core.
+	 *
+	 * The returned names have the base prefix stripped, so that they can be combined with either the actual site's
+	 * base prefix or the runtime environment's base prefix.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @global wpdb $wpdb WordPress database abstraction object.
+	 *
+	 * @param string $base_prefix    The actual site's database table base prefix.
+	 * @param string $runtime_prefix The runtime environment's database table base prefix.
+	 * @return string[] List of table names, without the base prefix.
+	 */
+	private function get_custom_table_names( string $base_prefix, string $runtime_prefix ): array {
+		global $wpdb;
+
+		$core_tables = array_flip( $this->get_core_table_names( $base_prefix, $runtime_prefix ) );
+
+		// `SHOW FULL TABLES` is used over `SHOW TABLES` so that views can be told apart from base tables.
+		$rows = $wpdb->get_results(
+			$wpdb->prepare( 'SHOW FULL TABLES LIKE %s', $wpdb->esc_like( $base_prefix ) . '%' ),
+			ARRAY_N
+		);
+
+		if ( ! is_array( $rows ) ) {
+			return array();
+		}
+
+		$custom_tables = array();
+
+		foreach ( $rows as $row ) {
+			if ( ! isset( $row[0] ) ) {
+				continue;
+			}
+
+			// Views cannot be duplicated with `CREATE TABLE ... LIKE`. Any other table type can.
+			if ( isset( $row[1] ) && false !== stripos( (string) $row[1], 'VIEW' ) ) {
+				continue;
+			}
+
+			// Skip the runtime environment's own tables, which also match the site's base prefix.
+			if ( str_starts_with( $row[0], $runtime_prefix ) ) {
+				continue;
+			}
+
+			$table_name = substr( $row[0], strlen( $base_prefix ) );
+
+			/*
+			 * On Multisite, the tables of sites other than the main site are prefixed with their site ID, e.g.
+			 * `wp_3_posts`. Strip that segment so that those tables are still recognized as core tables.
+			 */
+			$without_site_id = preg_replace( '/^\d+_/', '', $table_name );
+
+			if ( isset( $core_tables[ $table_name ] ) || isset( $core_tables[ $without_site_id ] ) ) {
+				continue;
+			}
+
+			$custom_tables[] = $table_name;
+		}
+
+		return $custom_tables;
+	}
+
+	/**
+	 * Duplicates the schema of all plugin-owned database tables into the runtime environment.
+	 *
+	 * Only the table structure is duplicated, never any data, so that runtime checks cannot read or modify the actual
+	 * site's content.
+	 *
+	 * A table that already exists is skipped rather than replaced, and is not reported as created. It could be a
+	 * leftover from an earlier run, but it could equally be a table of the actual site that happens to match the
+	 * runtime environment's prefix, and such a table must never be written to or, later on, dropped.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @global wpdb $wpdb WordPress database abstraction object.
+	 *
+	 * @param string $base_prefix    The actual site's database table base prefix.
+	 * @param string $runtime_prefix The runtime environment's database table base prefix.
+	 * @return string[] List of the table names that were created, without the base prefix.
+	 */
+	private function create_custom_tables( string $base_prefix, string $runtime_prefix ): array {
+		global $wpdb;
+
+		$created = array();
+
+		foreach ( $this->get_custom_table_names( $base_prefix, $runtime_prefix ) as $table_name ) {
+			$source = $base_prefix . $table_name;
+			$target = $runtime_prefix . $table_name;
+
+			if ( $target === $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $target ) ) ) ) {
+				continue;
+			}
+
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			if ( false !== $wpdb->query( "CREATE TABLE `$target` LIKE `$source`" ) ) {
+				$created[] = $table_name;
+			}
+		}
+
+		return $created;
+	}
+
+	/**
+	 * Records which plugin-owned tables the runtime environment created.
+	 *
+	 * Must be called while the actual site's database table prefix is in place, so that the record is stored in the
+	 * site's own options table rather than the runtime environment's.
+	 *
+	 * The names are merged with any already recorded, so that a second setup without an intermediate cleanup does not
+	 * cause the tables of the first one to be forgotten and left behind.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param string[] $table_names List of table names that were created, without the base prefix.
+	 */
+	private function record_custom_tables( array $table_names ): void {
+		$recorded = (array) get_option( self::CUSTOM_TABLES_OPTION, array() );
+		$merged   = array_values( array_unique( array_merge( $recorded, $table_names ) ) );
+
+		if ( $merged === $recorded ) {
+			return;
+		}
+
+		update_option( self::CUSTOM_TABLES_OPTION, $merged, false );
+	}
+
+	/**
+	 * Removes the plugin-owned database tables that the runtime environment created.
+	 *
+	 * The names come from the record written during setup, never from the database, so that only tables the runtime
+	 * environment created itself can be dropped.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @global wpdb $wpdb WordPress database abstraction object.
+	 *
+	 * @param string $runtime_prefix The runtime environment's database table base prefix.
+	 * @param array  $table_names    List of table names to drop, without the base prefix.
+	 */
+	private function drop_custom_tables( string $runtime_prefix, array $table_names ): void {
+		global $wpdb;
+
+		foreach ( $table_names as $table_name ) {
+			if ( ! is_string( $table_name ) || '' === $table_name ) {
+				continue;
+			}
+
+			$table = $runtime_prefix . $table_name;
+
+			$wpdb->query( "DROP TABLE IF EXISTS `$table`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		}
 	}
 
 	/**
