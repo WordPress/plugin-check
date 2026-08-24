@@ -18,11 +18,15 @@ use WordPressCS\WordPress\AbstractFunctionParameterSniff;
  *
  * Plugins should use the WordPress AI Connector APIs rather than
  * reading provider API keys directly from the options table.
+ *
+ * @since 2.2.0
  */
 final class AIConnectorAPIKeySniff extends AbstractFunctionParameterSniff {
 
 	/**
 	 * The group name for this group of functions.
+	 *
+	 * @since 2.2.0
 	 *
 	 * @var string
 	 */
@@ -30,6 +34,8 @@ final class AIConnectorAPIKeySniff extends AbstractFunctionParameterSniff {
 
 	/**
 	 * List of functions to examine.
+	 *
+	 * @since 2.2.0
 	 *
 	 * @var array<string, true>
 	 */
@@ -43,6 +49,8 @@ final class AIConnectorAPIKeySniff extends AbstractFunctionParameterSniff {
 	/**
 	 * Parameter positions for supported functions.
 	 *
+	 * @since 2.2.0
+	 *
 	 * @var array<string, int>
 	 */
 	private $param_positions = array(
@@ -54,6 +62,8 @@ final class AIConnectorAPIKeySniff extends AbstractFunctionParameterSniff {
 
 	/**
 	 * Parameter names for supported functions.
+	 *
+	 * @since 2.2.0
 	 *
 	 * @var array<string, string>
 	 */
@@ -69,6 +79,8 @@ final class AIConnectorAPIKeySniff extends AbstractFunctionParameterSniff {
 	 *
 	 * Checks whether the requested option name matches the
 	 * WordPress AI Connector API key naming pattern.
+	 *
+	 * @since 2.2.0
 	 *
 	 * @param int    $stackPtr        The position of the current token in the stack.
 	 * @param string $group_name      The name of the group which was matched.
@@ -129,6 +141,8 @@ final class AIConnectorAPIKeySniff extends AbstractFunctionParameterSniff {
 	/**
 	 * Adds an error for direct AI Connector API key access.
 	 *
+	 * @since 2.2.0
+	 *
 	 * @param int $stackPtr Position of the function call.
 	 *
 	 * @return void
@@ -144,6 +158,8 @@ final class AIConnectorAPIKeySniff extends AbstractFunctionParameterSniff {
 
 	/**
 	 * Checks whether an option name matches the AI Connector API key pattern.
+	 *
+	 * @since 2.2.0
 	 *
 	 * @param string $option_name Option name.
 	 * @return bool True when the option name matches the AI Connector API key pattern.
