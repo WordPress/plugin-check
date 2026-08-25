@@ -58,10 +58,14 @@ jobs:
           fi
 
           # Resolve the PR number from the trusted head SHA rather than the
-          # artifact-supplied value.
+          # artifact-supplied value. The commits/{sha}/pulls association index
+          # omits fork PR heads, so list open PRs and match on the exact head
+          # SHA instead; this also prevents resolving a different PR that
+          # merely contains the commit.
           resolved_pr_number="$(
-            gh api "repos/${GH_REPO}/commits/${TRUSTED_HEAD_SHA}/pulls" \
-              --jq 'map(select(.state == "open")) | first | .number // empty'
+            gh api "repos/${GH_REPO}/pulls?state=open&per_page=100" --paginate \
+              --jq '.[] | select(.head.sha == env.TRUSTED_HEAD_SHA) | .number' \
+              | head -n 1
           )"
 
           if ! [[ "$resolved_pr_number" =~ ^[0-9]+$ ]]; then
