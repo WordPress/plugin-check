@@ -213,8 +213,8 @@ final class Runtime_Environment_Setup {
 	 * @return string[] List of table names, without any prefix.
 	 */
 	private function get_core_table_names( string $base_prefix, string $runtime_prefix ): array {
-		// The schema functions live in this file, which callers are not required to have loaded already.
-		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		// `wp_get_db_schema()` lives in this file, which callers are not required to have loaded already.
+		require_once ABSPATH . 'wp-admin/includes/schema.php';
 
 		if ( ! preg_match_all( '/CREATE TABLE (?:IF NOT EXISTS )?`?([0-9a-zA-Z$_]+)`?/i', wp_get_db_schema( 'all' ), $matches ) ) {
 			return array();
