@@ -92,11 +92,20 @@ jobs:
 
       - name: Start WordPress
         run: |
-          if [[ ${{ matrix.coverage == true }} == true ]]; then
-            npm run wp-env:start:tests -- --xdebug=coverage
-          else
-            npm run wp-env:start:tests
-          fi
+          set +e
+          for i in 1 2 3 4 5; do
+            if [[ ${{ matrix.coverage == true }} == true ]]; then
+              npm run wp-env:start:tests -- --xdebug=coverage
+            else
+              npm run wp-env:start:tests
+            fi
+            if [ $? -eq 0 ]; then
+              exit 0
+            fi
+            echo "wp-env start failed (attempt $i), retrying in 60s..."
+            sleep 60
+          done
+          exit 1
 
       - name: Run tests
         run: |
@@ -107,6 +116,12 @@ jobs:
             npm run test-php
             npm run test-php-multisite
           fi
+
+      - name: Import Codecov GPG key
+        if: ${{ matrix.coverage }}
+        run: |
+          gpg --keyserver keyserver.ubuntu.com --recv-keys 27034E7FDB850E0BBC2C62FF806BB28AED779869 2>/dev/null || \
+          curl -fsSL https://keybase.io/codecovsecurity/pgp_keys.asc | gpg --import --no-default-keyring --keyring trustedkeys.gpg 2>/dev/null || true
 
       - name: Upload code coverage report
         if: ${{ matrix.coverage }}

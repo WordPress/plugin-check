@@ -153,6 +153,12 @@ jobs:
           echo "Coverage files: $FILES"
           echo "files=$FILES" >> $GITHUB_OUTPUT
 
+      - name: Import Codecov GPG key
+        if: ${{ matrix.coverage }}
+        run: |
+          gpg --keyserver keyserver.ubuntu.com --recv-keys 27034E7FDB850E0BBC2C62FF806BB28AED779869 2>/dev/null || \
+          curl -fsSL https://keybase.io/codecovsecurity/pgp_keys.asc | gpg --import --no-default-keyring --keyring trustedkeys.gpg 2>/dev/null || true
+
       - name: Upload code coverage report
         if: ${{ matrix.coverage }}
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f

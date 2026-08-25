@@ -414,14 +414,14 @@ final class Admin_Page {
 		?>
 		<style>
 			#plugin-check__results .notice,
-			#plugin-check__results .notice + h4 {
+			#plugin-check__results .notice + .plugin-check__file-section {
 				margin-top: 20px;
 			}
-			#plugin-check__results h4:first-child {
+			#plugin-check__results .plugin-check__file-section:first-child {
 				margin-top: 80.5px;
 			}
 			@media ( max-width: 782px ) {
-				#plugin-check__results h4:first-child {
+				#plugin-check__results .plugin-check__file-section:first-child {
 					margin-top: 88.5px;
 				}
 			}

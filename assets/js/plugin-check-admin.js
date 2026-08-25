@@ -4,6 +4,9 @@
 	const exportContainer = document.getElementById(
 		'plugin-check__export-controls'
 	);
+	const collapseExpandContainer = document.getElementById(
+		'plugin-check__collapse-expand-controls'
+	);
 	const spinner = document.getElementById( 'plugin-check__spinner' );
 	const pluginsList = document.getElementById(
 		'plugin-check__plugins-dropdown'
@@ -20,6 +23,7 @@
 		! pluginsList ||
 		! resultsContainer ||
 		! exportContainer ||
+		! collapseExpandContainer ||
 		! spinner ||
 		! categoriesList.length ||
 		! typesList.length
@@ -33,6 +37,7 @@
 	let checksCompleted = false;
 	exportContainer.classList.add( 'is-hidden' );
 	exportContainer.addEventListener( 'click', onExportContainerClick );
+	collapseExpandContainer.classList.add( 'is-hidden' );
 
 	const includeExperimental = document.getElementById(
 		'plugin-check__include-experimental'
@@ -198,6 +203,7 @@
 		resultsContainer.innerText = '';
 		exportContainer.innerHTML = '';
 		exportContainer.classList.add( 'is-hidden' );
+		collapseExpandContainer.classList.add( 'is-hidden' );
 		resetAggregatedResults();
 		checksCompleted = false;
 	}
@@ -500,10 +506,12 @@
 		exportContainer.innerHTML = '';
 		if ( ! checksCompleted ) {
 			exportContainer.classList.add( 'is-hidden' );
+			collapseExpandContainer.classList.add( 'is-hidden' );
 			return;
 		}
 
 		exportContainer.classList.remove( 'is-hidden' );
+		collapseExpandContainer.classList.remove( 'is-hidden' );
 
 		const exportButtonConfigs = [
 			{
@@ -1125,10 +1133,36 @@
 		const hasLinks =
 			hasLinksInResults( errors ) || hasLinksInResults( warnings );
 
+		const errorCount = countResultTree( { [ file ]: errors } );
+		const warningCount = countResultTree( { [ file ]: warnings } );
+
+		const errorLabel =
+			errorCount > 0
+				? ( errorCount === 1
+						? pluginCheck.errorString
+						: pluginCheck.errorsString
+				  ).replace( '%d', errorCount )
+				: '';
+		const warningLabel =
+			warningCount > 0
+				? ( warningCount === 1
+						? pluginCheck.warningString
+						: pluginCheck.warningsString
+				  ).replace( '%d', warningCount )
+				: '';
+
 		// Render the file table.
 		resultsContainer.innerHTML += renderTemplate(
 			'plugin-check-results-table',
-			{ file, index, hasLinks }
+			{
+				file,
+				index,
+				hasLinks,
+				errorCount,
+				warningCount,
+				errorLabel,
+				warningLabel,
+			}
 		);
 		const resultsTable = document.getElementById(
 			'plugin-check__results-body-' + index
@@ -1266,10 +1300,32 @@
 		const hasLinks =
 			hasLinksInResults( errors ) || hasLinksInResults( warnings );
 
+		const errorCount = countResultTree( { [ file ]: errors } );
+		const warningCount = countResultTree( { [ file ]: warnings } );
+
+		const errorLabel =
+			errorCount > 0
+				? ( errorCount === 1
+						? pluginCheck.errorString
+						: pluginCheck.errorsString
+				  ).replace( '%d', errorCount )
+				: '';
+		const warningLabel =
+			warningCount > 0
+				? ( warningCount === 1
+						? pluginCheck.warningString
+						: pluginCheck.warningsString
+				  ).replace( '%d', warningCount )
+				: '';
+
 		container.innerHTML += renderTemplate( 'plugin-check-results-table', {
 			file,
 			index,
 			hasLinks,
+			errorCount,
+			warningCount,
+			errorLabel,
+			warningLabel,
 		} );
 
 		const resultsTable = document.getElementById(
@@ -1430,5 +1486,101 @@
 		}
 		const template = templates[ templateSlug ];
 		return template( data );
+	}
+
+	/**
+	 * Toggles the open/collapsed state of a single file section.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param {HTMLElement} section The file section element.
+	 */
+	function toggleFileSection( section ) {
+		if ( ! section ) {
+			return;
+		}
+		const header = section.querySelector(
+			'.plugin-check__file-section-header'
+		);
+		const isCollapsed = section.classList.contains(
+			'plugin-check__file-section--collapsed'
+		);
+		if ( isCollapsed ) {
+			section.classList.remove( 'plugin-check__file-section--collapsed' );
+			if ( header ) {
+				header.setAttribute( 'aria-expanded', 'true' );
+			}
+		} else {
+			section.classList.add( 'plugin-check__file-section--collapsed' );
+			if ( header ) {
+				header.setAttribute( 'aria-expanded', 'false' );
+			}
+		}
+	}
+
+	/**
+	 * Sets the open state of every file section in the results container.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param {boolean} open Open state to apply.
+	 */
+	function setAllFileSectionsOpen( open ) {
+		const sections = resultsContainer.querySelectorAll(
+			'.plugin-check__file-section'
+		);
+		sections.forEach( function ( section ) {
+			const header = section.querySelector(
+				'.plugin-check__file-section-header'
+			);
+			if ( open ) {
+				section.classList.remove(
+					'plugin-check__file-section--collapsed'
+				);
+				if ( header ) {
+					header.setAttribute( 'aria-expanded', 'true' );
+				}
+			} else {
+				section.classList.add(
+					'plugin-check__file-section--collapsed'
+				);
+				if ( header ) {
+					header.setAttribute( 'aria-expanded', 'false' );
+				}
+			}
+		} );
+	}
+
+	// Delegated click handler for individual file section headers.
+	resultsContainer.addEventListener( 'click', function ( event ) {
+		const header = event.target.closest(
+			'.plugin-check__file-section-header'
+		);
+		if ( ! header ) {
+			return;
+		}
+		event.preventDefault();
+		const section = header.closest( '.plugin-check__file-section' );
+		toggleFileSection( section );
+	} );
+
+	// Wire up the Collapse All / Expand All buttons.
+	const expandAllButton = document.getElementById(
+		'plugin-check__expand-all'
+	);
+	const collapseAllButton = document.getElementById(
+		'plugin-check__collapse-all'
+	);
+
+	if ( expandAllButton ) {
+		expandAllButton.addEventListener( 'click', function () {
+			setAllFileSectionsOpen( true );
+		} );
+	}
+
+	if ( collapseAllButton ) {
+		collapseAllButton.addEventListener( 'click', function () {
+			setAllFileSectionsOpen( false );
+		} );
 	}
 } )( PLUGIN_CHECK );
