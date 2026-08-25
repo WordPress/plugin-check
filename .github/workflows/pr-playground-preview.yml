@@ -36,7 +36,8 @@ jobs:
           coverage: none
 
       - name: Install production Composer dependencies
-        run: composer install --no-dev --optimize-autoloader --no-interaction --no-progress
+        # --no-scripts stops a PR's composer.json from running code during the build.
+        run: composer install --no-dev --optimize-autoloader --no-interaction --no-progress --no-scripts
 
       - name: Build plugin zip honouring .distignore
         env:
