@@ -41,14 +41,14 @@
 				<span id="plugin-check__spinner" class="spinner" style="float: none;"></span>
 				<div class="plugin-check__options">
 					<div>
-						<h4><?php esc_attr_e( 'Categories', 'plugin-check' ); ?></h4>
+						<h4><?php esc_html_e( 'Categories', 'plugin-check' ); ?></h4>
 						<?php if ( ! empty( $categories ) ) : ?>
 							<table id="plugin-check__categories">
 								<?php foreach ( $categories as $category => $label ) : ?>
 									<tr>
 										<td>
 											<fieldset>
-												<legend class="screen-reader-text"><?php echo esc_html( $category ); ?></legend>
+												<legend class="screen-reader-text"><?php echo esc_html( $label ); ?></legend>
 												<label for="<?php echo esc_attr( $category ); ?>">
 													<input type="checkbox" id="<?php echo esc_attr( $category ); ?>" name="categories" value="<?php echo esc_attr( $category ); ?>" <?php checked( in_array( $category, $user_enabled_categories, true ) ); ?> />
 													<?php echo esc_html( $label ); ?>
@@ -61,14 +61,14 @@
 						<?php endif; ?>
 					</div>
 					<div id="plugin-check__types-container">
-						<h4><?php esc_attr_e( 'Types', 'plugin-check' ); ?></h4>
+						<h4><?php esc_html_e( 'Types', 'plugin-check' ); ?></h4>
 						<?php if ( ! empty( $types ) ) : ?>
 							<table id="plugin-check__types">
 								<?php foreach ( $types as $type => $label ) : ?>
 									<tr>
 										<td>
 											<fieldset>
-												<legend class="screen-reader-text"><?php echo esc_html( $type ); ?></legend>
+												<legend class="screen-reader-text"><?php echo esc_html( $label ); ?></legend>
 												<label for="<?php echo esc_attr( $type ); ?>">
 													<input type="checkbox" id="<?php echo esc_attr( $type ); ?>" name="types" value="<?php echo esc_attr( $type ); ?>" checked="checked" />
 													<?php echo esc_html( $label ); ?>
@@ -81,13 +81,12 @@
 						<?php endif; ?>
 					</div>
 					<div id="plugin-check__ai-container">
-						<h4><?php esc_attr_e( 'AI Settings', 'plugin-check' ); ?></h4>
+						<h4><?php esc_html_e( 'AI Settings', 'plugin-check' ); ?></h4>
 						<p>
 							<label><input type="checkbox" value="use-ai" id="plugin-check__use-ai" /> <?php esc_html_e( 'Enable AI Analysis', 'plugin-check' ); ?></label>
 						</p>
 					</div>
 				</div>
-				<span id="plugin-check__spinner" class="spinner" style="float: none;"></span>
 				<?php if ( $has_experimental_checks ) { ?>
 					<p>
 						<label><input type="checkbox" value="include-experimental" id="plugin-check__include-experimental" /> <?php esc_html_e( 'Include Experimental Checks', 'plugin-check' ); ?></label>

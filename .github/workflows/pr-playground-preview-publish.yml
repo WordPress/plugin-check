@@ -35,24 +35,50 @@ jobs:
             --name plugin-check-preview-metadata \
             --dir preview-metadata
 
-      - name: Read Playground preview metadata
+      - name: Resolve and verify Playground preview metadata
         id: metadata
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          # The build runs untrusted PR code, so its artifact is untrusted; the
+          # triggering run's head SHA is the only reliable value.
+          TRUSTED_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
-          pr_number="$(cat preview-metadata/pr-number)"
-          head_sha="$(cat preview-metadata/head-sha)"
+          artifact_pr_number="$(cat preview-metadata/pr-number)"
+          artifact_head_sha="$(cat preview-metadata/head-sha)"
 
-          if ! [[ "$pr_number" =~ ^[0-9]+$ ]]; then
-            echo "Invalid PR number in preview metadata: $pr_number" >&2
+          if ! [[ "$artifact_head_sha" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Invalid head SHA in preview metadata: $artifact_head_sha" >&2
             exit 1
           fi
 
-          if ! [[ "$head_sha" =~ ^[0-9a-f]{40}$ ]]; then
-            echo "Invalid head SHA in preview metadata: $head_sha" >&2
+          if [[ "$artifact_head_sha" != "$TRUSTED_HEAD_SHA" ]]; then
+            echo "Refusing to publish: artifact head SHA ($artifact_head_sha) does not match the triggering run's head SHA ($TRUSTED_HEAD_SHA)." >&2
             exit 1
           fi
 
-          echo "pr-number=$pr_number" >> "$GITHUB_OUTPUT"
-          echo "head-sha=$head_sha" >> "$GITHUB_OUTPUT"
+          # Resolve the PR number from the trusted head SHA rather than the
+          # artifact-supplied value. The commits/{sha}/pulls association index
+          # omits fork PR heads, so list open PRs and match on the exact head
+          # SHA instead; this also prevents resolving a different PR that
+          # merely contains the commit.
+          resolved_pr_number="$(
+            gh api "repos/${GH_REPO}/pulls?state=open&per_page=100" --paginate \
+              --jq '.[] | select(.head.sha == env.TRUSTED_HEAD_SHA) | .number' \
+              | head -n 1
+          )"
+
+          if ! [[ "$resolved_pr_number" =~ ^[0-9]+$ ]]; then
+            echo "Could not resolve an open pull request for head SHA $TRUSTED_HEAD_SHA." >&2
+            exit 1
+          fi
+
+          if [[ "$artifact_pr_number" != "$resolved_pr_number" ]]; then
+            echo "Notice: artifact PR number ($artifact_pr_number) does not match the PR resolved from the head SHA ($resolved_pr_number); using the resolved value." >&2
+          fi
+
+          echo "pr-number=$resolved_pr_number" >> "$GITHUB_OUTPUT"
+          echo "head-sha=$TRUSTED_HEAD_SHA" >> "$GITHUB_OUTPUT"
 
       - name: Expose built artifact as a public URL
         id: expose

@@ -128,6 +128,7 @@
 		e.preventDefault();
 
 		resetResults();
+		announce( defaultString( 'checkingPlugin' ) );
 		checkItButton.disabled = true;
 		pluginsList.disabled = true;
 		spinner.classList.add( 'is-active' );
@@ -183,6 +184,9 @@
 			} )
 			.catch( ( error ) => {
 				console.error( error );
+				const errorMsg =
+					error && error.message ? error.message : String( error );
+				announce( errorMsg );
 
 				resetForm();
 			} );
@@ -195,7 +199,7 @@
 	 */
 	function resetResults() {
 		// Empty the results container.
-		resultsContainer.innerText = '';
+		resultsContainer.textContent = '';
 		exportContainer.innerHTML = '';
 		exportContainer.classList.add( 'is-hidden' );
 		resetAggregatedResults();
@@ -813,7 +817,17 @@
 		}
 
 		renderFalsePositiveResults();
-		renderResultsMessage( isSuccessMessage, aiStats );
+		const resultsMessage = renderResultsMessage(
+			isSuccessMessage,
+			aiStats
+		);
+
+		// Announce the check results summary so screen-reader users know
+		// whether errors or warnings were found, rather than only the
+		// internal runtime cleanup status.
+		if ( resultsMessage ) {
+			announce( resultsMessage );
+		}
 	}
 
 	/**
@@ -823,6 +837,7 @@
 	 *
 	 * @param {boolean} isSuccessMessage Whether the message is a success message.
 	 * @param {Object}  aiStats          AI statistics.
+	 * @return {string} The rendered results message.
 	 */
 	function renderResultsMessage( isSuccessMessage, aiStats ) {
 		// Count errors and warnings to determine notice severity and compose the message.
@@ -980,6 +995,8 @@
 
 		checksCompleted = true;
 		renderExportButtons();
+
+		return messageText;
 	}
 
 	/**
