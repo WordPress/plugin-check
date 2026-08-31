@@ -218,6 +218,8 @@ final class Admin_Page {
 					'summaryBothTemplate'             => __( '%1$s and %2$s found.', 'plugin-check' ),
 					/* translators: %s: Formatted issue count string (e.g. "3 errors" or "2 warnings"). */
 					'summarySingleTemplate'           => __( '%s found.', 'plugin-check' ),
+					/* translators: %s: Comma-separated list of check slugs. */
+					'failedChecksMessage'             => __( 'These checks could not be completed and their results are unknown: %s.', 'plugin-check' ),
 					'strings'                         => array(
 						'checkingPlugin' => __( 'Running plugin checks…', 'plugin-check' ),
 						'exportCsv'      => __( 'Export CSV', 'plugin-check' ),

@@ -756,6 +756,7 @@
 	) {
 		let isSuccessMessage = true;
 		let aiStats = null;
+		const failedChecks = [];
 		for ( let i = 0; i < checks.length; i++ ) {
 			try {
 				const results = await runCheck(
@@ -812,14 +813,15 @@
 					}
 				}
 			} catch {
-				// Ignore for now.
+				failedChecks.push( checks[ i ] );
 			}
 		}
 
 		renderFalsePositiveResults();
 		const resultsMessage = renderResultsMessage(
 			isSuccessMessage,
-			aiStats
+			aiStats,
+			failedChecks
 		);
 
 		// Announce the check results summary so screen-reader users know
@@ -831,15 +833,34 @@
 	}
 
 	/**
+	 * Substitutes printf-style placeholders in a translated string.
+	 * Handles both simple (%d, %s) and positional (%1$d, %2$s) placeholders.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param {string}    template The translated format string.
+	 * @param {...string} args     Replacement values.
+	 * @return {string} Formatted string with placeholders replaced.
+	 */
+	function sprintfReplace( template, ...args ) {
+		let i = 0;
+		return template.replace( /%(\d+\$)?[ds]/g, function ( _match, pos ) {
+			const index = pos ? parseInt( pos, 10 ) - 1 : i++;
+			return args[ index ] !== undefined ? args[ index ] : _match;
+		} );
+	}
+
+	/**
 	 * Renders result message.
 	 *
 	 * @since 1.0.0
 	 *
 	 * @param {boolean} isSuccessMessage Whether the message is a success message.
 	 * @param {Object}  aiStats          AI statistics.
+	 * @param {Array}   failedChecks     Slugs of checks whose request did not complete.
 	 * @return {string} The rendered results message.
 	 */
-	function renderResultsMessage( isSuccessMessage, aiStats ) {
+	function renderResultsMessage( isSuccessMessage, aiStats, failedChecks ) {
 		// Count errors and warnings to determine notice severity and compose the message.
 		const { errorCount, warningCount } = isSuccessMessage
 			? { errorCount: 0, warningCount: 0 }
@@ -860,27 +881,6 @@
 		if ( isSuccessMessage ) {
 			messageText = pluginCheck.successMessage;
 		} else {
-			/**
-			 * Substitutes printf-style placeholders in a translated string.
-			 * Handles both simple (%d, %s) and positional (%1$d, %2$s) placeholders.
-			 *
-			 * @param {string}    template The translated format string.
-			 * @param {...string} args     Replacement values.
-			 * @return {string} Formatted string with placeholders replaced.
-			 */
-			function sprintfReplace( template, ...args ) {
-				let i = 0;
-				return template.replace(
-					/%(\d+\$)?[ds]/g,
-					function ( _match, pos ) {
-						const index = pos ? parseInt( pos, 10 ) - 1 : i++;
-						return args[ index ] !== undefined
-							? args[ index ]
-							: _match;
-					}
-				);
-			}
-
 			// Build the individual count parts with proper plural/singular forms.
 			let errorPart = '';
 			if ( errorCount > 0 ) {
@@ -924,6 +924,20 @@
 				// Fallback to default message if somehow no errors/warnings.
 				messageText = pluginCheck.errorMessage;
 			}
+		}
+
+		// A check whose request did not complete has no results, so the counts above cannot speak for it.
+		if ( failedChecks && failedChecks.length ) {
+			messageType = 'error';
+
+			const failedText = sprintfReplace(
+				pluginCheck.failedChecksMessage,
+				failedChecks.join( ', ' )
+			);
+
+			messageText = isSuccessMessage
+				? failedText
+				: messageText + ' ' + failedText;
 		}
 
 		if ( aiStats ) {
