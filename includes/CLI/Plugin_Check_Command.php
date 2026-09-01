@@ -265,7 +265,10 @@ final class Plugin_Check_Command {
 			$runner->set_check_slugs( $checks );
 			$runner->set_plugin( $plugin );
 			if ( $options['use-pcpignore'] ) {
-				Plugin_Request_Utility::apply_pcpignore_exclusions( $runner->get_plugin_basename() );
+				$plugin_path = $runner->get_plugin_basename();
+				$plugin_path = is_dir( $plugin_path ) ? $plugin_path : WP_PLUGIN_DIR . '/' . $plugin_path;
+
+				Plugin_Request_Utility::apply_pcpignore_exclusions( $plugin_path );
 			}
 			$runner->set_categories( $categories );
 			$runner->set_slug( $options['slug'] );

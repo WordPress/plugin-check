@@ -294,7 +294,10 @@ final class Admin_AJAX {
 			$runner->set_check_slugs( $checks );
 			$runner->set_plugin( $plugin );
 			if ( $use_pcpignore ) {
-				Plugin_Request_Utility::apply_pcpignore_exclusions( $runner->get_plugin_basename() );
+				$plugin_path = $runner->get_plugin_basename();
+				$plugin_path = is_dir( $plugin_path ) ? $plugin_path : WP_PLUGIN_DIR . '/' . $plugin_path;
+
+				Plugin_Request_Utility::apply_pcpignore_exclusions( $plugin_path );
 			}
 			$runner->set_use_ai( $use_ai );
 			$results = $runner->run();
