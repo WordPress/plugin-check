@@ -14,6 +14,7 @@ use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Checker\Runtime_Environment_Setup;
 use WordPress\Plugin_Check\Test_Data\Runtime_Check;
 use WordPress\Plugin_Check\Test_Utils\Traits\With_Mock_Filesystem;
+use WordPress\Plugin_Check\Utilities\PCP_Ignore_Utility;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 
 class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
@@ -311,7 +312,7 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 	public function test_get_pcpignore_exclusions() {
 		$plugin_directory = UNIT_TESTS_PLUGIN_DIR . 'test-plugin-pcpignore';
 
-		$exclusions = Plugin_Request_Utility::get_pcpignore_exclusions( $plugin_directory );
+		$exclusions = PCP_Ignore_Utility::get_exclusions( $plugin_directory );
 
 		$this->assertSame(
 			array( 'docs', 'tests/fixtures' ),
@@ -326,7 +327,7 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 	public function test_get_pcpignore_exclusions_without_ignore_file() {
 		$plugin_directory = UNIT_TESTS_PLUGIN_DIR . 'test-plugin-ignore-files';
 
-		$exclusions = Plugin_Request_Utility::get_pcpignore_exclusions( $plugin_directory );
+		$exclusions = PCP_Ignore_Utility::get_exclusions( $plugin_directory );
 
 		$this->assertSame(
 			array(

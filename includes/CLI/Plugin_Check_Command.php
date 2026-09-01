@@ -14,6 +14,7 @@ use WordPress\Plugin_Check\Checker\Check_Repository;
 use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Checker\Default_Check_Repository;
 use WordPress\Plugin_Check\Plugin_Context;
+use WordPress\Plugin_Check\Utilities\PCP_Ignore_Utility;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 use WordPress\Plugin_Check\Utilities\Results_Exporter;
 use WP_CLI;
@@ -268,7 +269,7 @@ final class Plugin_Check_Command {
 				$plugin_path = $runner->get_plugin_basename();
 				$plugin_path = is_dir( $plugin_path ) ? $plugin_path : WP_PLUGIN_DIR . '/' . $plugin_path;
 
-				Plugin_Request_Utility::apply_pcpignore_exclusions( $plugin_path );
+				PCP_Ignore_Utility::apply_exclusions( $plugin_path );
 			}
 			$runner->set_categories( $categories );
 			$runner->set_slug( $options['slug'] );

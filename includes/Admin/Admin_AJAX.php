@@ -12,6 +12,7 @@ use InvalidArgumentException;
 use WordPress\Plugin_Check\Checker\AJAX_Runner;
 use WordPress\Plugin_Check\Checker\Runtime_Check;
 use WordPress\Plugin_Check\Checker\Runtime_Environment_Setup;
+use WordPress\Plugin_Check\Utilities\PCP_Ignore_Utility;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 use WordPress\Plugin_Check\Utilities\Results_Exporter;
 use WP_Error;
@@ -297,7 +298,7 @@ final class Admin_AJAX {
 				$plugin_path = $runner->get_plugin_basename();
 				$plugin_path = is_dir( $plugin_path ) ? $plugin_path : WP_PLUGIN_DIR . '/' . $plugin_path;
 
-				Plugin_Request_Utility::apply_pcpignore_exclusions( $plugin_path );
+				PCP_Ignore_Utility::apply_exclusions( $plugin_path );
 			}
 			$runner->set_use_ai( $use_ai );
 			$results = $runner->run();
