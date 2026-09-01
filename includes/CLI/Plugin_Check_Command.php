@@ -124,6 +124,10 @@ final class Plugin_Check_Command {
 	 * This only excludes files from file-based scans. It does not suppress plugin-level findings such as
 	 * missing_composer_json_file; use `--ignore-codes` for specific result codes.
 	 *
+	 * [--use-pcpignore]
+	 * : Apply custom file and directory exclusions from a .pcpignore file in the plugin root.
+	 * This is intended for local and CI scans only and is disabled by default.
+	 *
 	 * [--severity=<severity>]
 	 * : Severity level.
 	 *
@@ -165,6 +169,7 @@ final class Plugin_Check_Command {
 	 *   wp plugin check akismet --ignore-codes=missing_composer_json_file
 	 *   wp plugin check akismet --format=json
 	 *   wp plugin check akismet --mode=update
+	 *   wp plugin check akismet --use-pcpignore
 	 *   wp plugin check akismet --ai
 	 *   wp plugin check akismet --ai --ai-model=openai::gpt-4o
 	 *
@@ -201,6 +206,7 @@ final class Plugin_Check_Command {
 				'mode'                          => 'new',
 				'ai'                            => false,
 				'ai-model'                      => '',
+				'use-pcpignore'                 => false,
 			)
 		);
 
@@ -258,6 +264,9 @@ final class Plugin_Check_Command {
 			$runner->set_experimental_flag( $options['include-experimental'] );
 			$runner->set_check_slugs( $checks );
 			$runner->set_plugin( $plugin );
+			if ( $options['use-pcpignore'] ) {
+				Plugin_Request_Utility::apply_pcpignore_exclusions( $runner->get_plugin_basename() );
+			}
 			$runner->set_categories( $categories );
 			$runner->set_slug( $options['slug'] );
 			$runner->set_mode( $options['mode'] );

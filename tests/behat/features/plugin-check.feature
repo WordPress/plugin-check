@@ -314,6 +314,42 @@ Feature: Test that the WP-CLI command works.
       FILE: subdirectory/error.php
       """
 
+  Scenario: Apply .pcpignore exclusions only when requested
+    Given a WP install with the Plugin Check plugin
+    And an empty wp-content/plugins/foo-plugin directory
+    And an empty wp-content/plugins/foo-plugin/docs directory
+    And a wp-content/plugins/foo-plugin/foo-plugin.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Plugin
+       * Text Domain: foo-plugin
+       */
+      """
+    And a wp-content/plugins/foo-plugin/docs/example.php file:
+      """
+      <?php
+      $value = 1;
+      echo $value;
+      """
+    And a wp-content/plugins/foo-plugin/.pcpignore file:
+      """
+      # Documentation is not distributed.
+      docs/
+      """
+
+    When I run the WP-CLI command `plugin check foo-plugin`
+    Then STDOUT should contain:
+      """
+      FILE: docs/example.php
+      """
+
+    When I run the WP-CLI command `plugin check foo-plugin --use-pcpignore`
+    Then STDOUT should not contain:
+      """
+      FILE: docs/example.php
+      """
+
   Scenario: Perform runtime check
     Given a WP install with the Plugin Check plugin
     And a wp-content/plugins/foo-single.php file:

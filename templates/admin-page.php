@@ -86,6 +86,12 @@
 							<label><input type="checkbox" value="use-ai" id="plugin-check__use-ai" /> <?php esc_html_e( 'Enable AI Analysis', 'plugin-check' ); ?></label>
 						</p>
 					</div>
+					<div id="plugin-check__pcpignore-container">
+						<h4><?php esc_html_e( 'Custom Exclusions', 'plugin-check' ); ?></h4>
+						<p>
+							<label><input type="checkbox" value="use-pcpignore" id="plugin-check__use-pcpignore" /> <?php esc_html_e( 'Use .pcpignore custom exclusions', 'plugin-check' ); ?></label>
+						</p>
+					</div>
 				</div>
 				<?php if ( $has_experimental_checks ) { ?>
 					<p>

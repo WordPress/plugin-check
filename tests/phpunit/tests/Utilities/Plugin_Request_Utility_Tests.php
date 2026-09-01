@@ -308,6 +308,35 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		$this->assertEquals( $custom_ignore_files, $result );
 	}
 
+	public function test_get_pcpignore_exclusions() {
+		$plugin_directory = UNIT_TESTS_PLUGIN_DIR . 'test-plugin-pcpignore';
+
+		$exclusions = Plugin_Request_Utility::get_pcpignore_exclusions( $plugin_directory );
+
+		$this->assertSame(
+			array( 'docs', 'tests/fixtures' ),
+			$exclusions['directories']
+		);
+		$this->assertSame(
+			array( 'development-only.php' ),
+			$exclusions['files']
+		);
+	}
+
+	public function test_get_pcpignore_exclusions_without_ignore_file() {
+		$plugin_directory = UNIT_TESTS_PLUGIN_DIR . 'test-plugin-ignore-files';
+
+		$exclusions = Plugin_Request_Utility::get_pcpignore_exclusions( $plugin_directory );
+
+		$this->assertSame(
+			array(
+				'directories' => array(),
+				'files'       => array(),
+			),
+			$exclusions
+		);
+	}
+
 	public function test_plugin_without_error_for_ignore_directories() {
 
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-ignore-directories/load.php' );

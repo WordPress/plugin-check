@@ -285,6 +285,7 @@ final class Admin_AJAX {
 
 		$include_experimental = 1 === filter_input( INPUT_POST, 'include-experimental', FILTER_VALIDATE_INT );
 		$use_ai               = 1 === filter_input( INPUT_POST, 'use-ai', FILTER_VALIDATE_INT );
+		$use_pcpignore        = 1 === filter_input( INPUT_POST, 'use-pcpignore', FILTER_VALIDATE_INT );
 		$types                = filter_input( INPUT_POST, 'types', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
 		$types                = is_null( $types ) ? array( 'error', 'warning' ) : $types;
 
@@ -292,6 +293,9 @@ final class Admin_AJAX {
 			$runner->set_experimental_flag( $include_experimental );
 			$runner->set_check_slugs( $checks );
 			$runner->set_plugin( $plugin );
+			if ( $use_pcpignore ) {
+				Plugin_Request_Utility::apply_pcpignore_exclusions( $runner->get_plugin_basename() );
+			}
 			$runner->set_use_ai( $use_ai );
 			$results = $runner->run();
 		} catch ( Exception $error ) {
