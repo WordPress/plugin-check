@@ -318,7 +318,7 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 			$exclusions['directories']
 		);
 		$this->assertSame(
-			array( 'development-only.php' ),
+			array( 'development-only.php', '.pcpignore' ),
 			$exclusions['files']
 		);
 	}

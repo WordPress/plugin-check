@@ -229,7 +229,7 @@ class Plugin_Request_Utility {
 		}
 
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
-		$lines = file( $ignore_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY );
+		$lines = file( $ignore_file, FILE_IGNORE_NEW_LINES );
 
 		if ( false === $lines ) {
 			return $exclusions;
@@ -242,9 +242,10 @@ class Plugin_Request_Utility {
 				continue;
 			}
 
-			$line = ltrim( wp_normalize_path( $line ), '/' );
+			$is_directory = '/' === substr( $line, -1 );
+			$line         = ltrim( wp_normalize_path( $line ), '/' );
 
-			if ( '/' === substr( $line, -1 ) ) {
+			if ( $is_directory ) {
 				$exclusions['directories'][] = untrailingslashit( $line );
 			} else {
 				$exclusions['files'][] = $line;
@@ -252,7 +253,7 @@ class Plugin_Request_Utility {
 		}
 
 		$exclusions['directories'] = array_unique( $exclusions['directories'] );
-		$exclusions['files']       = array_unique( $exclusions['files'] );
+		$exclusions['files']       = array_unique( array_merge( $exclusions['files'], array( '.pcpignore' ) ) );
 
 		return $exclusions;
 	}
