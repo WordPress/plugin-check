@@ -12,6 +12,7 @@
 	<rule ref="PluginCheck.CodeAnalysis.PHPErrorReporting" />
 	<rule ref="PluginCheck.CodeAnalysis.RequiredFunctionParameters" />
 	<rule ref="PluginCheck.CodeAnalysis.SettingSanitization" />
+	<rule ref="PluginCheck.CodeAnalysis.UnclosedObStart" />
 	<rule ref="PluginCheck.CodeAnalysis.WriteFile" />
 	<rule ref="PluginCheck.Security.VerifyNonce" />
 	<rule ref="PluginCheck.Security.DirectDB" />
