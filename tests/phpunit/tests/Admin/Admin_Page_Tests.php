@@ -25,7 +25,39 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 	public function test_add_hooks() {
 		$this->admin_page->add_hooks();
 		$this->assertEquals( 10, has_action( 'admin_menu', array( $this->admin_page, 'add_and_initialize_page' ) ) );
+		$this->assertEquals( 10, has_action( 'network_admin_menu', array( $this->admin_page, 'add_and_initialize_network_page' ) ) );
 		$this->assertEquals( 10, has_filter( 'plugin_action_links', array( $this->admin_page, 'filter_plugin_action_links' ) ) );
+		$this->assertEquals( 10, has_filter( 'network_admin_plugin_action_links', array( $this->admin_page, 'filter_network_admin_plugin_action_links' ) ) );
+	}
+
+	public function test_add_and_initialize_network_page() {
+
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'The Network Admin is only available on multisite.' );
+		}
+
+		global $_parent_pages;
+
+		$current_screen = get_current_screen();
+
+		$admin_user = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		grant_super_admin( $admin_user );
+		wp_set_current_user( $admin_user );
+
+		set_current_screen( 'dashboard-network' );
+
+		$this->admin_page->add_and_initialize_network_page();
+		$page_hook    = $this->admin_page->get_hook_suffix();
+		$parent_pages = $_parent_pages;
+
+		set_current_screen( $current_screen );
+
+		$this->assertNotEmpty( $page_hook );
+
+		// In the Network Admin the page lives under "Settings" (settings.php).
+		$this->assertArrayHasKey( 'plugin-check', $parent_pages );
+		$this->assertEquals( 'settings.php', $parent_pages['plugin-check'] );
+		$this->assertNotFalse( has_action( "load-{$page_hook}", array( $this->admin_page, 'initialize_page' ) ) );
 	}
 
 	public function test_add_and_initialize_page() {
@@ -150,6 +182,33 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 			sprintf(
 				'<a href="%1$s">%2$s</a>',
 				esc_url( admin_url( "tools.php?page=plugin-check&plugin={$base_file}" ) ),
+				esc_html__( 'Check this plugin', 'plugin-check' )
+			),
+			$action_links[0]
+		);
+	}
+
+	public function test_filter_network_admin_plugin_action_links() {
+
+		$base_file = 'akismet/akismet.php';
+
+		$action_links = $this->admin_page->filter_network_admin_plugin_action_links( array(), $base_file, array(), 'all' );
+		$this->assertEmpty( $action_links );
+
+		/** Administrator check */
+		$admin_user = self::factory()->user->create( array( 'role' => 'administrator' ) );
+
+		if ( is_multisite() ) {
+			grant_super_admin( $admin_user );
+		}
+		wp_set_current_user( $admin_user );
+		$action_links = $this->admin_page->filter_network_admin_plugin_action_links( array(), $base_file, array(), 'all' );
+
+		// In the Network Admin the link points to settings.php instead of tools.php.
+		$this->assertEquals(
+			sprintf(
+				'<a href="%1$s">%2$s</a>',
+				esc_url( network_admin_url( "settings.php?page=plugin-check&plugin={$base_file}" ) ),
 				esc_html__( 'Check this plugin', 'plugin-check' )
 			),
 			$action_links[0]
