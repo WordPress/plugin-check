@@ -87,6 +87,7 @@
 		<exclude name="WordPress.WP.AlternativeFunctions.json_encode_json_encode"/>
 		<exclude name="WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents"/>
 		<exclude name="WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents"/>
+		<exclude name="WordPress.WP.AlternativeFunctions.file_system_operations_fclose"/>
 	</rule>
 
 	<rule ref="Generic.PHP.ForbiddenFunctions">
