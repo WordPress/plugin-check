@@ -227,7 +227,6 @@ final class Admin_AJAX {
 		$checks      = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
 		$checks      = is_null( $checks ) ? array() : $checks;
 		$use_ai      = 1 === filter_input( INPUT_POST, 'use-ai', FILTER_VALIDATE_INT );
-		$use_ai_name = 1 === filter_input( INPUT_POST, 'use-ai-name', FILTER_VALIDATE_INT );
 		$runner      = $this->get_ajax_runner();
 
 		if ( is_wp_error( $runner ) ) {
@@ -238,7 +237,6 @@ final class Admin_AJAX {
 			$this->configure_runner( $runner );
 			$runner->set_categories( $categories );
 			$runner->set_use_ai( $use_ai );
-			$runner->set_use_ai_name( $use_ai_name );
 
 			$checks_to_run = $runner->get_checks_to_run();
 		} catch ( Exception $error ) {
@@ -277,7 +275,6 @@ final class Admin_AJAX {
 
 		$include_experimental = 1 === filter_input( INPUT_POST, 'include-experimental', FILTER_VALIDATE_INT );
 		$use_ai               = 1 === filter_input( INPUT_POST, 'use-ai', FILTER_VALIDATE_INT );
-		$use_ai_name          = 1 === filter_input( INPUT_POST, 'use-ai-name', FILTER_VALIDATE_INT );
 		$types                = filter_input( INPUT_POST, 'types', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
 		$types                = is_null( $types ) ? array( 'error', 'warning' ) : $types;
 
@@ -286,7 +283,6 @@ final class Admin_AJAX {
 			$runner->set_check_slugs( $checks );
 			$runner->set_plugin( $plugin );
 			$runner->set_use_ai( $use_ai );
-			$runner->set_use_ai_name( $use_ai_name );
 			$results = $runner->run();
 		} catch ( Exception $error ) {
 			wp_send_json_error(

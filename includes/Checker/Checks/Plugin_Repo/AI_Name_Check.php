@@ -75,10 +75,10 @@ class AI_Name_Check implements Static_Check {
 		if ( ! $runner ) {
 			return false;
 		}
-		if ( ! method_exists( $runner, 'should_use_ai_name' ) ) {
+		if ( ! method_exists( $runner, 'should_use_ai' ) ) {
 			return false;
 		}
-		if ( ! $runner->should_use_ai_name() ) {
+		if ( ! $runner->should_use_ai() ) {
 			return false;
 		}
 		if ( is_wp_error( $this->check_ai_prerequisites() ) ) {

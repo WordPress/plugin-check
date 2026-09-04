@@ -9,6 +9,7 @@ namespace WordPress\Plugin_Check;
 
 use WordPress\Plugin_Check\Admin\Admin_AJAX;
 use WordPress\Plugin_Check\Admin\Admin_Page;
+use WordPress\Plugin_Check\Admin\Namer_Page;
 use WordPress\Plugin_Check\Admin\Settings_Page;
 use WordPress\Plugin_Check\Admin\SVN_Checker_Page;
 
@@ -78,6 +79,11 @@ class Plugin_Main {
 		// Create the Settings page.
 		$settings_page = new Settings_Page();
 		$settings_page->add_hooks();
+
+		// Create the Plugin Check Namer tool page.
+		$namer_page = new Namer_Page();
+		$namer_page->add_hooks();
+
 		// Create the SVN Checker page.
 		$svn_checker_page = new SVN_Checker_Page();
 		$svn_checker_page->add_hooks();
