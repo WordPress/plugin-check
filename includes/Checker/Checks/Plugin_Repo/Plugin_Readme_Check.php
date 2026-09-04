@@ -983,7 +983,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 * Checks for a "Tested up to" header declared in the main plugin file.
 	 *
 	 * The "Tested up to" field is readme metadata and must be declared
-	 * exclusively in the plugin readme file. This reports an error whenever
+	 * exclusively in the readme file. This reports an error whenever
 	 * the main plugin file also declares it, whether the readme value is
 	 * missing, equal, or different.
 	 *
@@ -1023,19 +1023,19 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 			if ( $readme_tested_normalized !== $plugin_tested_normalized ) {
 				$message = sprintf(
 					/* translators: 1: Tested up to value from plugin header, 2: Tested up to value from readme */
-					__( '<strong>The "Tested up to" field must be declared only in the plugin readme file: %1$s != %2$s.</strong><br>Remove the "Tested up to" line from the main plugin PHP header and keep it only in readme.txt.', 'plugin-check' ),
+					__( '<strong>The "Tested up to" field must be declared only in the readme file: %1$s != %2$s.</strong><br>Remove the "Tested up to" line from the main plugin PHP header and keep it only in the readme file.', 'plugin-check' ),
 					esc_html( $plugin_tested_normalized ),
 					esc_html( $readme_tested_normalized )
 				);
 			} else {
 				$message = sprintf(
 					/* translators: %s: Tested up to value */
-					__( '<strong>The "Tested up to" field must be declared only in the plugin readme file (currently: %s).</strong><br>Keeping the value in both places can cause them to silently get out of sync in a future release. Remove the "Tested up to" line from the main plugin PHP header and keep it only in readme.txt.', 'plugin-check' ),
+					__( '<strong>The "Tested up to" field must be declared only in the readme file (currently: %s).</strong><br>Keeping the value in both places can cause them to silently get out of sync in a future release. Remove the "Tested up to" line from the main plugin PHP header and keep it only in the readme file.', 'plugin-check' ),
 					esc_html( $plugin_tested_normalized )
 				);
 			}
 		} else {
-			$message = __( '<strong>The "Tested up to" field must be declared only in the plugin readme file.</strong><br>Remove the "Tested up to" line from the main plugin PHP header and keep it only in readme.txt.', 'plugin-check' );
+			$message = __( '<strong>The "Tested up to" field must be declared only in the readme file.</strong><br>Remove the "Tested up to" line from the main plugin PHP header and keep it only in the readme file.', 'plugin-check' );
 		}
 
 		$this->add_result_error_for_file(
