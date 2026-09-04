@@ -767,11 +767,11 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$this->assertNotEmpty( $errors );
 		$this->assertArrayHasKey( 'load.php', $errors );
 
-		// Check for mismatched "Tested up to" error.
-		$this->assertCount( 1, wp_list_filter( $errors['load.php'][0][0], array( 'code' => 'mismatched_tested_up_to_header' ) ) );
+		// Check for "Tested up to" declared in the plugin header error.
+		$this->assertCount( 1, wp_list_filter( $errors['load.php'][0][0], array( 'code' => 'plugin_header_tested_up_to_not_allowed' ) ) );
 
 		// Verify the error message contains the correct versions.
-		$error_items   = wp_list_filter( $errors['load.php'][0][0], array( 'code' => 'mismatched_tested_up_to_header' ) );
+		$error_items   = wp_list_filter( $errors['load.php'][0][0], array( 'code' => 'plugin_header_tested_up_to_not_allowed' ) );
 		$error_message = reset( $error_items )['message'];
 		$this->assertStringContainsString( '6.7', $error_message );
 		$this->assertStringContainsString( '6.5', $error_message );
@@ -786,18 +786,15 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$errors = $check_result->get_errors();
 
-		// Should not have mismatched tested up to error when values match.
-		// Note: Other readme errors may still be present.
-		if ( ! empty( $errors ) ) {
-			foreach ( $errors as $file => $file_errors ) {
-				if ( isset( $file_errors[0][0] ) ) {
-					$this->assertCount( 0, wp_list_filter( $file_errors[0][0], array( 'code' => 'mismatched_tested_up_to_header' ) ) );
-				}
-			}
-		}
+		$this->assertNotEmpty( $errors );
+		$this->assertArrayHasKey( 'load.php', $errors );
 
-		// Explicitly assert that we checked for the error code.
-		$this->assertTrue( true );
+		// Even when the values match, declaring "Tested up to" in the header must be reported.
+		$this->assertCount( 1, wp_list_filter( $errors['load.php'][0][0], array( 'code' => 'plugin_header_tested_up_to_not_allowed' ) ) );
+
+		$error_items   = wp_list_filter( $errors['load.php'][0][0], array( 'code' => 'plugin_header_tested_up_to_not_allowed' ) );
+		$error_message = reset( $error_items )['message'];
+		$this->assertStringContainsString( '6.7', $error_message );
 	}
 
 	public function test_run_with_readme_only() {
@@ -809,12 +806,12 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$errors = $check_result->get_errors();
 
-		// Should not have mismatched tested up to error when only readme has the value.
+		// Should not report an error when "Tested up to" is only declared in the readme.
 		// Note: Other readme errors may still be present.
 		if ( ! empty( $errors ) ) {
 			foreach ( $errors as $file => $file_errors ) {
 				if ( isset( $file_errors[0][0] ) ) {
-					$this->assertCount( 0, wp_list_filter( $file_errors[0][0], array( 'code' => 'mismatched_tested_up_to_header' ) ) );
+					$this->assertCount( 0, wp_list_filter( $file_errors[0][0], array( 'code' => 'plugin_header_tested_up_to_not_allowed' ) ) );
 				}
 			}
 		}
@@ -832,18 +829,11 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$errors = $check_result->get_errors();
 
-		// Should not have mismatched tested up to error when only header has the value.
-		// Note: Other readme errors may still be present.
-		if ( ! empty( $errors ) ) {
-			foreach ( $errors as $file => $file_errors ) {
-				if ( isset( $file_errors[0][0] ) ) {
-					$this->assertCount( 0, wp_list_filter( $file_errors[0][0], array( 'code' => 'mismatched_tested_up_to_header' ) ) );
-				}
-			}
-		}
+		$this->assertNotEmpty( $errors );
+		$this->assertArrayHasKey( 'load.php', $errors );
 
-		// Explicitly assert that we checked for the error code.
-		$this->assertTrue( true );
+		// "Tested up to" declared only in the header must still be reported.
+		$this->assertCount( 1, wp_list_filter( $errors['load.php'][0][0], array( 'code' => 'plugin_header_tested_up_to_not_allowed' ) ) );
 	}
 
 	public function test_run_with_single_file_plugin() {
@@ -855,12 +845,12 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 
 		$errors = $check_result->get_errors();
 
-		// Should not have mismatched tested up to errors for single-file plugins.
+		// Should not report "Tested up to" header errors for single-file plugins.
 		// Note: Other header field errors may still be present.
 		if ( ! empty( $errors ) ) {
 			foreach ( $errors as $file => $file_errors ) {
 				if ( isset( $file_errors[0][0] ) ) {
-					$this->assertCount( 0, wp_list_filter( $file_errors[0][0], array( 'code' => 'mismatched_tested_up_to_header' ) ) );
+					$this->assertCount( 0, wp_list_filter( $file_errors[0][0], array( 'code' => 'plugin_header_tested_up_to_not_allowed' ) ) );
 				}
 			}
 		}
@@ -879,6 +869,6 @@ class Plugin_Readme_Check_Tests extends WP_UnitTestCase {
 		$errors = $check_result->get_errors();
 
 		// Should not have tested up to errors when readme doesn't exist.
-		$this->assertEmpty( wp_list_filter( $errors, array( 'code' => 'mismatched_tested_up_to_header' ) ) );
+		$this->assertEmpty( wp_list_filter( $errors, array( 'code' => 'plugin_header_tested_up_to_not_allowed' ) ) );
 	}
 }
