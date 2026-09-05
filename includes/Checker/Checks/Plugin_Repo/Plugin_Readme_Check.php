@@ -127,7 +127,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		$this->check_language( $result, $readme_file, $parser );
 
 		// Check for mismatched "Tested up to" header between plugin header and readme.
-		$this->check_tested_up_to_mismatch( $result, $parser, $result->plugin()->main_file() );
+		$this->check_tested_up_to_in_header( $result, $parser, $result->plugin()->main_file() );
 	}
 
 	/**
@@ -993,7 +993,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 * @param DotorgParser|PCPParser $parser           The Parser object.
 	 * @param string                 $plugin_main_file The main plugin file path.
 	 */
-	private function check_tested_up_to_mismatch( Check_Result $result, $parser, string $plugin_main_file ) {
+	private function check_tested_up_to_in_header( Check_Result $result, $parser, string $plugin_main_file ) {
 
 		// Check if single file plugin, then bail early.
 		if ( $result->plugin()->is_single_file_plugin() ) {
