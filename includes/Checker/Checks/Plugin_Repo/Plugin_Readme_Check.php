@@ -126,7 +126,7 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		// Check the readme for language.
 		$this->check_language( $result, $readme_file, $parser );
 
-		// Check for mismatched "Tested up to" header between plugin header and readme.
+		// Check for a "Tested up to" header declared in the main plugin file.
 		$this->check_tested_up_to_in_header( $result, $parser, $result->plugin()->main_file() );
 	}
 
