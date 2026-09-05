@@ -14,6 +14,7 @@ use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Checker\Runtime_Environment_Setup;
 use WordPress\Plugin_Check\Test_Data\Runtime_Check;
 use WordPress\Plugin_Check\Test_Utils\Traits\With_Mock_Filesystem;
+use WordPress\Plugin_Check\Utilities\PCP_Ignore_Utility;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 
 class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
@@ -306,6 +307,35 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		);
 
 		$this->assertEquals( $custom_ignore_files, $result );
+	}
+
+	public function test_get_pcpignore_exclusions() {
+		$plugin_directory = UNIT_TESTS_PLUGIN_DIR . 'test-plugin-pcpignore';
+
+		$exclusions = PCP_Ignore_Utility::get_exclusions( $plugin_directory );
+
+		$this->assertSame(
+			array( 'docs', 'tests/fixtures' ),
+			$exclusions['directories']
+		);
+		$this->assertSame(
+			array( 'development-only.php', '.pcpignore' ),
+			$exclusions['files']
+		);
+	}
+
+	public function test_get_pcpignore_exclusions_without_ignore_file() {
+		$plugin_directory = UNIT_TESTS_PLUGIN_DIR . 'test-plugin-ignore-files';
+
+		$exclusions = PCP_Ignore_Utility::get_exclusions( $plugin_directory );
+
+		$this->assertSame(
+			array(
+				'directories' => array(),
+				'files'       => array(),
+			),
+			$exclusions
+		);
 	}
 
 	public function test_plugin_without_error_for_ignore_directories() {
