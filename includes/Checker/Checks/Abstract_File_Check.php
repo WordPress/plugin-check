@@ -13,6 +13,7 @@ use RecursiveIteratorIterator;
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Static_Check;
+use WordPress\Plugin_Check\Utilities\Ignore_Matcher;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 
 /**
@@ -293,11 +294,11 @@ abstract class Abstract_File_Check implements Static_Check {
 
 				$file_path = wp_normalize_path( $file->getPathname() );
 
-				if ( Plugin_Request_Utility::is_file_in_ignored_directory( $file_path, $plugin_root, $directories_to_ignore ) ) {
+				if ( Ignore_Matcher::is_file_in_ignored_directory( $file_path, $plugin_root, $directories_to_ignore ) ) {
 					continue;
 				}
 
-				if ( Plugin_Request_Utility::is_file_ignored( $file_path, $plugin_root, $files_to_ignore ) ) {
+				if ( Ignore_Matcher::is_file_ignored( $file_path, $plugin_root, $files_to_ignore ) ) {
 					continue;
 				}
 

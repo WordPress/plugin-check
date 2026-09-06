@@ -13,6 +13,7 @@ use PHP_CodeSniffer\Runner;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Static_Check;
 use WordPress\Plugin_Check\Traits\Amend_Check_Result;
+use WordPress\Plugin_Check\Utilities\Ignore_Matcher;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 
 /**
@@ -258,8 +259,8 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		$directories_to_ignore = Plugin_Request_Utility::get_directories_to_ignore();
 		$files_to_ignore       = Plugin_Request_Utility::get_files_to_ignore();
 
-		list( $anchored_directories, $unanchored_directories ) = Plugin_Request_Utility::split_anchored_ignore_entries( $directories_to_ignore );
-		list( $anchored_files, $unanchored_files )             = Plugin_Request_Utility::split_anchored_ignore_entries( $files_to_ignore );
+		list( $anchored_directories, $unanchored_directories ) = Ignore_Matcher::split_anchored_entries( $directories_to_ignore );
+		list( $anchored_files, $unanchored_files )             = Ignore_Matcher::split_anchored_entries( $files_to_ignore );
 
 		// Ignore directories at any depth (default exclusions and --exclude-directories).
 		if ( ! empty( $unanchored_directories ) ) {
