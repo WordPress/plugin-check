@@ -126,8 +126,8 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 		// Check the readme for language.
 		$this->check_language( $result, $readme_file, $parser );
 
-		// Check for mismatched "Tested up to" header between plugin header and readme.
-		$this->check_tested_up_to_mismatch( $result, $parser, $result->plugin()->main_file() );
+		// Check for a "Tested up to" header declared in the main plugin file.
+		$this->check_tested_up_to_in_header( $result, $parser, $result->plugin()->main_file() );
 	}
 
 	/**
@@ -980,7 +980,12 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 
 
 	/**
-	 * Checks for mismatched "Tested up to" header between plugin header and readme.
+	 * Checks for a "Tested up to" header declared in the main plugin file.
+	 *
+	 * The "Tested up to" field is readme metadata and must be declared
+	 * exclusively in the readme file. This reports an error whenever
+	 * the main plugin file also declares it, whether the readme value is
+	 * missing, equal, or different.
 	 *
 	 * @since 1.8.0
 	 *
@@ -988,17 +993,10 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 	 * @param DotorgParser|PCPParser $parser           The Parser object.
 	 * @param string                 $plugin_main_file The main plugin file path.
 	 */
-	private function check_tested_up_to_mismatch( Check_Result $result, $parser, string $plugin_main_file ) {
+	private function check_tested_up_to_in_header( Check_Result $result, $parser, string $plugin_main_file ) {
 
 		// Check if single file plugin, then bail early.
 		if ( $result->plugin()->is_single_file_plugin() ) {
-			return;
-		}
-
-		// Get the "Tested up to" value from the readme.
-		$readme_tested = isset( $parser->tested ) ? $parser->tested : '';
-
-		if ( empty( $readme_tested ) ) {
 			return;
 		}
 
@@ -1014,28 +1012,42 @@ class Plugin_Readme_Check extends Abstract_File_Check {
 			return;
 		}
 
-		// Normalize versions by removing any suffixes (like -RC1, -beta1).
-		$readme_tested_normalized = strtok( $readme_tested, '-' );
-		$plugin_tested_normalized = strtok( $plugin_tested, '-' );
+		// Get the "Tested up to" value from the readme, if available.
+		$readme_tested = isset( $parser->tested ) ? $parser->tested : '';
 
-		// Compare the two values.
-		if ( $readme_tested_normalized !== $plugin_tested_normalized ) {
-			$this->add_result_error_for_file(
-				$result,
-				sprintf(
-					/* translators: 1: Tested up to value from readme, 2: Tested up to value from plugin header */
-					__( '<strong>Mismatched "Tested up to": %1$s != %2$s.</strong><br>The "Tested up to" value in the readme file must match the "Tested up to" value in the plugin header. If the plugin header has a "Tested up to" value, it will override the readme value, which can cause confusion.', 'plugin-check' ),
-					esc_html( $readme_tested_normalized ),
+		if ( ! empty( $readme_tested ) ) {
+			// Normalize versions by removing any suffixes (like -RC1, -beta1).
+			$readme_tested_normalized = strtok( $readme_tested, '-' );
+			$plugin_tested_normalized = strtok( $plugin_tested, '-' );
+
+			if ( $readme_tested_normalized !== $plugin_tested_normalized ) {
+				$message = sprintf(
+					/* translators: 1: Tested up to value from plugin header, 2: Tested up to value from readme */
+					__( '<strong>The "Tested up to" field must be declared only in the readme file: %1$s != %2$s.</strong><br>Remove the "Tested up to" line from the main plugin PHP header and keep it only in the readme file.', 'plugin-check' ),
+					esc_html( $plugin_tested_normalized ),
+					esc_html( $readme_tested_normalized )
+				);
+			} else {
+				$message = sprintf(
+					/* translators: %s: Tested up to value */
+					__( '<strong>The "Tested up to" field must be declared only in the readme file (currently: %s).</strong><br>Keeping the value in both places can cause them to silently get out of sync in a future release. Remove the "Tested up to" line from the main plugin PHP header and keep it only in the readme file.', 'plugin-check' ),
 					esc_html( $plugin_tested_normalized )
-				),
-				'mismatched_tested_up_to_header',
-				$plugin_main_file,
-				0,
-				0,
-				'https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/#readme-header-information',
-				7
-			);
+				);
+			}
+		} else {
+			$message = __( '<strong>The "Tested up to" field must be declared only in the readme file.</strong><br>Remove the "Tested up to" line from the main plugin PHP header and keep it only in the readme file.', 'plugin-check' );
 		}
+
+		$this->add_result_error_for_file(
+			$result,
+			$message,
+			'plugin_header_tested_up_to_not_allowed',
+			$plugin_main_file,
+			0,
+			0,
+			'https://developer.wordpress.org/plugins/wordpress-org/how-your-readme-txt-works/#readme-header-information',
+			7
+		);
 	}
 
 	/**

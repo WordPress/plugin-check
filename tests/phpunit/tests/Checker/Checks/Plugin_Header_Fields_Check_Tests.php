@@ -244,7 +244,7 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 
 		// The "Tested up to" mismatch check has been moved to Plugin_Readme_Check.
 		// This test now verifies that Plugin_Header_Fields_Check does NOT report this error.
-		$error_items = wp_list_filter( $errors['load.php'][0][0] ?? array(), array( 'code' => 'mismatched_tested_up_to_header' ) );
+		$error_items = wp_list_filter( $errors['load.php'][0][0] ?? array(), array( 'code' => 'plugin_header_tested_up_to_not_allowed' ) );
 		$this->assertCount( 0, $error_items );
 	}
 
@@ -258,7 +258,7 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 		$errors = $check_result->get_errors();
 
 		// Should not have mismatched tested up to error.
-		$error_items = wp_list_filter( $errors['load.php'][0][0] ?? array(), array( 'code' => 'mismatched_tested_up_to_header' ) );
+		$error_items = wp_list_filter( $errors['load.php'][0][0] ?? array(), array( 'code' => 'plugin_header_tested_up_to_not_allowed' ) );
 		$this->assertCount( 0, $error_items );
 	}
 
