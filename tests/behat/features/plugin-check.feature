@@ -350,6 +350,107 @@ Feature: Test that the WP-CLI command works.
       FILE: docs/example.php
       """
 
+  Scenario: .pcpignore exclusions are anchored to the plugin root
+    Given a WP install with the Plugin Check plugin
+    And an empty wp-content/plugins/foo-plugin directory
+    And an empty wp-content/plugins/foo-plugin/docs directory
+    And an empty wp-content/plugins/foo-plugin/includes/docs directory
+    And a wp-content/plugins/foo-plugin/foo-plugin.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Plugin
+       * Text Domain: foo-plugin
+       */
+      """
+    And a wp-content/plugins/foo-plugin/docs/example.php file:
+      """
+      <?php
+      $value = 1;
+      echo $value;
+      """
+    And a wp-content/plugins/foo-plugin/includes/docs/real-code.php file:
+      """
+      <?php
+      $value = 1;
+      echo $value;
+      """
+    And a wp-content/plugins/foo-plugin/.pcpignore file:
+      """
+      # Only the top-level docs directory is not distributed.
+      docs/
+      """
+
+    When I run the WP-CLI command `plugin check foo-plugin --use-pcpignore`
+    Then STDOUT should not contain:
+      """
+      FILE: docs/example.php
+      """
+    And STDOUT should contain:
+      """
+      FILE: includes/docs/real-code.php
+      """
+
+  Scenario: .pcpignore exclusions support wildcard patterns
+    Given a WP install with the Plugin Check plugin
+    And an empty wp-content/plugins/foo-plugin directory
+    And a wp-content/plugins/foo-plugin/foo-plugin.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Plugin
+       * Text Domain: foo-plugin
+       */
+      """
+    And a wp-content/plugins/foo-plugin/app.js.map file:
+      """
+      {"version":3,"sources":[],"mappings":""}
+      """
+    And a wp-content/plugins/foo-plugin/.pcpignore file:
+      """
+      # Source maps are not distributed.
+      *.map
+      """
+
+    When I run the WP-CLI command `plugin check foo-plugin`
+    Then STDOUT should contain:
+      """
+      FILE: app.js.map
+      """
+
+    When I run the WP-CLI command `plugin check foo-plugin --use-pcpignore`
+    Then STDOUT should not contain:
+      """
+      FILE: app.js.map
+      """
+
+  Scenario: An unreadable .pcpignore file produces a warning instead of failing the scan
+    Given a WP install with the Plugin Check plugin
+    And an empty wp-content/plugins/foo-plugin directory
+    And a wp-content/plugins/foo-plugin/foo-plugin.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Plugin
+       * Text Domain: foo-plugin
+       */
+      """
+    And a wp-content/plugins/foo-plugin/.pcpignore file:
+      """
+      docs/
+      """
+    And I run `wp eval "chmod( WP_CONTENT_DIR . '/plugins/foo-plugin/.pcpignore', 0000 );"`
+
+    When I run the WP-CLI command `plugin check foo-plugin --use-pcpignore`
+    Then STDOUT should contain:
+      """
+      Warning:
+      """
+    And STDOUT should contain:
+      """
+      .pcpignore
+      """
+
   Scenario: Perform runtime check
     Given a WP install with the Plugin Check plugin
     And a wp-content/plugins/foo-single.php file:

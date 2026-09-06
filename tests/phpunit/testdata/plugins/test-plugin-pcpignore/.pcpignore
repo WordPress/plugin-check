@@ -2,3 +2,4 @@
 docs/
 tests/fixtures/
 development-only.php
+*.map

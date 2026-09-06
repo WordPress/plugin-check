@@ -218,20 +218,10 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 			'--report-width=9999',
 		);
 
-		$ignore_patterns = array();
+		$location    = wp_normalize_path( $result->plugin()->location() );
+		$plugin_root = untrailingslashit( is_dir( $location ) ? $location : dirname( $location ) );
 
-		$directories_to_ignore = Plugin_Request_Utility::get_directories_to_ignore();
-		$files_to_ignore       = Plugin_Request_Utility::get_files_to_ignore();
-
-		// Ignore directories.
-		if ( ! empty( $directories_to_ignore ) ) {
-			$ignore_patterns[] = '*/' . implode( '/*,*/', $directories_to_ignore ) . '/*';
-		}
-
-		// Ignore files.
-		if ( ! empty( $files_to_ignore ) ) {
-			$ignore_patterns[] = '/' . implode( ',/', $files_to_ignore );
-		}
+		$ignore_patterns = $this->get_ignore_patterns( $plugin_root );
 
 		if ( ! empty( $ignore_patterns ) ) {
 			$defaults[] = '--ignore=' . implode( ',', $ignore_patterns );
@@ -246,6 +236,52 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 		}
 
 		return $defaults;
+	}
+
+	/**
+	 * Builds the PHPCS `--ignore` patterns for the given directories and files to ignore.
+	 *
+	 * Entries anchored to the plugin root (i.e. beginning with a forward
+	 * slash, such as those sourced from a `.pcpignore` file) are translated
+	 * into absolute, plugin-root-relative patterns so PHPCS only matches
+	 * them at that exact location, and may include `*` / `?` wildcards.
+	 * Unanchored entries retain the historical any-depth pattern.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param string $plugin_root Absolute, normalized path to the plugin root directory, without a trailing slash.
+	 * @return array An indexed array of PHPCS `--ignore` patterns.
+	 */
+	private function get_ignore_patterns( $plugin_root ) {
+		$ignore_patterns = array();
+
+		$directories_to_ignore = Plugin_Request_Utility::get_directories_to_ignore();
+		$files_to_ignore       = Plugin_Request_Utility::get_files_to_ignore();
+
+		list( $anchored_directories, $unanchored_directories ) = Plugin_Request_Utility::split_anchored_ignore_entries( $directories_to_ignore );
+		list( $anchored_files, $unanchored_files )             = Plugin_Request_Utility::split_anchored_ignore_entries( $files_to_ignore );
+
+		// Ignore directories at any depth (default exclusions and --exclude-directories).
+		if ( ! empty( $unanchored_directories ) ) {
+			$ignore_patterns[] = '*/' . implode( '/*,*/', $unanchored_directories ) . '/*';
+		}
+
+		// Ignore directories anchored to the plugin root (e.g. from .pcpignore).
+		foreach ( $anchored_directories as $directory ) {
+			$ignore_patterns[] = $plugin_root . $directory . '/*';
+		}
+
+		// Ignore files at any depth (--exclude-files).
+		if ( ! empty( $unanchored_files ) ) {
+			$ignore_patterns[] = '/' . implode( ',/', $unanchored_files );
+		}
+
+		// Ignore files anchored to the plugin root (e.g. from .pcpignore).
+		foreach ( $anchored_files as $file ) {
+			$ignore_patterns[] = $plugin_root . $file;
+		}
+
+		return $ignore_patterns;
 	}
 
 	/**

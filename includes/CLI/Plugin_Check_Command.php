@@ -127,7 +127,8 @@ final class Plugin_Check_Command {
 	 *
 	 * [--use-pcpignore]
 	 * : Apply custom file and directory exclusions from a .pcpignore file in the plugin root.
-	 * This is intended for local and CI scans only and is disabled by default.
+	 * Entries are anchored to the plugin root and may include * and ? wildcards. Not supported for
+	 * single-file plugins. This is intended for local and CI scans only and is disabled by default.
 	 *
 	 * [--severity=<severity>]
 	 * : Severity level.
@@ -270,6 +271,10 @@ final class Plugin_Check_Command {
 				$plugin_path = is_dir( $plugin_path ) ? $plugin_path : WP_PLUGIN_DIR . '/' . $plugin_path;
 
 				PCP_Ignore_Utility::apply_exclusions( $plugin_path );
+
+				if ( '' !== PCP_Ignore_Utility::get_warning() ) {
+					WP_CLI::warning( PCP_Ignore_Utility::get_warning() );
+				}
 			}
 			$runner->set_categories( $categories );
 			$runner->set_slug( $options['slug'] );

@@ -66,8 +66,11 @@ missing_composer_json_file; use `--ignore-codes` for specific result codes.
 
 [--use-pcpignore]
 : Apply custom file and directory exclusions from a `.pcpignore` file in the plugin root.
-Each non-empty, non-comment line is a path relative to that root. A trailing slash excludes a directory;
-all other entries exclude files. This option is disabled by default and is intended for local and CI scans.
+Each non-empty, non-comment line is a path anchored to that root (not matched at any depth), so `docs/`
+only excludes a top-level `docs` directory, not a `docs` directory nested elsewhere. A trailing slash
+excludes a directory; all other entries exclude files. Entries may include `*` and `?` wildcards, e.g.
+`*.map`. Single-file plugins are not supported, since they have no dedicated plugin directory to hold a
+`.pcpignore` file. This option is disabled by default and is intended for local and CI scans.
 WordPress.org scans must not use this option.
 
 [--severity=<severity>]

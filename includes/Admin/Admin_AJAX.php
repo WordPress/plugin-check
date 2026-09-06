@@ -290,6 +290,8 @@ final class Admin_AJAX {
 		$types                = filter_input( INPUT_POST, 'types', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
 		$types                = is_null( $types ) ? array( 'error', 'warning' ) : $types;
 
+		$pcpignore_warning = '';
+
 		try {
 			$runner->set_experimental_flag( $include_experimental );
 			$runner->set_check_slugs( $checks );
@@ -299,6 +301,8 @@ final class Admin_AJAX {
 				$plugin_path = is_dir( $plugin_path ) ? $plugin_path : WP_PLUGIN_DIR . '/' . $plugin_path;
 
 				PCP_Ignore_Utility::apply_exclusions( $plugin_path );
+
+				$pcpignore_warning = PCP_Ignore_Utility::get_warning();
 			}
 			$runner->set_use_ai( $use_ai );
 			$results = $runner->run();
@@ -310,6 +314,10 @@ final class Admin_AJAX {
 		}
 
 		$response_data = $this->prepare_results_response( $results, $types );
+
+		if ( '' !== $pcpignore_warning ) {
+			$response_data['pcpignore_warning'] = $pcpignore_warning;
+		}
 
 		// Include AI analysis results if available.
 		$ai_analysis = $results->get_ai_analysis();
