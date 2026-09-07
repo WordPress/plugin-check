@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "@wordpress/env": "^11.13.0",
-    "@wordpress/scripts": "^34.1.0",
+    "@wordpress/scripts": "^34.2.0",
     "gherkin-lint": "^4.2.4"
   },
   "scripts": {
