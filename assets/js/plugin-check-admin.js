@@ -812,7 +812,8 @@
 						);
 					}
 				}
-			} catch {
+			} catch ( error ) {
+				console.error( error );
 				failedChecks.push( checks[ i ] );
 			}
 		}
@@ -836,10 +837,10 @@
 	 * Substitutes printf-style placeholders in a translated string.
 	 * Handles both simple (%d, %s) and positional (%1$d, %2$s) placeholders.
 	 *
-	 * @since 2.1.0
+	 * @since n.e.x.t
 	 *
-	 * @param {string}    template The translated format string.
-	 * @param {...string} args     Replacement values.
+	 * @param {string}             template The translated format string.
+	 * @param {...(string|number)} args     Replacement values.
 	 * @return {string} Formatted string with placeholders replaced.
 	 */
 	function sprintfReplace( template, ...args ) {
@@ -855,9 +856,9 @@
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param {boolean} isSuccessMessage Whether the message is a success message.
-	 * @param {Object}  aiStats          AI statistics.
-	 * @param {Array}   failedChecks     Slugs of checks whose request did not complete.
+	 * @param {boolean}  isSuccessMessage Whether the message is a success message.
+	 * @param {?Object}  aiStats          AI statistics.
+	 * @param {string[]} failedChecks     Slugs of checks whose request did not complete.
 	 * @return {string} The rendered results message.
 	 */
 	function renderResultsMessage( isSuccessMessage, aiStats, failedChecks ) {
