@@ -188,4 +188,118 @@ class Check_Result_Tests extends WP_UnitTestCase {
 
 		$this->assertEquals( 1, $this->check_result->get_error_count() );
 	}
+
+	public function test_check_result_filter_receives_data_result_and_is_error_flag() {
+		$captured = array();
+
+		add_filter(
+			'wp_plugin_check_check_result',
+			static function ( $data, $result, $is_error ) use ( &$captured ) {
+				$captured[] = array(
+					'data'     => $data,
+					'result'   => $result,
+					'is_error' => $is_error,
+				);
+
+				return $data;
+			},
+			10,
+			3
+		);
+
+		$this->check_result->add_message(
+			true,
+			'Error message',
+			array(
+				'code'   => 'test_error',
+				'file'   => 'test-plugin/test-plugin.php',
+				'line'   => 22,
+				'column' => 30,
+			)
+		);
+
+		$this->assertCount( 1, $captured );
+		$this->assertIsArray( $captured[0]['data'] );
+		$this->assertSame( 'Error message', $captured[0]['data']['message'] );
+		$this->assertSame( 'test_error', $captured[0]['data']['code'] );
+		// File path is normalised before the filter fires.
+		$this->assertSame( 'test-plugin.php', $captured[0]['data']['file'] );
+		$this->assertSame( 22, $captured[0]['data']['line'] );
+		$this->assertSame( 30, $captured[0]['data']['column'] );
+		$this->assertSame( $this->check_result, $captured[0]['result'] );
+		$this->assertTrue( $captured[0]['is_error'] );
+	}
+
+	public function test_check_result_filter_suppresses_entry_when_returning_null() {
+		add_filter(
+			'wp_plugin_check_check_result',
+			static function ( $data ) {
+				return ( 'noisy_warning' === ( $data['code'] ?? '' ) ) ? null : $data;
+			}
+		);
+
+		$this->check_result->add_message(
+			false,
+			'Noise.',
+			array(
+				'code' => 'noisy_warning',
+				'file' => 'test-plugin/test-plugin.php',
+			)
+		);
+		$this->check_result->add_message(
+			false,
+			'Real warning.',
+			array(
+				'code' => 'real_warning',
+				'file' => 'test-plugin/test-plugin.php',
+			)
+		);
+
+		$this->assertEquals( 1, $this->check_result->get_warning_count() );
+		$this->assertEquals( 0, $this->check_result->get_error_count() );
+
+		$warnings = $this->check_result->get_warnings();
+		$entries  = array();
+		foreach ( $warnings as $file_entries ) {
+			foreach ( $file_entries as $line_entries ) {
+				foreach ( $line_entries as $column_entries ) {
+					foreach ( $column_entries as $entry ) {
+						$entries[] = $entry['code'] ?? '';
+					}
+				}
+			}
+		}
+		$this->assertSame( array( 'real_warning' ), $entries );
+	}
+
+	public function test_check_result_filter_can_mutate_entry() {
+		add_filter(
+			'wp_plugin_check_check_result',
+			static function ( $data ) {
+				if ( 'mutable_warning' === ( $data['code'] ?? '' ) ) {
+					$data['message']  = 'Edited by filter.';
+					$data['severity'] = 9;
+				}
+
+				return $data;
+			}
+		);
+
+		$this->check_result->add_message(
+			false,
+			'Original.',
+			array(
+				'code'   => 'mutable_warning',
+				'file'   => 'test-plugin/test-plugin.php',
+				'line'   => 1,
+				'column' => 1,
+			)
+		);
+
+		$warnings = $this->check_result->get_warnings();
+		$entry    = $warnings['test-plugin.php'][1][1][0];
+
+		$this->assertSame( 'Edited by filter.', $entry['message'] );
+		$this->assertSame( 9, $entry['severity'] );
+	}
 }

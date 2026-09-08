@@ -24,73 +24,103 @@ final class Runtime_Environment_Setup {
 	 *
 	 * @global wpdb               $wpdb          WordPress database abstraction object.
 	 * @global WP_Filesystem_Base $wp_filesystem WordPress filesystem subclass.
+	 *
+	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
 	 */
 	public function set_up() {
 		global $wpdb, $wp_filesystem;
 
-		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
+		/**
+		 * Fires before the runtime environment is set up.
+		 *
+		 * @since 2.0.0
+		 *
+		 * @param array $context {
+		 *     Context for the hook.
+		 *
+		 *     @type bool $early_exit Whether the method exited before completing all setup steps.
+		 * }
+		 */
+		do_action( 'wp_plugin_check_before_runtime_setup', array( 'early_exit' => false ) );
 
-		// Get the existing site URL.
-		$site_url = get_option( 'siteurl' );
+		try {
+			require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 
-		// Get the existing active plugins.
-		$active_plugins = get_option( 'active_plugins' );
+			// Get the existing site URL.
+			$site_url = get_option( 'siteurl' );
 
-		// Get the existing active theme.
-		$active_theme = get_option( 'stylesheet' );
+			// Get the existing active plugins.
+			$active_plugins = get_option( 'active_plugins' );
 
-		// Get the existing permalink structure.
-		$permalink_structure = get_option( 'permalink_structure' );
+			// Get the existing active theme.
+			$active_theme = get_option( 'stylesheet' );
 
-		// Set the new prefix.
-		$prefix_cleanup = $this->amend_db_base_prefix();
+			// Get the existing permalink structure.
+			$permalink_structure = get_option( 'permalink_structure' );
 
-		// Create and populate the test database tables if they do not exist.
-		if ( $wpdb->posts !== $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->posts ) ) ) {
-			/*
-			 * Set the same permalink structure *before* install finishes,
-			 * so that wp_install_maybe_enable_pretty_permalinks() does not flush rewrite rules.
-			 *
-			 * See https://github.com/WordPress/plugin-check/issues/330
-			 */
-			add_action(
-				'populate_options',
-				static function () use ( $permalink_structure ) {
-					/*
-					 * If pretty permalinks are not used, temporarily enable them by setting a permalink structure, to
-					 * avoid flushing rewrite rules in wp_install_maybe_enable_pretty_permalinks().
-					 * Afterwards, on the 'wp_install' action, set the original (empty) permalink structure.
-					 */
-					if ( ! $permalink_structure ) {
-						add_action(
-							'wp_install',
-							static function () use ( $permalink_structure ) {
-								update_option( 'permalink_structure', $permalink_structure );
-							}
-						);
-						$permalink_structure = '/%postname%/';
+			// Set the new prefix.
+			$prefix_cleanup = $this->amend_db_base_prefix();
+
+			// Create and populate the test database tables if they do not exist.
+			if ( $wpdb->posts !== $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->posts ) ) ) {
+				/*
+				 * Set the same permalink structure *before* install finishes,
+				 * so that wp_install_maybe_enable_pretty_permalinks() does not flush rewrite rules.
+				 *
+				 * See https://github.com/WordPress/plugin-check/issues/330
+				 */
+				add_action(
+					'populate_options',
+					static function () use ( $permalink_structure ) {
+						/*
+						 * If pretty permalinks are not used, temporarily enable them by setting a permalink structure, to
+						 * avoid flushing rewrite rules in wp_install_maybe_enable_pretty_permalinks().
+						 * Afterwards, on the 'wp_install' action, set the original (empty) permalink structure.
+						 */
+						if ( ! $permalink_structure ) {
+							add_action(
+								'wp_install',
+								static function () use ( $permalink_structure ) {
+									update_option( 'permalink_structure', $permalink_structure );
+								}
+							);
+							$permalink_structure = '/%postname%/';
+						}
+						add_option( 'permalink_structure', $permalink_structure );
 					}
-					add_option( 'permalink_structure', $permalink_structure );
-				}
-			);
+				);
 
-			$this->install_wordpress( $site_url, $active_theme, $active_plugins );
-		}
-
-		// Restore the old prefix.
-		$prefix_cleanup();
-
-		// Return early if the plugin check object cache already exists.
-		if ( defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) && WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION ) {
-			return;
-		}
-
-		// Create the object-cache.php file.
-		if ( $wp_filesystem || WP_Filesystem() ) {
-			// Do not replace the object-cache.php file if it already exists.
-			if ( ! $wp_filesystem->exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
-				$wp_filesystem->copy( WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'drop-ins/object-cache.copy.php', WP_CONTENT_DIR . '/object-cache.php' );
+				$this->install_wordpress( $site_url, $active_theme, $active_plugins );
 			}
+
+			// Restore the old prefix.
+			$prefix_cleanup();
+
+			// Return early if the plugin check object cache already exists.
+			if ( defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) && WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION ) {
+				return;
+			}
+
+			// Create the object-cache.php file.
+			if ( $wp_filesystem || WP_Filesystem() ) {
+				// Do not replace the object-cache.php file if it already exists.
+				if ( ! $wp_filesystem->exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
+					$wp_filesystem->copy( WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'drop-ins/object-cache.copy.php', WP_CONTENT_DIR . '/object-cache.php' );
+				}
+			}
+		} finally {
+			/**
+			 * Fires after the runtime environment is set up, including when it exits early.
+			 *
+			 * @since 2.0.0
+			 *
+			 * @param array $context {
+			 *     Context for the hook.
+			 *
+			 *     @type bool $early_exit Whether the method exited before completing all setup steps.
+			 * }
+			 */
+			do_action( 'wp_plugin_check_after_runtime_setup', array( 'early_exit' => false ) );
 		}
 	}
 
@@ -105,38 +135,66 @@ final class Runtime_Environment_Setup {
 	public function clean_up() {
 		global $wpdb, $wp_filesystem;
 
-		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
+		/**
+		 * Fires before the runtime environment is cleaned up.
+		 *
+		 * @since 2.0.0
+		 *
+		 * @param array $context {
+		 *     Context for the hook.
+		 *
+		 *     @type bool $early_exit Whether the method exited before completing all cleanup steps.
+		 * }
+		 */
+		do_action( 'wp_plugin_check_before_runtime_cleanup', array( 'early_exit' => false ) );
 
-		$prefix_cleanup = $this->amend_db_base_prefix();
-		$tables         = $wpdb->tables();
+		try {
+			require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 
-		$tables = $this->ignore_custom_tables( $tables );
+			$prefix_cleanup = $this->amend_db_base_prefix();
+			$tables         = $wpdb->tables();
 
-		foreach ( $tables as $table ) {
-			$wpdb->query( "DROP TABLE IF EXISTS `$table`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		}
+			$tables = $this->ignore_custom_tables( $tables );
 
-		// Restore the old prefix.
-		$prefix_cleanup();
+			foreach ( $tables as $table ) {
+				$wpdb->query( "DROP TABLE IF EXISTS `$table`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			}
 
-		// Return early if the plugin check object cache does not exist.
-		if ( ! defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) || ! WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION ) {
-			return;
-		}
+			// Restore the old prefix.
+			$prefix_cleanup();
 
-		// Remove the object-cache.php file.
-		if ( $wp_filesystem || WP_Filesystem() ) {
-			if ( ! $wp_filesystem->exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
+			// Return early if the plugin check object cache does not exist.
+			if ( ! defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) || ! WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION ) {
 				return;
 			}
 
-			// Check the drop-in file matches the copy.
-			$original_content = $wp_filesystem->get_contents( WP_CONTENT_DIR . '/object-cache.php' );
-			$copy_content     = $wp_filesystem->get_contents( WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'drop-ins/object-cache.copy.php' );
+			// Remove the object-cache.php file.
+			if ( $wp_filesystem || WP_Filesystem() ) {
+				if ( ! $wp_filesystem->exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
+					return;
+				}
 
-			if ( $original_content && $original_content === $copy_content ) {
-				$wp_filesystem->delete( WP_CONTENT_DIR . '/object-cache.php' );
+				// Check the drop-in file matches the copy.
+				$original_content = $wp_filesystem->get_contents( WP_CONTENT_DIR . '/object-cache.php' );
+				$copy_content     = $wp_filesystem->get_contents( WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'drop-ins/object-cache.copy.php' );
+
+				if ( $original_content && $original_content === $copy_content ) {
+					$wp_filesystem->delete( WP_CONTENT_DIR . '/object-cache.php' );
+				}
 			}
+		} finally {
+			/**
+			 * Fires after the runtime environment is cleaned up, including when it exits early.
+			 *
+			 * @since 2.0.0
+			 *
+			 * @param array $context {
+			 *     Context for the hook.
+			 *
+			 *     @type bool $early_exit Whether the method exited before completing all cleanup steps.
+			 * }
+			 */
+			do_action( 'wp_plugin_check_after_runtime_cleanup', array( 'early_exit' => false ) );
 		}
 	}
 
