@@ -185,6 +185,7 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	 *                   the check).
 	 *
 	 * @SuppressWarnings(PHPMD.NPathComplexity)
+	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
 	 */
 	protected function check_url( Check_Result $result, $url ) {
 		// Reset the WP_Scripts instance.
@@ -200,54 +201,180 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 
 		$plugin_scripts     = array();
 		$plugin_script_size = 0;
+		$dep_scripts        = array();
+		$dep_script_size    = 0;
 
-		foreach ( wp_scripts()->done as $handle ) {
+		// Walk only scripts reachable from the plugin's own dependency graph so
+		// unrelated scripts enqueued by the theme, core, or other plugins are
+		// not attributed to the audited plugin.
+		$relevant = $this->collect_relevant_handles( $result );
+
+		foreach ( array_keys( $relevant ) as $handle ) {
 			$script = wp_scripts()->registered[ $handle ];
 
-			if ( ! $script->src || strpos( $script->src, $result->plugin()->url() ) !== 0 ) {
+			if ( ! $script->src ) {
 				continue;
 			}
 
+			$is_plugin_owned = strpos( $script->src, $result->plugin()->url() ) === 0;
+
 			// Get size of script src.
-			$script_path = str_replace( $result->plugin()->url(), $result->plugin()->path(), $script->src );
-			$script_size = function_exists( 'wp_filesize' ) ? wp_filesize( $script_path ) : filesize( $script_path );
+			$script_path = $this->script_src_to_path( $script->src, $result );
+
+			$script_size = ( $script_path && file_exists( $script_path ) )
+				? ( function_exists( 'wp_filesize' ) ? wp_filesize( $script_path ) : filesize( $script_path ) )
+				: 0;
+
+			// Guard against wp_filesize/filesize returning false on read failure.
+			$script_size = (int) $script_size;
 
 			// Get size of additional inline scripts.
-			if ( ! empty( $script->extra['after'] ) ) {
-				foreach ( $script->extra['after'] as $extra ) {
-					$script_size += ( is_string( $extra ) ) ? mb_strlen( $extra, '8bit' ) : 0;
-				}
-			}
+			$script_size += $this->get_inline_script_size( $script );
 
-			if ( ! empty( $script->extra['before'] ) ) {
-				foreach ( $script->extra['before'] as $extra ) {
-					$script_size += ( is_string( $extra ) ) ? mb_strlen( $extra, '8bit' ) : 0;
-				}
+			if ( $is_plugin_owned ) {
+				$plugin_scripts[]    = array(
+					'path' => $script_path,
+					'size' => $script_size,
+				);
+				$plugin_script_size += $script_size;
+			} else {
+				$dep_scripts[]    = array(
+					'src'  => $script->src,
+					'size' => $script_size,
+				);
+				$dep_script_size += $script_size;
 			}
-
-			$plugin_scripts[]    = array(
-				'path' => $script_path,
-				'size' => $script_size,
-			);
-			$plugin_script_size += $script_size;
 		}
+
+		$total_script_size = $plugin_script_size + $dep_script_size;
 
 		if ( $plugin_script_size > $this->threshold_size ) {
 			foreach ( $plugin_scripts as $plugin_script ) {
 				$this->add_result_warning_for_file(
 					$result,
 					sprintf(
-						/* translators: 1: style file size. 2: tested URL. 3: threshold file size. */
+						/* translators: 1: script file size. 2: tested URL. 3: threshold file size. */
 						__( 'This script has a size of %1$s which in combination with the other scripts enqueued on %2$s exceeds the script size threshold of %3$s.', 'plugin-check' ),
 						size_format( $plugin_script['size'] ),
 						$url,
 						size_format( $this->threshold_size )
 					),
 					'EnqueuedScriptsSize.ScriptSizeGreaterThanThreshold',
-					$plugin_script['path']
+					$plugin_script['path'] ?? ''
 				);
 			}
 		}
+
+		if ( $dep_script_size > 0 && $total_script_size > $this->threshold_size ) {
+			$this->add_result_warning_for_file(
+				$result,
+				sprintf(
+					/* translators: 1: total script size including dependencies. 2: formatted dependency size. 3: dependency script count. 4: tested URL. */
+					__( 'The total size of scripts enqueued for the page is %1$s with dependencies adding %2$s (from %3$d script(s)) on %4$s, exceeding the script size threshold.', 'plugin-check' ),
+					size_format( $total_script_size ),
+					size_format( $dep_script_size ),
+					count( $dep_scripts ),
+					$url
+				),
+				'EnqueuedScriptsSize.ExternalDependencySize',
+				$result->plugin()->path()
+			);
+		}
+	}
+
+	/**
+	 * Resolves a script source URL to a local filesystem path if possible.
+	 *
+	 * Returns null when the URL points to an external/CDN host that cannot be
+	 * measured locally. Supports plugin-owned URLs, includes URL, and content URL.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string       $src    Script source URL.
+	 * @param Check_Result $result The check result providing plugin context.
+	 * @return string|null Absolute filesystem path, or null when not resolvable.
+	 */
+	protected function script_src_to_path( $src, Check_Result $result ) {
+		// Strip query string version payload before resolving.
+		$src_clean = strstr( $src, '?', true );
+		if ( false === $src_clean ) {
+			$src_clean = $src;
+		}
+
+		if ( strpos( $src_clean, $result->plugin()->url() ) === 0 ) {
+			return wp_normalize_path(
+				str_replace( $result->plugin()->url(), $result->plugin()->path(), $src_clean )
+			);
+		}
+
+		if ( strpos( $src_clean, includes_url() ) === 0 ) {
+			$relative = substr( $src_clean, strlen( includes_url() ) );
+			$path     = ABSPATH . WPINC . '/' . ltrim( $relative, '/' );
+			return file_exists( $path ) ? wp_normalize_path( $path ) : null;
+		}
+
+		if ( strpos( $src_clean, content_url() ) === 0 ) {
+			$relative = substr( $src_clean, strlen( content_url() ) );
+			$path     = trailingslashit( WP_CONTENT_DIR ) . ltrim( $relative, '/' );
+			return file_exists( $path ) ? wp_normalize_path( $path ) : null;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Collects script handles reachable from the plugin's own dependency graph.
+	 *
+	 * Starts from plugin-owned handles in `wp_scripts()->done` and BFS-walks
+	 * their `$script->deps` transitively, restricted to handles that loaded.
+	 * Cycles guarded via a `$seen` set.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param Check_Result $result The check result providing plugin context.
+	 * @return array Map of relevant handle => true.
+	 */
+	private function collect_relevant_handles( Check_Result $result ) {
+		$done_handles = array_flip( wp_scripts()->done );
+		$plugin_url   = $result->plugin()->url();
+		$relevant     = array();
+		$seen         = array();
+
+		foreach ( wp_scripts()->done as $seed ) {
+			$seed_script = wp_scripts()->registered[ $seed ] ?? null;
+			if ( ! $seed_script || empty( $seed_script->src ) ) {
+				continue;
+			}
+			if ( strpos( $seed_script->src, $plugin_url ) !== 0 ) {
+				continue;
+			}
+
+			$queue = array( $seed );
+
+			while ( $queue ) {
+				$current              = array_shift( $queue );
+				$relevant[ $current ] = true;
+				$seen[ $current ]     = true;
+
+				$current_script = wp_scripts()->registered[ $current ] ?? null;
+				if ( ! $current_script || empty( $current_script->deps ) ) {
+					continue;
+				}
+
+				foreach ( $current_script->deps as $dep ) {
+					if ( isset( $seen[ $dep ] ) ) {
+						continue;
+					}
+					$seen[ $dep ] = true;
+					if ( ! isset( $done_handles[ $dep ] ) ) {
+						continue;
+					}
+					$queue[] = $dep;
+				}
+			}
+		}
+
+		return $relevant;
 	}
 
 	/**
@@ -263,6 +390,30 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 		}
 
 		return $this->viewable_post_types;
+	}
+
+	/**
+	 * Sums the byte length of inline script payloads attached to a script dependency.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param object $script Script dependency whose extras are summed.
+	 * @return int Total byte length of inline payloads.
+	 */
+	private function get_inline_script_size( $script ) {
+		$size = 0;
+
+		foreach ( array( 'after', 'before' ) as $position ) {
+			if ( empty( $script->extra[ $position ] ) ) {
+				continue;
+			}
+
+			foreach ( $script->extra[ $position ] as $extra ) {
+				$size += is_string( $extra ) ? mb_strlen( $extra, '8bit' ) : 0;
+			}
+		}
+
+		return $size;
 	}
 
 	/**

@@ -31,7 +31,7 @@
 | write_file | plugin_repo | Detects if plugins save data in the plugin folder instead of using the uploads directory or database. | [Learn more](https://developer.wordpress.org/plugins/wordpress-org/common-issues/#saving-data-in-the-plugin-folder) |
 | setting_sanitization | plugin_repo | Ensures sanitization in register_setting(). | [Learn more](https://developer.wordpress.org/reference/functions/register_setting/) |
 | prefixing | plugin_repo | Checks plugin for unique prefixing for everything the plugin defines in the public namespace. | [Learn more](https://developer.wordpress.org/plugins/plugin-basics/best-practices/) |
-| enqueued_scripts_size | performance | Checks whether the cumulative size of all scripts enqueued on a page exceeds 293 KB. | [Learn more](https://developer.wordpress.org/plugins/) |
+| enqueued_scripts_size | performance | Checks whether the cumulative size of all scripts enqueued on a page exceeds 293 KB, including any external script dependencies. | [Learn more](https://developer.wordpress.org/plugins/) |
 | enqueued_styles_size | performance | Checks whether the cumulative size of all stylesheets enqueued on a page exceeds 293 KB. | [Learn more](https://developer.wordpress.org/plugins/) |
 | enqueued_styles_scope | performance | Checks whether any stylesheets are loaded on all pages, which is usually not desirable and can lead to performance issues. | [Learn more](https://developer.wordpress.org/plugins/) |
 | enqueued_scripts_scope | performance | Checks whether any scripts are loaded on all pages, which is usually not desirable and can lead to performance issues. | [Learn more](https://developer.wordpress.org/plugins/) |
