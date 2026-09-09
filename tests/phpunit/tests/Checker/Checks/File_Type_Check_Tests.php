@@ -211,7 +211,7 @@ class File_Type_Check_Tests extends WP_UnitTestCase {
 		$errors = $check_result->get_errors();
 
 		$this->assertNotEmpty( $errors );
-		$this->assertEquals( 2, $check_result->get_error_count() );
+		$this->assertEquals( 3, $check_result->get_error_count() );
 
 		// Check for core PHPMailer.
 		$this->assertArrayHasKey( 0, $errors['PHPMailer.php'] );
@@ -222,6 +222,22 @@ class File_Type_Check_Tests extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 0, $errors['jquery.js'] );
 		$this->assertArrayHasKey( 0, $errors['jquery.js'][0] );
 		$this->assertCount( 1, wp_list_filter( $errors['jquery.js'][0][0], array( 'code' => 'library_core_files' ) ) );
+
+		// Check for core ClipboardJS.
+		$this->assertArrayHasKey( 0, $errors['clipboard.js'] );
+		$this->assertArrayHasKey( 0, $errors['clipboard.js'][0] );
+		$this->assertCount( 1, wp_list_filter( $errors['clipboard.js'][0][0], array( 'code' => 'library_core_files' ) ) );
+	}
+
+	public function test_run_with_library_core_filename_false_positives() {
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-file-type-library-core-without-errors/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check = new File_Type_Check( File_Type_Check::TYPE_LIBRARY_CORE );
+		$check->run( $check_result );
+
+		$this->assertSame( 0, $check_result->get_error_count() );
+		$this->assertEmpty( $check_result->get_errors() );
 	}
 
 	public function test_run_with_composer_errors() {
