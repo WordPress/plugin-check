@@ -16,14 +16,14 @@ namespace WordPress\Plugin_Check\Utilities;
  * historical, any-depth matching behavior of the default exclusions and the
  * `--exclude-directories` / `--exclude-files` CLI options.
  *
- * @since n.e.x.t
+ * @since 2.2.0
  */
 class Ignore_Matcher {
 
 	/**
 	 * Splits ignore entries into those anchored to the plugin root and those that are not.
 	 *
-	 * @since n.e.x.t
+	 * @since 2.2.0
 	 *
 	 * @param array $entries Ignore entries.
 	 * @return array An indexed array with the anchored entries first, followed by the unanchored entries.
@@ -53,7 +53,7 @@ class Ignore_Matcher {
 	 * Anchored directories only match a directory at that exact location
 	 * relative to the plugin root. Unanchored directories match at any depth.
 	 *
-	 * @since n.e.x.t
+	 * @since 2.2.0
 	 *
 	 * @param string $file_path             Absolute, normalized path to the file being checked.
 	 * @param string $plugin_root           Absolute, normalized path to the plugin root directory, without a trailing slash.
@@ -95,7 +95,7 @@ class Ignore_Matcher {
 	 * that exact location relative to the plugin root. Unanchored files
 	 * match at any depth, by filename suffix.
 	 *
-	 * @since n.e.x.t
+	 * @since 2.2.0
 	 *
 	 * @param string $file_path       Absolute, normalized path to the file being checked.
 	 * @param string $plugin_root     Absolute, normalized path to the plugin root directory, without a trailing slash.
@@ -133,7 +133,7 @@ class Ignore_Matcher {
 	/**
 	 * Converts a glob-style pattern (using `*` and `?` wildcards) to a regular expression.
 	 *
-	 * @since n.e.x.t
+	 * @since 2.2.0
 	 *
 	 * @param string $pattern The glob-style pattern.
 	 * @return string The equivalent case-insensitive, fully anchored regular expression.

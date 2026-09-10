@@ -161,7 +161,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	/**
 	 * Runs PHP_CodeSniffer.
 	 *
-	 * @since n.e.x.t
+	 * @since 2.2.0
 	 */
 	protected function run_php_codesniffer() {
 		/*
@@ -248,7 +248,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	 * them at that exact location, and may include `*` / `?` wildcards.
 	 * Unanchored entries retain the historical any-depth pattern.
 	 *
-	 * @since n.e.x.t
+	 * @since 2.2.0
 	 *
 	 * @param string $plugin_root Absolute, normalized path to the plugin root directory, without a trailing slash.
 	 * @return array An indexed array of PHPCS `--ignore` patterns.
@@ -288,7 +288,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	/**
 	 * Registers an error handler for known PHPCS notices.
 	 *
-	 * @since n.e.x.t
+	 * @since 2.2.0
 	 */
 	private function register_php_codesniffer_error_handler() {
 		$previous_error_handler = null;
@@ -328,7 +328,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 	 * processing throws, PHP_CodeSniffer does not restore that handler, so it must
 	 * be removed before the temporary deprecation handler can be restored.
 	 *
-	 * @since n.e.x.t
+	 * @since 2.2.0
 	 *
 	 * @param callable $php_codesniffer_error_handler The temporary error handler registered before running PHP_CodeSniffer.
 	 */
