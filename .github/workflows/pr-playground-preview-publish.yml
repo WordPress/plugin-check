@@ -2,12 +2,12 @@ name: PR Playground Preview Publish
 
 # Publishes the read-only build artifact from "PR Playground Preview Build" and
 # writes the Playground button to the PR. This workflow must not check out or
-# execute pull request code.
+# execute pull request code, and must treat everything the build run produced
+# as untrusted.
 
 on:
   workflow_run:
     workflows:
-      - PR Playground Preview
       - PR Playground Preview Build
     types:
       - completed
@@ -25,73 +25,71 @@ jobs:
       github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.event == 'pull_request'
     steps:
-      - name: Download Playground preview metadata
+      - name: Resolve pull request from the triggering run
+        id: metadata
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          # The build runs untrusted PR code, so nothing it uploads can identify
+          # the PR; only the triggering run's own metadata can.
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          HEAD_REPO: ${{ github.event.workflow_run.head_repository.full_name }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          # workflow_run.pull_requests is empty for fork PRs; match repo, branch and SHA so no other PR at this commit can claim the run.
+          pr_numbers="$(
+            gh api "repos/${GH_REPO}/pulls?state=open&per_page=100" --paginate \
+              --jq '.[] | select(.head.sha == env.HEAD_SHA and .head.repo.full_name == env.HEAD_REPO and .head.ref == env.HEAD_BRANCH) | .number'
+          )"
+          # First match; piping into head instead would SIGPIPE gh under pipefail.
+          pr_number="${pr_numbers%%$'\n'*}"
+
+          if ! [[ "$pr_number" =~ ^[0-9]+$ ]]; then
+            echo "Could not resolve an open pull request for ${HEAD_REPO}@${HEAD_BRANCH} (${HEAD_SHA})." >&2
+            exit 1
+          fi
+
+          echo "pr-number=$pr_number" >> "$GITHUB_OUTPUT"
+
+      - name: Download and verify plugin zip artifact
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RUN_ID: ${{ github.event.workflow_run.id }}
         run: |
           gh run download "$RUN_ID" \
             --repo "$GITHUB_REPOSITORY" \
-            --name plugin-check-preview-metadata \
-            --dir preview-metadata
+            --name plugin-check-zip \
+            --dir plugin-zip
 
-      - name: Resolve and verify Playground preview metadata
-        id: metadata
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_REPO: ${{ github.repository }}
-          # The build runs untrusted PR code, so its artifact is untrusted; the
-          # triggering run's head SHA is the only reliable value.
-          TRUSTED_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
-        run: |
-          artifact_pr_number="$(cat preview-metadata/pr-number)"
-          artifact_head_sha="$(cat preview-metadata/head-sha)"
-
-          if ! [[ "$artifact_head_sha" =~ ^[0-9a-f]{40}$ ]]; then
-            echo "Invalid head SHA in preview metadata: $artifact_head_sha" >&2
+          # Untrusted artifact: publish only a regular file that is a valid zip.
+          zip_path=plugin-zip/plugin-check.zip
+          if [[ -L "$zip_path" || ! -f "$zip_path" ]]; then
+            echo "Refusing to publish: '$zip_path' is not a regular file." >&2
             exit 1
           fi
+          unzip -tq "$zip_path"
 
-          if [[ "$artifact_head_sha" != "$TRUSTED_HEAD_SHA" ]]; then
-            echo "Refusing to publish: artifact head SHA ($artifact_head_sha) does not match the triggering run's head SHA ($TRUSTED_HEAD_SHA)." >&2
-            exit 1
-          fi
+      # The expose action does not check artifacts from other runs, so hand it this run's verified copy.
+      - name: Upload verified plugin zip for publishing
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: plugin-check-zip
+          path: plugin-zip/plugin-check.zip
+          if-no-files-found: error
+          retention-days: 1
 
-          # Resolve the PR number from the trusted head SHA rather than the
-          # artifact-supplied value. The commits/{sha}/pulls association index
-          # omits fork PR heads, so list open PRs and match on the exact head
-          # SHA instead; this also prevents resolving a different PR that
-          # merely contains the commit.
-          resolved_pr_number="$(
-            gh api "repos/${GH_REPO}/pulls?state=open&per_page=100" --paginate \
-              --jq '.[] | select(.head.sha == env.TRUSTED_HEAD_SHA) | .number' \
-              | head -n 1
-          )"
-
-          if ! [[ "$resolved_pr_number" =~ ^[0-9]+$ ]]; then
-            echo "Could not resolve an open pull request for head SHA $TRUSTED_HEAD_SHA." >&2
-            exit 1
-          fi
-
-          if [[ "$artifact_pr_number" != "$resolved_pr_number" ]]; then
-            echo "Notice: artifact PR number ($artifact_pr_number) does not match the PR resolved from the head SHA ($resolved_pr_number); using the resolved value." >&2
-          fi
-
-          echo "pr-number=$resolved_pr_number" >> "$GITHUB_OUTPUT"
-          echo "head-sha=$TRUSTED_HEAD_SHA" >> "$GITHUB_OUTPUT"
-
+      # Pinned to commits: this job holds a write token, and a moved tag on
+      # either action would run new code with it.
       - name: Expose built artifact as a public URL
         id: expose
-        uses: WordPress/action-wp-playground-pr-preview/.github/actions/expose-artifact-on-public-url@v3
+        uses: WordPress/action-wp-playground-pr-preview/.github/actions/expose-artifact-on-public-url@43fc435558bc6cee69f5b214d6b8ca4f9f80c31d # v3
         with:
-          artifact-name:              plugin-check-zip
-          artifact-filename:          plugin-check.zip
-          artifact-source-run-id:     ${{ github.event.workflow_run.id }}
-          artifact-source-repository: ${{ github.repository }}
-          pr-number:                  ${{ steps.metadata.outputs.pr-number }}
-          commit-sha:                 ${{ steps.metadata.outputs.head-sha }}
-          artifacts-to-keep:          '2'
-          github-token:               ${{ secrets.GITHUB_TOKEN }}
+          artifact-name:     plugin-check-zip
+          artifact-filename: plugin-check.zip
+          pr-number:         ${{ steps.metadata.outputs.pr-number }}
+          commit-sha:        ${{ github.event.workflow_run.head_sha }}
+          artifacts-to-keep: '2'
+          github-token:      ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate Playground blueprint
         id: blueprint
@@ -127,7 +125,7 @@ jobs:
           NODE
 
       - name: Post Playground Preview Button
-        uses: WordPress/action-wp-playground-pr-preview@v3
+        uses: WordPress/action-wp-playground-pr-preview@43fc435558bc6cee69f5b214d6b8ca4f9f80c31d # v3
         with:
           mode:         append-to-description
           blueprint:    ${{ steps.blueprint.outputs.blueprint }}
