@@ -27,6 +27,9 @@ jobs:
     steps:
       - name: Checkout PR head
         uses: actions/checkout@v7
+        with:
+          # Untrusted code: never persist credentials.
+          persist-credentials: false
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -36,7 +39,8 @@ jobs:
           coverage: none
 
       - name: Install production Composer dependencies
-        # --no-scripts stops a PR's composer.json from running code during the build.
+        # The PR controls this whole job, so --no-scripts is not a boundary;
+        # the read-only token and the publisher's artifact checks are.
         run: composer install --no-dev --optimize-autoloader --no-interaction --no-progress --no-scripts
 
       - name: Build plugin zip honouring .distignore
@@ -54,24 +58,10 @@ jobs:
           zip -qr "${PLUGIN_SLUG}.zip" "${PLUGIN_SLUG}"
           ls -lh "${PLUGIN_SLUG}.zip"
 
-      - name: Write Playground preview metadata
-        run: |
-          mkdir -p build/playground-preview
-          printf '%s' '${{ github.event.pull_request.number }}' > build/playground-preview/pr-number
-          printf '%s' '${{ github.event.pull_request.head.sha }}' > build/playground-preview/head-sha
-
       - name: Upload plugin zip artifact
         uses: actions/upload-artifact@v7
         with:
           name: plugin-check-zip
           path: build/plugin-check.zip
-          if-no-files-found: error
-          retention-days: 5
-
-      - name: Upload Playground preview metadata
-        uses: actions/upload-artifact@v7
-        with:
-          name: plugin-check-preview-metadata
-          path: build/playground-preview
           if-no-files-found: error
           retention-days: 5
