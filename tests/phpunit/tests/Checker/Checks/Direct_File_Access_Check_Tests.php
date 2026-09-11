@@ -88,6 +88,7 @@ class Direct_File_Access_Check_Tests extends WP_UnitTestCase {
 		// Files with only class definitions should not produce errors.
 		$this->assertArrayNotHasKey( 'includes/class-only-file.php', $errors );
 		$this->assertArrayNotHasKey( 'includes/namespace-class-only.php', $errors );
+		$this->assertArrayNotHasKey( 'includes/require-once-class-only.php', $errors );
 	}
 
 	/**
