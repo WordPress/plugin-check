@@ -38,6 +38,9 @@
 		'plugin-check__include-experimental'
 	);
 	const useAi = document.getElementById( 'plugin-check__use-ai' );
+	const usePcpignore = document.getElementById(
+		'plugin-check__use-pcpignore'
+	);
 
 	// Handle disabling the Check it button when a plugin is not selected.
 	function canRunChecks() {
@@ -141,6 +144,9 @@
 		if ( useAi ) {
 			useAi.disabled = true;
 		}
+		if ( usePcpignore ) {
+			usePcpignore.disabled = true;
+		}
 		if ( includeExperimental ) {
 			includeExperimental.disabled = true;
 		}
@@ -149,6 +155,8 @@
 		const categories = getSelectedValues( categoriesList );
 		const types = getSelectedValues( typesList );
 		const useAiChecked = useAi && useAi.checked ? 1 : 0;
+		const usePcpignoreChecked =
+			usePcpignore && usePcpignore.checked ? 1 : 0;
 		const includeExperimentalChecked =
 			includeExperimental && includeExperimental.checked ? 1 : 0;
 		let currentChecks;
@@ -157,7 +165,8 @@
 			plugin,
 			categories,
 			includeExperimentalChecked,
-			useAiChecked
+			useAiChecked,
+			usePcpignoreChecked
 		)
 			.then( ( data ) => {
 				currentChecks = data.checks;
@@ -165,7 +174,8 @@
 					plugin,
 					currentChecks,
 					includeExperimentalChecked,
-					useAiChecked
+					useAiChecked,
+					usePcpignoreChecked
 				);
 			} )
 			.then( () =>
@@ -174,7 +184,8 @@
 					currentChecks,
 					types,
 					includeExperimentalChecked,
-					useAiChecked
+					useAiChecked,
+					usePcpignoreChecked
 				)
 			)
 			.then( () => cleanUpEnvironment() )
@@ -223,6 +234,9 @@
 		}
 		if ( useAi ) {
 			useAi.disabled = false;
+		}
+		if ( usePcpignore ) {
+			usePcpignore.disabled = false;
 		}
 		if ( includeExperimental ) {
 			includeExperimental.disabled = false;
@@ -639,13 +653,15 @@
 	 * @param {Array}  checks                   Check slugs that will run.
 	 * @param {number} includeExperimentalInput Whether to include experimental checks.
 	 * @param {number} useAiInput               Whether to enable AI analysis.
+	 * @param {number} usePcpignoreInput        Whether to apply .pcpignore exclusions.
 	 * @return {Promise<Object>} Resolves with the response message.
 	 */
 	function setUpEnvironment(
 		plugin,
 		checks,
 		includeExperimentalInput,
-		useAiInput
+		useAiInput,
+		usePcpignoreInput
 	) {
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'plugin', plugin );
@@ -658,6 +674,7 @@
 			includeExperimentalInput
 		);
 		pluginCheckData.append( 'use-ai', useAiInput );
+		pluginCheckData.append( 'use-pcpignore', usePcpignoreInput );
 
 		for ( let i = 0; i < checks.length; i++ ) {
 			pluginCheckData.append( 'checks[]', checks[ i ] );
@@ -706,13 +723,15 @@
 	 * @param {Array}  categories               Selected category slugs.
 	 * @param {number} includeExperimentalInput Whether to include experimental checks.
 	 * @param {number} useAiInput               Whether to enable AI analysis.
+	 * @param {number} usePcpignoreInput        Whether to apply .pcpignore exclusions.
 	 * @return {Promise<Object>} Resolves with the response containing plugin and checks.
 	 */
 	function getChecksToRun(
 		plugin,
 		categories,
 		includeExperimentalInput,
-		useAiInput
+		useAiInput,
+		usePcpignoreInput
 	) {
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'plugin', plugin );
@@ -722,6 +741,7 @@
 			includeExperimentalInput
 		);
 		pluginCheckData.append( 'use-ai', useAiInput );
+		pluginCheckData.append( 'use-pcpignore', usePcpignoreInput );
 
 		for ( let i = 0; i < categories.length; i++ ) {
 			pluginCheckData.append( 'categories[]', categories[ i ] );
@@ -746,13 +766,15 @@
 	 * @param {Array}  types                    Result types to include (error, warning).
 	 * @param {number} includeExperimentalInput Whether to include experimental checks.
 	 * @param {number} useAiInput               Whether to enable AI analysis.
+	 * @param {number} usePcpignoreInput        Whether to apply .pcpignore exclusions.
 	 */
 	async function runChecks(
 		plugin,
 		checks,
 		types,
 		includeExperimentalInput,
-		useAiInput
+		useAiInput,
+		usePcpignoreInput
 	) {
 		let isSuccessMessage = true;
 		let aiStats = null;
@@ -763,7 +785,8 @@
 					checks[ i ],
 					types,
 					includeExperimentalInput,
-					useAiInput
+					useAiInput,
+					usePcpignoreInput
 				);
 				const splitResults = splitResultsByFalsePositive( results );
 				const errorsLength = countResultTree(
@@ -1009,6 +1032,7 @@
 	 * @param {Array}  types                    Result types to include (error, warning).
 	 * @param {number} includeExperimentalInput Whether to include experimental checks.
 	 * @param {number} useAiInput               Whether to enable AI analysis.
+	 * @param {number} usePcpignoreInput        Whether to apply .pcpignore exclusions.
 	 * @return {Promise<Object>} The check results.
 	 */
 	function runCheck(
@@ -1016,7 +1040,8 @@
 		check,
 		types,
 		includeExperimentalInput,
-		useAiInput
+		useAiInput,
+		usePcpignoreInput
 	) {
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'plugin', plugin );
@@ -1027,6 +1052,7 @@
 			includeExperimentalInput
 		);
 		pluginCheckData.append( 'use-ai', useAiInput );
+		pluginCheckData.append( 'use-pcpignore', usePcpignoreInput );
 
 		for ( let i = 0; i < types.length; i++ ) {
 			pluginCheckData.append( 'types[]', types[ i ] );

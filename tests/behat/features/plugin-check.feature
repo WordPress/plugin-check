@@ -314,6 +314,145 @@ Feature: Test that the WP-CLI command works.
       FILE: subdirectory/error.php
       """
 
+  Scenario: Apply .pcpignore exclusions only when requested
+    Given a WP install with the Plugin Check plugin
+    And an empty wp-content/plugins/foo-plugin directory
+    And an empty wp-content/plugins/foo-plugin/docs directory
+    And a wp-content/plugins/foo-plugin/foo-plugin.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Plugin
+       * Text Domain: foo-plugin
+       */
+      """
+    And a wp-content/plugins/foo-plugin/docs/example.php file:
+      """
+      <?php
+      $value = 1;
+      echo $value;
+      """
+    And a wp-content/plugins/foo-plugin/.pcpignore file:
+      """
+      # Documentation is not distributed.
+      docs/
+      """
+
+    When I run the WP-CLI command `plugin check foo-plugin`
+    Then STDOUT should contain:
+      """
+      FILE: docs/example.php
+      """
+
+    When I run the WP-CLI command `plugin check foo-plugin --use-pcpignore`
+    Then STDOUT should not contain:
+      """
+      FILE: docs/example.php
+      """
+
+  Scenario: .pcpignore exclusions are anchored to the plugin root
+    Given a WP install with the Plugin Check plugin
+    And an empty wp-content/plugins/foo-plugin directory
+    And an empty wp-content/plugins/foo-plugin/docs directory
+    And an empty wp-content/plugins/foo-plugin/includes/docs directory
+    And a wp-content/plugins/foo-plugin/foo-plugin.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Plugin
+       * Text Domain: foo-plugin
+       */
+      """
+    And a wp-content/plugins/foo-plugin/docs/example.php file:
+      """
+      <?php
+      $value = 1;
+      echo $value;
+      """
+    And a wp-content/plugins/foo-plugin/includes/docs/real-code.php file:
+      """
+      <?php
+      $value = 1;
+      echo $value;
+      """
+    And a wp-content/plugins/foo-plugin/.pcpignore file:
+      """
+      # Only the top-level docs directory is not distributed.
+      docs/
+      """
+
+    When I run the WP-CLI command `plugin check foo-plugin --use-pcpignore`
+    Then STDOUT should not contain:
+      """
+      FILE: docs/example.php
+      """
+    And STDOUT should contain:
+      """
+      FILE: includes/docs/real-code.php
+      """
+
+  Scenario: .pcpignore exclusions support wildcard patterns
+    Given a WP install with the Plugin Check plugin
+    And an empty wp-content/plugins/foo-plugin directory
+    And an empty wp-content/plugins/foo-plugin/assets directory
+    And a wp-content/plugins/foo-plugin/foo-plugin.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Plugin
+       * Text Domain: foo-plugin
+       */
+      """
+    And a wp-content/plugins/foo-plugin/assets/app.exe file:
+      """
+      This file is not executable.
+      """
+    And a wp-content/plugins/foo-plugin/.pcpignore file:
+      """
+      # Application files are not distributed.
+      *.exe
+      """
+
+    When I run the WP-CLI command `plugin check foo-plugin --checks=file_type`
+    Then STDOUT should contain:
+      """
+      FILE: assets/app.exe
+      """
+
+    When I run the WP-CLI command `plugin check foo-plugin --checks=file_type --use-pcpignore`
+    Then STDOUT should not contain:
+      """
+      FILE: assets/app.exe
+      """
+
+  Scenario: An unreadable .pcpignore file produces a warning instead of failing the scan
+    Given a WP install with the Plugin Check plugin
+    And an empty wp-content/plugins/foo-plugin directory
+    And a wp-content/plugins/foo-plugin/foo-plugin.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Plugin
+       * Text Domain: foo-plugin
+       */
+      """
+    And a wp-content/plugins/foo-plugin/.pcpignore file:
+      """
+      docs/
+      """
+    And I run `wp eval "chmod( WP_CONTENT_DIR . '/plugins/foo-plugin/.pcpignore', 0000 );"`
+
+    When I try the WP-CLI command `plugin check foo-plugin --use-pcpignore`
+    Then STDERR should contain:
+      """
+      Warning:
+      """
+    And STDERR should contain:
+      """
+      .pcpignore
+      """
+    And the return code should be 0
+
   Scenario: Perform runtime check
     Given a WP install with the Plugin Check plugin
     And a wp-content/plugins/foo-single.php file:

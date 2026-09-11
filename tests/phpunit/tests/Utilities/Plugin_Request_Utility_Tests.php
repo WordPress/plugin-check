@@ -14,6 +14,7 @@ use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Checker\Runtime_Environment_Setup;
 use WordPress\Plugin_Check\Test_Data\Runtime_Check;
 use WordPress\Plugin_Check\Test_Utils\Traits\With_Mock_Filesystem;
+use WordPress\Plugin_Check\Utilities\PCP_Ignore_Utility;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 
 class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
@@ -306,6 +307,103 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		);
 
 		$this->assertEquals( $custom_ignore_files, $result );
+	}
+
+	public function test_get_pcpignore_exclusions() {
+		$plugin_directory = UNIT_TESTS_PLUGIN_DIR . 'test-plugin-pcpignore';
+
+		$exclusions = PCP_Ignore_Utility::get_exclusions( $plugin_directory );
+
+		$this->assertSame(
+			array( '/docs', '/tests/fixtures' ),
+			$exclusions['directories']
+		);
+		$this->assertSame(
+			array( '/development-only.php', '/*.map', '/.pcpignore' ),
+			$exclusions['files']
+		);
+		$this->assertSame( '', PCP_Ignore_Utility::get_warning() );
+	}
+
+	public function test_get_pcpignore_exclusions_without_ignore_file() {
+		$plugin_directory = UNIT_TESTS_PLUGIN_DIR . 'test-plugin-ignore-files';
+
+		$exclusions = PCP_Ignore_Utility::get_exclusions( $plugin_directory );
+
+		$this->assertSame(
+			array(
+				'directories' => array(),
+				'files'       => array(),
+			),
+			$exclusions
+		);
+		$this->assertSame( '', PCP_Ignore_Utility::get_warning() );
+	}
+
+	public function test_get_pcpignore_exclusions_for_single_file_plugin() {
+		$exclusions = PCP_Ignore_Utility::get_exclusions( WP_PLUGIN_DIR . '/foo-single.php' );
+
+		$this->assertSame(
+			array(
+				'directories' => array(),
+				'files'       => array(),
+			),
+			$exclusions
+		);
+		$this->assertSame( '', PCP_Ignore_Utility::get_warning() );
+	}
+
+	public function test_get_pcpignore_exclusions_with_unreadable_file() {
+		$plugin_directory = UNIT_TESTS_PLUGIN_DIR . 'test-plugin-pcpignore';
+		$ignore_file      = trailingslashit( $plugin_directory ) . '.pcpignore';
+
+		chmod( $ignore_file, 0000 );
+		$this->cleanups[] = function () use ( $ignore_file ) {
+			chmod( $ignore_file, 0644 );
+		};
+
+		$exclusions = PCP_Ignore_Utility::get_exclusions( $plugin_directory );
+
+		$this->assertSame(
+			array(
+				'directories' => array(),
+				'files'       => array(),
+			),
+			$exclusions
+		);
+		$this->assertNotSame( '', PCP_Ignore_Utility::get_warning() );
+	}
+
+	public function test_pcpignore_directory_exclusion_is_anchored_to_plugin_root() {
+		$checks_to_run = array(
+			new I18n_Usage_Check(),
+		);
+
+		add_filter(
+			'wp_plugin_check_checks',
+			function () {
+				return array(
+					'i18n_usage_check' => new I18n_Usage_Check(),
+				);
+			}
+		);
+
+		// Without exclusions, both docs/example.php (root) and
+		// includes/docs/real-code.php (nested) trigger an error.
+		$check_context   = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-pcpignore/load.php' );
+		$results_without = ( new Checks() )->run_checks( $check_context, $checks_to_run );
+
+		$this->assertSame( 2, $results_without->get_error_count() );
+
+		// With .pcpignore exclusions applied, only the root-level docs/
+		// directory is excluded; the nested includes/docs/ directory, which
+		// merely shares the same directory name, must still be scanned.
+		PCP_Ignore_Utility::apply_exclusions( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-pcpignore' );
+
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-pcpignore/load.php' );
+		$results_with  = ( new Checks() )->run_checks( $check_context, $checks_to_run );
+
+		$this->assertSame( 1, $results_with->get_error_count() );
 	}
 
 	public function test_plugin_without_error_for_ignore_directories() {

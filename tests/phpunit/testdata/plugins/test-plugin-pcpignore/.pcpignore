@@ -1,0 +1,5 @@
+# Development-only files and directories.
+docs/
+tests/fixtures/
+development-only.php
+*.map
