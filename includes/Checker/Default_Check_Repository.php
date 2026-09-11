@@ -105,6 +105,7 @@ class Default_Check_Repository extends Empty_Check_Repository {
 				'external_admin_menu_links'  => new Checks\Plugin_Repo\External_Admin_Menu_Links_Check(),
 				'wp_functions_compatibility' => new Checks\Plugin_Repo\WP_Functions_Compatibility_Check(),
 				'ai_provider'                => new Checks\General\AI_Provider_Check(),
+				'ai_name'                    => new Checks\Plugin_Repo\AI_Name_Check(),
 			)
 		);
 

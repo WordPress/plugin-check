@@ -16,6 +16,8 @@ use WordPress\Plugin_Check\Checker\CLI_Runner;
  * Class providing utility methods to return plugin information based on the request.
  *
  * @since 1.0.0
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class Plugin_Request_Utility {
 
@@ -141,6 +143,21 @@ class Plugin_Request_Utility {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Sets the Runner class for the current request.
+	 *
+	 * This is needed for requests (e.g. AJAX requests running only static checks)
+	 * where the runner is not registered early via the object-cache.php drop-in,
+	 * so that checks relying on get_runner() (such as AI_Name_Check) can access it.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param Abstract_Check_Runner $runner The runner instance for the current request.
+	 */
+	public static function set_runner( Abstract_Check_Runner $runner ) {
+		static::$runner = $runner;
 	}
 
 	/**
