@@ -394,6 +394,7 @@ Feature: Test that the WP-CLI command works.
   Scenario: .pcpignore exclusions support wildcard patterns
     Given a WP install with the Plugin Check plugin
     And an empty wp-content/plugins/foo-plugin directory
+    And an empty wp-content/plugins/foo-plugin/assets directory
     And a wp-content/plugins/foo-plugin/foo-plugin.php file:
       """
       <?php
@@ -402,26 +403,26 @@ Feature: Test that the WP-CLI command works.
        * Text Domain: foo-plugin
        */
       """
-    And a wp-content/plugins/foo-plugin/app.js.map file:
+    And a wp-content/plugins/foo-plugin/assets/app.exe file:
       """
-      {"version":3,"sources":[],"mappings":""}
+      This file is not executable.
       """
     And a wp-content/plugins/foo-plugin/.pcpignore file:
       """
-      # Source maps are not distributed.
-      *.map
+      # Application files are not distributed.
+      *.exe
       """
 
-    When I run the WP-CLI command `plugin check foo-plugin`
+    When I run the WP-CLI command `plugin check foo-plugin --checks=file_type`
     Then STDOUT should contain:
       """
-      FILE: app.js.map
+      FILE: assets/app.exe
       """
 
-    When I run the WP-CLI command `plugin check foo-plugin --use-pcpignore`
+    When I run the WP-CLI command `plugin check foo-plugin --checks=file_type --use-pcpignore`
     Then STDOUT should not contain:
       """
-      FILE: app.js.map
+      FILE: assets/app.exe
       """
 
   Scenario: An unreadable .pcpignore file produces a warning instead of failing the scan
@@ -441,15 +442,16 @@ Feature: Test that the WP-CLI command works.
       """
     And I run `wp eval "chmod( WP_CONTENT_DIR . '/plugins/foo-plugin/.pcpignore', 0000 );"`
 
-    When I run the WP-CLI command `plugin check foo-plugin --use-pcpignore`
-    Then STDOUT should contain:
+    When I try the WP-CLI command `plugin check foo-plugin --use-pcpignore`
+    Then STDERR should contain:
       """
       Warning:
       """
-    And STDOUT should contain:
+    And STDERR should contain:
       """
       .pcpignore
       """
+    And the return code should be 0
 
   Scenario: Perform runtime check
     Given a WP install with the Plugin Check plugin
