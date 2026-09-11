@@ -389,11 +389,11 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		);
 
 		// Without exclusions, both docs/example.php (root) and
-		// includes/docs/real-code.php (nested) trigger a warning.
+		// includes/docs/real-code.php (nested) trigger an error.
 		$check_context   = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-pcpignore/load.php' );
 		$results_without = ( new Checks() )->run_checks( $check_context, $checks_to_run );
 
-		$this->assertSame( 2, $results_without->get_warning_count() );
+		$this->assertSame( 2, $results_without->get_error_count() );
 
 		// With .pcpignore exclusions applied, only the root-level docs/
 		// directory is excluded; the nested includes/docs/ directory, which
@@ -403,7 +403,7 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-pcpignore/load.php' );
 		$results_with  = ( new Checks() )->run_checks( $check_context, $checks_to_run );
 
-		$this->assertSame( 1, $results_with->get_warning_count() );
+		$this->assertSame( 1, $results_with->get_error_count() );
 	}
 
 	public function test_plugin_without_error_for_ignore_directories() {
