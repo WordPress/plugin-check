@@ -106,6 +106,7 @@ In any case, passing the checks in this tool likely helps to achieve a smooth pl
 = 2.0.0 =
 
 * Enhancement - Add WordPress functions compatibility check to flag usage of functions unavailable in a plugin's declared minimum WordPress version.
+* Enhancement - Add Inlined React Runtime check to detect a bundled, outdated React runtime that breaks under React 19.
 * Enhancement - Add Write File check to detect plugins saving data in the plugin folder instead of the uploads directory or database.
 * Enhancement - Add batched AI false positive detection with check-specific prompts and AI model selection for WP-CLI.
 * Enhancement - Add CTRF export support for check results.
