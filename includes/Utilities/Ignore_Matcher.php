@@ -70,7 +70,7 @@ class Ignore_Matcher {
 				$anchored_directory = $plugin_root . $directory;
 
 				if ( false !== strpbrk( $directory, '*?' ) ) {
-					if ( preg_match( self::glob_to_regex( $anchored_directory, true ), $file_path ) ) {
+					if ( preg_match( self::glob_directory_to_regex( $anchored_directory ), $file_path ) ) {
 						return true;
 					}
 				} elseif ( 0 === strpos( $file_path, $anchored_directory . '/' ) ) {
@@ -112,7 +112,7 @@ class Ignore_Matcher {
 				$anchored_file = $plugin_root . $file;
 
 				if ( false !== strpbrk( $file, '*?' ) ) {
-					if ( preg_match( self::glob_to_regex( $anchored_file ), $file_path ) ) {
+					if ( preg_match( self::glob_file_to_regex( $anchored_file ), $file_path ) ) {
 						return true;
 					}
 				} elseif ( $file_path === $anchored_file ) {
@@ -131,7 +131,7 @@ class Ignore_Matcher {
 	}
 
 	/**
-	 * Builds an anchored PHP_CodeSniffer ignore pattern.
+	 * Builds an anchored PHP_CodeSniffer directory ignore pattern.
 	 *
 	 * PHP_CodeSniffer treats ignore entries as regular expressions and expands
 	 * literal asterisks itself. This method translates glob wildcards before
@@ -141,18 +141,29 @@ class Ignore_Matcher {
 	 * @since 2.2.0
 	 *
 	 * @param string $plugin_root Absolute, normalized path to the plugin root directory, without a trailing slash.
-	 * @param string $entry       Anchored ignore entry.
-	 * @param bool   $is_directory Whether the entry refers to a directory.
+	 * @param string $entry       Anchored directory ignore entry.
 	 * @return string The PHP_CodeSniffer-compatible regular expression pattern.
 	 */
-	public static function get_php_codesniffer_ignore_pattern( $plugin_root, $entry, $is_directory ) {
-		$pattern = '^' . self::glob_to_regex_fragment( $plugin_root . $entry, '`', true );
+	public static function get_php_codesniffer_directory_ignore_pattern( $plugin_root, $entry ) {
+		return '^' . self::glob_to_regex_fragment( $plugin_root . $entry, '`' ) . '/*';
+	}
 
-		if ( $is_directory ) {
-			return $pattern . '/*';
-		}
-
-		return $pattern . '$';
+	/**
+	 * Builds an anchored PHP_CodeSniffer file ignore pattern.
+	 *
+	 * PHP_CodeSniffer treats ignore entries as regular expressions and expands
+	 * literal asterisks itself. This method translates glob wildcards before
+	 * passing the pattern to PHP_CodeSniffer so they have the same semantics as
+	 * the file-based checks.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param string $plugin_root Absolute, normalized path to the plugin root directory, without a trailing slash.
+	 * @param string $entry       Anchored file ignore entry.
+	 * @return string The PHP_CodeSniffer-compatible regular expression pattern.
+	 */
+	public static function get_php_codesniffer_file_ignore_pattern( $plugin_root, $entry ) {
+		return '^' . self::glob_to_regex_fragment( $plugin_root . $entry, '`' ) . '$';
 	}
 
 	/**
@@ -164,20 +175,23 @@ class Ignore_Matcher {
 	 *
 	 * @since 2.2.0
 	 *
-	 * @param string $pattern     The glob-style pattern.
-	 * @param bool   $is_directory Whether the pattern refers to a directory, in which case the
-	 *                             regular expression also matches any file within that directory,
-	 *                             at any depth.
+	 * @param string $pattern The glob-style pattern.
 	 * @return string The equivalent case-insensitive, fully anchored regular expression.
 	 */
-	private static function glob_to_regex( $pattern, $is_directory = false ) {
-		$regex = self::glob_to_regex_fragment( $pattern, '#' );
+	private static function glob_directory_to_regex( $pattern ) {
+		return '#^' . self::glob_to_regex_fragment( $pattern, '#' ) . '/.*$#i';
+	}
 
-		if ( $is_directory ) {
-			return '#^' . $regex . '/.*$#i';
-		}
-
-		return '#^' . $regex . '$#i';
+	/**
+	 * Converts a glob-style file pattern (using `*` and `?` wildcards) to a regular expression.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param string $pattern The glob-style pattern.
+	 * @return string The equivalent case-insensitive, fully anchored regular expression.
+	 */
+	private static function glob_file_to_regex( $pattern ) {
+		return '#^' . self::glob_to_regex_fragment( $pattern, '#' ) . '$#i';
 	}
 
 	/**
@@ -185,12 +199,11 @@ class Ignore_Matcher {
 	 *
 	 * @since 2.2.0
 	 *
-	 * @param string $pattern      The glob-style pattern.
-	 * @param string $delimiter    The regular expression delimiter to escape.
-	 * @param bool   $escape_comma Whether literal commas need escaping for PHP_CodeSniffer.
+	 * @param string $pattern   The glob-style pattern.
+	 * @param string $delimiter The regular expression delimiter to escape.
 	 * @return string The regular expression fragment.
 	 */
-	private static function glob_to_regex_fragment( $pattern, $delimiter, $escape_comma = false ) {
+	private static function glob_to_regex_fragment( $pattern, $delimiter ) {
 		$parts = preg_split( '/([*?])/', $pattern, -1, PREG_SPLIT_DELIM_CAPTURE );
 
 		$regex = '';
@@ -200,8 +213,7 @@ class Ignore_Matcher {
 			} elseif ( '?' === $part ) {
 				$regex .= '[^/]';
 			} else {
-				$part   = preg_quote( $part, $delimiter );
-				$regex .= $escape_comma ? str_replace( ',', '\\,', $part ) : $part;
+				$regex .= str_replace( ',', '\\,', preg_quote( $part, $delimiter ) );
 			}
 		}
 

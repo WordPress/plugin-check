@@ -390,10 +390,10 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 	public function test_pcpignore_php_codesniffer_patterns_match_glob_semantics() {
 		$plugin_root = '/plugin';
 
-		$this->assertSame( '^/plugin/[^/]{0,}\\.map$', Ignore_Matcher::get_php_codesniffer_ignore_pattern( $plugin_root, '/*.map', false ) );
-		$this->assertSame( '^/plugin/file[^/]\\.php$', Ignore_Matcher::get_php_codesniffer_ignore_pattern( $plugin_root, '/file?.php', false ) );
-		$this->assertSame( '^/plugin/data\\[1\\]\\.php$', Ignore_Matcher::get_php_codesniffer_ignore_pattern( $plugin_root, '/data[1].php', false ) );
-		$this->assertSame( '^/plugin/docs[^/]{0,}/*', Ignore_Matcher::get_php_codesniffer_ignore_pattern( $plugin_root, '/docs*', true ) );
+		$this->assertSame( '^/plugin/[^/]{0,}\\.map$', Ignore_Matcher::get_php_codesniffer_file_ignore_pattern( $plugin_root, '/*.map' ) );
+		$this->assertSame( '^/plugin/file[^/]\\.php$', Ignore_Matcher::get_php_codesniffer_file_ignore_pattern( $plugin_root, '/file?.php' ) );
+		$this->assertSame( '^/plugin/data\\[1\\]\\.php$', Ignore_Matcher::get_php_codesniffer_file_ignore_pattern( $plugin_root, '/data[1].php' ) );
+		$this->assertSame( '^/plugin/docs[^/]{0,}/*', Ignore_Matcher::get_php_codesniffer_directory_ignore_pattern( $plugin_root, '/docs*' ) );
 	}
 
 	public function test_pcpignore_directory_exclusion_is_anchored_to_plugin_root() {

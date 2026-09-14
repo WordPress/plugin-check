@@ -269,7 +269,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 
 		// Ignore directories anchored to the plugin root (e.g. from .pcpignore).
 		foreach ( $anchored_directories as $directory ) {
-			$ignore_patterns[] = Ignore_Matcher::get_php_codesniffer_ignore_pattern( $plugin_root, $directory, true );
+			$ignore_patterns[] = Ignore_Matcher::get_php_codesniffer_directory_ignore_pattern( $plugin_root, $directory );
 		}
 
 		// Ignore files at any depth (--exclude-files).
@@ -279,7 +279,7 @@ abstract class Abstract_PHP_CodeSniffer_Check implements Static_Check {
 
 		// Ignore files anchored to the plugin root (e.g. from .pcpignore).
 		foreach ( $anchored_files as $file ) {
-			$ignore_patterns[] = Ignore_Matcher::get_php_codesniffer_ignore_pattern( $plugin_root, $file, false );
+			$ignore_patterns[] = Ignore_Matcher::get_php_codesniffer_file_ignore_pattern( $plugin_root, $file );
 		}
 
 		return $ignore_patterns;
