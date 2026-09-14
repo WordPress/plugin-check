@@ -70,7 +70,7 @@ class Ignore_Matcher {
 				$anchored_directory = $plugin_root . $directory;
 
 				if ( false !== strpbrk( $directory, '*?' ) ) {
-					if ( preg_match( self::glob_to_regex( $anchored_directory . '/*' ), $file_path ) ) {
+					if ( preg_match( self::glob_to_regex( $anchored_directory, true ), $file_path ) ) {
 						return true;
 					}
 				} elseif ( 0 === strpos( $file_path, $anchored_directory . '/' ) ) {
@@ -131,17 +131,79 @@ class Ignore_Matcher {
 	}
 
 	/**
-	 * Converts a glob-style pattern (using `*` and `?` wildcards) to a regular expression.
+	 * Builds an anchored PHP_CodeSniffer ignore pattern.
+	 *
+	 * PHP_CodeSniffer treats ignore entries as regular expressions and expands
+	 * literal asterisks itself. This method translates glob wildcards before
+	 * passing the pattern to PHP_CodeSniffer so they have the same semantics as
+	 * the file-based checks.
 	 *
 	 * @since 2.2.0
 	 *
-	 * @param string $pattern The glob-style pattern.
+	 * @param string $plugin_root Absolute, normalized path to the plugin root directory, without a trailing slash.
+	 * @param string $entry       Anchored ignore entry.
+	 * @param bool   $is_directory Whether the entry refers to a directory.
+	 * @return string The PHP_CodeSniffer-compatible regular expression pattern.
+	 */
+	public static function get_php_codesniffer_ignore_pattern( $plugin_root, $entry, $is_directory ) {
+		$pattern = '^' . self::glob_to_regex_fragment( $plugin_root . $entry, '`' );
+		$pattern = str_replace( ',', '\\,', $pattern );
+
+		if ( $is_directory ) {
+			return $pattern . '/*';
+		}
+
+		return $pattern . '$';
+	}
+
+	/**
+	 * Converts a glob-style pattern (using `*` and `?` wildcards) to a regular expression.
+	 *
+	 * Unlike a typical glob implementation, `*` and `?` never match a `/`,
+	 * so a pattern such as `*.map` only matches files directly inside the
+	 * anchored location, not at any nested depth.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param string $pattern     The glob-style pattern.
+	 * @param bool   $is_directory Whether the pattern refers to a directory, in which case the
+	 *                             regular expression also matches any file within that directory,
+	 *                             at any depth.
 	 * @return string The equivalent case-insensitive, fully anchored regular expression.
 	 */
-	private static function glob_to_regex( $pattern ) {
-		$regex = preg_quote( $pattern, '#' );
-		$regex = str_replace( array( '\*', '\?' ), array( '.*', '.' ), $regex );
+	private static function glob_to_regex( $pattern, $is_directory = false ) {
+		$regex = self::glob_to_regex_fragment( $pattern, '#' );
+
+		if ( $is_directory ) {
+			return '#^' . $regex . '/.*$#i';
+		}
 
 		return '#^' . $regex . '$#i';
+	}
+
+	/**
+	 * Converts glob-style wildcards to a regular expression fragment.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param string $pattern   The glob-style pattern.
+	 * @param string $delimiter The regular expression delimiter to escape.
+	 * @return string The regular expression fragment.
+	 */
+	private static function glob_to_regex_fragment( $pattern, $delimiter ) {
+		$parts = preg_split( '/([*?])/', $pattern, -1, PREG_SPLIT_DELIM_CAPTURE );
+
+		$regex = '';
+		foreach ( $parts as $part ) {
+			if ( '*' === $part ) {
+				$regex .= '[^/]{0,}';
+			} elseif ( '?' === $part ) {
+				$regex .= '[^/]';
+			} else {
+				$regex .= preg_quote( $part, $delimiter );
+			}
+		}
+
+		return $regex;
 	}
 }

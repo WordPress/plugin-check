@@ -119,7 +119,17 @@ class PCP_Ignore_Utility {
 			return null;
 		}
 
-		if ( ! is_readable( $ignore_file ) ) {
+		/**
+		 * Filters whether a `.pcpignore` file is readable.
+		 *
+		 * @since 2.2.0
+		 *
+		 * @param bool   $is_readable Whether the file is readable.
+		 * @param string $ignore_file Absolute path to the `.pcpignore` file.
+		 */
+		$is_readable = (bool) apply_filters( 'wp_plugin_check_pcpignore_is_readable', is_file( $ignore_file ) && is_readable( $ignore_file ), $ignore_file );
+
+		if ( ! $is_readable ) {
 			self::$warning = sprintf(
 				/* translators: %s: Path to the .pcpignore file. */
 				__( 'The .pcpignore file at %s could not be read and was ignored.', 'plugin-check' ),

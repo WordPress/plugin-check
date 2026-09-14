@@ -14,6 +14,7 @@ use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Checker\Runtime_Environment_Setup;
 use WordPress\Plugin_Check\Test_Data\Runtime_Check;
 use WordPress\Plugin_Check\Test_Utils\Traits\With_Mock_Filesystem;
+use WordPress\Plugin_Check\Utilities\Ignore_Matcher;
 use WordPress\Plugin_Check\Utilities\PCP_Ignore_Utility;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 
@@ -357,9 +358,12 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 		$plugin_directory = UNIT_TESTS_PLUGIN_DIR . 'test-plugin-pcpignore';
 		$ignore_file      = trailingslashit( $plugin_directory ) . '.pcpignore';
 
-		chmod( $ignore_file, 0000 );
-		$this->cleanups[] = function () use ( $ignore_file ) {
-			chmod( $ignore_file, 0644 );
+		$filter = static function ( $is_readable, $file ) use ( $ignore_file ) {
+			return $ignore_file === $file ? false : $is_readable;
+		};
+		add_filter( 'wp_plugin_check_pcpignore_is_readable', $filter, 10, 2 );
+		$this->cleanups[] = static function () use ( $filter ) {
+			remove_filter( 'wp_plugin_check_pcpignore_is_readable', $filter );
 		};
 
 		$exclusions = PCP_Ignore_Utility::get_exclusions( $plugin_directory );
@@ -372,6 +376,24 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 			$exclusions
 		);
 		$this->assertNotSame( '', PCP_Ignore_Utility::get_warning() );
+	}
+
+	public function test_pcpignore_wildcards_do_not_cross_directory_boundaries() {
+		$plugin_root = '/plugin';
+
+		$this->assertTrue( Ignore_Matcher::is_file_ignored( '/plugin/app.js.map', $plugin_root, array( '/*.map' ) ) );
+		$this->assertFalse( Ignore_Matcher::is_file_ignored( '/plugin/assets/app.js.map', $plugin_root, array( '/*.map' ) ) );
+		$this->assertTrue( Ignore_Matcher::is_file_in_ignored_directory( '/plugin/docs-new/readme.txt', $plugin_root, array( '/docs*/' ) ) );
+		$this->assertFalse( Ignore_Matcher::is_file_in_ignored_directory( '/plugin/includes/docs-new/readme.txt', $plugin_root, array( '/docs*/' ) ) );
+	}
+
+	public function test_pcpignore_php_codesniffer_patterns_match_glob_semantics() {
+		$plugin_root = '/plugin';
+
+		$this->assertSame( '^/plugin/[^/]{0,}\\.map$', Ignore_Matcher::get_php_codesniffer_ignore_pattern( $plugin_root, '/*.map', false ) );
+		$this->assertSame( '^/plugin/file[^/]\\.php$', Ignore_Matcher::get_php_codesniffer_ignore_pattern( $plugin_root, '/file?.php', false ) );
+		$this->assertSame( '^/plugin/data\\[1\\]\\.php$', Ignore_Matcher::get_php_codesniffer_ignore_pattern( $plugin_root, '/data[1].php', false ) );
+		$this->assertSame( '^/plugin/docs[^/]{0,}/*', Ignore_Matcher::get_php_codesniffer_ignore_pattern( $plugin_root, '/docs*', true ) );
 	}
 
 	public function test_pcpignore_directory_exclusion_is_anchored_to_plugin_root() {
