@@ -146,8 +146,7 @@ class Ignore_Matcher {
 	 * @return string The PHP_CodeSniffer-compatible regular expression pattern.
 	 */
 	public static function get_php_codesniffer_ignore_pattern( $plugin_root, $entry, $is_directory ) {
-		$pattern = '^' . self::glob_to_regex_fragment( $plugin_root . $entry, '`' );
-		$pattern = str_replace( ',', '\\,', $pattern );
+		$pattern = '^' . self::glob_to_regex_fragment( $plugin_root . $entry, '`', true );
 
 		if ( $is_directory ) {
 			return $pattern . '/*';
@@ -186,11 +185,12 @@ class Ignore_Matcher {
 	 *
 	 * @since 2.2.0
 	 *
-	 * @param string $pattern   The glob-style pattern.
-	 * @param string $delimiter The regular expression delimiter to escape.
+	 * @param string $pattern      The glob-style pattern.
+	 * @param string $delimiter    The regular expression delimiter to escape.
+	 * @param bool   $escape_comma Whether literal commas need escaping for PHP_CodeSniffer.
 	 * @return string The regular expression fragment.
 	 */
-	private static function glob_to_regex_fragment( $pattern, $delimiter ) {
+	private static function glob_to_regex_fragment( $pattern, $delimiter, $escape_comma = false ) {
 		$parts = preg_split( '/([*?])/', $pattern, -1, PREG_SPLIT_DELIM_CAPTURE );
 
 		$regex = '';
@@ -200,7 +200,8 @@ class Ignore_Matcher {
 			} elseif ( '?' === $part ) {
 				$regex .= '[^/]';
 			} else {
-				$regex .= preg_quote( $part, $delimiter );
+				$part   = preg_quote( $part, $delimiter );
+				$regex .= $escape_comma ? str_replace( ',', '\\,', $part ) : $part;
 			}
 		}
 

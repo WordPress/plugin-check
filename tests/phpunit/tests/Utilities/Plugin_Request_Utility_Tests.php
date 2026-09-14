@@ -383,8 +383,8 @@ class Plugin_Request_Utility_Tests extends WP_UnitTestCase {
 
 		$this->assertTrue( Ignore_Matcher::is_file_ignored( '/plugin/app.js.map', $plugin_root, array( '/*.map' ) ) );
 		$this->assertFalse( Ignore_Matcher::is_file_ignored( '/plugin/assets/app.js.map', $plugin_root, array( '/*.map' ) ) );
-		$this->assertTrue( Ignore_Matcher::is_file_in_ignored_directory( '/plugin/docs-new/readme.txt', $plugin_root, array( '/docs*/' ) ) );
-		$this->assertFalse( Ignore_Matcher::is_file_in_ignored_directory( '/plugin/includes/docs-new/readme.txt', $plugin_root, array( '/docs*/' ) ) );
+		$this->assertTrue( Ignore_Matcher::is_file_in_ignored_directory( '/plugin/docs-new/readme.txt', $plugin_root, array( '/docs*' ) ) );
+		$this->assertFalse( Ignore_Matcher::is_file_in_ignored_directory( '/plugin/includes/docs-new/readme.txt', $plugin_root, array( '/docs*' ) ) );
 	}
 
 	public function test_pcpignore_php_codesniffer_patterns_match_glob_semantics() {
