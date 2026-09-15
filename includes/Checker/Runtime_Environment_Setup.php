@@ -24,9 +24,24 @@ final class Runtime_Environment_Setup {
 	 *
 	 * @global wpdb               $wpdb          WordPress database abstraction object.
 	 * @global WP_Filesystem_Base $wp_filesystem WordPress filesystem subclass.
+	 *
+	 * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
 	 */
 	public function set_up() {
 		global $wpdb, $wp_filesystem;
+
+		/**
+		 * Fires before the runtime environment is set up.
+		 *
+		 * @since 2.0.0
+		 *
+		 * @param array $context {
+		 *     Context for the hook.
+		 *
+		 *     @type bool $early_exit Whether the method exited before completing all setup steps.
+		 * }
+		 */
+		do_action( 'wp_plugin_check_before_runtime_setup', array( 'early_exit' => false ) );
 
 		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 
@@ -82,6 +97,18 @@ final class Runtime_Environment_Setup {
 
 		// Return early if the plugin check object cache already exists.
 		if ( defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) && WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION ) {
+			/**
+			 * Fires after the runtime environment is set up, including when it exits early.
+			 *
+			 * @since 2.0.0
+			 *
+			 * @param array $context {
+			 *     Context for the hook.
+			 *
+			 *     @type bool $early_exit Whether the method exited before completing all setup steps.
+			 * }
+			 */
+			do_action( 'wp_plugin_check_after_runtime_setup', array( 'early_exit' => true ) );
 			return;
 		}
 
@@ -92,6 +119,19 @@ final class Runtime_Environment_Setup {
 				$wp_filesystem->copy( WP_PLUGIN_CHECK_PLUGIN_DIR_PATH . 'drop-ins/object-cache.copy.php', WP_CONTENT_DIR . '/object-cache.php' );
 			}
 		}
+
+		/**
+		 * Fires after the runtime environment is set up, including when it exits early.
+		 *
+		 * @since 2.0.0
+		 *
+		 * @param array $context {
+		 *     Context for the hook.
+		 *
+		 *     @type bool $early_exit Whether the method exited before completing all setup steps.
+		 * }
+		 */
+		do_action( 'wp_plugin_check_after_runtime_setup', array( 'early_exit' => false ) );
 	}
 
 	/**
@@ -104,6 +144,19 @@ final class Runtime_Environment_Setup {
 	 */
 	public function clean_up() {
 		global $wpdb, $wp_filesystem;
+
+		/**
+		 * Fires before the runtime environment is cleaned up.
+		 *
+		 * @since 2.0.0
+		 *
+		 * @param array $context {
+		 *     Context for the hook.
+		 *
+		 *     @type bool $early_exit Whether the method exited before completing all cleanup steps.
+		 * }
+		 */
+		do_action( 'wp_plugin_check_before_runtime_cleanup', array( 'early_exit' => false ) );
 
 		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 
@@ -121,12 +174,36 @@ final class Runtime_Environment_Setup {
 
 		// Return early if the plugin check object cache does not exist.
 		if ( ! defined( 'WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION' ) || ! WP_PLUGIN_CHECK_OBJECT_CACHE_DROPIN_VERSION ) {
+			/**
+			 * Fires after the runtime environment is cleaned up, including when it exits early.
+			 *
+			 * @since 2.0.0
+			 *
+			 * @param array $context {
+			 *     Context for the hook.
+			 *
+			 *     @type bool $early_exit Whether the method exited before completing all cleanup steps.
+			 * }
+			 */
+			do_action( 'wp_plugin_check_after_runtime_cleanup', array( 'early_exit' => true ) );
 			return;
 		}
 
 		// Remove the object-cache.php file.
 		if ( $wp_filesystem || WP_Filesystem() ) {
 			if ( ! $wp_filesystem->exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
+				/**
+				 * Fires after the runtime environment is cleaned up, including when it exits early.
+				 *
+				 * @since 2.0.0
+				 *
+				 * @param array $context {
+				 *     Context for the hook.
+				 *
+				 *     @type bool $early_exit Whether the method exited before completing all cleanup steps.
+				 * }
+				 */
+				do_action( 'wp_plugin_check_after_runtime_cleanup', array( 'early_exit' => true ) );
 				return;
 			}
 
@@ -138,6 +215,19 @@ final class Runtime_Environment_Setup {
 				$wp_filesystem->delete( WP_CONTENT_DIR . '/object-cache.php' );
 			}
 		}
+
+		/**
+		 * Fires after the runtime environment is cleaned up, including when it exits early.
+		 *
+		 * @since 2.0.0
+		 *
+		 * @param array $context {
+		 *     Context for the hook.
+		 *
+		 *     @type bool $early_exit Whether the method exited before completing all cleanup steps.
+		 * }
+		 */
+		do_action( 'wp_plugin_check_after_runtime_cleanup', array( 'early_exit' => false ) );
 	}
 
 	/**
