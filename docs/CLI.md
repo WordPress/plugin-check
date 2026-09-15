@@ -64,6 +64,15 @@ missing_composer_json_file; use `--ignore-codes` for specific result codes.
 This only excludes files from file-based scans. It does not suppress plugin-level findings such as
 missing_composer_json_file; use `--ignore-codes` for specific result codes.
 
+[--use-pcpignore]
+: Apply custom file and directory exclusions from a `.pcpignore` file in the plugin root.
+Each non-empty, non-comment line is a path anchored to that root (not matched at any depth), so `docs/`
+only excludes a top-level `docs` directory, not a `docs` directory nested elsewhere. A trailing slash
+excludes a directory; all other entries exclude files. Entries may include `*` and `?` wildcards, e.g.
+`*.map`. Single-file plugins are not supported, since they have no dedicated plugin directory to hold a
+`.pcpignore` file. This option is disabled by default and is intended for local and CI scans.
+WordPress.org scans must not use this option.
+
 [--severity=<severity>]
 : Severity level.
 
@@ -106,6 +115,7 @@ wp plugin check akismet --ignore-codes=missing_composer_json_file
 wp plugin check akismet --format=json
 wp plugin check akismet --format=ctrf
 wp plugin check akismet --mode=update
+wp plugin check akismet --use-pcpignore
 wp plugin check akismet --ai
 wp plugin check akismet --ai --ai-model=openai::gpt-4o
 ```
