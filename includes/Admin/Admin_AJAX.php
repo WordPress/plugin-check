@@ -222,12 +222,12 @@ final class Admin_AJAX {
 	public function get_checks_to_run() {
 		$this->check_request_validity();
 
-		$categories  = filter_input( INPUT_POST, 'categories', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
-		$categories  = is_null( $categories ) ? array() : $categories;
-		$checks      = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
-		$checks      = is_null( $checks ) ? array() : $checks;
-		$use_ai      = 1 === filter_input( INPUT_POST, 'use-ai', FILTER_VALIDATE_INT );
-		$runner      = $this->get_ajax_runner();
+		$categories = filter_input( INPUT_POST, 'categories', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
+		$categories = is_null( $categories ) ? array() : $categories;
+		$checks     = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
+		$checks     = is_null( $checks ) ? array() : $checks;
+		$use_ai     = 1 === filter_input( INPUT_POST, 'use-ai', FILTER_VALIDATE_INT );
+		$runner     = $this->get_ajax_runner();
 
 		if ( is_wp_error( $runner ) ) {
 			wp_send_json_error( $runner, 500 );
