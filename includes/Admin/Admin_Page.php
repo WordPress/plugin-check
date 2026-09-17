@@ -436,6 +436,10 @@ final class Admin_Page {
 			.plugin-check__export-controls.is-hidden {
 				display: none;
 			}
+			/** Plugin Check Client Errors **/
+			#plugin-check__client-error.is-hidden {
+				display: none;
+			}
 		</style>
 		<?php
 	}
