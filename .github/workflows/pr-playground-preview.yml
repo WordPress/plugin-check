@@ -6,7 +6,7 @@ name: PR Playground Preview Build
 # permissions.
 #
 # References:
-# - https://github.com/WordPress/action-wp-playground-pr-preview/tree/v2
+# - https://github.com/WordPress/action-wp-playground-pr-preview/tree/v4
 # - https://wordpress.github.io/wordpress-playground/guides/github-action-pr-preview/
 
 on:
