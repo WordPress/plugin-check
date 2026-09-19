@@ -180,6 +180,7 @@ final class Admin_Page {
 			WP_PLUGIN_CHECK_PLUGIN_DIR_URL . 'assets/js/plugin-check-admin.js',
 			array(
 				'wp-util',
+				'wp-a11y',
 			),
 			WP_PLUGIN_CHECK_VERSION,
 			true
@@ -218,6 +219,7 @@ final class Admin_Page {
 					/* translators: %s: Formatted issue count string (e.g. "3 errors" or "2 warnings"). */
 					'summarySingleTemplate'           => __( '%s found.', 'plugin-check' ),
 					'strings'                         => array(
+						'checkingPlugin' => __( 'Running plugin checks…', 'plugin-check' ),
 						'exportCsv'      => __( 'Export CSV', 'plugin-check' ),
 						'exportJson'     => __( 'Export JSON', 'plugin-check' ),
 						'exportCtrf'     => __( 'Export CTRF', 'plugin-check' ),

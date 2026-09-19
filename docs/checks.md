@@ -9,12 +9,13 @@
 | plugin_content | plugin_repo | Detects content that does not comply with the WordPress.org plugin guidelines. | [Learn more](https://developer.wordpress.org/plugins/wordpress-org/detailed-plugin-guidelines/) |
 | direct_file_access | security, plugin_repo | Checks that plugin files include proper security validation using the ABSPATH constant to prevent direct file access. | [Learn more](https://developer.wordpress.org/plugins/plugin-basics/best-practices/#file-security) |
 | file_type | plugin_repo | Detects the usage of hidden and compressed files, VCS directories, application files, badly named files, AI development directories (.cursor, .claude, .aider, .continue, .windsurf, .ai, .github), and unexpected markdown files in plugin root. | [Learn more](https://developer.wordpress.org/plugins/wordpress-org/detailed-plugin-guidelines/) |
-| plugin_header_fields | plugin_repo | Checks adherence to the Headers requirements, including validation of "Tested up to" header matching between plugin file and readme.txt. | [Learn more](https://developer.wordpress.org/plugins/plugin-basics/header-requirements/) |
+| plugin_header_fields | plugin_repo | Checks adherence to the Headers requirements. | [Learn more](https://developer.wordpress.org/plugins/plugin-basics/header-requirements/) |
 | late_escaping | security, plugin_repo | Checks that all output is escaped before being sent to the browser. | [Learn more](https://developer.wordpress.org/apis/security/escaping/) |
 | safe_redirect | security, plugin_repo | Checks that redirects use wp_safe_redirect() instead of wp_redirect() for security. | [Learn more](https://developer.wordpress.org/reference/functions/wp_safe_redirect/) |
 | plugin_updater | plugin_repo | Prevents altering WordPress update routines or using custom updaters, which are not allowed on WordPress.org. | [Learn more](https://developer.wordpress.org/plugins/wordpress-org/detailed-plugin-guidelines/) |
 | plugin_uninstall | plugin_repo | Checks related to plugin uninstallation. | [Learn more](https://developer.wordpress.org/plugins/plugin-basics/uninstall-methods/#method-2-uninstall-php) |
 | external_admin_menu_links | plugin_repo | Detects external URLs used in top-level WordPress admin menu, which disrupts the expected user experience. | [Learn more](https://developer.wordpress.org/plugins/wordpress-org/detailed-plugin-guidelines/#11-plugins-should-not-hijack-the-admin) |
+| menu_image_icon | plugin_repo | Detects the use of raster image files as admin menu icons, which do not adapt to the WordPress admin color schemes. Use a dashicon or an SVG data: URI instead. | [Learn more](https://developer.wordpress.org/resource/dashicons/) |
 | wp_functions_compatibility | plugin_repo | Checks whether WordPress functions used by the plugin are compatible with the declared minimum supported WordPress version ("Requires at least"). | [Learn more](https://developer.wordpress.org/plugins/plugin-basics/header-requirements/#header-fields) |
 | plugin_review_phpcs | plugin_repo | Runs PHP_CodeSniffer to detect certain best practices plugins should follow for submission on WordPress.org, including heredoc usage detection. | [Learn more](https://developer.wordpress.org/plugins/plugin-basics/best-practices/) |
 | direct_db_queries | security, plugin_repo | Checks the usage of direct database queries, which should be avoided. | [Learn more](https://developer.wordpress.org/apis/database/) |
@@ -37,6 +38,26 @@
 | enqueued_scripts_scope | performance | Checks whether any scripts are loaded on all pages, which is usually not desirable and can lead to performance issues. | [Learn more](https://developer.wordpress.org/plugins/) |
 | non_blocking_scripts | performance | Checks whether scripts and styles are enqueued using a recommended loading strategy. | [Learn more](https://developer.wordpress.org/plugins/) |
 | ai_provider | general | Recommends the WordPress AI Client when a plugin integrates directly with a third-party AI provider. | [Learn more](https://developer.wordpress.org/plugins/) |
+
+## Results and severity
+
+The check name in the table is a **check slug**. When a check finds a problem, it emits a separate **result code**. Result codes are the values accepted by `--ignore-codes` and are included in the CLI output alongside the result type and severity.
+
+Each result has a type (`ERROR` or `WARNING`) and a severity from 1 (lowest) to 10 (highest). A check can emit more than one result code, and the same code can be emitted for multiple files. Unless a check overrides it, a result uses the default severity of 5.
+
+For example, the `code_obfuscation` check reports the following result for supported obfuscation tools:
+
+| Check | Result code | Type | Severity | Detected tools |
+| --- | --- | --- | --- | --- |
+| code_obfuscation | `obfuscated_code_detected` | ERROR | 7 | Zend Guard, Source Guardian, ionCube |
+
+To see the result codes and severity values produced for a plugin, run:
+
+```bash
+wp plugin check <plugin> --format=csv --fields=code,type,severity,message
+```
+
+Use the check slug with `--checks` or `--exclude-checks`; use the result code with `--ignore-codes`. This distinction is important when filtering a check without suppressing a particular finding across other checks.
 
 ## Notes
 

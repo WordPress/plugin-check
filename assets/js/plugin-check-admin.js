@@ -39,6 +39,9 @@
 	);
 	const useAi = document.getElementById( 'plugin-check__use-ai' );
 	const useAiName = document.getElementById( 'plugin-check__use-ai-name' );
+	const usePcpignore = document.getElementById(
+		'plugin-check__use-pcpignore'
+	);
 
 	// Handle disabling the Check it button when a plugin is not selected.
 	function canRunChecks() {
@@ -129,6 +132,7 @@
 		e.preventDefault();
 
 		resetResults();
+		announce( defaultString( 'checkingPlugin' ) );
 		checkItButton.disabled = true;
 		pluginsList.disabled = true;
 		spinner.classList.add( 'is-active' );
@@ -144,6 +148,9 @@
 		if ( useAiName ) {
 			useAiName.disabled = true;
 		}
+		if ( usePcpignore ) {
+			usePcpignore.disabled = true;
+		}
 		if ( includeExperimental ) {
 			includeExperimental.disabled = true;
 		}
@@ -153,6 +160,8 @@
 		const types = getSelectedValues( typesList );
 		const useAiChecked = useAi && useAi.checked ? 1 : 0;
 		const useAiNameChecked = useAiName && useAiName.checked ? 1 : 0;
+		const usePcpignoreChecked =
+			usePcpignore && usePcpignore.checked ? 1 : 0;
 		const includeExperimentalChecked =
 			includeExperimental && includeExperimental.checked ? 1 : 0;
 		let currentChecks;
@@ -162,7 +171,8 @@
 			categories,
 			includeExperimentalChecked,
 			useAiChecked,
-			useAiNameChecked
+			useAiNameChecked,
+			usePcpignoreChecked
 		)
 			.then( ( data ) => {
 				currentChecks = data.checks;
@@ -171,7 +181,8 @@
 					currentChecks,
 					includeExperimentalChecked,
 					useAiChecked,
-					useAiNameChecked
+					useAiNameChecked,
+					usePcpignoreChecked
 				);
 			} )
 			.then( () =>
@@ -181,7 +192,8 @@
 					types,
 					includeExperimentalChecked,
 					useAiChecked,
-					useAiNameChecked
+					useAiNameChecked,
+					usePcpignoreChecked
 				)
 			)
 			.then( () => cleanUpEnvironment() )
@@ -191,6 +203,9 @@
 			} )
 			.catch( ( error ) => {
 				console.error( error );
+				const errorMsg =
+					error && error.message ? error.message : String( error );
+				announce( errorMsg );
 
 				resetForm();
 			} );
@@ -203,7 +218,7 @@
 	 */
 	function resetResults() {
 		// Empty the results container.
-		resultsContainer.innerText = '';
+		resultsContainer.textContent = '';
 		exportContainer.innerHTML = '';
 		exportContainer.classList.add( 'is-hidden' );
 		resetAggregatedResults();
@@ -230,6 +245,9 @@
 		}
 		if ( useAiName ) {
 			useAiName.disabled = false;
+		}
+		if ( usePcpignore ) {
+			usePcpignore.disabled = false;
 		}
 		if ( includeExperimental ) {
 			includeExperimental.disabled = false;
@@ -647,6 +665,7 @@
 	 * @param {number} includeExperimentalInput Whether to include experimental checks.
 	 * @param {number} useAiInput               Whether to enable AI analysis.
 	 * @param {number} useAiNameInput           Whether to enable AI name check.
+	 * @param {number} usePcpignoreInput        Whether to apply .pcpignore exclusions.
 	 * @return {Promise<Object>} Resolves with the response message.
 	 */
 	function setUpEnvironment(
@@ -654,7 +673,8 @@
 		checks,
 		includeExperimentalInput,
 		useAiInput,
-		useAiNameInput
+		useAiNameInput,
+		usePcpignoreInput
 	) {
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'plugin', plugin );
@@ -668,6 +688,7 @@
 		);
 		pluginCheckData.append( 'use-ai', useAiInput );
 		pluginCheckData.append( 'use-ai-name', useAiNameInput );
+		pluginCheckData.append( 'use-pcpignore', usePcpignoreInput );
 
 		for ( let i = 0; i < checks.length; i++ ) {
 			pluginCheckData.append( 'checks[]', checks[ i ] );
@@ -717,6 +738,7 @@
 	 * @param {number} includeExperimentalInput Whether to include experimental checks.
 	 * @param {number} useAiInput               Whether to enable AI analysis.
 	 * @param {number} useAiNameInput           Whether to enable AI name check.
+	 * @param {number} usePcpignoreInput        Whether to apply .pcpignore exclusions.
 	 * @return {Promise<Object>} Resolves with the response containing plugin and checks.
 	 */
 	function getChecksToRun(
@@ -724,7 +746,8 @@
 		categories,
 		includeExperimentalInput,
 		useAiInput,
-		useAiNameInput
+		useAiNameInput,
+		usePcpignoreInput
 	) {
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'plugin', plugin );
@@ -735,6 +758,7 @@
 		);
 		pluginCheckData.append( 'use-ai', useAiInput );
 		pluginCheckData.append( 'use-ai-name', useAiNameInput );
+		pluginCheckData.append( 'use-pcpignore', usePcpignoreInput );
 
 		for ( let i = 0; i < categories.length; i++ ) {
 			pluginCheckData.append( 'categories[]', categories[ i ] );
@@ -760,6 +784,7 @@
 	 * @param {number} includeExperimentalInput Whether to include experimental checks.
 	 * @param {number} useAiInput               Whether to enable AI analysis.
 	 * @param {number} useAiNameInput           Whether to enable AI name check.
+	 * @param {number} usePcpignoreInput        Whether to apply .pcpignore exclusions.
 	 */
 	async function runChecks(
 		plugin,
@@ -767,7 +792,8 @@
 		types,
 		includeExperimentalInput,
 		useAiInput,
-		useAiNameInput
+		useAiNameInput,
+		usePcpignoreInput
 	) {
 		let isSuccessMessage = true;
 		let aiStats = null;
@@ -779,7 +805,8 @@
 					types,
 					includeExperimentalInput,
 					useAiInput,
-					useAiNameInput
+					useAiNameInput,
+					usePcpignoreInput
 				);
 				const splitResults = splitResultsByFalsePositive( results );
 				const errorsLength = countResultTree(
@@ -833,7 +860,17 @@
 		}
 
 		renderFalsePositiveResults();
-		renderResultsMessage( isSuccessMessage, aiStats );
+		const resultsMessage = renderResultsMessage(
+			isSuccessMessage,
+			aiStats
+		);
+
+		// Announce the check results summary so screen-reader users know
+		// whether errors or warnings were found, rather than only the
+		// internal runtime cleanup status.
+		if ( resultsMessage ) {
+			announce( resultsMessage );
+		}
 	}
 
 	/**
@@ -843,6 +880,7 @@
 	 *
 	 * @param {boolean} isSuccessMessage Whether the message is a success message.
 	 * @param {Object}  aiStats          AI statistics.
+	 * @return {string} The rendered results message.
 	 */
 	function renderResultsMessage( isSuccessMessage, aiStats ) {
 		// Count errors and warnings to determine notice severity and compose the message.
@@ -1000,6 +1038,8 @@
 
 		checksCompleted = true;
 		renderExportButtons();
+
+		return messageText;
 	}
 
 	/**
@@ -1013,6 +1053,7 @@
 	 * @param {number} includeExperimentalInput Whether to include experimental checks.
 	 * @param {number} useAiInput               Whether to enable AI analysis.
 	 * @param {number} useAiNameInput           Whether to enable AI name check.
+	 * @param {number} usePcpignoreInput        Whether to apply .pcpignore exclusions.
 	 * @return {Promise<Object>} The check results.
 	 */
 	function runCheck(
@@ -1021,7 +1062,8 @@
 		types,
 		includeExperimentalInput,
 		useAiInput,
-		useAiNameInput
+		useAiNameInput,
+		usePcpignoreInput
 	) {
 		const pluginCheckData = new FormData();
 		pluginCheckData.append( 'plugin', plugin );
@@ -1033,6 +1075,7 @@
 		);
 		pluginCheckData.append( 'use-ai', useAiInput );
 		pluginCheckData.append( 'use-ai-name', useAiNameInput );
+		pluginCheckData.append( 'use-pcpignore', usePcpignoreInput );
 
 		for ( let i = 0; i < types.length; i++ ) {
 			pluginCheckData.append( 'types[]', types[ i ] );
