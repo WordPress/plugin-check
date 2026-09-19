@@ -11,7 +11,7 @@ class AI_Name_Check_Tests extends \WP_UnitTestCase {
 
 	public function test_run_bails_early_when_ai_disabled() {
 		$runner = $this->createMock( AJAX_Runner::class );
-		$runner->method( 'should_use_ai' )->willReturn( false );
+		$runner->method( 'should_use_ai_name' )->willReturn( false );
 
 		$reflection = new \ReflectionClass( Plugin_Request_Utility::class );
 		$property   = $reflection->getProperty( 'runner' );

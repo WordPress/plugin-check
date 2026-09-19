@@ -44,6 +44,14 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	protected $use_ai = false;
 
 	/**
+	 * Whether AI plugin name checking is enabled.
+	 *
+	 * @since 2.2.0
+	 * @var bool
+	 */
+	protected $use_ai_name = false;
+
+	/**
 	 * AI model preference for analysis.
 	 *
 	 * @since 2.0.0
@@ -326,6 +334,17 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	}
 
 	/**
+	 * Sets whether to use AI plugin name check.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param bool $use_ai_name True to enable AI name check, false to disable.
+	 */
+	final public function set_use_ai_name( $use_ai_name ) {
+		$this->use_ai_name = (bool) $use_ai_name;
+	}
+
+	/**
 	 * Sets the AI model preference for analysis.
 	 *
 	 * @since 2.0.0
@@ -346,6 +365,17 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	public function should_use_ai() {
 		// Check if explicitly set via setter (e.g., CLI flag or checkbox).
 		return $this->use_ai;
+	}
+
+	/**
+	 * Determines if AI plugin name check should be used.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @return bool True if AI name check should be used, false otherwise.
+	 */
+	public function should_use_ai_name() {
+		return $this->use_ai_name;
 	}
 
 	/**
