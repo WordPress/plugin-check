@@ -71,6 +71,27 @@
 	}
 
 	/**
+	 * Reorders a list of check slugs so that priority checks run (and thus
+	 * render) first, in the given order, followed by the remaining checks
+	 * in their original order.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param {Array} checks         Check slugs to run.
+	 * @param {Array} priorityChecks Check slugs that should run first, in order.
+	 * @return {Array} Reordered check slugs.
+	 */
+	function prioritizeChecks( checks, priorityChecks ) {
+		const remaining = checks.filter(
+			( check ) => ! priorityChecks.includes( check )
+		);
+		const prioritized = priorityChecks.filter( ( check ) =>
+			checks.includes( check )
+		);
+		return [ ...prioritized, ...remaining ];
+	}
+
+	/**
 	 * Posts FormData to the plugin's AJAX endpoint.
 	 *
 	 * Wraps fetch with the standard options (ajaxurl, POST, same-origin
@@ -175,7 +196,9 @@
 			usePcpignoreChecked
 		)
 			.then( ( data ) => {
-				currentChecks = data.checks;
+				currentChecks = prioritizeChecks( data.checks, [
+					'ai_name',
+				] );
 				return setUpEnvironment(
 					plugin,
 					currentChecks,
