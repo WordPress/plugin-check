@@ -60,7 +60,7 @@ class Autoloaded_Options_Check extends Abstract_PHP_CodeSniffer_Check {
 	 * @return string Description.
 	 */
 	public function get_description(): string {
-		return __( 'Warns when add_option() or update_option() are called without explicitly setting the $autoload parameter.', 'plugin-check' );
+		return __( 'Warns when add_option() or update_option() are called without explicitly setting the $autoload parameter, leaving the autoload value implicit and dependent on WordPress behavior.', 'plugin-check' );
 	}
 
 	/**
@@ -73,6 +73,6 @@ class Autoloaded_Options_Check extends Abstract_PHP_CodeSniffer_Check {
 	 * @return string The documentation URL.
 	 */
 	public function get_documentation_url(): string {
-		return __( 'https://developer.wordpress.org/reference/functions/add_option/', 'plugin-check' );
+		return __( 'https://developer.wordpress.org/reference/functions/update_option/', 'plugin-check' );
 	}
 }

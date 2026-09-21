@@ -18,29 +18,34 @@ class Autoloaded_Options_Check_Tests extends WP_UnitTestCase {
 
 		$check->run( $check_result );
 
+		$errors   = $check_result->get_errors();
 		$warnings = $check_result->get_warnings();
 
+		$this->assertEmpty( $errors );
 		$this->assertNotEmpty( $warnings );
 		$this->assertArrayHasKey( 'load.php', $warnings );
+		$this->assertSame( 4, $check_result->get_warning_count() );
 
 		// Both add_option calls without $autoload must produce warnings.
+		$add_option_column = key( $warnings['load.php'][19] );
 		$this->assertSame(
 			'PluginCheck.CodeAnalysis.AutoLoadedOptions.add_option_autoloadMissing',
-			$warnings['load.php'][19][1][0]['code']
+			$warnings['load.php'][19][ $add_option_column ][0]['code']
 		);
 		$this->assertSame(
 			'PluginCheck.CodeAnalysis.AutoLoadedOptions.add_option_autoloadMissing',
-			$warnings['load.php'][22][1][0]['code']
+			$warnings['load.php'][22][ $add_option_column ][0]['code']
 		);
 
 		// Both update_option calls without $autoload must produce warnings.
+		$update_option_column = key( $warnings['load.php'][25] );
 		$this->assertSame(
 			'PluginCheck.CodeAnalysis.AutoLoadedOptions.update_option_autoloadMissing',
-			$warnings['load.php'][25][1][0]['code']
+			$warnings['load.php'][25][ $update_option_column ][0]['code']
 		);
 		$this->assertSame(
 			'PluginCheck.CodeAnalysis.AutoLoadedOptions.update_option_autoloadMissing',
-			$warnings['load.php'][28][1][0]['code']
+			$warnings['load.php'][28][ $update_option_column ][0]['code']
 		);
 	}
 

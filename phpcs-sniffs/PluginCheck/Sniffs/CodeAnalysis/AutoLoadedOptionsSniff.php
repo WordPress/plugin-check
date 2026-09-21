@@ -18,9 +18,11 @@ use WordPressCS\WordPress\AbstractFunctionParameterSniff;
  * Warns when add_option() / update_option() are called without explicitly
  * setting the $autoload parameter.
  *
- * The default value of $autoload is true, which loads the option on every
- * page request. Plugins that accumulate autoloaded options slow down every
- * request. Letting the author choose explicitly is the goal.
+ * When omitted, the autoload value is left to WordPress and depends on
+ * whether the option already exists and on the WordPress version: on 6.6+
+ * WordPress decides from the option size, update_option() on an existing
+ * option keeps its current value, and older versions autoload it. Deciding
+ * explicitly with a boolean keeps the performance trade-off intentional.
  *
  * @link https://developer.wordpress.org/reference/functions/add_option/
  * @link https://developer.wordpress.org/reference/functions/update_option/
@@ -90,12 +92,13 @@ final class AutoLoadedOptionsSniff extends AbstractFunctionParameterSniff {
 		if ( false === $found ) {
 			$error_code = MessageHelper::stringToErrorcode( $matched_content . '_autoload', true );
 
-			$this->phpcsFile->addWarning(
-				'The $autoload parameter for %s() is not explicitly set; the option will default to autoloading on every page request. Pass an explicit boolean (true or false) to make the performance trade-off intentional.',
-				$stackPtr,
-				$error_code . 'Missing',
-				array( $matched_content )
-			);
+				$this->phpcsFile->addWarning(
+					'The $autoload parameter for %s() is not explicitly set, so the autoload value is left to WordPress and depends on whether the option already exists and on the WordPress version. Pass an explicit boolean (true or false) to make the performance trade-off intentional.',
+					$stackPtr,
+					$error_code . 'Missing',
+					array( $matched_content )
+				);
+
 		}
 	}
 }
