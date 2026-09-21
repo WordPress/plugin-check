@@ -1,0 +1,457 @@
+<?php
+/**
+ * Class React_Usage_Check.
+ *
+ * @package plugin-check
+ */
+
+namespace WordPress\Plugin_Check\Checker\Checks\Performance;
+
+use Exception;
+use WordPress\Plugin_Check\Checker\Check_Categories;
+use WordPress\Plugin_Check\Checker\Check_Result;
+use WordPress\Plugin_Check\Checker\Checks\Abstract_File_Check;
+use WordPress\Plugin_Check\Traits\Amend_Check_Result;
+use WordPress\Plugin_Check\Traits\Stable_Check;
+
+/**
+ * Check to detect React usage that breaks once WordPress upgrades to React 19.
+ *
+ * WordPress is moving from React 18 to React 19, and two kinds of build output
+ * stop working at that point.
+ *
+ * The first, and by far the most common cause of breakage, is a plugin inlining
+ * React into its build output instead of externalizing it (i.e. relying on the
+ * copy shipped with WordPress). The element object shape changed between React 18
+ * and 19, so elements produced by an inlined pre-19 build are rejected by the
+ * React 19 bundled with WordPress. Those files are reported as errors.
+ *
+ * The second is calling one of the long-deprecated public APIs that React 19
+ * drops. Such calls keep working today and stop working after the upgrade, so
+ * they are reported as warnings.
+ *
+ * @since 2.0.0
+ */
+class React_Usage_Check extends Abstract_File_Check {
+
+	use Amend_Check_Result;
+	use Stable_Check;
+
+	/**
+	 * URL explaining how to externalize React.
+	 *
+	 * @since 2.0.0
+	 * @var string
+	 */
+	const EXTERNALIZE_DOCS_URL = 'https://developer.wordpress.org/block-editor/reference-guides/packages/packages-dependency-extraction-webpack-plugin/';
+
+	/**
+	 * URL of the React 19 upgrade guide.
+	 *
+	 * @since 2.0.0
+	 * @var string
+	 */
+	const UPGRADE_DOCS_URL = 'https://react.dev/blog/2024/04/25/react-19-upgrade-guide';
+
+	/**
+	 * Gets the categories for the check.
+	 *
+	 * Every check must have at least one category.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @return array The categories for the check.
+	 */
+	public function get_categories() {
+		return array( Check_Categories::CATEGORY_PERFORMANCE );
+	}
+
+	/**
+	 * Amends the given result by running the check on the given list of files.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param Check_Result $result The check result to amend, including the plugin context to check.
+	 * @param array        $files  List of absolute file paths.
+	 *
+	 * @throws Exception Thrown when the check fails with a critical error (unrelated to any errors detected as part of
+	 *                   the check).
+	 */
+	protected function check_files( Check_Result $result, array $files ) {
+		$js_files = self::filter_files_by_extension( $files, 'js' );
+
+		foreach ( $js_files as $file ) {
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			$contents = file_get_contents( $file );
+			if ( false === $contents ) {
+				continue;
+			}
+
+			// A file with React inlined into it is reported for that alone. Most
+			// of what it contains is React's own code rather than the plugin's,
+			// and externalizing the package is the fix either way.
+			if ( $this->check_inlined_packages( $result, $file, $contents ) ) {
+				continue;
+			}
+
+			$this->check_removed_apis( $result, $file, $contents );
+		}
+	}
+
+	/**
+	 * Reports every pre-React 19 package inlined into a single file.
+	 *
+	 * Detection happens in two steps. The `react.element` symbol name establishes
+	 * that a pre-19 build is in the file at all: React 19 renamed it to
+	 * `react.transitional.element`, and a build that externalizes React contains
+	 * neither. A second marker then identifies which package was inlined, because
+	 * the three packages WordPress externalizes are fixed separately.
+	 *
+	 * Both steps are required. The symbol name alone proves nothing, because small
+	 * libraries such as `react-is` list every React symbol without inlining any
+	 * React code, and a file may well inline one package while externalizing the
+	 * rest.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param Check_Result $result   The check result to amend.
+	 * @param string       $file     Absolute path to the JavaScript file.
+	 * @param string       $contents Contents of the JavaScript file.
+	 * @return bool True if any inlined package was reported, false otherwise.
+	 */
+	private function check_inlined_packages( Check_Result $result, $file, $contents ) {
+		$position = $this->find_inlined_pre_19_react( $contents );
+
+		if ( false === $position ) {
+			return false;
+		}
+
+		$reported       = false;
+		$is_development = $this->is_development_build( $contents );
+
+		foreach ( $this->get_packages() as $package ) {
+			if ( ! preg_match( $package['pattern'], $contents ) ) {
+				continue;
+			}
+
+			// Do not report a package that is externalized to the copy shipped
+			// with WordPress. A `*.asset.php` dependency is deliberately not
+			// accepted as proof: the element marker means a pre-19 build is
+			// already inlined, and a declared dependency does not rule out a
+			// stale or mixed build that still bundles its own copy.
+			if ( preg_match( $package['global'], $contents ) ) {
+				continue;
+			}
+
+			$this->add_package_error( $result, $file, $position, $package, $is_development );
+			$reported = true;
+		}
+
+		return $reported;
+	}
+
+	/**
+	 * Locates the element marker emitted by React builds predating React 19.
+	 *
+	 * `react.element` is the name of the element type symbol used up to React
+	 * 18. React 19 renamed it to `react.transitional.element`, and a build that
+	 * externalizes React to the copy shipped with WordPress contains neither.
+	 *
+	 * Only the string literal is matched, not the surrounding
+	 * `Symbol.for( ... )` call: the React 17 production builds hoist `Symbol.for`
+	 * into a local variable and call it through that variable instead.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param string $contents Contents of the JavaScript file.
+	 * @return array|false Array with `line` and `column` keys, or false if no match was found.
+	 */
+	private function find_inlined_pre_19_react( $contents ) {
+		return $this->find_first_match( '/([\'"])react\.element\1/', $contents );
+	}
+
+	/**
+	 * Adds the error for a single inlined package.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param Check_Result $result         The check result to amend.
+	 * @param string       $file           Absolute path to the JavaScript file.
+	 * @param array        $position       Array with `line` and `column` keys.
+	 * @param array        $package        Package definition as returned by `get_packages()`.
+	 * @param bool         $is_development Whether the inlined build is a development build.
+	 */
+	private function add_package_error( Check_Result $result, $file, array $position, array $package, $is_development ) {
+		if ( $is_development ) {
+			$message = sprintf(
+				/* translators: %s: npm package name, e.g. "react-dom" */
+				__( 'This file inlines a development build of the "%s" package instead of externalizing it. The bundled copy predates React 19 and breaks when WordPress upgrades to React 19, and development builds are far larger and slower than production builds. Use the dependency extraction webpack plugin so that the package is loaded from WordPress instead.', 'plugin-check' ),
+				$package['label']
+			);
+		} else {
+			$message = sprintf(
+				/* translators: %s: npm package name, e.g. "react-dom" */
+				__( 'This file inlines the "%s" package instead of externalizing it. The bundled copy predates React 19 and breaks when WordPress upgrades to React 19. Use the dependency extraction webpack plugin so that the package is loaded from WordPress instead.', 'plugin-check' ),
+				$package['label']
+			);
+		}
+
+		$this->add_result_error_for_file(
+			$result,
+			$message,
+			$package['code'],
+			$file,
+			$position['line'],
+			$position['column'],
+			self::EXTERNALIZE_DOCS_URL,
+			$is_development ? 7 : 6
+		);
+	}
+
+	/**
+	 * Returns the packages this check can tell apart.
+	 *
+	 * Each `pattern` matches code internal to the package, so that a build which
+	 * merely calls the package does not match. `global` matches a reference to
+	 * the browser global that the dependency extraction webpack plugin maps the
+	 * package to. The trailing word boundary keeps `window.ReactDOM` from
+	 * counting as a reference to `window.React`.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @return array List of package definitions.
+	 */
+	private function get_packages() {
+		return array(
+			array(
+				'label'   => 'react/jsx-runtime',
+				'code'    => 'inlined_react_jsx_runtime',
+				'global'  => '/\bwindow\.ReactJSXRuntime\b/',
+				// The runtime assigns `jsx`/`jsxs` onto its exports object. Call
+				// sites such as `ReactJSXRuntime.jsxs( ... )` are not matched.
+				// Either name alone is enough, because a bundler that sees only
+				// `jsx` call sites tree-shakes the `jsxs` export away.
+				'pattern' => '/\bjsxs?\s*[:=][^=]/',
+			),
+			array(
+				'label'   => 'react',
+				'code'    => 'inlined_react',
+				'global'  => '/\bwindow\.React\b/',
+				// Only the library itself assigns this export. `react-dom` also
+				// assigns its own, which is fine because bundling the renderer
+				// always bundles the library too, but `react/jsx-runtime` merely
+				// reads it, so the assignment is what tells the two apart.
+				'pattern' => '/__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED\s*[:=][^=]/',
+			),
+			array(
+				'label'   => 'react-dom',
+				'code'    => 'inlined_react_dom',
+				'global'  => '/\bwindow\.ReactDOM\b/',
+				// The key under which the renderer caches the fiber on every
+				// DOM node it owns, renamed in React 17. Nothing but the
+				// renderer defines it, code that merely calls the renderer does
+				// not, and it survives minification because it is a string
+				// literal.
+				'pattern' => '/__reactFiber\$|__reactInternalInstance\$/',
+			),
+		);
+	}
+
+	/**
+	 * Determines whether the inlined build is a development build.
+	 *
+	 * Development builds embed documentation links in their warning messages,
+	 * under `reactjs.org` up to React 18 and under `react.dev` from React 19.
+	 * Production builds strip every warning, so neither link survives.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param string $contents Contents of the JavaScript file.
+	 * @return bool True if the file inlines a development build, false otherwise.
+	 */
+	private function is_development_build( $contents ) {
+		return 1 === preg_match( '#https://(?:reactjs\.org|react\.dev)/link/#', $contents );
+	}
+
+	/**
+	 * Reports every call to a removed React API in a single file.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param Check_Result $result   The check result to amend.
+	 * @param string       $file     Absolute path to the JavaScript file.
+	 * @param string       $contents Contents of the JavaScript file.
+	 */
+	private function check_removed_apis( Check_Result $result, $file, $contents ) {
+		// Blank out comments and string literals first, so a mention in a code
+		// comment, changelog entry, or translation string is not reported as
+		// usage.
+		$scannable = $this->blank_comments_and_strings( $contents );
+
+		foreach ( $this->get_removed_apis() as $api ) {
+			$position = $this->find_first_match( $api['pattern'], $scannable );
+
+			if ( false === $position ) {
+				continue;
+			}
+
+			$this->add_result_warning_for_file(
+				$result,
+				sprintf(
+					/* translators: 1: the removed React API name, 2: the API replacing it */
+					__( 'This file calls "%1$s", which was removed in React 19 and stops working once WordPress upgrades React. Use %2$s instead.', 'plugin-check' ),
+					$api['name'],
+					$api['replacement']
+				),
+				'react_removed_api',
+				$file,
+				$position['line'],
+				$position['column'],
+				self::UPGRADE_DOCS_URL,
+				5
+			);
+		}
+	}
+
+	/**
+	 * Returns the public React APIs removed in React 19.
+	 *
+	 * Only the documented public surface is matched. Internals such as
+	 * `ReactCurrentOwner` are deliberately left out: they never appear in plugin
+	 * code, only inside a React build that the plugin inlined, which the inlined
+	 * package errors cover.
+	 *
+	 * `render` and `hydrate` are common words, so they are only matched when
+	 * called on a `ReactDOM` object. The remaining names are specific enough to
+	 * match on their own.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @return array List of removed API definitions.
+	 */
+	private function get_removed_apis() {
+		return array(
+			array(
+				'name'        => 'ReactDOM.render',
+				'pattern'     => '/\bReactDOM\s*\.\s*render\s*\(/',
+				'replacement' => 'createRoot()',
+			),
+			array(
+				'name'        => 'ReactDOM.hydrate',
+				'pattern'     => '/\bReactDOM\s*\.\s*hydrate\s*\(/',
+				'replacement' => 'hydrateRoot()',
+			),
+			array(
+				'name'        => 'ReactDOM.unmountComponentAtNode',
+				'pattern'     => '/\bunmountComponentAtNode\s*\(/',
+				'replacement' => 'root.unmount()',
+			),
+			array(
+				'name'        => 'ReactDOM.findDOMNode',
+				'pattern'     => '/\bfindDOMNode\s*\(/',
+				'replacement' => 'a ref on the element',
+			),
+			array(
+				'name'        => 'ReactDOM.unstable_renderSubtreeIntoContainer',
+				'pattern'     => '/\bunstable_renderSubtreeIntoContainer\s*\(/',
+				'replacement' => 'createPortal()',
+			),
+			array(
+				'name'        => 'ReactDOMServer.renderToNodeStream',
+				'pattern'     => '/\brenderToNodeStream\s*\(/',
+				'replacement' => 'renderToPipeableStream()',
+			),
+			array(
+				'name'        => 'React.createFactory',
+				'pattern'     => '/\bReact\s*\.\s*createFactory\s*\(/',
+				'replacement' => 'JSX or createElement()',
+			),
+		);
+	}
+
+	/**
+	 * Blanks out comments and string literals in JavaScript contents.
+	 *
+	 * Characters inside line comments, block comments, and single-, double-, or
+	 * backtick-quoted strings are replaced with spaces. The length of the string
+	 * and every newline are preserved, so match offsets still map to the correct
+	 * line and column in the original contents.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param string $contents Contents of the JavaScript file.
+	 * @return string The contents with comments and string literals blanked out.
+	 */
+	private function blank_comments_and_strings( $contents ) {
+		$pattern = '~/\*.*?\*/|//[^\r\n]*|"(?:\\\\.|[^"\\\\])*"|\'(?:\\\\.|[^\'\\\\])*\'|`(?:\\\\.|[^`\\\\])*`~s';
+
+		$blanked = preg_replace_callback(
+			$pattern,
+			static function ( $matches ) {
+				return preg_replace( '/[^\r\n]/', ' ', $matches[0] );
+			},
+			$contents
+		);
+
+		// On a PCRE failure (e.g. backtracking limit) fall back to the raw contents.
+		return is_string( $blanked ) ? $blanked : $contents;
+	}
+
+	/**
+	 * Finds the first occurrence of a pattern and returns its line and column.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param string $pattern  The regular expression pattern to search for.
+	 * @param string $contents The contents to search.
+	 * @return array|false Array with `line` and `column` keys, or false if no match was found.
+	 */
+	private function find_first_match( $pattern, $contents ) {
+		if ( ! preg_match( $pattern, $contents, $matches, PREG_OFFSET_CAPTURE ) ) {
+			return false;
+		}
+
+		$offset = $matches[0][1];
+
+		if ( 0 === $offset ) {
+			return array(
+				'line'   => 1,
+				'column' => 1,
+			);
+		}
+
+		$before   = substr( $contents, 0, $offset );
+		$exploded = explode( PHP_EOL, $before );
+
+		return array(
+			'line'   => count( $exploded ),
+			'column' => strlen( (string) end( $exploded ) ) + 1,
+		);
+	}
+
+	/**
+	 * Gets the description for the check.
+	 *
+	 * Every check must have a short description explaining what the check does.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @return string Description.
+	 */
+	public function get_description(): string {
+		return __( 'Detects React usage that breaks when WordPress upgrades to React 19.', 'plugin-check' );
+	}
+
+	/**
+	 * Gets the documentation URL for the check.
+	 *
+	 * Every check must have a URL with further information about the check.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @return string The documentation URL.
+	 */
+	public function get_documentation_url(): string {
+		return self::UPGRADE_DOCS_URL;
+	}
+}

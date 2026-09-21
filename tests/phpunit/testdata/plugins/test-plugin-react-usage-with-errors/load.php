@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Test Plugin Inlined React Runtime With Errors
+ * Plugin Name: Test Plugin React Usage With Errors
  * Plugin URI: https://github.com/WordPress/plugin-check
  * Description: Some plugin description.
  * Requires at least: 6.0
@@ -10,7 +10,7 @@
  * Author URI: https://make.wordpress.org/performance/
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- * Text Domain: test-plugin-inlined-react-runtime-with-errors
+ * Text Domain: test-plugin-react-usage-with-errors
  *
- * @package test-plugin-inlined-react-runtime-with-errors
+ * @package test-plugin-react-usage-with-errors
  */
