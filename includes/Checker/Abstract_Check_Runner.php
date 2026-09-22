@@ -646,7 +646,7 @@ abstract class Abstract_Check_Runner implements Check_Runner {
 	 *
 	 * @return string The plugin basename to check.
 	 *
-	 * @throws Exception Thrown if an plugin basename could not be set.
+	 * @throws Exception Thrown if a plugin basename could not be set.
 	 */
 	final public function get_plugin_basename() {
 		if ( null === $this->plugin_basename ) {
