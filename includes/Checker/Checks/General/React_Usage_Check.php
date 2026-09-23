@@ -680,6 +680,11 @@ class React_Usage_Check extends Abstract_File_Check {
 	/**
 	 * Finds the first occurrence of a pattern and returns its line and column.
 	 *
+	 * All three line endings are recognized, and a carriage return followed by a
+	 * line feed counts once. The line ending of the file being read is what
+	 * matters here, which is unrelated to the one native to the machine running
+	 * the check.
+	 *
 	 * @since 2.2.0
 	 *
 	 * @param string $pattern  The regular expression pattern to search for.
@@ -691,21 +696,12 @@ class React_Usage_Check extends Abstract_File_Check {
 			return false;
 		}
 
-		$offset = $matches[0][1];
-
-		if ( 0 === $offset ) {
-			return array(
-				'line'   => 1,
-				'column' => 1,
-			);
-		}
-
-		$before   = substr( $contents, 0, $offset );
-		$exploded = explode( PHP_EOL, $before );
+		$before = substr( $contents, 0, $matches[0][1] );
+		$lines  = preg_split( '/\r\n|\n|\r/', $before );
 
 		return array(
-			'line'   => count( $exploded ),
-			'column' => strlen( (string) end( $exploded ) ) + 1,
+			'line'   => count( $lines ),
+			'column' => strlen( (string) end( $lines ) ) + 1,
 		);
 	}
 

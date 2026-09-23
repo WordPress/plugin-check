@@ -50,7 +50,7 @@ class React_Usage_Check_Tests extends WP_UnitTestCase {
 		$warnings     = $check_result->get_warnings();
 
 		$this->assertNotEmpty( $warnings );
-		$this->assertSame( 5, $check_result->get_warning_count() );
+		$this->assertSame( 6, $check_result->get_warning_count() );
 
 		// Every removed API used in a file is reported, not only the first one.
 		$this->assertSame(
@@ -72,6 +72,11 @@ class React_Usage_Check_Tests extends WP_UnitTestCase {
 		// A file that inlines a package is reported for that alone, even though
 		// the inlined renderer defines the removed APIs itself.
 		$this->assertArrayNotHasKey( 'react-dom.js', $warnings );
+
+		// Positions follow the line endings of the file. Counting the ones native
+		// to this machine instead would put the call on line 1 of a file written
+		// with carriage returns alone.
+		$this->assertSame( array( 3 ), array_keys( $warnings['cr-line-endings.js'] ) );
 	}
 
 	public function test_run_without_errors() {
