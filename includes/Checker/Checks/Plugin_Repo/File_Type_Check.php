@@ -375,62 +375,20 @@ class File_Type_Check extends Abstract_File_Check {
 	 * @param array        $files  List of absolute file paths.
 	 */
 	protected function look_for_library_core_files( Check_Result $result, array $files ) {
-		// Known libraries that are part of WordPress core.
-		// https://meta.trac.wordpress.org/browser/sites/trunk/api.wordpress.org/public_html/core/credits/wp-59.php#L739 .
-		$look_known_libraries_core_services = array(
-			'(?<![\.|-])jquery(-[0-9|\.]*)?(\.slim)?(\.min)?\.js(?!\/)',
-			'jquery-ui(-[0-9|\.]*)?(\.slim)?(\.min)?\.js(?!\/)',
-			'jquery.color(\.slim)?(\.min)?\.js(?!\/)',
-			'jquery.ui.touch-punch(?!\/)',
-			'jquery.hoverintent(?!\/)',
-			'jquery.imgareaselect(?!\/)',
-			'jquery.hotkeys(?!\/)',
-			'jquery.ba-serializeobject(?!\/)',
-			'jquery.query-object(?!\/)',
-			'jquery.suggest(?!\/)',
-			'polyfill(\.min)?\.js(?!\/)',
-			'iris(\.min)?\.js(?!\/)',
-			'backbone(\.min)?\.js(?!\/)',
-			'clipboard(\.min)?\.js(?!\/)',
-			'closest(\.min)?\.js(?!\/)',
-			'codemirror(\.min)?\.js(?!\/)',
-			'formdata(\.min)?\.js(?!\/)',
-			'json2(\.min)?\.js(?!\/)',
-			'lodash(\.min)?\.js(?!\/)',
-			'masonry(\.pkgd)(\.min)?\.js(?!\/)',
-			'mediaelement-and-player(\.min)?\.js(?!\/)',
-			'moment(\.min)?\.js(?!\/)',
-			'plupload(\.full)(\.min)?\.js(?!\/)',
-			'thickbox(\.min)?\.js(?!\/)',
-			'twemoji(\.min)?\.js(?!\/)',
-			'underscore([\.|-]min)?\.js(?!\/)',
-			'moxie(\.min)?\.js(?!\/)',
-			'zxcvbn(\.min)?\.js(?!\/)',
-			'getid3\.php(?!\/)',
-			'pclzip\.lib\.php(?!\/)',
-			'PasswordHash\.php(?!\/)',
-			'PHPMailer\.php(?!\/)',
-			'SimplePie\.php(?!\/)',
-		);
-
-		$combined_pattern = '/(' . implode( ')|(', $look_known_libraries_core_services ) . ')/i';
-
 		$plugin_path = $result->plugin()->path();
 
-		$files = array_map(
-			function ( $file ) use ( $plugin_path ) {
-				return str_replace( $plugin_path, '', $file );
-			},
-			$files
-		);
-
+		$relative_files = array();
 		foreach ( $files as $file ) {
-			if ( preg_match( $combined_pattern, $file ) ) {
+			$relative_files[ $file ] = str_replace( $plugin_path, '', $file );
+		}
+
+		foreach ( $relative_files as $file => $relative_file ) {
+			if ( Core_Library_File_Signature_Checker::file_matches_core_library_signature( $file, $relative_file ) ) {
 				$this->add_result_error_for_file(
 					$result,
 					__( 'Library files that are already in the WordPress core are not permitted.', 'plugin-check' ),
 					'library_core_files',
-					$file,
+					$relative_file,
 					0,
 					0,
 					'',
