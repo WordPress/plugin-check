@@ -297,12 +297,7 @@ class React_Usage_Check extends Abstract_File_Check {
 
 			$this->add_result_warning_for_file(
 				$result,
-				sprintf(
-					/* translators: 1: the removed React API name, 2: the API replacing it */
-					__( 'This file calls "%1$s", which was removed in React 19 and stops working once WordPress upgrades React. Use %2$s instead.', 'plugin-check' ),
-					$api['name'],
-					$api['replacement']
-				),
+				$this->get_removed_api_message( $api ),
 				'react_removed_api',
 				$file,
 				$position['line'],
@@ -311,6 +306,33 @@ class React_Usage_Check extends Abstract_File_Check {
 				5
 			);
 		}
+	}
+
+	/**
+	 * Returns the message reported for a call to a removed API.
+	 *
+	 * Most of the removed APIs have a drop-in replacement, and the name of that
+	 * replacement is code that must stay untranslated, so those share a single
+	 * sentence with the name interpolated into it. The rest have no such
+	 * replacement and need prose, which has to be part of the translated
+	 * sentence rather than substituted into it.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param array $api Removed API definition as returned by `get_removed_apis()`.
+	 * @return string The message to report.
+	 */
+	private function get_removed_api_message( array $api ) {
+		if ( isset( $api['message'] ) ) {
+			return $api['message'];
+		}
+
+		return sprintf(
+			/* translators: 1: the removed React API name, 2: the name of the API replacing it */
+			__( 'This file calls "%1$s", which was removed in React 19 and stops working once WordPress upgrades React. Use %2$s instead.', 'plugin-check' ),
+			$api['name'],
+			$api['replacement']
+		);
 	}
 
 	/**
@@ -324,6 +346,9 @@ class React_Usage_Check extends Abstract_File_Check {
 	 * `render` and `hydrate` are common words, so they are only matched when
 	 * called on a `ReactDOM` object. The remaining names are specific enough to
 	 * match on their own.
+	 *
+	 * An entry carries either a `replacement`, naming the API to migrate to, or
+	 * a complete `message` for the APIs that have no such replacement.
 	 *
 	 * @since 2.0.0
 	 *
@@ -347,9 +372,9 @@ class React_Usage_Check extends Abstract_File_Check {
 				'replacement' => 'root.unmount()',
 			),
 			array(
-				'name'        => 'ReactDOM.findDOMNode',
-				'pattern'     => '/\bfindDOMNode\s*\(/',
-				'replacement' => 'a ref on the element',
+				'name'    => 'ReactDOM.findDOMNode',
+				'pattern' => '/\bfindDOMNode\s*\(/',
+				'message' => __( 'This file calls "ReactDOM.findDOMNode", which was removed in React 19 and stops working once WordPress upgrades React. Use a ref on the element instead.', 'plugin-check' ),
 			),
 			array(
 				'name'        => 'ReactDOM.unstable_renderSubtreeIntoContainer',
@@ -362,9 +387,9 @@ class React_Usage_Check extends Abstract_File_Check {
 				'replacement' => 'renderToPipeableStream()',
 			),
 			array(
-				'name'        => 'React.createFactory',
-				'pattern'     => '/\bReact\s*\.\s*createFactory\s*\(/',
-				'replacement' => 'JSX or createElement()',
+				'name'    => 'React.createFactory',
+				'pattern' => '/\bReact\s*\.\s*createFactory\s*\(/',
+				'message' => __( 'This file calls "React.createFactory", which was removed in React 19 and stops working once WordPress upgrades React. Use JSX or createElement() instead.', 'plugin-check' ),
 			),
 		);
 	}
