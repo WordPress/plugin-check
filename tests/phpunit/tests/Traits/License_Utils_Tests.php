@@ -79,6 +79,10 @@ class License_Utils_Tests extends WP_UnitTestCase {
 			array( 'The Unlicense', 'Unlicense' ),
 			array( 'Unlicense', 'Unlicense' ),
 
+			array( 'BlueOak-1.0.0', 'BlueOak' ),
+			array( 'Blue Oak Model License 1.0.0', 'BlueOak' ),
+			array( 'Blue Oak Model License', 'BlueOak' ),
+
 			array( 'WTFPL', 'WTFPL' ),
 			array( 'WTFPL v2', 'WTFPL' ),
 
@@ -102,6 +106,7 @@ class License_Utils_Tests extends WP_UnitTestCase {
 			array( 'EUPL-1.1', true ),
 			array( 'EUPL-1.2', true ),
 			array( 'AGPL-3.0-only', true ),
+			array( 'BlueOak-1.0.0', true ),
 
 			array( 'MIT License', false ),
 			array( 'GPL (v3)', false ),
@@ -136,6 +141,8 @@ class License_Utils_Tests extends WP_UnitTestCase {
 			array( 'Do What The Fuck You Want To Public License', true ),
 			array( 'EUPL-1.1', true ),
 			array( 'EUPL-1.2', true ),
+			array( 'BlueOak', true ),
+			array( 'BlueOak-1.0.0', true ),
 
 			array( 'EPL', false ),
 			array( 'MPL10', false ),
