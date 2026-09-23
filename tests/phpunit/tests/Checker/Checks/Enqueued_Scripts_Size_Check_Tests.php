@@ -115,4 +115,139 @@ class Enqueued_Scripts_Size_Check_Tests extends Runtime_Check_UnitTestCase {
 		$this->assertEquals( 0, $results->get_error_count() );
 		$this->assertEquals( 4, $results->get_warning_count() );
 	}
+
+	public function test_run_reports_dep_size() {
+		// Load the test plugin that enqueues a script with external dependencies.
+		require UNIT_TESTS_PLUGIN_DIR . 'test-plugin-enqueued-script-size-check-with-deps/load.php';
+
+		$check   = new Enqueued_Scripts_Size_Check( 1 );
+		$context = $this->get_context( WP_PLUGIN_CHECK_MAIN_FILE );
+		$results = $this->run_check( $check, $context );
+
+		$warnings = $this->flatten_warnings( $results->get_warnings() );
+
+		$plugin_codes = array_values(
+			array_filter(
+				array_column( $warnings, 'code' ),
+				static function ( $code ) {
+					return 'EnqueuedScriptsSize.ScriptSizeGreaterThanThreshold' === $code;
+				}
+			)
+		);
+		$dep_codes    = array_values(
+			array_filter(
+				array_column( $warnings, 'code' ),
+				static function ( $code ) {
+					return 'EnqueuedScriptsSize.ExternalDependencySize' === $code;
+				}
+			)
+		);
+
+		// 1 plugin asset x 4 URLs.
+		$this->assertCount( 4, $plugin_codes );
+		// 1 combined dep warning per URL (4 URLs).
+		$this->assertCount( 4, $dep_codes );
+	}
+
+	public function test_run_handles_external_dep_safely() {
+		// Fixture enqueues a CDN dep that the resolver cannot measure.
+		require UNIT_TESTS_PLUGIN_DIR . 'test-plugin-enqueued-script-size-check-with-deps/load.php';
+
+		// High threshold so plugin bucket alone does not warn, but the
+		// combination does.
+		$check   = new Enqueued_Scripts_Size_Check( 50 );
+		$context = $this->get_context( WP_PLUGIN_CHECK_MAIN_FILE );
+		$results = $this->run_check( $check, $context );
+
+		$errors = $results->get_errors();
+		$this->assertEmpty( $errors );
+
+		$warnings  = $this->flatten_warnings( $results->get_warnings() );
+		$dep_codes = array_values(
+			array_filter(
+				array_column( $warnings, 'code' ),
+				static function ( $code ) {
+					return 'EnqueuedScriptsSize.ExternalDependencySize' === $code;
+				}
+			)
+		);
+
+		$this->assertNotEmpty( $dep_codes, 'External dep warning should still emit when CDN src cannot be measured.' );
+	}
+
+	public function test_run_no_dep_warning_when_no_deps() {
+		// Plain fixture, no deps registered.
+		require UNIT_TESTS_PLUGIN_DIR . 'test-plugin-enqueued-script-size-check/load.php';
+
+		$check   = new Enqueued_Scripts_Size_Check( 1 );
+		$context = $this->get_context( WP_PLUGIN_CHECK_MAIN_FILE );
+		$results = $this->run_check( $check, $context );
+
+		$warnings  = $this->flatten_warnings( $results->get_warnings() );
+		$dep_codes = array_values(
+			array_filter(
+				array_column( $warnings, 'code' ),
+				static function ( $code ) {
+					return 'EnqueuedScriptsSize.ExternalDependencySize' === $code;
+				}
+			)
+		);
+
+		$this->assertCount( 0, $dep_codes, 'Dep warning must not fire when plugin enqueues no external deps.' );
+	}
+
+	public function test_run_no_false_positive_on_unrelated_external_scripts() {
+		// Fixture enqueues a small plugin script plus a large unrelated external
+		// script that is NOT in the plugin's dep graph.
+		require UNIT_TESTS_PLUGIN_DIR . 'test-plugin-enqueued-script-size-check-with-unrelated-external-script/load.php';
+
+		// Threshold above the plugin script size, but below it once the
+		// unrelated external would be (incorrectly) counted.
+		$check   = new Enqueued_Scripts_Size_Check( 1000 );
+		$context = $this->get_context( WP_PLUGIN_CHECK_MAIN_FILE );
+		$results = $this->run_check( $check, $context );
+
+		$errors = $results->get_errors();
+		$this->assertEmpty( $errors );
+
+		$warnings = $this->flatten_warnings( $results->get_warnings() );
+
+		$plugin_codes = array_values(
+			array_filter(
+				array_column( $warnings, 'code' ),
+				static function ( $code ) {
+					return 'EnqueuedScriptsSize.ScriptSizeGreaterThanThreshold' === $code;
+				}
+			)
+		);
+		$dep_codes    = array_values(
+			array_filter(
+				array_column( $warnings, 'code' ),
+				static function ( $code ) {
+					return 'EnqueuedScriptsSize.ExternalDependencySize' === $code;
+				}
+			)
+		);
+
+		$this->assertCount( 0, $plugin_codes, 'Plugin bucket alone must not trigger the per-file warning.' );
+		$this->assertCount(
+			0,
+			$dep_codes,
+			'Unrelated external scripts not in the plugin dep graph must not trigger the dep warning.'
+		);
+	}
+
+	private function flatten_warnings( $warnings ) {
+		$flat = array();
+		foreach ( $warnings as $lines ) {
+			foreach ( $lines as $columns ) {
+				foreach ( $columns as $entries ) {
+					foreach ( $entries as $entry ) {
+						$flat[] = $entry;
+					}
+				}
+			}
+		}
+		return $flat;
+	}
 }
