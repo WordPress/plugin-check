@@ -23,8 +23,15 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
  * The first, and by far the most common cause of breakage, is a plugin inlining
  * React into its build output instead of externalizing it (i.e. relying on the
  * copy shipped with WordPress). The element object shape changed between React 18
- * and 19, so elements produced by an inlined pre-19 build are rejected by the
- * React 19 bundled with WordPress. Those files are reported as errors.
+ * and 19, so elements produced by an inlined pre-19 build are not what the React
+ * 19 bundled with WordPress expects. Those files are reported as errors.
+ *
+ * Whether that surfaces as a hard failure depends on where such an element ends
+ * up, because the bundles WordPress ships patch React 19 into accepting the
+ * older shape and warning about it. That is why the message says the build will
+ * likely break rather than that it does. The patch is there to carry plugins
+ * through the upgrade rather than to make the older shape supported, so the
+ * severity stays an error.
  *
  * The second is calling one of the long-deprecated public APIs that React 19
  * drops. Such calls keep working today and stop working after the upgrade, so
@@ -251,13 +258,13 @@ class React_Usage_Check extends Abstract_File_Check {
 		if ( $is_development ) {
 			$message = sprintf(
 				/* translators: %s: npm package name, e.g. "react-dom" */
-				__( 'This file inlines a development build of the "%s" package instead of externalizing it. The bundled copy predates React 19 and breaks when WordPress upgrades to React 19, and development builds are far larger and slower than production builds. Use the dependency extraction webpack plugin so that the package is loaded from WordPress instead.', 'plugin-check' ),
+				__( 'This file inlines a development build of the "%s" package instead of externalizing it. The bundled copy predates React 19 and will likely break when WordPress upgrades to React 19, and development builds are far larger and slower than production builds. Use the dependency extraction webpack plugin so that the package is loaded from WordPress instead.', 'plugin-check' ),
 				$package['label']
 			);
 		} else {
 			$message = sprintf(
 				/* translators: %s: npm package name, e.g. "react-dom" */
-				__( 'This file inlines the "%s" package instead of externalizing it. The bundled copy predates React 19 and breaks when WordPress upgrades to React 19. Use the dependency extraction webpack plugin so that the package is loaded from WordPress instead.', 'plugin-check' ),
+				__( 'This file inlines the "%s" package instead of externalizing it. The bundled copy predates React 19 and will likely break when WordPress upgrades to React 19. Use the dependency extraction webpack plugin so that the package is loaded from WordPress instead.', 'plugin-check' ),
 				$package['label']
 			);
 		}
