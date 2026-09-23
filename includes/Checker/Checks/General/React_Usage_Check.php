@@ -30,7 +30,7 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
  * drops. Such calls keep working today and stop working after the upgrade, so
  * they are reported as warnings.
  *
- * @since 2.0.0
+ * @since 2.2.0
  */
 class React_Usage_Check extends Abstract_File_Check {
 
@@ -40,7 +40,7 @@ class React_Usage_Check extends Abstract_File_Check {
 	/**
 	 * URL explaining how to externalize React.
 	 *
-	 * @since 2.0.0
+	 * @since 2.2.0
 	 * @var string
 	 */
 	const EXTERNALIZE_DOCS_URL = 'https://developer.wordpress.org/block-editor/reference-guides/packages/packages-dependency-extraction-webpack-plugin/';
@@ -48,7 +48,7 @@ class React_Usage_Check extends Abstract_File_Check {
 	/**
 	 * URL of the React 19 upgrade guide.
 	 *
-	 * @since 2.0.0
+	 * @since 2.2.0
 	 * @var string
 	 */
 	const UPGRADE_DOCS_URL = 'https://react.dev/blog/2024/04/25/react-19-upgrade-guide';
@@ -58,7 +58,7 @@ class React_Usage_Check extends Abstract_File_Check {
 	 *
 	 * Every check must have at least one category.
 	 *
-	 * @since 2.0.0
+	 * @since 2.2.0
 	 *
 	 * @return array The categories for the check.
 	 */
@@ -69,7 +69,7 @@ class React_Usage_Check extends Abstract_File_Check {
 	/**
 	 * Amends the given result by running the check on the given list of files.
 	 *
-	 * @since 2.0.0
+	 * @since 2.2.0
 	 *
 	 * @param Check_Result $result The check result to amend, including the plugin context to check.
 	 * @param array        $files  List of absolute file paths.
@@ -112,7 +112,7 @@ class React_Usage_Check extends Abstract_File_Check {
 	 * React code, and a file may well inline one package while externalizing the
 	 * rest.
 	 *
-	 * @since 2.0.0
+	 * @since 2.2.0
 	 *
 	 * @param Check_Result $result   The check result to amend.
 	 * @param string       $file     Absolute path to the JavaScript file.
@@ -161,7 +161,7 @@ class React_Usage_Check extends Abstract_File_Check {
 	 * `Symbol.for( ... )` call: the React 17 production builds hoist `Symbol.for`
 	 * into a local variable and call it through that variable instead.
 	 *
-	 * @since 2.0.0
+	 * @since 2.2.0
 	 *
 	 * @param string $contents Contents of the JavaScript file.
 	 * @return array|false Array with `line` and `column` keys, or false if no match was found.
@@ -173,7 +173,7 @@ class React_Usage_Check extends Abstract_File_Check {
 	/**
 	 * Adds the error for a single inlined package.
 	 *
-	 * @since 2.0.0
+	 * @since 2.2.0
 	 *
 	 * @param Check_Result $result         The check result to amend.
 	 * @param string       $file           Absolute path to the JavaScript file.
@@ -217,7 +217,7 @@ class React_Usage_Check extends Abstract_File_Check {
 	 * package to. The trailing word boundary keeps `window.ReactDOM` from
 	 * counting as a reference to `window.React`.
 	 *
-	 * @since 2.0.0
+	 * @since 2.2.0
 	 *
 	 * @return array List of package definitions.
 	 */
@@ -264,7 +264,7 @@ class React_Usage_Check extends Abstract_File_Check {
 	 * under `reactjs.org` up to React 18 and under `react.dev` from React 19.
 	 * Production builds strip every warning, so neither link survives.
 	 *
-	 * @since 2.0.0
+	 * @since 2.2.0
 	 *
 	 * @param string $contents Contents of the JavaScript file.
 	 * @return bool True if the file inlines a development build, false otherwise.
@@ -276,7 +276,7 @@ class React_Usage_Check extends Abstract_File_Check {
 	/**
 	 * Reports every call to a removed React API in a single file.
 	 *
-	 * @since 2.0.0
+	 * @since 2.2.0
 	 *
 	 * @param Check_Result $result   The check result to amend.
 	 * @param string       $file     Absolute path to the JavaScript file.
@@ -317,7 +317,7 @@ class React_Usage_Check extends Abstract_File_Check {
 	 * replacement and need prose, which has to be part of the translated
 	 * sentence rather than substituted into it.
 	 *
-	 * @since 2.0.0
+	 * @since 2.2.0
 	 *
 	 * @param array $api Removed API definition as returned by `get_removed_apis()`.
 	 * @return string The message to report.
@@ -350,7 +350,7 @@ class React_Usage_Check extends Abstract_File_Check {
 	 * An entry carries either a `replacement`, naming the API to migrate to, or
 	 * a complete `message` for the APIs that have no such replacement.
 	 *
-	 * @since 2.0.0
+	 * @since 2.2.0
 	 *
 	 * @return array List of removed API definitions.
 	 */
@@ -402,7 +402,7 @@ class React_Usage_Check extends Abstract_File_Check {
 	 * and every newline are preserved, so match offsets still map to the correct
 	 * line and column in the original contents.
 	 *
-	 * @since 2.0.0
+	 * @since 2.2.0
 	 *
 	 * @param string $contents Contents of the JavaScript file.
 	 * @return string The contents with comments and string literals blanked out.
@@ -425,7 +425,7 @@ class React_Usage_Check extends Abstract_File_Check {
 	/**
 	 * Finds the first occurrence of a pattern and returns its line and column.
 	 *
-	 * @since 2.0.0
+	 * @since 2.2.0
 	 *
 	 * @param string $pattern  The regular expression pattern to search for.
 	 * @param string $contents The contents to search.
@@ -459,7 +459,7 @@ class React_Usage_Check extends Abstract_File_Check {
 	 *
 	 * Every check must have a short description explaining what the check does.
 	 *
-	 * @since 2.0.0
+	 * @since 2.2.0
 	 *
 	 * @return string Description.
 	 */
@@ -472,7 +472,7 @@ class React_Usage_Check extends Abstract_File_Check {
 	 *
 	 * Every check must have a URL with further information about the check.
 	 *
-	 * @since 2.0.0
+	 * @since 2.2.0
 	 *
 	 * @return string The documentation URL.
 	 */
