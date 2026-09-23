@@ -162,9 +162,14 @@ class React_Usage_Check extends Abstract_File_Check {
 				continue;
 			}
 
-			// A file with React inlined into it is reported for that alone. Most
-			// of what it contains is React's own code rather than the plugin's,
-			// and externalizing the package is the fix either way.
+			// A file with React inlined into it is reported for that alone. A
+			// removed API called inside an inlined renderer is React's own code
+			// rather than the plugin's. Called next to any other inlined package
+			// it may well be the plugin's own, but it is a small thing to raise
+			// beside a bundled copy of React, and externalizing the package is
+			// the fix to make first. Neither call is lost by waiting: the marker
+			// goes when the inlined copy does, so a call that is still there is
+			// reported on the next run.
 			if ( $this->check_inlined_packages( $result, $file, $contents ) ) {
 				continue;
 			}
