@@ -35,25 +35,43 @@ class Amend_Check_Result_Tests extends WP_UnitTestCase {
 	private $fixture_symlink_ready = false;
 
 	/**
+	 * Whether this test execution created the fixture symlink.
+	 *
+	 * @var bool
+	 */
+	private $fixture_symlink_created = false;
+
+	/**
 	 * Sets up test environment and fixture symlink.
 	 */
 	public function set_up() {
 		parent::set_up();
 
-		$this->fixture_symlink = WP_PLUGIN_DIR . '/test-plugin-external-admin-menu-links-without-errors';
-		$target                = UNIT_TESTS_PLUGIN_DIR . 'test-plugin-external-admin-menu-links-without-errors';
+		$this->fixture_symlink         = WP_PLUGIN_DIR . '/test-plugin-external-admin-menu-links-without-errors';
+		$this->fixture_symlink_ready   = false;
+		$this->fixture_symlink_created = false;
+		$target                        = UNIT_TESTS_PLUGIN_DIR . 'test-plugin-external-admin-menu-links-without-errors';
 
 		if ( is_link( $this->fixture_symlink ) ) {
 			$this->fixture_symlink_ready = true;
 		} elseif ( is_dir( $target ) && ! file_exists( $this->fixture_symlink ) && symlink( $target, $this->fixture_symlink ) ) {
-			$this->fixture_symlink_ready = true;
+			$this->fixture_symlink_ready   = true;
+			$this->fixture_symlink_created = true;
 		}
 	}
 
 	/**
-	 * Cleans up filters and test environment.
+	 * Cleans up filters, test environment, and removes fixture symlink if created.
 	 */
 	public function tear_down() {
+		// Clean up fixture symlink created during set_up to prevent global state leakage.
+		if ( $this->fixture_symlink_created && null !== $this->fixture_symlink && ( is_link( $this->fixture_symlink ) || file_exists( $this->fixture_symlink ) ) ) {
+			unlink( $this->fixture_symlink );
+		}
+		$this->fixture_symlink         = null;
+		$this->fixture_symlink_ready   = false;
+		$this->fixture_symlink_created = false;
+
 		foreach ( $this->cleanups as $cleanup ) {
 			$cleanup();
 		}
