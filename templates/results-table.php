@@ -2,25 +2,25 @@
 <table id="plugin-check__results-table-{{data.index}}" class="widefat striped plugin-check__results-table">
 	<thead>
 		<tr>
-			<td>
+			<th scope="col">
 				<?php esc_html_e( 'Line', 'plugin-check' ); ?>
-			</td>
-			<td>
+			</th>
+			<th scope="col">
 				<?php esc_html_e( 'Column', 'plugin-check' ); ?>
-			</td>
-			<td>
+			</th>
+			<th scope="col">
 				<?php esc_html_e( 'Type', 'plugin-check' ); ?>
-			</td>
-			<td>
+			</th>
+			<th scope="col">
 				<?php esc_html_e( 'Code', 'plugin-check' ); ?>
-			</td>
-			<td>
+			</th>
+			<th scope="col">
 				<?php esc_html_e( 'Message', 'plugin-check' ); ?>
-			</td>
+			</th>
 			<# if ( data.hasLinks ) { #>
-				<td>
+				<th scope="col">
 					<?php esc_html_e( 'Edit Link', 'plugin-check' ); ?>
-				</td>
+				</th>
 			<# } #>
 		</tr>
 	</thead>
