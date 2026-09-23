@@ -202,12 +202,7 @@ class React_Usage_Check extends Abstract_File_Check {
 				continue;
 			}
 
-			// Do not report a package that is externalized to the copy shipped
-			// with WordPress. A `*.asset.php` dependency is deliberately not
-			// accepted as proof: the element marker means a pre-19 build is
-			// already inlined, and a declared dependency does not rule out a
-			// stale or mixed build that still bundles its own copy.
-			if ( preg_match( $package['global'], $contents ) ) {
+			if ( $this->externalizes_global( $package['global'], $contents ) ) {
 				continue;
 			}
 
@@ -277,6 +272,42 @@ class React_Usage_Check extends Abstract_File_Check {
 	}
 
 	/**
+	 * Reports whether a package is externalized to the copy WordPress ships.
+	 *
+	 * Externalizing keeps the package out of the build and reads it from a
+	 * browser global instead, so reading that global is what proves a package
+	 * was externalized.
+	 *
+	 * Writing the global proves the opposite, and one assignment anywhere in a
+	 * file overrides every read in it. A build can only publish a copy of the
+	 * package it already carries, and publishing it replaces the copy WordPress
+	 * loaded, for every script that runs afterwards as well.
+	 *
+	 * A `*.asset.php` dependency is deliberately not accepted as proof either.
+	 * The element marker means a pre-19 build is inlined regardless, and a
+	 * declared dependency does not rule out a stale or mixed build that still
+	 * bundles its own copy.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param string $name     Name of the browser global, e.g. `ReactDOM`.
+	 * @param string $contents Contents of the JavaScript file.
+	 * @return bool True if the package is externalized, false otherwise.
+	 */
+	private function externalizes_global( $name, $contents ) {
+		// The trailing word boundary keeps `window.ReactDOM` from counting as a
+		// reference to `window.React`.
+		$reference = '/\bwindow\.' . $name . '\b/';
+
+		// Plain assignment, along with the logical assignments a minifier may
+		// emit. Ruling out a second equals sign leaves the comparison operators
+		// out.
+		$assignment = '/\bwindow\.' . $name . '\b\s*(?:\|\||&&|\?\?)?=[^=]/';
+
+		return 1 === preg_match( $reference, $contents ) && 1 !== preg_match( $assignment, $contents );
+	}
+
+	/**
 	 * Reports whether every one of the given patterns matches the contents.
 	 *
 	 * @since 2.2.0
@@ -300,9 +331,8 @@ class React_Usage_Check extends Abstract_File_Check {
 	 *
 	 * Every one of a package's `patterns` has to match. They match code internal
 	 * to the package, so that a build which merely calls the package does not.
-	 * `global` matches a reference to the browser global that the dependency
-	 * extraction webpack plugin maps the package to. The trailing word boundary
-	 * keeps `window.ReactDOM` from counting as a reference to `window.React`.
+	 * `global` names the browser global that the dependency extraction webpack
+	 * plugin maps the package to.
 	 *
 	 * @since 2.2.0
 	 *
@@ -313,7 +343,7 @@ class React_Usage_Check extends Abstract_File_Check {
 			array(
 				'label'    => 'react/jsx-runtime',
 				'code'     => 'inlined_react_jsx_runtime',
-				'global'   => '/\bwindow\.ReactJSXRuntime\b/',
+				'global'   => 'ReactJSXRuntime',
 				'patterns' => array(
 					// The runtime assigns `jsx`/`jsxs` onto its exports object.
 					// Call sites such as `ReactJSXRuntime.jsxs( ... )` are not
@@ -327,7 +357,7 @@ class React_Usage_Check extends Abstract_File_Check {
 			array(
 				'label'    => 'react',
 				'code'     => 'inlined_react',
-				'global'   => '/\bwindow\.React\b/',
+				'global'   => 'React',
 				'patterns' => array(
 					// Only the library itself assigns this export. `react-dom`
 					// also assigns its own, which is fine because bundling the
@@ -341,7 +371,7 @@ class React_Usage_Check extends Abstract_File_Check {
 			array(
 				'label'    => 'react-dom',
 				'code'     => 'inlined_react_dom',
-				'global'   => '/\bwindow\.ReactDOM\b/',
+				'global'   => 'ReactDOM',
 				'patterns' => array(
 					// The key under which the renderer caches the fiber on every
 					// DOM node it owns, renamed in React 17. Nothing but the

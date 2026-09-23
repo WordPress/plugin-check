@@ -16,7 +16,7 @@ class React_Usage_Check_Tests extends WP_UnitTestCase {
 		$errors       = $check_result->get_errors();
 
 		$this->assertNotEmpty( $errors );
-		$this->assertSame( 8, $check_result->get_error_count() );
+		$this->assertSame( 10, $check_result->get_error_count() );
 
 		// Each package is reported under its own code.
 		$this->assertSame( array( 'inlined_react_jsx_runtime' ), $this->get_codes( $errors, 'jsx-runtime.js' ) );
@@ -43,6 +43,13 @@ class React_Usage_Check_Tests extends WP_UnitTestCase {
 		// A declared react-jsx-runtime dependency in the sibling asset file must
 		// not suppress the inlined pre-19 runtime found in the JavaScript.
 		$this->assertSame( array( 'inlined_react_jsx_runtime' ), $this->get_codes( $errors, 'asset-declared.js' ) );
+
+		// Writing the globals is not externalizing, so neither inlined package
+		// is suppressed by the file publishing itself under them.
+		$this->assertSame(
+			array( 'inlined_react', 'inlined_react_dom' ),
+			$this->get_codes( $errors, 'global-override.js' )
+		);
 	}
 
 	public function test_run_with_warnings() {
@@ -80,6 +87,9 @@ class React_Usage_Check_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_run_without_errors() {
+		// Of these files only fiber-inspector.js matches a package's markers. It
+		// is silent because it reads the renderer global, so it is what covers
+		// the externalization guard; the rest never match a package at all.
 		$check_result = $this->run_check( 'test-plugin-react-usage-without-errors' );
 
 		$this->assertEmpty( $check_result->get_errors() );
