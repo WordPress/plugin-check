@@ -7,7 +7,7 @@
 
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
-use WordPress\Plugin_Check\Checker\Checks\Performance\React_Usage_Check;
+use WordPress\Plugin_Check\Checker\Checks\General\React_Usage_Check;
 
 class React_Usage_Check_Tests extends WP_UnitTestCase {
 

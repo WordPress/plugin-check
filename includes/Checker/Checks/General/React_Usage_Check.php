@@ -5,7 +5,7 @@
  * @package plugin-check
  */
 
-namespace WordPress\Plugin_Check\Checker\Checks\Performance;
+namespace WordPress\Plugin_Check\Checker\Checks\General;
 
 use Exception;
 use WordPress\Plugin_Check\Checker\Check_Categories;
@@ -63,7 +63,7 @@ class React_Usage_Check extends Abstract_File_Check {
 	 * @return array The categories for the check.
 	 */
 	public function get_categories() {
-		return array( Check_Categories::CATEGORY_PERFORMANCE );
+		return array( Check_Categories::CATEGORY_GENERAL );
 	}
 
 	/**
