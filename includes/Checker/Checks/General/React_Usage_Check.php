@@ -54,6 +54,60 @@ class React_Usage_Check extends Abstract_File_Check {
 	const UPGRADE_DOCS_URL = 'https://react.dev/blog/2024/04/25/react-19-upgrade-guide';
 
 	/**
+	 * Characters that may appear in a JavaScript identifier, keyword, or number.
+	 *
+	 * @since 2.2.0
+	 * @var string
+	 */
+	const WORD_CHARACTERS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$';
+
+	/**
+	 * Characters that separate JavaScript tokens without being one.
+	 *
+	 * @since 2.2.0
+	 * @var string
+	 */
+	const WHITESPACE_CHARACTERS = " \t\n\r";
+
+	/**
+	 * Characters that begin a token the tokenizer has to look at.
+	 *
+	 * Anything else is an operator or punctuator, which the tokenizer only needs
+	 * to know it has passed.
+	 *
+	 * @since 2.2.0
+	 * @var string
+	 */
+	const TOKEN_START_CHARACTERS = self::WORD_CHARACTERS . self::WHITESPACE_CHARACTERS . "\"'`/)]";
+
+	/**
+	 * Keywords that expect a value to follow them.
+	 *
+	 * A slash divides when a value precedes it and opens a regular expression
+	 * otherwise. These are the keywords that look like a value, because they are
+	 * made of word characters, but are followed by one instead.
+	 *
+	 * @since 2.2.0
+	 * @var string[]
+	 */
+	const VALUE_EXPECTING_KEYWORDS = array(
+		'return',
+		'typeof',
+		'instanceof',
+		'in',
+		'of',
+		'new',
+		'delete',
+		'void',
+		'throw',
+		'case',
+		'do',
+		'else',
+		'yield',
+		'await',
+	);
+
+	/**
 	 * Gets the categories for the check.
 	 *
 	 * Every check must have at least one category.
@@ -395,31 +449,184 @@ class React_Usage_Check extends Abstract_File_Check {
 	}
 
 	/**
-	 * Blanks out comments and string literals in JavaScript contents.
+	 * Blanks out comments and literals in JavaScript contents.
 	 *
-	 * Characters inside line comments, block comments, and single-, double-, or
-	 * backtick-quoted strings are replaced with spaces. The length of the string
-	 * and every newline are preserved, so match offsets still map to the correct
-	 * line and column in the original contents.
+	 * Characters inside line comments, block comments, quoted strings, and
+	 * regular expression literals are replaced with spaces. The length of the
+	 * contents and every newline are preserved, so match offsets still map to
+	 * the correct line and column in the original file.
+	 *
+	 * The contents are tokenized rather than matched with a single regular
+	 * expression, for two reasons. A regular expression cannot tell a regex
+	 * literal from a division operator, so the quote in `/"/` was read as the
+	 * start of a string and swallowed the code following it. PCRE also gives up
+	 * on the long string literals of a bundled file, which left the contents
+	 * unblanked and reported mentions in comments as calls.
 	 *
 	 * @since 2.2.0
 	 *
 	 * @param string $contents Contents of the JavaScript file.
-	 * @return string The contents with comments and string literals blanked out.
+	 * @return string The contents with comments and literals blanked out.
 	 */
 	private function blank_comments_and_strings( $contents ) {
-		$pattern = '~/\*.*?\*/|//[^\r\n]*|"(?:\\\\.|[^"\\\\])*"|\'(?:\\\\.|[^\'\\\\])*\'|`(?:\\\\.|[^`\\\\])*`~s';
+		$length      = strlen( $contents );
+		$blanked     = '';
+		$copied      = 0;
+		$offset      = 0;
+		$after_value = false;
 
-		$blanked = preg_replace_callback(
-			$pattern,
-			static function ( $matches ) {
-				return preg_replace( '/[^\r\n]/', ' ', $matches[0] );
-			},
-			$contents
-		);
+		while ( $offset < $length ) {
+			// Whitespace does not change which token may come next.
+			$offset += strspn( $contents, self::WHITESPACE_CHARACTERS, $offset );
 
-		// On a PCRE failure (e.g. backtracking limit) fall back to the raw contents.
-		return is_string( $blanked ) ? $blanked : $contents;
+			// Operators and punctuators all expect a value after them.
+			$punctuation = strcspn( $contents, self::TOKEN_START_CHARACTERS, $offset );
+
+			if ( $punctuation > 0 ) {
+				$after_value = false;
+				$offset     += $punctuation;
+				continue;
+			}
+
+			if ( $offset >= $length ) {
+				break;
+			}
+
+			// Identifiers, keywords, and numbers are consumed whole, so that the
+			// slash in `return/^a$/.test( s )` is not taken for a division.
+			$word = strspn( $contents, self::WORD_CHARACTERS, $offset );
+
+			if ( $word > 0 ) {
+				$after_value = ! in_array( substr( $contents, $offset, $word ), self::VALUE_EXPECTING_KEYWORDS, true );
+				$offset     += $word;
+				continue;
+			}
+
+			$char = $contents[ $offset ];
+			$next = $offset + 1 < $length ? $contents[ $offset + 1 ] : '';
+
+			if ( ')' === $char || ']' === $char ) {
+				$after_value = true;
+				++$offset;
+				continue;
+			}
+
+			if ( '/' === $char && '/' === $next ) {
+				$end = $offset + strcspn( $contents, "\r\n", $offset );
+			} elseif ( '/' === $char && '*' === $next ) {
+				$close = strpos( $contents, '*/', $offset + 2 );
+				$end   = false === $close ? $length : $close + 2;
+			} elseif ( '/' !== $char ) {
+				$end         = $this->find_literal_end( $contents, $offset, $char );
+				$after_value = true;
+			} elseif ( ! $after_value ) {
+				$end         = $this->find_literal_end( $contents, $offset, '/' );
+				$after_value = true;
+			} else {
+				// A division operator.
+				$after_value = false;
+				++$offset;
+				continue;
+			}
+
+			$blanked .= substr( $contents, $copied, $offset - $copied );
+			$blanked .= preg_replace( '/[^\r\n]/', ' ', substr( $contents, $offset, $end - $offset ) );
+			$copied   = $end;
+			$offset   = $end;
+		}
+
+		return $blanked . substr( $contents, $copied );
+	}
+
+	/**
+	 * Finds the offset just past the end of a string or regex literal.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param string $contents  Contents being scanned.
+	 * @param int    $start     Offset of the opening delimiter.
+	 * @param string $delimiter The delimiter that closes the literal.
+	 * @return int Offset just past the literal, or where it is cut short by the end
+	 *             of the line or of the contents.
+	 */
+	private function find_literal_end( $contents, $start, $delimiter ) {
+		$length = strlen( $contents );
+
+		// Characters that interrupt the literal: an escape, its own delimiter,
+		// and a line break for the literals that may not span lines. In a regular
+		// expression a character class opens too, because the slash inside one
+		// does not close the literal.
+		if ( '/' === $delimiter ) {
+			$stops = "\\/[\r\n";
+		} elseif ( '`' === $delimiter ) {
+			$stops = '\\`';
+		} else {
+			$stops = '\\' . $delimiter . "\r\n";
+		}
+
+		$offset = $start + 1;
+
+		while ( $offset < $length ) {
+			$offset += strcspn( $contents, $stops, $offset );
+
+			if ( $offset >= $length ) {
+				break;
+			}
+
+			$char = $contents[ $offset ];
+
+			if ( '\\' === $char ) {
+				$offset += 2;
+				continue;
+			}
+
+			if ( $delimiter === $char ) {
+				return $offset + 1;
+			}
+
+			if ( '[' === $char ) {
+				$offset = $this->find_character_class_end( $contents, $offset );
+				continue;
+			}
+
+			// Cut short by the end of the line.
+			return $offset;
+		}
+
+		return $length;
+	}
+
+	/**
+	 * Finds the offset just past the end of a regex character class.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param string $contents Contents being scanned.
+	 * @param int    $start    Offset of the opening bracket.
+	 * @return int Offset just past the character class, or where it is cut short by
+	 *             the end of the line or of the contents.
+	 */
+	private function find_character_class_end( $contents, $start ) {
+		$length = strlen( $contents );
+		$offset = $start + 1;
+
+		while ( $offset < $length ) {
+			$offset += strcspn( $contents, "\\]\r\n", $offset );
+
+			if ( $offset >= $length ) {
+				break;
+			}
+
+			if ( '\\' === $contents[ $offset ] ) {
+				$offset += 2;
+				continue;
+			}
+
+			// Closed, or cut short by the end of the line.
+			return ']' === $contents[ $offset ] ? $offset + 1 : $offset;
+		}
+
+		return $length;
 	}
 
 	/**

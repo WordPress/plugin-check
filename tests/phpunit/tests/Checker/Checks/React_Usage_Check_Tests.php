@@ -50,7 +50,7 @@ class React_Usage_Check_Tests extends WP_UnitTestCase {
 		$warnings     = $check_result->get_warnings();
 
 		$this->assertNotEmpty( $warnings );
-		$this->assertSame( 4, $check_result->get_warning_count() );
+		$this->assertSame( 5, $check_result->get_warning_count() );
 
 		// Every removed API used in a file is reported, not only the first one.
 		$this->assertSame(
@@ -60,6 +60,13 @@ class React_Usage_Check_Tests extends WP_UnitTestCase {
 		$this->assertSame(
 			array( 'ReactDOM.hydrate', 'ReactDOM.unmountComponentAtNode' ),
 			$this->get_reported_apis( $warnings, 'hydrate.js' )
+		);
+
+		// A quote inside a regular expression literal must not be read as the
+		// start of a string, which would hide the call following it.
+		$this->assertSame(
+			array( 'ReactDOM.findDOMNode' ),
+			$this->get_reported_apis( $warnings, 'regex-literal.js' )
 		);
 
 		// A file that inlines a package is reported for that alone, even though
