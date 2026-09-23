@@ -16,7 +16,7 @@ class React_Usage_Check_Tests extends WP_UnitTestCase {
 		$errors       = $check_result->get_errors();
 
 		$this->assertNotEmpty( $errors );
-		$this->assertSame( 10, $check_result->get_error_count() );
+		$this->assertSame( 11, $check_result->get_error_count() );
 
 		// Each package is reported under its own code.
 		$this->assertSame( array( 'inlined_react_jsx_runtime' ), $this->get_codes( $errors, 'jsx-runtime.js' ) );
@@ -33,6 +33,9 @@ class React_Usage_Check_Tests extends WP_UnitTestCase {
 
 		// React 17 production builds call Symbol.for through a local variable.
 		$this->assertSame( array( 'inlined_react' ), $this->get_codes( $errors, 'react-17-prod.js' ) );
+
+		// A minifier may leave no quoted string in the file at all.
+		$this->assertSame( array( 'inlined_react' ), $this->get_codes( $errors, 'template-strings.js' ) );
 
 		// A development build is reported under the same code but with a higher severity.
 		$this->assertSame( array( 'inlined_react_jsx_runtime' ), $this->get_codes( $errors, 'jsx-runtime-dev.js' ) );

@@ -224,13 +224,16 @@ class React_Usage_Check extends Abstract_File_Check {
 	 * `Symbol.for( ... )` call: the React 17 production builds hoist `Symbol.for`
 	 * into a local variable and call it through that variable instead.
 	 *
+	 * A template literal counts as well as a quoted string, because some
+	 * minifiers rewrite every string in a bundle as one.
+	 *
 	 * @since 2.2.0
 	 *
 	 * @param string $contents Contents of the JavaScript file.
 	 * @return array|false Array with `line` and `column` keys, or false if no match was found.
 	 */
 	private function find_inlined_pre_19_react( $contents ) {
-		return $this->find_first_match( '/([\'"])react\.element\1/', $contents );
+		return $this->find_first_match( '/([\'"`])react\.element\1/', $contents );
 	}
 
 	/**
