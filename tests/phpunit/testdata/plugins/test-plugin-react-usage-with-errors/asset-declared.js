@@ -3,6 +3,6 @@
 ( function ( exports ) {
 	var k = Symbol.for( "react.element" );
 	exports.jsxs = function ( type, props ) {
-		return { $$typeof: k, type: type, props: props };
+		return { $$typeof: k, type: type, props: props, _owner: null };
 	};
 }( {} ) );

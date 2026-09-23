@@ -54,6 +54,20 @@ class React_Usage_Check extends Abstract_File_Check {
 	const UPGRADE_DOCS_URL = 'https://react.dev/blog/2024/04/25/react-19-upgrade-guide';
 
 	/**
+	 * Pattern matching the element factory of a build predating React 19.
+	 *
+	 * `_owner` is a field of the element object that React 19 dropped, so only a
+	 * build that creates pre-19 elements itself assigns it. Requiring it stops a
+	 * name as ordinary as `jsx` from implicating a bundle that merely mentions
+	 * the element symbol, and keeps libraries that reimplement the React API on
+	 * their own element type, such as `preact/compat`, out of the results.
+	 *
+	 * @since 2.2.0
+	 * @var string
+	 */
+	const ELEMENT_FACTORY_PATTERN = '/_owner\s*:/';
+
+	/**
 	 * Characters that may appear in a JavaScript identifier, keyword, or number.
 	 *
 	 * @since 2.2.0
@@ -158,8 +172,8 @@ class React_Usage_Check extends Abstract_File_Check {
 	 * Detection happens in two steps. The `react.element` symbol name establishes
 	 * that a pre-19 build is in the file at all: React 19 renamed it to
 	 * `react.transitional.element`, and a build that externalizes React contains
-	 * neither. A second marker then identifies which package was inlined, because
-	 * the three packages WordPress externalizes are fixed separately.
+	 * neither. Markers internal to a package then identify which one was inlined,
+	 * because the three packages WordPress externalizes are fixed separately.
 	 *
 	 * Both steps are required. The symbol name alone proves nothing, because small
 	 * libraries such as `react-is` list every React symbol without inlining any
@@ -184,7 +198,7 @@ class React_Usage_Check extends Abstract_File_Check {
 		$is_development = $this->is_development_build( $contents );
 
 		foreach ( $this->get_packages() as $package ) {
-			if ( ! preg_match( $package['pattern'], $contents ) ) {
+			if ( ! $this->matches_every_pattern( $package['patterns'], $contents ) ) {
 				continue;
 			}
 
@@ -263,13 +277,32 @@ class React_Usage_Check extends Abstract_File_Check {
 	}
 
 	/**
+	 * Reports whether every one of the given patterns matches the contents.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param string[] $patterns Regular expression patterns.
+	 * @param string   $contents Contents of the JavaScript file.
+	 * @return bool True if all of the patterns match, false otherwise.
+	 */
+	private function matches_every_pattern( array $patterns, $contents ) {
+		foreach ( $patterns as $pattern ) {
+			if ( ! preg_match( $pattern, $contents ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * Returns the packages this check can tell apart.
 	 *
-	 * Each `pattern` matches code internal to the package, so that a build which
-	 * merely calls the package does not match. `global` matches a reference to
-	 * the browser global that the dependency extraction webpack plugin maps the
-	 * package to. The trailing word boundary keeps `window.ReactDOM` from
-	 * counting as a reference to `window.React`.
+	 * Every one of a package's `patterns` has to match. They match code internal
+	 * to the package, so that a build which merely calls the package does not.
+	 * `global` matches a reference to the browser global that the dependency
+	 * extraction webpack plugin maps the package to. The trailing word boundary
+	 * keeps `window.ReactDOM` from counting as a reference to `window.React`.
 	 *
 	 * @since 2.2.0
 	 *
@@ -278,35 +311,50 @@ class React_Usage_Check extends Abstract_File_Check {
 	private function get_packages() {
 		return array(
 			array(
-				'label'   => 'react/jsx-runtime',
-				'code'    => 'inlined_react_jsx_runtime',
-				'global'  => '/\bwindow\.ReactJSXRuntime\b/',
-				// The runtime assigns `jsx`/`jsxs` onto its exports object. Call
-				// sites such as `ReactJSXRuntime.jsxs( ... )` are not matched.
-				// Either name alone is enough, because a bundler that sees only
-				// `jsx` call sites tree-shakes the `jsxs` export away.
-				'pattern' => '/\bjsxs?\s*[:=][^=]/',
+				'label'    => 'react/jsx-runtime',
+				'code'     => 'inlined_react_jsx_runtime',
+				'global'   => '/\bwindow\.ReactJSXRuntime\b/',
+				'patterns' => array(
+					// The runtime assigns `jsx`/`jsxs` onto its exports object.
+					// Call sites such as `ReactJSXRuntime.jsxs( ... )` are not
+					// matched. Either name alone is enough, because a bundler
+					// that sees only `jsx` call sites tree-shakes the `jsxs`
+					// export away.
+					'/\bjsxs?\s*[:=][^=]/',
+					self::ELEMENT_FACTORY_PATTERN,
+				),
 			),
 			array(
-				'label'   => 'react',
-				'code'    => 'inlined_react',
-				'global'  => '/\bwindow\.React\b/',
-				// Only the library itself assigns this export. `react-dom` also
-				// assigns its own, which is fine because bundling the renderer
-				// always bundles the library too, but `react/jsx-runtime` merely
-				// reads it, so the assignment is what tells the two apart.
-				'pattern' => '/__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED\s*[:=][^=]/',
+				'label'    => 'react',
+				'code'     => 'inlined_react',
+				'global'   => '/\bwindow\.React\b/',
+				'patterns' => array(
+					// Only the library itself assigns this export. `react-dom`
+					// also assigns its own, which is fine because bundling the
+					// renderer always bundles the library too, but
+					// `react/jsx-runtime` merely reads it, so the assignment is
+					// what tells the two apart.
+					'/__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED\s*[:=][^=]/',
+					self::ELEMENT_FACTORY_PATTERN,
+				),
 			),
 			array(
-				'label'   => 'react-dom',
-				'code'    => 'inlined_react_dom',
-				'global'  => '/\bwindow\.ReactDOM\b/',
-				// The key under which the renderer caches the fiber on every
-				// DOM node it owns, renamed in React 17. Nothing but the
-				// renderer defines it, code that merely calls the renderer does
-				// not, and it survives minification because it is a string
-				// literal.
-				'pattern' => '/__reactFiber\$|__reactInternalInstance\$/',
+				'label'    => 'react-dom',
+				'code'     => 'inlined_react_dom',
+				'global'   => '/\bwindow\.ReactDOM\b/',
+				'patterns' => array(
+					// The key under which the renderer caches the fiber on every
+					// DOM node it owns, renamed in React 17. Nothing but the
+					// renderer defines it, code that merely calls the renderer
+					// does not, and it survives minification because it is a
+					// string literal.
+					//
+					// The element factory is deliberately not required here. The
+					// renderer consumes elements instead of creating them, so a
+					// file holding nothing but a copy of `react-dom` has no
+					// factory in it, and this marker is specific on its own.
+					'/__reactFiber\$|__reactInternalInstance\$/',
+				),
 			),
 		);
 	}

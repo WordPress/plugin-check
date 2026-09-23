@@ -10,8 +10,9 @@
 	PureComponent.prototype.isPureReactComponent = true;
 	exports.Component = Component;
 	exports.PureComponent = PureComponent;
-	exports.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED = { ReactCurrentOwner: { current: null } };
+	var internals = { ReactCurrentOwner: { current: null } };
+	exports.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED = internals;
 	exports.createElement = function ( type ) {
-		return { $$typeof: k, type: type };
+		return { $$typeof: k, type: type, _owner: internals.ReactCurrentOwner.current };
 	};
 }( {} ) );

@@ -3,9 +3,10 @@
 // reference to the library global.
 ( function ( exports ) {
 	var k = Symbol.for( "react.element" );
-	exports.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED = { ReactCurrentOwner: { current: null } };
+	var internals = { ReactCurrentOwner: { current: null } };
+	exports.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED = internals;
 	exports.createElement = function ( type ) {
-		return { $$typeof: k, type: type };
+		return { $$typeof: k, type: type, _owner: internals.ReactCurrentOwner.current };
 	};
 	window.ReactDOM.createRoot( document.body ).render( exports.createElement( "div" ) );
 }( {} ) );

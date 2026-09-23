@@ -5,7 +5,7 @@
 		if ( ! type ) {
 			console.error( "React.jsx: type is invalid. See https://reactjs.org/link/invalid-element-type for more information." );
 		}
-		return { $$typeof: k, type: type, props: props };
+		return { $$typeof: k, type: type, props: props, _owner: null };
 	}
 	exports.jsx = jsxWithValidation;
 	exports.jsxs = jsxWithValidation;
