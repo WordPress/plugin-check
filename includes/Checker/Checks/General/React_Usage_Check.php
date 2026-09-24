@@ -570,7 +570,6 @@ class React_Usage_Check extends Abstract_File_Check {
 			}
 
 			$char = $contents[ $offset ];
-			$next = $offset + 1 < $length ? $contents[ $offset + 1 ] : '';
 
 			if ( ')' === $char || ']' === $char ) {
 				$after_value = true;
@@ -578,20 +577,10 @@ class React_Usage_Check extends Abstract_File_Check {
 				continue;
 			}
 
-			if ( '/' === $char && '/' === $next ) {
-				$end = $offset + strcspn( $contents, "\r\n", $offset );
-			} elseif ( '/' === $char && '*' === $next ) {
-				$close = strpos( $contents, '*/', $offset + 2 );
-				$end   = false === $close ? $length : $close + 2;
-			} elseif ( '/' !== $char ) {
-				$end         = $this->find_literal_end( $contents, $offset, $char );
-				$after_value = true;
-			} elseif ( ! $after_value ) {
-				$end         = $this->find_literal_end( $contents, $offset, '/' );
-				$after_value = true;
-			} else {
-				// A division operator.
-				$after_value = false;
+			$end = $this->find_blank_end( $contents, $offset, $after_value );
+
+			// A division operator, which leaves nothing to blank.
+			if ( false === $end ) {
 				++$offset;
 				continue;
 			}
@@ -603,6 +592,50 @@ class React_Usage_Check extends Abstract_File_Check {
 		}
 
 		return $blanked . substr( $contents, $copied );
+	}
+
+	/**
+	 * Finds the offset just past the end of the comment or literal at an offset.
+	 *
+	 * A slash is the ambiguous case. It opens a comment when another slash or a
+	 * star follows it, and otherwise divides when a value precedes it and opens
+	 * a regular expression when one does not.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param string $contents    Contents being scanned.
+	 * @param int    $offset      Offset of the opening character.
+	 * @param bool   $after_value Whether a value precedes the offset, updated to
+	 *                            describe what now precedes the returned offset.
+	 * @return int|false Offset just past the comment or literal, or false when the
+	 *                   character is a division operator and blanks nothing.
+	 */
+	private function find_blank_end( $contents, $offset, &$after_value ) {
+		$length = strlen( $contents );
+		$char   = $contents[ $offset ];
+		$next   = $offset + 1 < $length ? $contents[ $offset + 1 ] : '';
+
+		if ( '/' === $char && '/' === $next ) {
+			return $offset + strcspn( $contents, "\r\n", $offset );
+		}
+
+		if ( '/' === $char && '*' === $next ) {
+			$close = strpos( $contents, '*/', $offset + 2 );
+
+			return false === $close ? $length : $close + 2;
+		}
+
+		if ( '/' === $char && $after_value ) {
+			$after_value = false;
+
+			return false;
+		}
+
+		// Either a quoted string, or a regular expression opened by the slash
+		// that the checks above have left as the only reading.
+		$after_value = true;
+
+		return $this->find_literal_end( $contents, $offset, $char );
 	}
 
 	/**
