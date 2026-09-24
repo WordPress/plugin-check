@@ -196,9 +196,7 @@
 			usePcpignoreChecked
 		)
 			.then( ( data ) => {
-				currentChecks = prioritizeChecks( data.checks, [
-					'ai_name',
-				] );
+				currentChecks = prioritizeChecks( data.checks, [ 'ai_name' ] );
 				return setUpEnvironment(
 					plugin,
 					currentChecks,

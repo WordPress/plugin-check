@@ -259,6 +259,11 @@ final class Plugin_Check_Command {
 			);
 		}
 
+		// Register the runner so that checks relying on Plugin_Request_Utility::get_runner()
+		// (e.g. AI_Name_Check) can access it, even when the object-cache.php drop-in
+		// was not loaded (e.g. running static checks only via --require=cli.php).
+		Plugin_Request_Utility::set_runner( $runner );
+
 		// Ensure the correct slug.
 		if ( is_dir( $plugin ) && empty( $options['slug'] ) ) {
 			$options['slug'] = basename( $plugin );

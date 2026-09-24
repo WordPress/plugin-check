@@ -20,7 +20,7 @@ use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 /**
  * Check for plugin name issues using AI.
  *
- * @since x.x.x
+ * @since 2.2.0
  */
 class AI_Name_Check implements Static_Check {
 
@@ -32,7 +32,7 @@ class AI_Name_Check implements Static_Check {
 	/**
 	 * Gets the categories for the check.
 	 *
-	 * @since x.x.x
+	 * @since 2.2.0
 	 *
 	 * @return array The categories for the check.
 	 */
@@ -43,7 +43,7 @@ class AI_Name_Check implements Static_Check {
 	/**
 	 * Runs the AI Name Check.
 	 *
-	 * @since x.x.x
+	 * @since 2.2.0
 	 *
 	 * @param Check_Result $result The check result to amend.
 	 */
@@ -66,7 +66,7 @@ class AI_Name_Check implements Static_Check {
 	/**
 	 * Determines if the AI check should run.
 	 *
-	 * @since x.x.x
+	 * @since 2.2.0
 	 *
 	 * @param mixed $runner The active runner.
 	 * @return bool True if the check should run, false otherwise.
@@ -93,7 +93,7 @@ class AI_Name_Check implements Static_Check {
 	/**
 	 * Gets the selected AI model preference.
 	 *
-	 * @since x.x.x
+	 * @since 2.2.0
 	 *
 	 * @param mixed $runner The active runner.
 	 * @return string The model preference.
@@ -112,7 +112,7 @@ class AI_Name_Check implements Static_Check {
 	/**
 	 * Gets the plugin name and author from headers.
 	 *
-	 * @since x.x.x
+	 * @since 2.2.0
 	 *
 	 * @param Check_Result $result The check result.
 	 * @return array|null Name and author if found, null otherwise.
@@ -141,7 +141,7 @@ class AI_Name_Check implements Static_Check {
 	/**
 	 * Handles the AI analysis response and parses results.
 	 *
-	 * @since x.x.x
+	 * @since 2.2.0
 	 *
 	 * @param Check_Result $result           The check result.
 	 * @param mixed        $analysis         The analysis response or WP_Error.
@@ -169,7 +169,7 @@ class AI_Name_Check implements Static_Check {
 	/**
 	 * Process analysis results and add appropriate warnings/errors.
 	 *
-	 * @since x.x.x
+	 * @since 2.2.0
 	 *
 	 * @param Check_Result $result           The check result.
 	 * @param array        $parsed           The parsed analysis data.
@@ -191,7 +191,7 @@ class AI_Name_Check implements Static_Check {
 	/**
 	 * Check if the plugin name is disallowed.
 	 *
-	 * @since x.x.x
+	 * @since 2.2.0
 	 *
 	 * @param Check_Result $result           The check result.
 	 * @param array        $data             The parsed analysis data.
@@ -200,14 +200,14 @@ class AI_Name_Check implements Static_Check {
 	private function check_disallowed_name( Check_Result $result, array $data, string $plugin_main_file ) {
 		if ( ! empty( $data['disallowed'] ) ) {
 			$msg = isset( $data['disallowed_explanation'] ) ? $data['disallowed_explanation'] : __( 'The plugin name is disallowed.', 'plugin-check' );
-			$this->add_result_error_for_file( $result, $msg, 'plugin_name_disallowed', $plugin_main_file );
+			$this->add_result_error_for_file( $result, esc_html( $msg ), 'plugin_name_disallowed', $plugin_main_file );
 		}
 	}
 
 	/**
 	 * Check for possible naming issues.
 	 *
-	 * @since x.x.x
+	 * @since 2.2.0
 	 *
 	 * @param Check_Result $result           The check result.
 	 * @param array        $data             The parsed analysis data.
@@ -216,14 +216,14 @@ class AI_Name_Check implements Static_Check {
 	private function check_naming_issues( Check_Result $result, array $data, string $plugin_main_file ) {
 		if ( ! empty( $data['possible_naming_issues'] ) ) {
 			$msg = isset( $data['naming_explanation'] ) ? $data['naming_explanation'] : __( 'The plugin name has possible naming issues.', 'plugin-check' );
-			$this->add_result_warning_for_file( $result, $msg, 'plugin_name_issue', $plugin_main_file );
+			$this->add_result_warning_for_file( $result, esc_html( $msg ), 'plugin_name_issue', $plugin_main_file );
 		}
 	}
 
 	/**
 	 * Check for possible owner issues.
 	 *
-	 * @since x.x.x
+	 * @since 2.2.0
 	 *
 	 * @param Check_Result $result           The check result.
 	 * @param array        $data             The parsed analysis data.
@@ -232,42 +232,59 @@ class AI_Name_Check implements Static_Check {
 	private function check_owner_issues( Check_Result $result, array $data, string $plugin_main_file ) {
 		if ( ! empty( $data['possible_owner_issues'] ) ) {
 			$msg = isset( $data['owner_explanation'] ) ? $data['owner_explanation'] : __( 'The plugin name has possible trademark or ownership issues.', 'plugin-check' );
-			$this->add_result_warning_for_file( $result, $msg, 'plugin_name_trademark_issue', $plugin_main_file );
+			$this->add_result_warning_for_file( $result, esc_html( $msg ), 'plugin_name_trademark_issue', $plugin_main_file );
 		}
 	}
 
 	/**
 	 * Check for similar plugins.
 	 *
-	 * @since x.x.x
+	 * @since 2.2.0
 	 *
 	 * @param Check_Result $result           The check result.
 	 * @param array        $parsed           The parsed analysis data.
 	 * @param string       $plugin_main_file The plugin main file path.
 	 */
 	private function check_similar_plugins( Check_Result $result, array $parsed, string $plugin_main_file ) {
-		if ( ! empty( $parsed['confusion_existing_plugins'] ) && is_array( $parsed['confusion_existing_plugins'] ) ) {
-			$plugins_list = array();
-			foreach ( $parsed['confusion_existing_plugins'] as $plugin ) {
-				$plugins_list[] = sprintf( '%s (%s, %s active installs)', $plugin['name'], $plugin['similarity_level'], $plugin['active_installations'] );
+		if ( empty( $parsed['confusion_existing_plugins'] ) || ! is_array( $parsed['confusion_existing_plugins'] ) ) {
+			return;
+		}
+
+		$plugins_list = array();
+		foreach ( $parsed['confusion_existing_plugins'] as $plugin ) {
+			if ( ! is_array( $plugin ) || ! isset( $plugin['name'], $plugin['similarity_level'], $plugin['active_installations'] ) ) {
+				continue;
 			}
-			$this->add_result_warning_for_file(
-				$result,
-				sprintf(
-					/* translators: %s: List of similar plugins. */
-					__( 'Plugin name is similar to existing plugins: %s', 'plugin-check' ),
-					implode( '; ', $plugins_list )
-				),
-				'plugin_name_similarity',
-				$plugin_main_file
+
+			$plugins_list[] = sprintf(
+				/* translators: 1: Plugin name, 2: Similarity level, 3: Active install count. */
+				__( '%1$s (%2$s, %3$s active installs)', 'plugin-check' ),
+				esc_html( $plugin['name'] ),
+				esc_html( $plugin['similarity_level'] ),
+				esc_html( $plugin['active_installations'] )
 			);
 		}
+
+		if ( empty( $plugins_list ) ) {
+			return;
+		}
+
+		$this->add_result_warning_for_file(
+			$result,
+			sprintf(
+				/* translators: %s: List of similar plugins. */
+				__( 'Plugin name is similar to existing plugins: %s', 'plugin-check' ),
+				implode( '; ', $plugins_list )
+			),
+			'plugin_name_similarity',
+			$plugin_main_file
+		);
 	}
 
 	/**
 	 * Gets the description for the check.
 	 *
-	 * @since x.x.x
+	 * @since 2.2.0
 	 *
 	 * @return string Description.
 	 */
@@ -278,7 +295,7 @@ class AI_Name_Check implements Static_Check {
 	/**
 	 * Gets the documentation URL for the check.
 	 *
-	 * @since x.x.x
+	 * @since 2.2.0
 	 *
 	 * @return string The documentation URL.
 	 */

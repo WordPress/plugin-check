@@ -45,6 +45,16 @@ trait AI_Check_Names {
 		// Combine token usage from both queries.
 		$prereview_result['token_usage']['similar_name'] = $similar_name_result['token_usage'];
 
+		// Carry over structured similarity data from the first query so callers
+		// (e.g. AI_Name_Check::check_similar_plugins()) can surface it.
+		$similar_name_data = $this->parse_json_response_generic( $similar_name_result['text'] );
+		if ( ! empty( $similar_name_data['confusion_existing_plugins'] ) ) {
+			$prereview_result['confusion_existing_plugins'] = $similar_name_data['confusion_existing_plugins'];
+		}
+		if ( ! empty( $similar_name_data['confusion_existing_others'] ) ) {
+			$prereview_result['confusion_existing_others'] = $similar_name_data['confusion_existing_others'];
+		}
+
 		return $prereview_result;
 	}
 
@@ -331,6 +341,15 @@ trait AI_Check_Names {
 				$result['token_usage'] = $analysis['token_usage'];
 			}
 
+			// Carry over structured similarity data (from the similar-name query)
+			// so callers can surface confusion with existing plugins/others.
+			if ( is_array( $analysis ) && isset( $analysis['confusion_existing_plugins'] ) ) {
+				$result['confusion_existing_plugins'] = $analysis['confusion_existing_plugins'];
+			}
+			if ( is_array( $analysis ) && isset( $analysis['confusion_existing_others'] ) ) {
+				$result['confusion_existing_others'] = $analysis['confusion_existing_others'];
+			}
+
 			return $result;
 		}
 
@@ -379,6 +398,48 @@ trait AI_Check_Names {
 		$decoded = json_decode( $json_text, true );
 
 		if ( JSON_ERROR_NONE === json_last_error() && is_array( $decoded ) && isset( $decoded['possible_naming_issues'] ) ) {
+			return $decoded;
+		}
+
+		return array();
+	}
+
+	/**
+	 * Parses a generic JSON response from AI, without requiring the
+	 * pre-review specific keys. Used for the similar-name query response.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param string $text AI response text.
+	 * @return array Parsed data array or empty array if not valid JSON.
+	 */
+	protected function parse_json_response_generic( $text ) {
+		if ( empty( $text ) ) {
+			return array();
+		}
+
+		$trimmed = trim( (string) $text );
+
+		// Remove markdown code fences if present.
+		$trimmed = preg_replace( '/^```(?:json)?\s*\n?/m', '', $trimmed );
+		$trimmed = preg_replace( '/\n?```\s*$/m', '', $trimmed );
+		$trimmed = trim( $trimmed );
+
+		// Try to find JSON object boundaries.
+		$first_brace = strpos( $trimmed, '{' );
+		if ( false === $first_brace ) {
+			return array();
+		}
+
+		$last_brace = strrpos( $trimmed, '}' );
+		if ( false === $last_brace || $last_brace <= $first_brace ) {
+			return array();
+		}
+
+		$json_text = substr( $trimmed, $first_brace, $last_brace - $first_brace + 1 );
+		$decoded   = json_decode( $json_text, true );
+
+		if ( JSON_ERROR_NONE === json_last_error() && is_array( $decoded ) ) {
 			return $decoded;
 		}
 
@@ -837,28 +898,40 @@ trait AI_Check_Names {
 		return array(
 			'type'                 => 'object',
 			'properties'           => array(
-				'possible_naming_issues'            => array( 'type' => 'boolean' ),
-				'naming_explanation'                => array( 'type' => 'string' ),
-				'disallowed'                        => array( 'type' => 'boolean' ),
-				'disallowed_explanation'            => array( 'type' => 'string' ),
-				'disallowed_type'                   => array(
+				'possible_naming_issues'             => array( 'type' => 'boolean' ),
+				'naming_explanation'                 => array( 'type' => 'string' ),
+				'possible_owner_issues'               => array( 'type' => 'boolean' ),
+				'owner_explanation'                   => array( 'type' => 'string' ),
+				'possible_description_issues'         => array( 'type' => 'boolean' ),
+				'description_explanation'             => array( 'type' => 'string' ),
+				'disallowed'                          => array( 'type' => 'boolean' ),
+				'disallowed_explanation'              => array( 'type' => 'string' ),
+				'disallowed_type'                     => array(
 					'type'  => 'array',
 					'items' => array(
 						'type' => 'string',
 					),
 				),
-				'trademarks_or_project_names_array' => array(
+				'trademarks_or_project_names_array'   => array(
 					'type'  => 'array',
 					'items' => array(
 						'type' => 'string',
 					),
 				),
-				'suggested_display_name'            => array( 'type' => 'string' ),
-				'suggested_slug'                    => array( 'type' => 'string' ),
+				'suggested_display_name'              => array( 'type' => 'string' ),
+				'suggested_slug'                       => array( 'type' => 'string' ),
+				'short_description'                    => array( 'type' => 'string' ),
+				'plugin_category'                       => array( 'type' => 'string' ),
+				'description_language_is_in_english'   => array( 'type' => 'boolean' ),
+				'description_what_is_not_in_english'   => array( 'type' => 'string' ),
 			),
 			'required'             => array(
 				'possible_naming_issues',
 				'naming_explanation',
+				'possible_owner_issues',
+				'owner_explanation',
+				'possible_description_issues',
+				'description_explanation',
 				'disallowed',
 				'disallowed_explanation',
 				'disallowed_type',
@@ -867,6 +940,8 @@ trait AI_Check_Names {
 				'suggested_slug',
 				'short_description',
 				'plugin_category',
+				'description_language_is_in_english',
+				'description_what_is_not_in_english',
 			),
 			'additionalProperties' => false,
 		);
