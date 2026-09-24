@@ -144,6 +144,10 @@ final class Admin_AJAX {
 			return new WP_Error( 'invalid-runner', __( 'AJAX Runner was not initialized correctly.', 'plugin-check' ) );
 		}
 
+		// Register the runner so that checks relying on Plugin_Request_Utility::get_runner()
+		// (e.g. AI_Name_Check) can access it, even when no runtime checks are involved.
+		Plugin_Request_Utility::set_runner( $runner );
+
 		return $runner;
 	}
 
@@ -219,12 +223,13 @@ final class Admin_AJAX {
 	public function get_checks_to_run() {
 		$this->check_request_validity();
 
-		$categories = filter_input( INPUT_POST, 'categories', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
-		$categories = is_null( $categories ) ? array() : $categories;
-		$checks     = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
-		$checks     = is_null( $checks ) ? array() : $checks;
-		$use_ai     = 1 === filter_input( INPUT_POST, 'use-ai', FILTER_VALIDATE_INT );
-		$runner     = $this->get_ajax_runner();
+		$categories  = filter_input( INPUT_POST, 'categories', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
+		$categories  = is_null( $categories ) ? array() : $categories;
+		$checks      = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
+		$checks      = is_null( $checks ) ? array() : $checks;
+		$use_ai      = 1 === filter_input( INPUT_POST, 'use-ai', FILTER_VALIDATE_INT );
+		$use_ai_name = 1 === filter_input( INPUT_POST, 'use-ai-name', FILTER_VALIDATE_INT );
+		$runner      = $this->get_ajax_runner();
 
 		if ( is_wp_error( $runner ) ) {
 			wp_send_json_error( $runner, 500 );
@@ -234,6 +239,7 @@ final class Admin_AJAX {
 			$this->configure_runner( $runner );
 			$runner->set_categories( $categories );
 			$runner->set_use_ai( $use_ai );
+			$runner->set_use_ai_name( $use_ai_name );
 
 			$checks_to_run = $runner->get_checks_to_run();
 		} catch ( Exception $error ) {
@@ -266,26 +272,13 @@ final class Admin_AJAX {
 			wp_send_json_error( $runner, 500 );
 		}
 
-		$runner = Plugin_Request_Utility::get_runner();
-
-		if ( is_null( $runner ) ) {
-			$runner = new AJAX_Runner();
-		}
-
-		// Make sure we are using the correct runner instance.
-		if ( ! ( $runner instanceof AJAX_Runner ) ) {
-			wp_send_json_error(
-				new WP_Error( 'invalid-runner', __( 'AJAX Runner was not initialized correctly.', 'plugin-check' ) ),
-				500
-			);
-		}
-
 		$checks = filter_input( INPUT_POST, 'checks', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
 		$checks = is_null( $checks ) ? array() : $checks;
 		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		$include_experimental = 1 === filter_input( INPUT_POST, 'include-experimental', FILTER_VALIDATE_INT );
 		$use_ai               = 1 === filter_input( INPUT_POST, 'use-ai', FILTER_VALIDATE_INT );
+		$use_ai_name          = 1 === filter_input( INPUT_POST, 'use-ai-name', FILTER_VALIDATE_INT );
 		$use_pcpignore        = 1 === filter_input( INPUT_POST, 'use-pcpignore', FILTER_VALIDATE_INT );
 		$types                = filter_input( INPUT_POST, 'types', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
 		$types                = is_null( $types ) ? array( 'error', 'warning' ) : $types;
@@ -305,6 +298,7 @@ final class Admin_AJAX {
 				$pcpignore_warning = PCP_Ignore_Utility::get_warning();
 			}
 			$runner->set_use_ai( $use_ai );
+			$runner->set_use_ai_name( $use_ai_name );
 			$results = $runner->run();
 		} catch ( Exception $error ) {
 			wp_send_json_error(

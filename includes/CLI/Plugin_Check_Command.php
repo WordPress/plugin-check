@@ -163,6 +163,9 @@ final class Plugin_Check_Command {
 	 * [--ai-model=<model>]
 	 * : AI model preference for analysis (e.g., 'openai::gpt-4o'). Requires --ai.
 	 *
+	 * [--ai-name]
+	 * : Enable AI-based plugin name checking.
+	 *
 	 * ## EXAMPLES
 	 *
 	 *   wp plugin check akismet
@@ -208,6 +211,7 @@ final class Plugin_Check_Command {
 				'mode'                          => 'new',
 				'ai'                            => false,
 				'ai-model'                      => '',
+				'ai-name'                       => false,
 				'use-pcpignore'                 => false,
 			)
 		);
@@ -255,6 +259,11 @@ final class Plugin_Check_Command {
 			);
 		}
 
+		// Register the runner so that checks relying on Plugin_Request_Utility::get_runner()
+		// (e.g. AI_Name_Check) can access it, even when the object-cache.php drop-in
+		// was not loaded (e.g. running static checks only via --require=cli.php).
+		Plugin_Request_Utility::set_runner( $runner );
+
 		// Ensure the correct slug.
 		if ( is_dir( $plugin ) && empty( $options['slug'] ) ) {
 			$options['slug'] = basename( $plugin );
@@ -280,6 +289,7 @@ final class Plugin_Check_Command {
 			$runner->set_slug( $options['slug'] );
 			$runner->set_mode( $options['mode'] );
 			$runner->set_use_ai( $options['ai'] );
+			$runner->set_use_ai_name( $options['ai-name'] );
 			if ( ! empty( $options['ai-model'] ) ) {
 				$runner->set_ai_model_preference( $options['ai-model'] );
 			}
