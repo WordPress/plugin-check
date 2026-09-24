@@ -59,7 +59,7 @@ class React_Usage_Check_Tests extends WP_UnitTestCase {
 		$warnings     = $check_result->get_warnings();
 
 		$this->assertNotEmpty( $warnings );
-		$this->assertSame( 6, $check_result->get_warning_count() );
+		$this->assertSame( 8, $check_result->get_warning_count() );
 
 		// Every removed API used in a file is reported, not only the first one.
 		$this->assertSame(
@@ -76,6 +76,13 @@ class React_Usage_Check_Tests extends WP_UnitTestCase {
 		$this->assertSame(
 			array( 'ReactDOM.findDOMNode' ),
 			$this->get_reported_apis( $warnings, 'regex-literal.js' )
+		);
+
+		// A bundler calls an imported function through a sequence expression, so
+		// a closing parenthesis stands between the name and the call.
+		$this->assertSame(
+			array( 'ReactDOM.findDOMNode', 'ReactDOM.unstable_renderSubtreeIntoContainer' ),
+			$this->get_reported_apis( $warnings, 'bundled-call.js' )
 		);
 
 		// A file that inlines a package is reported for that alone, even though

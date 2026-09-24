@@ -410,7 +410,7 @@ class React_Usage_Check extends Abstract_File_Check {
 		$scannable = $this->blank_comments_and_strings( $contents );
 
 		foreach ( $this->get_removed_apis() as $api ) {
-			$position = $this->find_first_match( $api['pattern'], $scannable );
+			$position = $this->find_first_match( $this->get_call_pattern( $api['callee'] ), $scannable );
 
 			if ( false === $position ) {
 				continue;
@@ -427,6 +427,24 @@ class React_Usage_Check extends Abstract_File_Check {
 				5
 			);
 		}
+	}
+
+	/**
+	 * Builds the pattern matching a call to one of the removed APIs.
+	 *
+	 * A bundler drops the `this` an imported function would otherwise be called
+	 * with by wrapping the reference in a sequence expression, so the call to
+	 * `findDOMNode` written as one reads `(0,r.findDOMNode)(node)` once built.
+	 * The closing parenthesis that lands between the name and the call is the
+	 * reason one is allowed here.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param string $callee Pattern matching the name the API is called by.
+	 * @return string Pattern matching a call to it.
+	 */
+	private function get_call_pattern( $callee ) {
+		return '/\b' . $callee . '\s*\)?\s*\(/';
 	}
 
 	/**
@@ -465,11 +483,16 @@ class React_Usage_Check extends Abstract_File_Check {
 	 * package errors cover.
 	 *
 	 * `render` and `hydrate` are common words, so they are only matched when
-	 * called on a `ReactDOM` object. The remaining names are specific enough to
-	 * match on their own.
+	 * called on a `ReactDOM` object. This misses them in a bundle, where the
+	 * object is renamed and the call comes out as something like
+	 * `(0,r.render)(...)`, but matching either name on its own would report far
+	 * more code that has nothing to do with React than it would find. The other
+	 * names are specific enough to match without an object, so renaming one
+	 * does not hide them.
 	 *
-	 * An entry carries either a `replacement`, naming the API to migrate to, or
-	 * a complete `message` for the APIs that have no such replacement.
+	 * Every entry carries a `callee`, matching the name the API is called by,
+	 * and either a `replacement` naming the API to migrate to or a complete
+	 * `message` for the APIs that have no such replacement.
 	 *
 	 * @since 2.2.0
 	 *
@@ -479,37 +502,37 @@ class React_Usage_Check extends Abstract_File_Check {
 		return array(
 			array(
 				'name'        => 'ReactDOM.render',
-				'pattern'     => '/\bReactDOM\s*\.\s*render\s*\(/',
+				'callee'      => 'ReactDOM\s*\.\s*render',
 				'replacement' => 'createRoot()',
 			),
 			array(
 				'name'        => 'ReactDOM.hydrate',
-				'pattern'     => '/\bReactDOM\s*\.\s*hydrate\s*\(/',
+				'callee'      => 'ReactDOM\s*\.\s*hydrate',
 				'replacement' => 'hydrateRoot()',
 			),
 			array(
 				'name'        => 'ReactDOM.unmountComponentAtNode',
-				'pattern'     => '/\bunmountComponentAtNode\s*\(/',
+				'callee'      => 'unmountComponentAtNode',
 				'replacement' => 'root.unmount()',
 			),
 			array(
 				'name'    => 'ReactDOM.findDOMNode',
-				'pattern' => '/\bfindDOMNode\s*\(/',
+				'callee'  => 'findDOMNode',
 				'message' => __( 'This file calls "ReactDOM.findDOMNode", which was removed in React 19 and stops working once WordPress upgrades React. Use a ref on the element instead.', 'plugin-check' ),
 			),
 			array(
 				'name'        => 'ReactDOM.unstable_renderSubtreeIntoContainer',
-				'pattern'     => '/\bunstable_renderSubtreeIntoContainer\s*\(/',
+				'callee'      => 'unstable_renderSubtreeIntoContainer',
 				'replacement' => 'createPortal()',
 			),
 			array(
 				'name'        => 'ReactDOMServer.renderToNodeStream',
-				'pattern'     => '/\brenderToNodeStream\s*\(/',
+				'callee'      => 'renderToNodeStream',
 				'replacement' => 'renderToPipeableStream()',
 			),
 			array(
 				'name'    => 'React.createFactory',
-				'pattern' => '/\bReact\s*\.\s*createFactory\s*\(/',
+				'callee'  => 'React\s*\.\s*createFactory',
 				'message' => __( 'This file calls "React.createFactory", which was removed in React 19 and stops working once WordPress upgrades React. Use JSX or createElement() instead.', 'plugin-check' ),
 			),
 		);
