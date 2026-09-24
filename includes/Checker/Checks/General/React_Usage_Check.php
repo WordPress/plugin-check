@@ -206,8 +206,7 @@ class React_Usage_Check extends Abstract_File_Check {
 			return false;
 		}
 
-		$reported       = false;
-		$is_development = $this->is_development_build( $contents );
+		$reported = false;
 
 		foreach ( $this->get_packages() as $package ) {
 			if ( ! $this->matches_every_pattern( $package['patterns'], $contents ) ) {
@@ -218,7 +217,7 @@ class React_Usage_Check extends Abstract_File_Check {
 				continue;
 			}
 
-			$this->add_package_error( $result, $file, $position, $package, $is_development );
+			$this->add_package_error( $result, $file, $position, $package );
 			$reported = true;
 		}
 
@@ -253,26 +252,17 @@ class React_Usage_Check extends Abstract_File_Check {
 	 *
 	 * @since 2.2.0
 	 *
-	 * @param Check_Result $result         The check result to amend.
-	 * @param string       $file           Absolute path to the JavaScript file.
-	 * @param array        $position       Array with `line` and `column` keys.
-	 * @param array        $package        Package definition as returned by `get_packages()`.
-	 * @param bool         $is_development Whether the inlined build is a development build.
+	 * @param Check_Result $result   The check result to amend.
+	 * @param string       $file     Absolute path to the JavaScript file.
+	 * @param array        $position Array with `line` and `column` keys.
+	 * @param array        $package  Package definition as returned by `get_packages()`.
 	 */
-	private function add_package_error( Check_Result $result, $file, array $position, array $package, $is_development ) {
-		if ( $is_development ) {
-			$message = sprintf(
-				/* translators: %s: npm package name, e.g. "react-dom" */
-				__( 'This file inlines a development build of the "%s" package instead of externalizing it. The bundled copy predates React 19 and will likely break when WordPress upgrades to React 19, and development builds are far larger and slower than production builds. Use the dependency extraction webpack plugin so that the package is loaded from WordPress instead.', 'plugin-check' ),
-				$package['label']
-			);
-		} else {
-			$message = sprintf(
-				/* translators: %s: npm package name, e.g. "react-dom" */
-				__( 'This file inlines the "%s" package instead of externalizing it. The bundled copy predates React 19 and will likely break when WordPress upgrades to React 19. Use the dependency extraction webpack plugin so that the package is loaded from WordPress instead.', 'plugin-check' ),
-				$package['label']
-			);
-		}
+	private function add_package_error( Check_Result $result, $file, array $position, array $package ) {
+		$message = sprintf(
+			/* translators: %s: npm package name, e.g. "react-dom" */
+			__( 'This file inlines the "%s" package instead of externalizing it. The bundled copy predates React 19 and will likely break when WordPress upgrades to React 19. Use the dependency extraction webpack plugin so that the package is loaded from WordPress instead.', 'plugin-check' ),
+			$package['label']
+		);
 
 		$this->add_result_error_for_file(
 			$result,
@@ -402,22 +392,6 @@ class React_Usage_Check extends Abstract_File_Check {
 				),
 			),
 		);
-	}
-
-	/**
-	 * Determines whether the inlined build is a development build.
-	 *
-	 * Development builds embed documentation links in their warning messages,
-	 * under `reactjs.org` up to React 18 and under `react.dev` from React 19.
-	 * Production builds strip every warning, so neither link survives.
-	 *
-	 * @since 2.2.0
-	 *
-	 * @param string $contents Contents of the JavaScript file.
-	 * @return bool True if the file inlines a development build, false otherwise.
-	 */
-	private function is_development_build( $contents ) {
-		return 1 === preg_match( '#https://(?:reactjs\.org|react\.dev)/link/#', $contents );
 	}
 
 	/**
