@@ -282,7 +282,7 @@ class React_Usage_Check extends Abstract_File_Check {
 			$position['line'],
 			$position['column'],
 			self::EXTERNALIZE_DOCS_URL,
-			$is_development ? 7 : 6
+			5
 		);
 	}
 

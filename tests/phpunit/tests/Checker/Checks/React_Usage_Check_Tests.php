@@ -37,10 +37,11 @@ class React_Usage_Check_Tests extends WP_UnitTestCase {
 		// A minifier may leave no quoted string in the file at all.
 		$this->assertSame( array( 'inlined_react' ), $this->get_codes( $errors, 'template-strings.js' ) );
 
-		// A development build is reported under the same code but with a higher severity.
+		// A development build is reported under the same code and the same
+		// severity as a production one, and is told apart only by the message.
 		$this->assertSame( array( 'inlined_react_jsx_runtime' ), $this->get_codes( $errors, 'jsx-runtime-dev.js' ) );
-		$this->assertSame( 6, $this->get_first_message( $errors, 'jsx-runtime.js' )['severity'] );
-		$this->assertSame( 7, $this->get_first_message( $errors, 'jsx-runtime-dev.js' )['severity'] );
+		$this->assertSame( 5, $this->get_first_message( $errors, 'jsx-runtime.js' )['severity'] );
+		$this->assertSame( 5, $this->get_first_message( $errors, 'jsx-runtime-dev.js' )['severity'] );
 		$this->assertStringContainsString( 'development build', $this->get_first_message( $errors, 'jsx-runtime-dev.js' )['message'] );
 
 		// A declared react-jsx-runtime dependency in the sibling asset file must
