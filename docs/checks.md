@@ -38,6 +38,7 @@
 | enqueued_scripts_scope | performance | Checks whether any scripts are loaded on all pages, which is usually not desirable and can lead to performance issues. | [Learn more](https://developer.wordpress.org/plugins/) |
 | non_blocking_scripts | performance | Checks whether scripts and styles are enqueued using a recommended loading strategy. | [Learn more](https://developer.wordpress.org/plugins/) |
 | ai_provider | general | Recommends the WordPress AI Client when a plugin integrates directly with a third-party AI provider. | [Learn more](https://developer.wordpress.org/plugins/) |
+| react_usage | general | Detects React usage that breaks when WordPress upgrades to React 19. | [Learn more](https://react.dev/blog/2024/04/25/react-19-upgrade-guide) |
 
 ## Results and severity
 

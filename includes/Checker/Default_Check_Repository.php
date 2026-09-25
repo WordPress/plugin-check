@@ -106,6 +106,7 @@ class Default_Check_Repository extends Empty_Check_Repository {
 				'menu_image_icon'            => new Checks\Plugin_Repo\Menu_Image_Icon_Check(),
 				'wp_functions_compatibility' => new Checks\Plugin_Repo\WP_Functions_Compatibility_Check(),
 				'ai_provider'                => new Checks\General\AI_Provider_Check(),
+				'react_usage'                => new Checks\General\React_Usage_Check(),
 			)
 		);
 
