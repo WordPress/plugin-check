@@ -115,4 +115,22 @@ class Enqueued_Scripts_Size_Check_Tests extends Runtime_Check_UnitTestCase {
 		$this->assertEquals( 0, $results->get_error_count() );
 		$this->assertEquals( 4, $results->get_warning_count() );
 	}
+
+	public function test_run_counts_external_dependencies() {
+		// Load the test plugin, whose script depends on a 1000 byte script served from outside
+		// the plugin directory.
+		require UNIT_TESTS_PLUGIN_DIR . 'test-plugin-enqueued-script-size-check/load.php';
+
+		// A threshold above the plugin's own script but below its size once the external
+		// dependency is counted. Warnings only appear if dependencies are included in the total.
+		$check   = new Enqueued_Scripts_Size_Check( 500 );
+		$context = $this->get_context( WP_PLUGIN_CHECK_MAIN_FILE );
+		$results = $this->run_check( $check, $context );
+
+		$this->assertEmpty( $results->get_errors() );
+		$this->assertNotEmpty( $results->get_warnings() );
+
+		$this->assertEquals( 0, $results->get_error_count() );
+		$this->assertEquals( 4, $results->get_warning_count() );
+	}
 }
