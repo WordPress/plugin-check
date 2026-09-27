@@ -325,6 +325,19 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 			$src = site_url( $src );
 		}
 
+		return $this->get_local_path_from_roots( $src );
+	}
+
+	/**
+	 * Maps a fully-qualified local URL to a readable filesystem path, or false when
+	 * it maps to no known local root (e.g. a script served from another host).
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param string $src Fully-qualified script URL (query string already stripped).
+	 * @return string|false The local file path, or false if it can't be resolved to a readable file.
+	 */
+	private function get_local_path_from_roots( $src ) {
 		// Map known local URL roots to their filesystem paths, most specific first.
 		$roots = array(
 			array( plugins_url(), WP_PLUGIN_DIR ),
@@ -336,11 +349,13 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 		foreach ( $roots as $root ) {
 			list( $url_root, $dir_root ) = $root;
 
-			if ( $url_root && strpos( $src, $url_root ) === 0 ) {
-				$path = wp_normalize_path( $dir_root . substr( $src, strlen( $url_root ) ) );
-
-				return ( file_exists( $path ) && is_readable( $path ) ) ? $path : false;
+			if ( ! $url_root || strpos( $src, $url_root ) !== 0 ) {
+				continue;
 			}
+
+			$path = wp_normalize_path( $dir_root . substr( $src, strlen( $url_root ) ) );
+
+			return ( file_exists( $path ) && is_readable( $path ) ) ? $path : false;
 		}
 
 		return false;
