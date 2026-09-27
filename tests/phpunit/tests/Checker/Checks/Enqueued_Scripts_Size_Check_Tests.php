@@ -11,6 +11,18 @@ use WordPress\Plugin_Check\Test_Utils\TestCase\Runtime_Check_UnitTestCase;
 
 class Enqueued_Scripts_Size_Check_Tests extends Runtime_Check_UnitTestCase {
 
+	public function tear_down() {
+		// Remove the dependency files the size-check fixture writes to the uploads directory.
+		$basedir = trailingslashit( wp_upload_dir()['basedir'] );
+		foreach ( array( 'plugin-check-external-dependency.js', 'plugin-check-external-transitive-dependency.js' ) as $file ) {
+			if ( file_exists( $basedir . $file ) ) {
+				unlink( $basedir . $file );
+			}
+		}
+
+		parent::tear_down();
+	}
+
 	public function test_get_shared_preparations() {
 		$check        = new Enqueued_Scripts_Size_Check();
 		$preparations = $check->get_shared_preparations();
@@ -117,13 +129,15 @@ class Enqueued_Scripts_Size_Check_Tests extends Runtime_Check_UnitTestCase {
 	}
 
 	public function test_run_counts_external_dependencies() {
-		// Load the test plugin, whose script depends on a 1000 byte script served from outside
-		// the plugin directory.
+		// The fixture's script depends on a 1000 byte script served from the uploads directory,
+		// which in turn depends on a 500 byte transitive one, plus a remote (CDN) script that
+		// can't be measured locally and must be skipped rather than fataling.
 		require UNIT_TESTS_PLUGIN_DIR . 'test-plugin-enqueued-script-size-check/load.php';
 
-		// A threshold above the plugin's own script but below its size once the external
-		// dependency is counted. Warnings only appear if dependencies are included in the total.
-		$check   = new Enqueued_Scripts_Size_Check( 500 );
+		// The threshold sits above the plugin's own script plus its direct dependency (~1053 bytes)
+		// but below the total once the transitive dependency is also counted (~1553 bytes), so the
+		// warning only appears if the dependency graph is walked recursively.
+		$check   = new Enqueued_Scripts_Size_Check( 1200 );
 		$context = $this->get_context( WP_PLUGIN_CHECK_MAIN_FILE );
 		$results = $this->run_check( $check, $context );
 

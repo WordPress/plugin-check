@@ -226,7 +226,10 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 
 				$dep_script = $wp_scripts->registered[ $dep_handle ];
 				$dep_path   = $this->get_path_from_src( $dep_script->src, $plugin_url, $plugin_path );
-				$dep_size   = $dep_path ? ( $this->get_file_size( $dep_path ) + $this->get_inline_size( $dep_script ) ) : 0;
+
+				// The file itself may be unmeasurable (e.g. a CDN-hosted dependency), but any inline
+				// before/after code attached to the handle is still printed, so count it regardless.
+				$dep_size = ( $dep_path ? $this->get_file_size( $dep_path ) : 0 ) + $this->get_inline_size( $dep_script );
 
 				$measured[ $dep_handle ] = array(
 					'path' => $dep_path,
@@ -326,7 +329,7 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 		$roots = array(
 			array( plugins_url(), WP_PLUGIN_DIR ),
 			array( content_url(), WP_CONTENT_DIR ),
-			array( includes_url(), ABSPATH . WPINC . '/' ),
+			array( includes_url(), ABSPATH . 'wp-includes/' ),
 			array( site_url( '/' ), ABSPATH ),
 		);
 
