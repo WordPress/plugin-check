@@ -157,10 +157,17 @@ class Plugin_Context {
 	 */
 	public function path( $relative_path = '/' ) {
 		if ( is_dir( $this->main_file ) ) {
-			return trailingslashit( $this->main_file ) . ltrim( $relative_path, '/' );
+			$base = trailingslashit( $this->main_file );
 		} else {
-			return plugin_dir_path( $this->main_file ) . ltrim( $relative_path, '/' );
+			$base = plugin_dir_path( $this->main_file );
 		}
+
+		$real_base = realpath( $base );
+		if ( false !== $real_base ) {
+			$base = trailingslashit( $real_base );
+		}
+
+		return $base . ltrim( $relative_path, '/' );
 	}
 
 	/**
