@@ -28,6 +28,31 @@ if ( ! class_exists( 'WordPress\Plugin_Check\CLI\Plugin_Check_Command' ) ) {
 	require_once __DIR__ . '/vendor/autoload.php';
 }
 
+/*
+ * Load the consumer-supplied bootstrap file (if configured) before the command is registered.
+ * This mirrors the behaviour of the `object-cache.php` drop-in so that integrations have one
+ * consistent extension point across admin and WP-CLI paths.
+ *
+ * The constant is expected to hold an absolute filesystem path. When the constant is defined
+ * but the file is missing, a WP-CLI warning is emitted and execution continues.
+ */
+if ( defined( 'WP_PLUGIN_CHECK_BOOTSTRAP_FILE' ) ) {
+	$plugin_check_bootstrap_file = WP_PLUGIN_CHECK_BOOTSTRAP_FILE;
+	if ( is_string( $plugin_check_bootstrap_file ) && '' !== $plugin_check_bootstrap_file ) {
+		if ( is_file( $plugin_check_bootstrap_file ) ) {
+			require_once $plugin_check_bootstrap_file;
+		} else {
+			WP_CLI::warning(
+				sprintf(
+					'Plugin Check: WP_PLUGIN_CHECK_BOOTSTRAP_FILE points to "%s", but the file does not exist.',
+					$plugin_check_bootstrap_file
+				)
+			);
+		}
+	}
+	unset( $plugin_check_bootstrap_file );
+}
+
 if ( ! isset( $context ) ) {
 	$context = new Plugin_Context( __DIR__ . '/plugin.php' );
 }
