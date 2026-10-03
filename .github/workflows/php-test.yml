@@ -112,7 +112,7 @@ jobs:
         if: ${{ matrix.coverage }}
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5
         with:
-          file: build/logs/*.xml
+          files: build/logs/*.xml
           flags: unit
           token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -158,6 +158,6 @@ jobs:
         if: ${{ matrix.coverage }}
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5
         with:
-          file: build/logs/*.xml
+          files: build/logs/*.xml
           flags: phpcs-sniffs
           token: ${{ secrets.CODECOV_TOKEN }}
