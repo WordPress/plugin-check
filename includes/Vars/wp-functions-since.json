@@ -1,7 +1,7 @@
 {
     "metadata": {
         "source": "wordpress-core",
-        "wordpress_version": "7.1.1"
+        "wordpress_version": "7.1.2"
     },
     "function_since": {
         "_": "0.71",
@@ -330,6 +330,7 @@
         "_wp_http_get_object": "2.7.0",
         "_wp_image_editor_choose": "3.5.0",
         "_wp_image_meta_replace_original": "5.3.0",
+        "_wp_is_template_path_allowed": "7.1.2",
         "_wp_is_valid_utf8_fallback": "6.9.0",
         "_wp_iso_convert": "3.1.0",
         "_wp_json_convert_string": "4.1.0",

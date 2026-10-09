@@ -138,7 +138,10 @@ class React_Usage_Check extends Abstract_File_Check {
 	 * @return array The categories for the check.
 	 */
 	public function get_categories() {
-		return array( Check_Categories::CATEGORY_GENERAL );
+		return array(
+			Check_Categories::CATEGORY_GENERAL,
+			Check_Categories::CATEGORY_PLUGIN_REPO,
+		);
 	}
 
 	/**
