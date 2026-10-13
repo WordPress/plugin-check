@@ -56,7 +56,9 @@ final class Admin_Page {
 	 */
 	public function add_hooks() {
 		add_action( 'admin_menu', array( $this, 'add_and_initialize_page' ) );
+		add_action( 'network_admin_menu', array( $this, 'add_and_initialize_network_page' ) );
 		add_filter( 'plugin_action_links', array( $this, 'filter_plugin_action_links' ), 10, 4 );
+		add_filter( 'network_admin_plugin_action_links', array( $this, 'filter_network_admin_plugin_action_links' ), 10, 4 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'add_jump_to_line_code_editor' ) );
 
 		$this->admin_ajax->add_hooks();
@@ -84,6 +86,35 @@ final class Admin_Page {
 	 */
 	public function add_and_initialize_page() {
 		$this->add_page();
+		add_action( 'load-' . $this->get_hook_suffix(), array( $this, 'initialize_page' ) );
+	}
+
+	/**
+	 * Adds the admin page under the network "Settings" menu.
+	 *
+	 * The "Tools" menu does not exist in the Network Admin, so the screen is
+	 * added under "Settings" (settings.php) instead.
+	 *
+	 * @since 2.1.0
+	 */
+	public function add_network_page() {
+		$this->hook_suffix = add_submenu_page(
+			'settings.php',
+			__( 'Plugin Check', 'plugin-check' ),
+			__( 'Plugin Check', 'plugin-check' ),
+			'manage_network_plugins',
+			'plugin-check',
+			array( $this, 'render_page' )
+		);
+	}
+
+	/**
+	 * Adds and initializes the admin page under the network "Settings" menu.
+	 *
+	 * @since 2.1.0
+	 */
+	public function add_and_initialize_network_page() {
+		$this->add_network_page();
 		add_action( 'load-' . $this->get_hook_suffix(), array( $this, 'initialize_page' ) );
 	}
 
@@ -338,6 +369,39 @@ final class Admin_Page {
 	 * @return array The modified list of actions.
 	 */
 	public function filter_plugin_action_links( $actions, $plugin_file, $plugin_data, $context ) {
+		return $this->add_check_action_link( $actions, $plugin_file, $context, admin_url( 'tools.php?page=plugin-check' ) );
+	}
+
+	/**
+	 * Adds "check this plugin" link in the Network Admin plugins list table.
+	 *
+	 * In the Network Admin the page lives under "Settings" (settings.php), so
+	 * the link URL differs from the regular WP Admin.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param array  $actions     List of actions.
+	 * @param string $plugin_file Plugin main file.
+	 * @param array  $plugin_data An array of plugin data.
+	 * @param string $context     The plugin context.
+	 * @return array The modified list of actions.
+	 */
+	public function filter_network_admin_plugin_action_links( $actions, $plugin_file, $plugin_data, $context ) {
+		return $this->add_check_action_link( $actions, $plugin_file, $context, network_admin_url( 'settings.php?page=plugin-check' ) );
+	}
+
+	/**
+	 * Adds the "check this plugin" action link using the given page URL.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param array  $actions     List of actions.
+	 * @param string $plugin_file Plugin main file.
+	 * @param string $context     The plugin context.
+	 * @param string $page_url    The Plugin Check page URL to link to.
+	 * @return array The modified list of actions.
+	 */
+	private function add_check_action_link( $actions, $plugin_file, $context, $page_url ) {
 
 		if ( in_array( $context, array( 'mustuse', 'dropins' ), true ) ) {
 			return $actions;
@@ -347,7 +411,7 @@ final class Admin_Page {
 		if ( $plugin_check_base_name === $plugin_file ) {
 			$actions[] = sprintf(
 				'<a href="%1$s">%2$s</a>',
-				esc_url( admin_url( 'tools.php?page=plugin-check' ) ),
+				esc_url( $page_url ),
 				esc_html__( 'Check a plugin', 'plugin-check' )
 			);
 			return $actions;
@@ -356,7 +420,7 @@ final class Admin_Page {
 		if ( current_user_can( 'activate_plugins' ) ) {
 			$actions[] = sprintf(
 				'<a href="%1$s">%2$s</a>',
-				esc_url( admin_url( "tools.php?page=plugin-check&plugin={$plugin_file}" ) ),
+				esc_url( $page_url . "&plugin={$plugin_file}" ),
 				esc_html__( 'Check this plugin', 'plugin-check' )
 			);
 		}
