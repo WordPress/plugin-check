@@ -97,6 +97,8 @@ final class Check_Result {
 	/**
 	 * Adds an error or warning to the respective stack.
 	 *
+	 * @SuppressWarnings(PHPMD.NPathComplexity)
+	 *
 	 * @since 1.0.0
 	 *
 	 * @param bool   $error   Whether it is an error message.
@@ -130,9 +132,35 @@ final class Check_Result {
 			array_intersect_key( $args, $defaults )
 		);
 
-		$file   = str_replace( $this->plugin()->path( '/' ), '', $data['file'] );
-		$line   = $data['line'];
-		$column = $data['column'];
+		// Normalize the file path before the filter so consumers see the same value as the stored entry.
+		$data['file'] = str_replace( $this->plugin()->path(), '', $data['file'] );
+
+		/**
+		 * Filters a single check result entry before it is recorded.
+		 *
+		 * Return `null` (or any non-array value) to suppress the entry entirely.
+		 * Return a modified array to record the modified entry instead.
+		 * The `$is_error` argument continues to drive whether the entry is stored
+		 * as an error or a warning regardless of changes made to the filtered array —
+		 * promotion / demotion is intentionally out of scope here.
+		 *
+		 * @since 2.0.0
+		 *
+		 * @param array|null $data       Entry data with keys
+		 *                               `message`, `code`, `file`, `line`, `column`, `link`, `docs`, `severity`.
+		 *                               Return `null` to drop the entry.
+		 * @param Check_Result $result   The check result the entry will be added to.
+		 * @param bool         $is_error True if the entry is being recorded as an error, false if as a warning.
+		 */
+		$data = apply_filters( 'wp_plugin_check_check_result', $data, $this, $error );
+
+		if ( ! is_array( $data ) ) {
+			return;
+		}
+
+		$file   = isset( $data['file'] ) ? (string) $data['file'] : '';
+		$line   = isset( $data['line'] ) ? (int) $data['line'] : 0;
+		$column = isset( $data['column'] ) ? (int) $data['column'] : 0;
 		unset( $data['line'], $data['column'], $data['file'] );
 
 		if ( $error ) {

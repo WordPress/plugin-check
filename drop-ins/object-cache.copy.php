@@ -34,6 +34,32 @@ function plugin_check_initialize_runner() {
 
 	require_once $plugin_dir . 'vendor/autoload.php';
 
+	/*
+	 * Load the consumer-supplied bootstrap file (if configured) before the runner is initialized.
+	 * The bootstrap file is the earliest point at which an integration can register listeners for
+	 * plugin-check actions/filters, since this drop-in runs before mu-plugins.
+	 *
+	 * The constant is expected to hold an absolute filesystem path. When the constant is defined
+	 * but the file is missing, a PHP warning is emitted so that misconfiguration is visible; PCP
+	 * keeps running regardless.
+	 */
+	if ( defined( 'WP_PLUGIN_CHECK_BOOTSTRAP_FILE' ) ) {
+		$plugin_check_bootstrap_file = WP_PLUGIN_CHECK_BOOTSTRAP_FILE;
+		if ( is_string( $plugin_check_bootstrap_file ) && '' !== $plugin_check_bootstrap_file ) {
+			if ( is_file( $plugin_check_bootstrap_file ) ) {
+				require_once $plugin_check_bootstrap_file;
+			} else {
+				trigger_error(
+					sprintf(
+						'Plugin Check: WP_PLUGIN_CHECK_BOOTSTRAP_FILE points to "%s", but the file does not exist.',
+						$plugin_check_bootstrap_file
+					),
+					E_USER_WARNING
+				);
+			}
+		}
+	}
+
 	if ( class_exists( 'WordPress\Plugin_Check\Utilities\Plugin_Request_Utility' ) ) {
 		// Initialize the Check Runner class based on the request.
 		WordPress\Plugin_Check\Utilities\Plugin_Request_Utility::initialize_runner();
