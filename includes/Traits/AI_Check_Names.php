@@ -27,14 +27,16 @@ trait AI_Check_Names {
 	 * @return array|WP_Error Array with 'text' and 'token_usage' keys, or WP_Error.
 	 */
 	protected function run_name_analysis( $model_preference, $name, $author = '' ) {
+		$directory_matches = $this->query_wordpress_org_directory( $name );
+
 		// First query: Similar name search.
 		$similar_name_result = $this->run_similar_name_query( $model_preference, $name );
 		if ( is_wp_error( $similar_name_result ) ) {
 			return $similar_name_result;
 		}
 
-		// Build additional context from similar name results.
-		$additional_context = $this->build_similar_name_context( $similar_name_result['text'] );
+		// Build additional context from similar name results and live directory matches.
+		$additional_context = $this->build_similar_name_context( $similar_name_result['text'], $directory_matches );
 
 		// Second query: Pre-review with similar name results as context.
 		$prereview_result = $this->run_prereview_query( $model_preference, $name, $additional_context, $author );
@@ -42,10 +44,235 @@ trait AI_Check_Names {
 			return $prereview_result;
 		}
 
-		// Combine token usage from both queries.
+		/*
+		 * Workaround: Merge live directory matches from the WordPress.org Plugin Directory API with the AI
+		 * similar_name output so that known existing plugins are reliably presented in the UI and pre-review context.
+		 */
 		$prereview_result['token_usage']['similar_name'] = $similar_name_result['token_usage'];
 
+		$similar_data = $this->parse_json_response( $similar_name_result['text'] );
+		$ai_plugins   = ! empty( $similar_data['confusion_existing_plugins'] ) && is_array( $similar_data['confusion_existing_plugins'] ) ? $similar_data['confusion_existing_plugins'] : array();
+		$ai_others    = ! empty( $similar_data['confusion_existing_others'] ) && is_array( $similar_data['confusion_existing_others'] ) ? $similar_data['confusion_existing_others'] : array();
+
+		$prereview_result['confusion_existing_plugins'] = array_merge( $directory_matches, $ai_plugins );
+		$prereview_result['confusion_existing_others']  = $ai_others;
+
 		return $prereview_result;
+	}
+
+	/**
+	 * Programmatically queries the WordPress.org Plugin Directory API for existing plugins with similar or exact names and slugs.
+	 *
+	 * @since 1.10.0
+	 *
+	 * @param string $name Plugin name to check.
+	 * @return array Array of matching existing plugins.
+	 */
+	protected function query_wordpress_org_directory( $name ) {
+		if ( ! function_exists( 'plugins_api' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
+		}
+
+		$matches        = array();
+		$candidate_slug = sanitize_title_with_dashes( $name );
+		$slug_parts     = explode( '-', $candidate_slug );
+		$slugs_to_check = array_unique(
+			array_filter(
+				array(
+					$candidate_slug,
+					implode( '-', array_slice( $slug_parts, 0, 1 ) ),
+					implode( '-', array_slice( $slug_parts, 0, 2 ) ),
+					implode( '-', array_slice( $slug_parts, 0, 3 ) ),
+				)
+			)
+		);
+
+		/*
+		 * Workaround: Since AI models may not reliably detect exact or near-exact existing plugin names/slugs
+		 * from training data alone, programmatically query the WordPress.org Plugin Directory API (`plugins_api`)
+		 * for exact candidate slugs and top search matches.
+		 */
+		$this->check_directory_slug_matches( $name, $candidate_slug, $slugs_to_check, $matches );
+		$this->check_directory_search_matches( $name, $candidate_slug, $matches );
+
+		return array_values( $matches );
+	}
+
+	/**
+	 * Checks candidate slugs against the WordPress.org Plugin Directory API (`plugins_api`).
+	 *
+	 * @since 1.10.0
+	 *
+	 * @param string $name           Plugin name to check.
+	 * @param string $candidate_slug Base candidate slug.
+	 * @param array  $slugs_to_check List of slug strings to query.
+	 * @param array  $matches        Reference to matching plugins array.
+	 */
+	protected function check_directory_slug_matches( $name, $candidate_slug, $slugs_to_check, &$matches ) {
+		foreach ( $slugs_to_check as $slug ) {
+			$info = plugins_api( 'plugin_information', array( 'slug' => $slug ) );
+			if ( is_wp_error( $info ) || empty( $info ) ) {
+				continue;
+			}
+
+			$info_slug = $this->get_item_property( $info, 'slug' );
+			$info_name = $this->get_item_property( $info, 'name' );
+
+			if ( empty( $info_slug ) || empty( $info_name ) ) {
+				continue;
+			}
+
+			$is_exact              = $this->is_directory_item_exact_match( $info_slug, $info_name, $candidate_slug, $name );
+			$matches[ $info_slug ] = array(
+				'name'                 => html_entity_decode( $info_name, ENT_QUOTES | ENT_HTML5, 'UTF-8' ),
+				'similarity_level'     => $is_exact ? 'Exact Match' : 'High',
+				'explanation'          => __( 'Existing plugin found directly in the WordPress.org Plugin Directory.', 'plugin-check' ),
+				'active_installations' => $this->get_item_property( $info, 'active_installs', '0' ),
+				'link'                 => 'https://wordpress.org/plugins/' . $info_slug . '/',
+				'is_exact_match'       => $is_exact,
+			);
+		}
+	}
+
+	/**
+	 * Checks search results against the WordPress.org Plugin Directory API (`plugins_api`).
+	 *
+	 * @since 1.10.0
+	 *
+	 * @param string $name           Plugin name to check.
+	 * @param string $candidate_slug Base candidate slug.
+	 * @param array  $matches        Reference to matching plugins array.
+	 */
+	protected function check_directory_search_matches( $name, $candidate_slug, &$matches ) {
+		$search_queries = $this->build_search_queries( $name, $candidate_slug );
+
+		foreach ( array_unique( $search_queries ) as $search_query ) {
+			$search_results = plugins_api(
+				'query_plugins',
+				array(
+					'search'   => $search_query,
+					'per_page' => 5,
+				)
+			);
+
+			if ( is_wp_error( $search_results ) || empty( $search_results->plugins ) || ! is_array( $search_results->plugins ) ) {
+				continue;
+			}
+
+			foreach ( $search_results->plugins as $plugin ) {
+				$this->process_search_result_plugin( $plugin, $candidate_slug, $name, $matches );
+			}
+		}
+	}
+
+	/**
+	 * Builds the list of search queries from a plugin name and candidate slug.
+	 *
+	 * @since 1.10.0
+	 *
+	 * @param string $name           Plugin name.
+	 * @param string $candidate_slug Base candidate slug.
+	 * @return array List of search query strings.
+	 */
+	protected function build_search_queries( $name, $candidate_slug ) {
+		$search_queries = array( $name );
+		$slug_parts     = explode( '-', $candidate_slug );
+		$generic_words  = array( 'wp', 'wordpress', 'simple', 'easy', 'custom', 'plugin', 'advanced', 'pro', 'woo', 'ultimate', 'best', 'free', 'new', 'all', 'super', 'smart', 'fast', 'quick', 'contact', 'form', 'forms', 'image', 'video', 'post', 'posts', 'page', 'pages', 'user', 'users' );
+
+		// Cap additional word queries to avoid excessive HTTP requests for long plugin names.
+		$max_word_queries = 3;
+		$word_count       = 0;
+
+		foreach ( $slug_parts as $part ) {
+			if ( $word_count >= $max_word_queries ) {
+				break;
+			}
+			if ( strlen( $part ) >= 4 && ! in_array( $part, $generic_words, true ) && $part !== $candidate_slug ) {
+				$search_queries[] = $part;
+				++$word_count;
+			}
+		}
+
+		return $search_queries;
+	}
+
+	/**
+	 * Processes a single plugin from the directory search results.
+	 *
+	 * @since 1.10.0
+	 *
+	 * @param object|array $plugin        Plugin data from the search results.
+	 * @param string       $candidate_slug Base candidate slug.
+	 * @param string       $name           Evaluated plugin name.
+	 * @param array        $matches        Reference to matching plugins array.
+	 */
+	protected function process_search_result_plugin( $plugin, $candidate_slug, $name, &$matches ) {
+		$p_slug = $this->get_item_property( $plugin, 'slug' );
+		$p_name = $this->get_item_property( $plugin, 'name' );
+
+		if ( empty( $p_slug ) || isset( $matches[ $p_slug ] ) ) {
+			return;
+		}
+
+		$is_exact           = $this->is_directory_item_exact_match( $p_slug, $p_name, $candidate_slug, $name );
+		$matches[ $p_slug ] = array(
+			'name'                 => html_entity_decode( $p_name, ENT_QUOTES | ENT_HTML5, 'UTF-8' ),
+			'similarity_level'     => $is_exact ? 'Exact Match' : 'High',
+			'explanation'          => __( 'Similar plugin detected via WordPress.org directory search.', 'plugin-check' ),
+			'active_installations' => $this->get_item_property( $plugin, 'active_installs', '0' ),
+			'link'                 => 'https://wordpress.org/plugins/' . $p_slug . '/',
+			'is_exact_match'       => $is_exact,
+		);
+	}
+
+	/**
+	 * Determines if a directory plugin item is an exact or near-exact match for the evaluated name/slug.
+	 *
+	 * @since 1.10.0
+	 *
+	 * @param string $info_slug      Slug of the directory item.
+	 * @param string $info_name      Name of the directory item.
+	 * @param string $candidate_slug Evaluated candidate slug.
+	 * @param string $name           Evaluated plugin name.
+	 * @return bool True if exact or near-exact match, false otherwise.
+	 */
+	protected function is_directory_item_exact_match( $info_slug, $info_name, $candidate_slug, $name ) {
+		if ( empty( $info_slug ) || empty( $candidate_slug ) ) {
+			return false;
+		}
+
+		// Same slug or same name (case-insensitive).
+		if ( $info_slug === $candidate_slug || 0 === strcasecmp( trim( $info_name ), trim( $name ) ) ) {
+			return true;
+		}
+
+		// Name normalizes to same slug (handles special characters like em-dashes).
+		if ( 0 === strcasecmp( sanitize_title_with_dashes( $info_name ), $candidate_slug ) ) {
+			return true;
+		}
+
+		// Dash-stripped comparison (e.g. "less-flux" vs "lessflux").
+		return str_replace( '-', '', $info_slug ) === str_replace( '-', '', $candidate_slug );
+	}
+
+	/**
+	 * Safely retrieves a scalar property or array element from an item.
+	 *
+	 * @since 1.10.0
+	 *
+	 * @param object|array $item          The object or array to retrieve from.
+	 * @param string       $key           Property name or array key.
+	 * @param string       $default_value Optional default value. Default empty string.
+	 * @return string The string value of the property or element, or default value.
+	 */
+	protected function get_item_property( $item, $key, $default_value = '' ) {
+		if ( is_object( $item ) && isset( $item->$key ) && is_scalar( $item->$key ) ) {
+			return (string) $item->$key;
+		}
+		if ( is_array( $item ) && isset( $item[ $key ] ) && is_scalar( $item[ $key ] ) ) {
+			return (string) $item[ $key ];
+		}
+		return $default_value;
 	}
 
 	/**
@@ -252,16 +479,34 @@ trait AI_Check_Names {
 	 * @since 1.8.0
 	 *
 	 * @param string $similar_name_result Similar name query result.
+	 * @param array  $directory_matches   Optional directory matches from plugins_api.
 	 * @return string Additional context text.
 	 */
-	protected function build_similar_name_context( $similar_name_result ) {
-		if ( empty( $similar_name_result ) ) {
+	protected function build_similar_name_context( $similar_name_result, $directory_matches = array() ) {
+		if ( empty( $similar_name_result ) && empty( $directory_matches ) ) {
 			return '';
 		}
 
-		$context  = "# Possible similarity to other plugins, trademarks and project names.\n\n";
-		$context .= "We've detected the following possible similarities. Check them and determine if there is a high similarity. This is not an exhaustive list. It is only the result of an internet search, so you need to check its validity for this case. Do not mention them in your reply.\n\n";
-		$context .= $similar_name_result;
+		$context = "# Possible similarity to other plugins, trademarks and project names.\n\n";
+
+		if ( ! empty( $directory_matches ) ) {
+			$context .= "We have confirmed via WordPress.org Plugin Directory API that the following existing plugins ALREADY EXIST on WordPress.org:\n";
+			foreach ( $directory_matches as $match ) {
+				$context .= sprintf(
+					"- %1\$s (slug: %2\$s, active installations: %3\$s, link: %4\$s)\n",
+					$match['name'],
+					basename( rtrim( $match['link'], '/' ) ),
+					$match['active_installations'],
+					$match['link']
+				);
+			}
+			$context .= "\nIf the evaluated plugin name exactly matches or is nearly identical/confusingly similar to any of the above existing plugins or their slugs, you MUST set possible_naming_issues to true and explain the conflict in naming_explanation.\n\n";
+		}
+
+		if ( ! empty( $similar_name_result ) ) {
+			$context .= "We've detected the following possible similarities. Check them and determine if there is a high similarity. This is not an exhaustive list. It is only the result of an internet search, so you need to check its validity for this case. Do not mention them in your reply.\n\n";
+			$context .= $similar_name_result;
+		}
 
 		return $context;
 	}
@@ -324,12 +569,16 @@ trait AI_Check_Names {
 		}
 
 		if ( ! empty( $parsed_data ) && isset( $parsed_data['possible_naming_issues'] ) ) {
+			$this->enforce_directory_match_verdict( $parsed_data, $analysis );
+
 			$result = $this->parse_prereview_response( $parsed_data );
 
 			// Add token usage info if available.
 			if ( is_array( $analysis ) && isset( $analysis['token_usage'] ) ) {
 				$result['token_usage'] = $analysis['token_usage'];
 			}
+
+			$this->attach_existing_matches_to_result( $result, $analysis );
 
 			return $result;
 		}
@@ -340,6 +589,57 @@ trait AI_Check_Names {
 			'explanation' => wp_kses_post( __( 'The AI response could not be parsed. Raw response:', 'plugin-check' ) . '<br><br>' . esc_html( substr( $analysis_trim, 0, 500 ) ) ),
 			'raw'         => $analysis_trim,
 		);
+	}
+
+	/**
+	 * Enforces naming issues if an exact plugin match was detected in the directory query.
+	 *
+	 * @since 1.10.0
+	 *
+	 * @param array        $parsed_data Reference to parsed response data array.
+	 * @param array|string $analysis    Raw analysis input data.
+	 */
+	protected function enforce_directory_match_verdict( &$parsed_data, $analysis ) {
+		if ( ! is_array( $analysis ) || empty( $analysis['confusion_existing_plugins'] ) || ! is_array( $analysis['confusion_existing_plugins'] ) ) {
+			return;
+		}
+
+		foreach ( $analysis['confusion_existing_plugins'] as $plugin ) {
+			if ( empty( $plugin['is_exact_match'] ) ) {
+				continue;
+			}
+
+			$parsed_data['possible_naming_issues'] = true;
+			if ( empty( $parsed_data['naming_explanation'] ) || false === strpos( (string) $parsed_data['naming_explanation'], 'WordPress.org Plugin Directory' ) ) {
+				$link                              = isset( $plugin['link'] ) ? (string) $plugin['link'] : '';
+				$parsed_data['naming_explanation'] = sprintf(
+					/* translators: %s: plugin directory link */
+					__( 'An existing plugin with an exact or nearly identical name/slug exists in the WordPress.org Plugin Directory (%s).', 'plugin-check' ),
+					$link
+				);
+			}
+			break;
+		}
+	}
+
+	/**
+	 * Attaches existing plugin and other confusion match data to the result array.
+	 *
+	 * @since 1.10.0
+	 *
+	 * @param array        $result   Reference to the pre-review result array.
+	 * @param array|string $analysis Raw analysis input data.
+	 */
+	protected function attach_existing_matches_to_result( &$result, $analysis ) {
+		if ( ! is_array( $analysis ) ) {
+			return;
+		}
+		if ( isset( $analysis['confusion_existing_plugins'] ) ) {
+			$result['confusion_existing_plugins'] = $analysis['confusion_existing_plugins'];
+		}
+		if ( isset( $analysis['confusion_existing_others'] ) ) {
+			$result['confusion_existing_others'] = $analysis['confusion_existing_others'];
+		}
 	}
 
 	/**
@@ -378,7 +678,7 @@ trait AI_Check_Names {
 		// Try to decode as JSON.
 		$decoded = json_decode( $json_text, true );
 
-		if ( JSON_ERROR_NONE === json_last_error() && is_array( $decoded ) && isset( $decoded['possible_naming_issues'] ) ) {
+		if ( JSON_ERROR_NONE === json_last_error() && is_array( $decoded ) ) {
 			return $decoded;
 		}
 
