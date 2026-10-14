@@ -57,6 +57,7 @@ trait License_Utils {
 		$license = preg_replace( '/EUPL\s*[-|\.]*\s*[v]?([0-9]+)(\.[0-9]+)?/i', 'EUPL', $license );
 		$license = preg_replace( '/Apache.*?([0-9])(\.[0])?/i', 'Apache$1', $license );
 		$license = preg_replace( '/(The\s+)?Unlicense/i', 'Unlicense', $license );
+		$license = preg_replace( '/Blue\s*Oak(\s+Model\s+License)?(\s*[v]?[0-9\.]+)?/i', 'BlueOak', $license );
 		// Normalize WTFPL variations - must come before version removal to catch full text.
 		$license = preg_replace( '/Do\s+What\s+The\s+F[^\s]*\s+You\s+Want\s+To\s+Public\s+License/i', 'WTFPL', $license );
 		// Remove version numbers from WTFPL (e.g., "WTFPL v2" -> "WTFPL").
@@ -95,7 +96,7 @@ trait License_Utils {
 			return true;
 		}
 
-		$match = preg_match( '/GPL|EUPL|GNU|MIT|FreeBSD|New BSD|BSD-3-Clause|BSD 3 Clause|OpenLDAP|Expat|Apache2|MPL20|ISC|CC0|Unlicense|WTFPL/im', $license );
+		$match = preg_match( '/GPL|EUPL|GNU|MIT|FreeBSD|New BSD|BSD-3-Clause|BSD 3 Clause|OpenLDAP|Expat|Apache2|MPL20|ISC|CC0|Unlicense|WTFPL|BlueOak/im', $license );
 
 		return ( false === $match || 0 === $match ) ? false : true;
 	}

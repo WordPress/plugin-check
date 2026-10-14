@@ -39,6 +39,7 @@
 
 				<input type="submit" value="<?php esc_attr_e( 'Check it!', 'plugin-check' ); ?>" id="plugin-check__submit" class="button button-primary" />
 				<span id="plugin-check__spinner" class="spinner" style="float: none;"></span>
+				<div class="notice notice-error is-hidden" role="alert" tabindex="-1" id="plugin-check__client-error"></div>
 				<div class="plugin-check__options">
 					<div>
 						<h4><?php esc_html_e( 'Categories', 'plugin-check' ); ?></h4>
@@ -84,6 +85,12 @@
 						<h4><?php esc_html_e( 'AI Settings', 'plugin-check' ); ?></h4>
 						<p>
 							<label><input type="checkbox" value="use-ai" id="plugin-check__use-ai" /> <?php esc_html_e( 'Enable AI Analysis', 'plugin-check' ); ?></label>
+						</p>
+					</div>
+					<div id="plugin-check__pcpignore-container">
+						<h4><?php esc_html_e( 'Custom Exclusions', 'plugin-check' ); ?></h4>
+						<p>
+							<label><input type="checkbox" value="use-pcpignore" id="plugin-check__use-pcpignore" /> <?php esc_html_e( 'Use .pcpignore custom exclusions', 'plugin-check' ); ?></label>
 						</p>
 					</div>
 				</div>

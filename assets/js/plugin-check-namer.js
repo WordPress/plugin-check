@@ -273,7 +273,7 @@
 							( tokenUsage.prompt_tokens &&
 							tokenUsage.completion_tokens
 								? tokenUsage.prompt_tokens +
-								  tokenUsage.completion_tokens
+									tokenUsage.completion_tokens
 								: null );
 
 						if ( totalTokens ) {
@@ -329,17 +329,19 @@
 									'</strong>' +
 									( plugin.active_installations
 										? ' <span class="plugin-check-namer-confusion-meta">(' +
-										  escapeHtml(
+											escapeHtml(
 												plugin.active_installations
-										  ) +
-										  ' ' +
-										  'active installs' +
-										  ')</span>'
+											) +
+											' ' +
+											'active installs' +
+											')</span>'
 										: '' ) +
 									( plugin.owner_username
 										? ' <span class="plugin-check-namer-confusion-meta"> - ' +
-										  escapeHtml( plugin.owner_username ) +
-										  '</span>'
+											escapeHtml(
+												plugin.owner_username
+											) +
+											'</span>'
 										: '' ) +
 									'<br>' +
 									'<span class="plugin-check-namer-confusion-text">' +
@@ -347,10 +349,10 @@
 									'</span>' +
 									( plugin.link
 										? '<br><a href="' +
-										  escapeHtml( plugin.link ) +
-										  '" target="_blank" rel="noopener">' +
-										  escapeHtml( plugin.link ) +
-										  '</a>'
+											escapeHtml( plugin.link ) +
+											'" target="_blank" rel="noopener">' +
+											escapeHtml( plugin.link ) +
+											'</a>'
 										: '' );
 								confusionPluginsList.appendChild( div );
 							}
@@ -387,10 +389,10 @@
 									'</span>' +
 									( item.link
 										? '<br><a href="' +
-										  escapeHtml( item.link ) +
-										  '" target="_blank" rel="noopener">' +
-										  escapeHtml( item.link ) +
-										  '</a>'
+											escapeHtml( item.link ) +
+											'" target="_blank" rel="noopener">' +
+											escapeHtml( item.link ) +
+											'</a>'
 										: '' );
 								confusionOthersList.appendChild( div );
 							}

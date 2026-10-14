@@ -12,6 +12,7 @@ use InvalidArgumentException;
 use WordPress\Plugin_Check\Checker\AJAX_Runner;
 use WordPress\Plugin_Check\Checker\Runtime_Check;
 use WordPress\Plugin_Check\Checker\Runtime_Environment_Setup;
+use WordPress\Plugin_Check\Utilities\PCP_Ignore_Utility;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 use WordPress\Plugin_Check\Utilities\Results_Exporter;
 use WP_Error;
@@ -285,13 +286,24 @@ final class Admin_AJAX {
 
 		$include_experimental = 1 === filter_input( INPUT_POST, 'include-experimental', FILTER_VALIDATE_INT );
 		$use_ai               = 1 === filter_input( INPUT_POST, 'use-ai', FILTER_VALIDATE_INT );
+		$use_pcpignore        = 1 === filter_input( INPUT_POST, 'use-pcpignore', FILTER_VALIDATE_INT );
 		$types                = filter_input( INPUT_POST, 'types', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
 		$types                = is_null( $types ) ? array( 'error', 'warning' ) : $types;
+
+		$pcpignore_warning = '';
 
 		try {
 			$runner->set_experimental_flag( $include_experimental );
 			$runner->set_check_slugs( $checks );
 			$runner->set_plugin( $plugin );
+			if ( $use_pcpignore ) {
+				$plugin_path = $runner->get_plugin_basename();
+				$plugin_path = is_dir( $plugin_path ) ? $plugin_path : WP_PLUGIN_DIR . '/' . $plugin_path;
+
+				PCP_Ignore_Utility::apply_exclusions( $plugin_path );
+
+				$pcpignore_warning = PCP_Ignore_Utility::get_warning();
+			}
 			$runner->set_use_ai( $use_ai );
 			$results = $runner->run();
 		} catch ( Exception $error ) {
@@ -302,6 +314,10 @@ final class Admin_AJAX {
 		}
 
 		$response_data = $this->prepare_results_response( $results, $types );
+
+		if ( '' !== $pcpignore_warning ) {
+			$response_data['pcpignore_warning'] = $pcpignore_warning;
+		}
 
 		// Include AI analysis results if available.
 		$ai_analysis = $results->get_ai_analysis();

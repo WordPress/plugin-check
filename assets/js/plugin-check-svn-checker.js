@@ -80,9 +80,9 @@
 				section.id === 'root' && meta.svn_url
 					? ` <a href="${ esc(
 							meta.svn_url
-					  ) }" target="_blank" rel="noopener" class="plugin-check-svn-checker-svn-link" title="${ esc(
+						) }" target="_blank" rel="noopener" class="plugin-check-svn-checker-svn-link" title="${ esc(
 							i18n.viewInSvn
-					  ) }"><span class="dashicons dashicons-external"></span></a>`
+						) }"><span class="dashicons dashicons-external"></span></a>`
 					: '';
 			html += `<h2>${ esc( section.label ) }${ svnLink }</h2>`;
 
