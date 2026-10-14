@@ -523,6 +523,19 @@
 		return '';
 	}
 
+	/**
+	 * Rounds a number and formats it with the thousands separator of the WordPress locale.
+	 *
+	 * @param {number} number Number to format.
+	 * @return {string} Formatted number.
+	 */
+	function formatNumber( number ) {
+		return String( Math.round( number ) ).replace(
+			/\B(?=(\d{3})+(?!\d))/g,
+			() => pluginCheck.thousandsSeparator
+		);
+	}
+
 	function renderExportButtons() {
 		exportContainer.innerHTML = '';
 		if ( ! checksCompleted ) {
@@ -978,7 +991,7 @@
 							aiStats.false_positives,
 							'plugin-check'
 						),
-						aiStats.false_positives.toLocaleString()
+						formatNumber( aiStats.false_positives )
 					)
 				);
 			}
@@ -987,7 +1000,7 @@
 					sprintf(
 						/* translators: %s: Number of input tokens. */
 						__( 'Input tokens: %s.', 'plugin-check' ),
-						aiStats.input_tokens.toLocaleString()
+						formatNumber( aiStats.input_tokens )
 					)
 				);
 			}
@@ -996,7 +1009,7 @@
 					sprintf(
 						/* translators: %s: Number of output tokens. */
 						__( 'Output tokens: %s.', 'plugin-check' ),
-						aiStats.output_tokens.toLocaleString()
+						formatNumber( aiStats.output_tokens )
 					)
 				);
 			}
@@ -1005,7 +1018,7 @@
 					sprintf(
 						/* translators: %s: Number of tokens spent. */
 						__( 'Tokens spent: %s.', 'plugin-check' ),
-						aiStats.tokens_spent.toLocaleString()
+						formatNumber( aiStats.tokens_spent )
 					)
 				);
 			}

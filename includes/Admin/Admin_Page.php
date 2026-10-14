@@ -175,6 +175,8 @@ final class Admin_Page {
 	 * @since 1.0.0
 	 */
 	public function enqueue_scripts() {
+		global $wp_locale;
+
 		wp_enqueue_script(
 			'plugin-check-admin',
 			WP_PLUGIN_CHECK_PLUGIN_DIR_URL . 'assets/js/plugin-check-admin.js',
@@ -221,6 +223,8 @@ final class Admin_Page {
 					'summaryBothTemplate'             => __( '%1$s and %2$s found.', 'plugin-check' ),
 					/* translators: %s: Formatted issue count string (e.g. "3 errors" or "2 warnings"). */
 					'summarySingleTemplate'           => __( '%s found.', 'plugin-check' ),
+					// Same separator number_format_i18n() uses. WP_Locale stores a space as "&nbsp;", so decode it for the escaped results template.
+					'thousandsSeparator'              => html_entity_decode( $wp_locale->number_format['thousands_sep'], ENT_QUOTES, 'UTF-8' ),
 					'strings'                         => array(
 						'checkingPlugin' => __( 'Running plugin checks…', 'plugin-check' ),
 						'exportCsv'      => __( 'Export CSV', 'plugin-check' ),
