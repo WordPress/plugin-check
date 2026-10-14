@@ -69,7 +69,8 @@ class WP_Functions_Compatibility_Check extends Abstract_File_Check {
 			return;
 		}
 
-		$php_files = self::filter_files_by_extension( $files, 'php' );
+		$php_files          = self::filter_files_by_extension( $files, 'php' );
+		$declared_functions = null;
 		foreach ( $php_files as $file ) {
 			foreach ( $this->find_wp_function_calls( $file ) as $call ) {
 				$function_name = $call['name'];
@@ -80,6 +81,14 @@ class WP_Functions_Compatibility_Check extends Abstract_File_Check {
 
 				$introduced_in = $functions_since_map[ $function_name ];
 				if ( ! version_compare( $introduced_in, $minimum_supported_wp, '>' ) ) {
+					continue;
+				}
+
+				// A function the plugin declares itself, such as a polyfill, is available on any version.
+				if ( null === $declared_functions ) {
+					$declared_functions = $this->get_declared_global_function_names( $php_files );
+				}
+				if ( isset( $declared_functions[ $function_name ] ) ) {
 					continue;
 				}
 
@@ -287,6 +296,109 @@ class WP_Functions_Compatibility_Check extends Abstract_File_Check {
 		}
 
 		return $calls;
+	}
+
+	/**
+	 * Collects the global functions declared across the plugin's files.
+	 *
+	 * Methods and namespaced functions are skipped, as they cannot stand in for a WordPress function.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param array $php_files PHP file paths.
+	 * @return array<string, true> Map of declared function names, keyed by lowercase name.
+	 */
+	private function get_declared_global_function_names( array $php_files ): array {
+		$class_like_tokens = array( T_CLASS, T_INTERFACE, T_TRAIT );
+		if ( defined( 'T_ENUM' ) ) {
+			$class_like_tokens[] = constant( 'T_ENUM' );
+		}
+
+		$declared = array();
+
+		foreach ( $php_files as $file ) {
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			$source = file_get_contents( $file );
+			if ( false === $source || '' === $source ) {
+				continue;
+			}
+
+			$tokens       = token_get_all( $source );
+			$in_namespace = false;
+			$depth        = 0;
+			$parens       = 0;
+			$class_depths = array();
+			$class_parens = null;
+
+			foreach ( $tokens as $index => $token ) {
+				if ( '(' === $token || ')' === $token ) {
+					$parens += '(' === $token ? 1 : -1;
+					continue;
+				}
+
+				if ( '{' === $token || ( is_array( $token ) && in_array( $token[0], array( T_CURLY_OPEN, T_DOLLAR_OPEN_CURLY_BRACES ), true ) ) ) {
+					++$depth;
+					// Braces inside an anonymous class's arguments, such as a closure, are not its body.
+					if ( $parens === $class_parens ) {
+						$class_depths[] = $depth;
+						$class_parens   = null;
+					}
+					continue;
+				}
+
+				if ( '}' === $token ) {
+					if ( end( $class_depths ) === $depth ) {
+						array_pop( $class_depths );
+					}
+					--$depth;
+					continue;
+				}
+
+				if ( ! is_array( $token ) ) {
+					continue;
+				}
+
+				$next_index = $this->get_next_significant_token_index( $tokens, $index );
+				$next_token = null === $next_index ? null : $tokens[ $next_index ];
+
+				if ( T_NAMESPACE === $token[0] ) {
+					// `namespace {` is the global namespace; `namespace\foo()` is a call.
+					if ( '{' === $next_token ) {
+						$in_namespace = false;
+					} elseif ( is_array( $next_token ) && T_NS_SEPARATOR !== $next_token[0] ) {
+						$in_namespace = true;
+					}
+					continue;
+				}
+
+				if ( in_array( $token[0], $class_like_tokens, true ) ) {
+					// Skip `Foo::class`.
+					$previous_index = $this->get_previous_significant_token_index( $tokens, $index );
+					$previous_token = null === $previous_index ? null : $tokens[ $previous_index ];
+					if ( ! is_array( $previous_token ) || T_DOUBLE_COLON !== $previous_token[0] ) {
+						$class_parens = $parens;
+					}
+					continue;
+				}
+
+				if ( T_FUNCTION !== $token[0] || $in_namespace || ! empty( $class_depths ) || null === $next_index ) {
+					continue;
+				}
+
+				// Skip the `&` of a function returning by reference.
+				if ( '&' === $next_token || ( is_array( $next_token ) && '&' === $next_token[1] ) ) {
+					$next_index = $this->get_next_significant_token_index( $tokens, $next_index );
+					$next_token = null === $next_index ? null : $tokens[ $next_index ];
+				}
+
+				// A closure has no name, so the next token is `(`.
+				if ( is_array( $next_token ) && T_STRING === $next_token[0] ) {
+					$declared[ strtolower( $next_token[1] ) ] = true;
+				}
+			}
+		}
+
+		return $declared;
 	}
 
 	/**
