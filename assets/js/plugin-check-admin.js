@@ -959,6 +959,7 @@
 		}
 
 		if ( aiStats ) {
+			const { __, _n, sprintf } = wp.i18n;
 			const aiParts = [];
 			const modelsUsed = [
 				...new Set( aiStats.models_used.filter( Boolean ) ),
@@ -969,53 +970,68 @@
 
 			if ( aiStats.false_positives > 0 ) {
 				aiParts.push(
-					'AI detected ' +
-						aiStats.false_positives +
-						' ' +
-						( 1 === aiStats.false_positives
-							? 'possible false positive'
-							: 'possible false positives' )
+					sprintf(
+						/* translators: %s: Number of possible false positives. */
+						_n(
+							'AI detected %s possible false positive.',
+							'AI detected %s possible false positives.',
+							aiStats.false_positives,
+							'plugin-check'
+						),
+						aiStats.false_positives.toLocaleString()
+					)
 				);
 			}
 			if ( aiStats.input_tokens > 0 ) {
 				aiParts.push(
-					'Input tokens: ' + aiStats.input_tokens.toLocaleString()
+					sprintf(
+						/* translators: %s: Number of input tokens. */
+						__( 'Input tokens: %s.', 'plugin-check' ),
+						aiStats.input_tokens.toLocaleString()
+					)
 				);
 			}
 			if ( aiStats.output_tokens > 0 ) {
 				aiParts.push(
-					'Output tokens: ' + aiStats.output_tokens.toLocaleString()
+					sprintf(
+						/* translators: %s: Number of output tokens. */
+						__( 'Output tokens: %s.', 'plugin-check' ),
+						aiStats.output_tokens.toLocaleString()
+					)
 				);
 			}
 			if ( aiStats.tokens_spent > 0 ) {
 				aiParts.push(
-					'Tokens spent: ' + aiStats.tokens_spent.toLocaleString()
+					sprintf(
+						/* translators: %s: Number of tokens spent. */
+						__( 'Tokens spent: %s.', 'plugin-check' ),
+						aiStats.tokens_spent.toLocaleString()
+					)
 				);
 			}
 			if ( modelsUsed.length > 0 || providersUsed.length > 0 ) {
-				if ( 1 === modelsUsed.length && 1 === providersUsed.length ) {
-					aiParts.push(
-						'Model: ' + providersUsed[ 0 ] + ' ' + modelsUsed[ 0 ]
-					);
-				} else if (
-					modelsUsed.length > 0 &&
-					providersUsed.length > 0
-				) {
-					aiParts.push(
-						'Model: ' +
-							providersUsed.join( ', ' ) +
-							' ' +
-							modelsUsed.join( ', ' )
-					);
+				let model;
+				if ( modelsUsed.length > 0 && providersUsed.length > 0 ) {
+					model =
+						providersUsed.join( ', ' ) +
+						' ' +
+						modelsUsed.join( ', ' );
 				} else if ( modelsUsed.length > 0 ) {
-					aiParts.push( 'Model: ' + modelsUsed.join( ', ' ) );
+					model = modelsUsed.join( ', ' );
 				} else {
-					aiParts.push( 'Model: ' + providersUsed.join( ', ' ) );
+					model = providersUsed.join( ', ' );
 				}
+				aiParts.push(
+					sprintf(
+						/* translators: %s: AI provider and model names. */
+						__( 'Model: %s.', 'plugin-check' ),
+						model
+					)
+				);
 			}
+			// Each part is a whole translated sentence with its own punctuation.
 			if ( aiParts.length > 0 ) {
-				messageText += /[.!?]\s*$/.test( messageText ) ? ' ' : '. ';
-				messageText += aiParts.join( '. ' );
+				messageText += ' ' + aiParts.join( ' ' );
 			}
 		}
 

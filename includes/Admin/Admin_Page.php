@@ -181,10 +181,13 @@ final class Admin_Page {
 			array(
 				'wp-util',
 				'wp-a11y',
+				'wp-i18n',
 			),
 			WP_PLUGIN_CHECK_VERSION,
 			true
 		);
+
+		wp_set_script_translations( 'plugin-check-admin', 'plugin-check' );
 
 		wp_enqueue_style(
 			'plugin-check-admin',
