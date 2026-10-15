@@ -46,15 +46,26 @@ class WP_Functions_Compatibility_Check_Tests extends WP_UnitTestCase {
 		$this->assertArrayNotHasKey( 'uses-guarded-function.php', $errors );
 	}
 
-	public function test_run_with_polyfill_file_without_errors() {
+	public function test_run_with_polyfill_file_with_warnings() {
 		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-wp-functions-compatibility-with-polyfill-file/load.php' );
 		$check_result  = new Check_Result( $check_context );
 
 		$check = new WP_Functions_Compatibility_Check();
 		$check->run( $check_result );
 
-		$errors = $check_result->get_errors();
-		$this->assertArrayNotHasKey( 'uses-polyfilled-function.php', $errors );
+		$this->assertEmpty( $check_result->get_errors() );
+
+		$warnings = $check_result->get_warnings();
+		$expected = array(
+			8  => 'includes/compat.php',
+			9  => 'includes/compat.php',
+			10 => 'includes/braced-namespaces.php',
+		);
+		foreach ( $expected as $line => $declaring_file ) {
+			$messages = wp_list_filter( $warnings['uses-polyfilled-function.php'][ $line ][0], array( 'code' => 'wp_function_declared_by_plugin' ) );
+			$this->assertCount( 1, $messages );
+			$this->assertStringContainsString( " in {$declaring_file},", reset( $messages )['message'] );
+		}
 	}
 
 	public function test_run_with_non_global_declarations_with_errors() {
