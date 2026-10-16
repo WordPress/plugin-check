@@ -190,7 +190,8 @@ trait Function_Declaration_Utils {
 	 * @return string|null Lowercase function name, or null when the token does not declare a global function.
 	 */
 	private function get_declared_global_function_name( array $tokens, int $index, array $state ): ?string {
-		if ( T_FUNCTION !== $tokens[ $index ][0] || $state['in_namespace'] || $state['in_use'] || ! empty( $state['class_depths'] ) ) {
+		// Only a function directly in a class body is a method; one declared inside a method body is global.
+		if ( T_FUNCTION !== $tokens[ $index ][0] || $state['in_namespace'] || $state['in_use'] || end( $state['class_depths'] ) === $state['depth'] ) {
 			return null;
 		}
 

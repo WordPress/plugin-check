@@ -61,6 +61,7 @@ class WP_Functions_Compatibility_Check_Tests extends WP_UnitTestCase {
 			9  => 'includes/compat.php',
 			10 => 'includes/braced-namespaces.php',
 			11 => 'includes/commented-declaration.php',
+			12 => 'includes/class-compat-loader.php',
 		);
 		foreach ( $expected as $line => $declaring_file ) {
 			$messages = wp_list_filter( $warnings['uses-polyfilled-function.php'][ $line ][0], array( 'code' => 'wp_function_declared_by_plugin' ) );
