@@ -52,10 +52,11 @@ trait Function_Declaration_Utils {
 	private function get_tokens_declared_function_names( array $tokens ): array {
 		$state    = array(
 			'in_namespace' => false,
+			'in_use'       => false,
 			'depth'        => 0,
 			'parens'       => 0,
 			'class_depths' => array(),
-			'class_parens' => null,
+			'class_parens' => array(),
 		);
 		$declared = array();
 
@@ -78,15 +79,20 @@ trait Function_Declaration_Utils {
 	}
 
 	/**
-	 * Tracks brace and parenthesis depth, and which braces open a class-like body.
+	 * Tracks brace and parenthesis depth, which braces open a class-like body, and the end of a `use` statement.
 	 *
 	 * @since 2.2.0
 	 *
 	 * @param array|string $token Current token.
 	 * @param array        $state Scan state, updated in place.
-	 * @return bool Whether the token is a brace or a parenthesis.
+	 * @return bool Whether the token is a brace, a parenthesis or a semicolon.
 	 */
 	private function track_declaration_scope( $token, array &$state ): bool {
+		if ( ';' === $token ) {
+			$state['in_use'] = false;
+			return true;
+		}
+
 		if ( '(' === $token || ')' === $token ) {
 			$state['parens'] += '(' === $token ? 1 : -1;
 			return true;
@@ -106,25 +112,31 @@ trait Function_Declaration_Utils {
 
 		++$state['depth'];
 		// Braces inside an anonymous class's arguments, such as a closure, are not its body.
-		if ( $state['parens'] === $state['class_parens'] ) {
+		if ( end( $state['class_parens'] ) === $state['parens'] ) {
 			$state['class_depths'][] = $state['depth'];
-			$state['class_parens']   = null;
+			array_pop( $state['class_parens'] );
 		}
 
 		return true;
 	}
 
 	/**
-	 * Tracks namespace declarations and the start of class-like declarations.
+	 * Tracks namespace declarations, `use` statements and the start of class-like declarations.
 	 *
 	 * @since 2.2.0
 	 *
 	 * @param array $tokens Token stream.
 	 * @param int   $index  Current token index.
 	 * @param array $state  Scan state, updated in place.
-	 * @return bool Whether the token is a namespace or class-like keyword.
+	 * @return bool Whether the token is a namespace, `use` or class-like keyword.
 	 */
 	private function track_declaration_context( array $tokens, int $index, array &$state ): bool {
+		// A `use` statement imports names up to its `;`; a closure's `use (` follows a `)`.
+		if ( T_USE === $tokens[ $index ][0] ) {
+			$state['in_use'] = ')' !== $this->get_previous_significant_token( $tokens, $index );
+			return true;
+		}
+
 		if ( T_NAMESPACE === $tokens[ $index ][0] ) {
 			$next_token = $this->get_next_significant_token( $tokens, $index );
 			// `namespace {` is the global namespace; `namespace\foo()` is a call.
@@ -140,7 +152,7 @@ trait Function_Declaration_Utils {
 			return false;
 		}
 
-		$state['class_parens'] = $state['parens'];
+		$state['class_parens'][] = $state['parens'];
 		return true;
 	}
 
@@ -178,13 +190,7 @@ trait Function_Declaration_Utils {
 	 * @return string|null Lowercase function name, or null when the token does not declare a global function.
 	 */
 	private function get_declared_global_function_name( array $tokens, int $index, array $state ): ?string {
-		if ( T_FUNCTION !== $tokens[ $index ][0] || $state['in_namespace'] || ! empty( $state['class_depths'] ) ) {
-			return null;
-		}
-
-		// Skip `use function foo;`.
-		$previous_token = $this->get_previous_significant_token( $tokens, $index );
-		if ( is_array( $previous_token ) && T_USE === $previous_token[0] ) {
+		if ( T_FUNCTION !== $tokens[ $index ][0] || $state['in_namespace'] || $state['in_use'] || ! empty( $state['class_depths'] ) ) {
 			return null;
 		}
 
@@ -203,15 +209,36 @@ trait Function_Declaration_Utils {
 	 * @return array|string|null
 	 */
 	private function get_function_name_token( array $tokens, int $index ) {
-		$next_index = $this->get_next_significant_token_index( $tokens, $index );
+		$next_index = $this->get_next_code_token_index( $tokens, $index );
 		$next_token = null === $next_index ? null : $tokens[ $next_index ];
 
 		// Skip the `&` of a function returning by reference.
 		if ( '&' === $next_token || ( is_array( $next_token ) && '&' === $next_token[1] ) ) {
-			return $this->get_next_significant_token( $tokens, $next_index );
+			$name_index = $this->get_next_code_token_index( $tokens, $next_index );
+			return null === $name_index ? null : $tokens[ $name_index ];
 		}
 
 		return $next_token;
+	}
+
+	/**
+	 * Finds the next token that is not whitespace or a comment.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param array $tokens Token stream.
+	 * @param int   $index  Current token index.
+	 * @return int|null
+	 */
+	private function get_next_code_token_index( array $tokens, int $index ): ?int {
+		$count = count( $tokens );
+		for ( $i = $index + 1; $i < $count; $i++ ) {
+			if ( ! is_array( $tokens[ $i ] ) || ! in_array( $tokens[ $i ][0], array( T_WHITESPACE, T_COMMENT, T_DOC_COMMENT ), true ) ) {
+				return $i;
+			}
+		}
+
+		return null;
 	}
 
 	/**

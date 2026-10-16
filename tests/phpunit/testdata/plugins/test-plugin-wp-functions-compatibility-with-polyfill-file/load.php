@@ -18,4 +18,5 @@
 
 require_once __DIR__ . '/includes/compat.php';
 require_once __DIR__ . '/includes/braced-namespaces.php';
+require_once __DIR__ . '/includes/commented-declaration.php';
 require_once __DIR__ . '/uses-polyfilled-function.php';

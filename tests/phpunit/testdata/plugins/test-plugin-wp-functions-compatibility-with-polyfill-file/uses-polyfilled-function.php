@@ -8,3 +8,4 @@
 wp_trigger_error( __FUNCTION__, 'Message' );
 wp_admin_notice( 'Message' );
 wp_get_admin_notice( 'Message' );
+wp_get_wp_version();
