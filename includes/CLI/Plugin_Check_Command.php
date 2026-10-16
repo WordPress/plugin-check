@@ -322,27 +322,7 @@ final class Plugin_Check_Command {
 		}
 
 		if ( empty( $errors ) && empty( $warnings ) ) {
-			$message = __( 'Checks complete. No errors found.', 'plugin-check' );
-
-			// Add AI statistics to the message if available.
-			if ( ! empty( $ai_stats ) && isset( $ai_stats['false_positives'] ) && $ai_stats['false_positives'] > 0 ) {
-				$ai_info = sprintf(
-					// translators: %1$d: Number of possible false positives, %2$s: "possible false positive(s)" label.
-					__( ' AI detected %1$d %2$s', 'plugin-check' ),
-					$ai_stats['false_positives'],
-					_n( 'possible false positive', 'possible false positives', $ai_stats['false_positives'], 'plugin-check' )
-				);
-				if ( isset( $ai_stats['tokens_spent'] ) && $ai_stats['tokens_spent'] > 0 ) {
-					$ai_info .= sprintf(
-						// translators: %s: Tokens spent (formatted).
-						__( ' (Tokens spent: %s)', 'plugin-check' ),
-						number_format_i18n( $ai_stats['tokens_spent'] )
-					);
-				}
-				$message .= '.' . $ai_info;
-			}
-
-			WP_CLI::success( $message );
+			WP_CLI::success( $this->get_success_message( $ai_stats ) );
 
 			return;
 		}
@@ -787,6 +767,43 @@ final class Plugin_Check_Command {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Returns the message shown when the check finds no errors or warnings.
+	 *
+	 * When AI analysis ran, the number of possible false positives and the
+	 * tokens spent are added as separate sentences.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param array $ai_stats AI statistics from the check result.
+	 * @return string The success message.
+	 */
+	private function get_success_message( array $ai_stats ) {
+		$message = __( 'Checks complete. No errors found.', 'plugin-check' );
+
+		$false_positives = isset( $ai_stats['false_positives'] ) ? (int) $ai_stats['false_positives'] : 0;
+		if ( $false_positives <= 0 ) {
+			return $message;
+		}
+
+		$message .= ' ' . sprintf(
+			/* translators: %s: Number of possible false positives. */
+			_n( 'AI detected %s possible false positive.', 'AI detected %s possible false positives.', $false_positives, 'plugin-check' ),
+			number_format_i18n( $false_positives )
+		);
+
+		$tokens_spent = isset( $ai_stats['tokens_spent'] ) ? (int) $ai_stats['tokens_spent'] : 0;
+		if ( $tokens_spent > 0 ) {
+			$message .= ' ' . sprintf(
+				/* translators: %s: Number of tokens spent. */
+				__( 'Tokens spent: %s.', 'plugin-check' ),
+				number_format_i18n( $tokens_spent )
+			);
+		}
+
+		return $message;
 	}
 
 	/**
