@@ -10,7 +10,7 @@ namespace WordPress\Plugin_Check\Traits;
 /**
  * Trait for finding the global functions a plugin declares.
  *
- * The using class provides get_next_significant_token_index() and get_previous_significant_token_index().
+ * The using class provides get_previous_significant_token_index().
  *
  * @since 2.2.0
  */
@@ -252,7 +252,7 @@ trait Function_Declaration_Utils {
 	 * @return array|string|null
 	 */
 	private function get_next_significant_token( array $tokens, int $index ) {
-		$next_index = $this->get_next_significant_token_index( $tokens, $index );
+		$next_index = $this->get_next_code_token_index( $tokens, $index );
 		return null === $next_index ? null : $tokens[ $next_index ];
 	}
 

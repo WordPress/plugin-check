@@ -5,7 +5,7 @@
  * @package test-plugin-wp-functions-compatibility-with-non-global-declarations
  */
 
-enum Notice_Level: string {
+enum /* level */ Notice_Level: string {
 	case INFO = 'info';
 
 	public function wp_trigger_error( $function_name, $message ) {

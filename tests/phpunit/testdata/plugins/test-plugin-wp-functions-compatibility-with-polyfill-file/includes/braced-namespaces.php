@@ -11,7 +11,7 @@ namespace Test_Plugin\Notices {
 	}
 }
 
-namespace {
+namespace /* global */ {
 	if ( ! function_exists( 'wp_get_admin_notice' ) ) {
 		function wp_get_admin_notice( $message, $args = array() ) {
 			return $message;
