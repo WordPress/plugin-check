@@ -11,6 +11,7 @@ use WordPress\Plugin_Check\Checker\Check_Categories;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Checker\Checks\Abstract_File_Check;
 use WordPress\Plugin_Check\Traits\Amend_Check_Result;
+use WordPress\Plugin_Check\Traits\Function_Declaration_Utils;
 use WordPress\Plugin_Check\Traits\Stable_Check;
 
 /**
@@ -21,6 +22,7 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
 class WP_Functions_Compatibility_Check extends Abstract_File_Check {
 
 	use Amend_Check_Result;
+	use Function_Declaration_Utils;
 	use Stable_Check;
 
 	/**
@@ -69,7 +71,8 @@ class WP_Functions_Compatibility_Check extends Abstract_File_Check {
 			return;
 		}
 
-		$php_files = self::filter_files_by_extension( $files, 'php' );
+		$php_files          = self::filter_files_by_extension( $files, 'php' );
+		$declared_functions = null;
 		foreach ( $php_files as $file ) {
 			foreach ( $this->find_wp_function_calls( $file ) as $call ) {
 				$function_name = $call['name'];
@@ -80,6 +83,31 @@ class WP_Functions_Compatibility_Check extends Abstract_File_Check {
 
 				$introduced_in = $functions_since_map[ $function_name ];
 				if ( ! version_compare( $introduced_in, $minimum_supported_wp, '>' ) ) {
+					continue;
+				}
+
+				if ( null === $declared_functions ) {
+					$declared_functions = $this->get_declared_global_functions( $php_files );
+				}
+
+				// A function the plugin declares itself, such as a polyfill, works only if its file loads before the call.
+				if ( isset( $declared_functions[ $function_name ] ) ) {
+					$this->add_result_warning_for_file(
+						$result,
+						sprintf(
+							/* translators: 1: Function name, 2: Function introduced in version, 3: Minimum supported WordPress version, 4: File declaring the function */
+							__( 'Function "%1$s()" requires WordPress %2$s, but your plugin minimum supported version is WordPress %3$s. The plugin declares it in %4$s, so make sure that file is loaded before this call.', 'plugin-check' ),
+							esc_html( $function_name ),
+							esc_html( $introduced_in ),
+							esc_html( $minimum_supported_wp ),
+							esc_html( str_replace( $result->plugin()->path(), '', $declared_functions[ $function_name ] ) )
+						),
+						'wp_function_declared_by_plugin',
+						$file,
+						$call['line'],
+						0,
+						'https://developer.wordpress.org/reference/'
+					);
 					continue;
 				}
 
