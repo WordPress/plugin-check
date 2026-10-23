@@ -65,6 +65,10 @@ Feature: Test that the severity level in plugin check works.
     When I run the WP-CLI command `plugin check foo-bar-wp --format=csv --fields=code,type,severity`
     Then STDOUT should contain:
       """
+      FILE: foo-bar-wp.php
+      """
+    And STDOUT should contain:
+      """
       allow_unfiltered_uploads_detected,ERROR,7
       """
     And STDOUT should contain:

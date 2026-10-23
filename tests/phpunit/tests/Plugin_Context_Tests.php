@@ -34,7 +34,30 @@ class Plugin_Context_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_path_with_parameter() {
-		$this->assertSame( WP_PLUGIN_DIR . '/' . $this->plugin_name . '/another/folder', $this->plugin_context->path( '/another/folder' ) );
+		$this->assertSame( WP_PLUGIN_DIR . '/' . $this->plugin_name . '/test-content/themes', $this->plugin_context->path( '/test-content/themes' ) );
+	}
+
+	public function test_path_with_nonexistent_relative_path() {
+		$this->assertSame( WP_PLUGIN_DIR . '/' . $this->plugin_name . '/does-not-exist/file.php', $this->plugin_context->path( '/does-not-exist/file.php' ) );
+	}
+
+	public function test_path_resolves_symlinked_plugin_directory() {
+		$target  = WP_PLUGIN_DIR . '/' . $this->plugin_name;
+		$symlink = WP_PLUGIN_DIR . '/plugin-context-symlink-test';
+
+		if ( file_exists( $symlink ) || ! symlink( $target, $symlink ) ) {
+			$this->markTestSkipped( 'Could not create symlink fixture.' );
+		}
+
+		try {
+			$context = new Plugin_Context( $symlink . '/' . basename( WP_PLUGIN_CHECK_MAIN_FILE ) );
+
+			// The path must resolve to the real (non-symlinked) plugin directory,
+			// matching how PHPCS reports resolved (realpath'd) file paths.
+			$this->assertSame( realpath( $target ) . '/', $context->path() );
+		} finally {
+			unlink( $symlink );
+		}
 	}
 
 	public function test_url() {
@@ -42,7 +65,7 @@ class Plugin_Context_Tests extends WP_UnitTestCase {
 	}
 
 	public function test_url_with_parameter() {
-		$this->assertSame( WP_PLUGIN_URL . '/' . $this->plugin_name . '/folder/file.css', $this->plugin_context->url( '/folder/file.css' ) );
+		$this->assertSame( WP_PLUGIN_URL . '/' . $this->plugin_name . '/assets/js/plugin-check-admin.js', $this->plugin_context->url( '/assets/js/plugin-check-admin.js' ) );
 	}
 
 	public function test_location() {
