@@ -479,6 +479,38 @@ Feature: Test that the WP-CLI command works.
       mt_rand() is discouraged.
       """
 
+  Scenario: Check a plugin using --require while Plugin Check is not active
+    Given a WP install with the Plugin Check plugin
+    And a wp-content/plugins/foo-single.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Single
+       * Plugin URI: https://foo-single.com
+       * Description: Custom plugin.
+       * Version: 0.1.0
+       * Author: WordPress Performance Team
+       * Author URI: https://make.wordpress.org/performance/
+       * License: GPL-2.0+
+       * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+       */
+
+      add_action(
+        'init',
+        function () {
+          $number = mt_rand( 10, 100 );
+          echo $number;
+        }
+      );
+      """
+    And I run the WP-CLI command `plugin deactivate plugin-check`
+
+    When I run the WP-CLI command `plugin check foo-single.php --require=./wp-content/plugins/plugin-check/cli.php`
+    Then STDOUT should contain:
+      """
+      mt_rand() is discouraged.
+      """
+
   Scenario: Perform runtime check for multi-file plugin
     Given a WP install with the Plugin Check plugin
     And a wp-content/plugins/foo-sample/foo-sample.php file:
