@@ -575,7 +575,7 @@ class Plugin_Header_Fields_Check implements Static_Check {
 				continue;
 			}
 
-			$this->check_requires_plugins_slug_status( $result, $slug, $plugin_main_file );
+			$this->check_requires_plugins_slug_status( $result, $slug, $label, $plugin_main_file );
 		}
 	}
 
@@ -586,9 +586,10 @@ class Plugin_Header_Fields_Check implements Static_Check {
 	 *
 	 * @param Check_Result $result           The check result to amend.
 	 * @param string       $slug             The dependency's WordPress.org slug.
+	 * @param string       $label            Label of the "Requires Plugins" header.
 	 * @param string       $plugin_main_file Absolute path to the main plugin file.
 	 */
-	private function check_requires_plugins_slug_status( Check_Result $result, string $slug, string $plugin_main_file ) {
+	private function check_requires_plugins_slug_status( Check_Result $result, string $slug, string $label, string $plugin_main_file ) {
 		$exists = $this->plugin_exists_in_directory( $slug );
 
 		// null = transport failure (silent skip). true = exists in directory.
@@ -599,8 +600,9 @@ class Plugin_Header_Fields_Check implements Static_Check {
 		$this->add_result_warning_for_file(
 			$result,
 			sprintf(
-				/* translators: %s: dependency slug */
-				__( 'The plugin declares "%s" as a required plugin, but it could not be found in the WordPress.org plugin directory.', 'plugin-check' ),
+				/* translators: 1: plugin header field, 2: dependency slug */
+				__( 'The "%1$s" header lists "%2$s", which is not available on WordPress.org. Plugins hosted on WordPress.org can only depend on plugins that are also hosted there.', 'plugin-check' ),
+				esc_html( $label ),
 				esc_html( $slug )
 			),
 			'plugin_header_requires_plugins_not_in_directory',

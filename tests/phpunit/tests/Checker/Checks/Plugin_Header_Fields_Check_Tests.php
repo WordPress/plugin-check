@@ -194,6 +194,7 @@ class Plugin_Header_Fields_Check_Tests extends WP_UnitTestCase {
 		$not_in_directory_items = wp_list_filter( $warnings['load.php'][0][0], array( 'code' => 'plugin_header_requires_plugins_not_in_directory' ) );
 		$this->assertCount( 1, $not_in_directory_items, 'Only the dependency missing from the directory should get a warning.' );
 		$this->assertStringContainsString( 'not-installed-plugin', reset( $not_in_directory_items )['message'] );
+		$this->assertStringContainsString( 'Requires Plugins', reset( $not_in_directory_items )['message'] );
 	}
 
 	public function test_run_with_empty_entry_in_requires_plugins_header() {
