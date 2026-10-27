@@ -346,10 +346,20 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 			array( site_url( '/' ), ABSPATH ),
 		);
 
+		// Compare on a single scheme so a dependency served over https still matches an http URL root
+		// (or vice versa). The host and path still have to match for the prefix check to succeed.
+		$src = set_url_scheme( $src, 'https' );
+
 		foreach ( $roots as $root ) {
 			list( $url_root, $dir_root ) = $root;
 
-			if ( ! $url_root || strpos( $src, $url_root ) !== 0 ) {
+			if ( ! $url_root ) {
+				continue;
+			}
+
+			$url_root = set_url_scheme( $url_root, 'https' );
+
+			if ( strpos( $src, $url_root ) !== 0 ) {
 				continue;
 			}
 

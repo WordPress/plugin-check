@@ -14,7 +14,7 @@ class Enqueued_Scripts_Size_Check_Tests extends Runtime_Check_UnitTestCase {
 	public function tear_down() {
 		// Remove the dependency files the size-check fixture writes to the uploads directory.
 		$basedir = trailingslashit( wp_upload_dir()['basedir'] );
-		foreach ( array( 'plugin-check-external-dependency.js', 'plugin-check-external-transitive-dependency.js' ) as $file ) {
+		foreach ( array( 'plugin-check-external-dependency.js', 'plugin-check-external-transitive-dependency.js', 'plugin-check-scheme-test.js' ) as $file ) {
 			if ( file_exists( $basedir . $file ) ) {
 				unlink( $basedir . $file );
 			}
@@ -146,5 +146,22 @@ class Enqueued_Scripts_Size_Check_Tests extends Runtime_Check_UnitTestCase {
 
 		$this->assertEquals( 0, $results->get_error_count() );
 		$this->assertEquals( 4, $results->get_warning_count() );
+	}
+
+	public function test_get_local_path_resolves_dependency_with_mismatched_scheme() {
+		// A dependency can be served over https while the site's URL roots are registered over http.
+		// Its size still has to resolve to the local file rather than being silently counted as zero.
+		$uploads = wp_upload_dir();
+		$file    = trailingslashit( $uploads['basedir'] ) . 'plugin-check-scheme-test.js';
+		file_put_contents( $file, str_repeat( 'a', 128 ) );
+
+		$https_src = set_url_scheme( trailingslashit( $uploads['baseurl'] ) . 'plugin-check-scheme-test.js', 'https' );
+
+		$check  = new Enqueued_Scripts_Size_Check();
+		$method = new ReflectionMethod( $check, 'get_local_path_from_roots' );
+		$method->setAccessible( true );
+		$resolved = $method->invoke( $check, $https_src );
+
+		$this->assertSame( wp_normalize_path( $file ), $resolved );
 	}
 }
