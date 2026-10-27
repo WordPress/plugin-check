@@ -131,7 +131,7 @@ class Enqueued_Scripts_Size_Check_Tests extends Runtime_Check_UnitTestCase {
 	public function test_run_counts_external_dependencies() {
 		// The fixture's script depends on a 1000 byte script served from the uploads directory,
 		// which in turn depends on a 500 byte transitive one, plus a remote (CDN) script that
-		// can't be measured locally and must be skipped rather than fataling.
+		// can't be measured locally and must be skipped rather than causing a fatal error.
 		require UNIT_TESTS_PLUGIN_DIR . 'test-plugin-enqueued-script-size-check/load.php';
 
 		// The threshold sits above the plugin's own script plus its direct dependency (~1053 bytes)

@@ -240,6 +240,16 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 		}
 
 		if ( $total_size > $this->threshold_size ) {
+			// Report the plugin's own scripts and their dependencies separately, so the author can see
+			// how much weight comes from the files they control versus what their dependencies pull in.
+			$plugin_size = 0;
+			foreach ( array_keys( $plugin_scripts ) as $handle ) {
+				if ( isset( $measured[ $handle ] ) ) {
+					$plugin_size += $measured[ $handle ]['size'];
+				}
+			}
+			$dependency_size = $total_size - $plugin_size;
+
 			foreach ( array_keys( $plugin_scripts ) as $handle ) {
 				// Only surface warnings for the plugin's own files; dependencies are counted toward
 				// the total but are not something the plugin author edits directly.
@@ -250,10 +260,12 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 				$this->add_result_warning_for_file(
 					$result,
 					sprintf(
-						/* translators: 1: script file size. 2: tested URL. 3: threshold file size. */
-						__( 'This script has a size of %1$s which in combination with the other scripts enqueued on %2$s exceeds the script size threshold of %3$s.', 'plugin-check' ),
+						/* translators: 1: script file size. 2: tested URL. 3: total size of the plugin's enqueued scripts. 4: total size of their dependencies. 5: threshold file size. */
+						__( 'This script has a size of %1$s. The scripts enqueued on %2$s total %3$s, with dependencies adding a further %4$s, which exceeds the script size threshold of %5$s.', 'plugin-check' ),
 						size_format( $measured[ $handle ]['size'] ),
 						$url,
+						size_format( $plugin_size ),
+						size_format( $dependency_size ),
 						size_format( $this->threshold_size )
 					),
 					'EnqueuedScriptsSize.ScriptSizeGreaterThanThreshold',
