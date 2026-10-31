@@ -113,6 +113,19 @@ Feature: Test that the WP-CLI command works.
       """
       WordPress.WP.AlternativeFunctions.rand_mt_rand
       """
+    When I try the WP-CLI command `plugin check foo-single.php --categories=securty`
+    Then STDERR should contain:
+      """
+      Error: Invalid category: securty. Valid categories are: general, plugin_repo, security, performance, accessibility.
+      """
+    And STDOUT should be empty
+    And the return code should be 1
+    When I try the WP-CLI command `plugin check foo-single.php --categories=security,foo,bar`
+    Then STDERR should contain:
+      """
+      Error: Invalid categories: foo, bar.
+      """
+    And the return code should be 1
     When I run the WP-CLI command `plugin check foo-single.php --checks=plugin_review_phpcs,late_escaping --exclude-checks=late_escaping`
     Then STDOUT should contain:
       """
@@ -478,6 +491,32 @@ Feature: Test that the WP-CLI command works.
       """
       mt_rand() is discouraged.
       """
+
+  Scenario: Clean up the runtime environment when an invalid category is passed
+    Given a WP install with the Plugin Check plugin
+    And a wp-content/plugins/foo-single.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Single
+       * Plugin URI: https://foo-single.com
+       * Description: Custom plugin.
+       * Version: 0.1.0
+       * Author: WordPress Performance Team
+       * Author URI: https://make.wordpress.org/performance/
+       * License: GPL-2.0+
+       * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+       */
+      """
+    And I run the WP-CLI command `plugin activate foo-single.php`
+
+    When I try the WP-CLI command `plugin check foo-single.php --categories=performance,foo --require=./wp-content/plugins/plugin-check/cli.php`
+    Then STDERR should contain:
+      """
+      Error: Invalid category: foo.
+      """
+    And the return code should be 1
+    And the wp-content/object-cache.php file should not exist
 
   Scenario: Check a plugin using --require while Plugin Check is not active
     Given a WP install with the Plugin Check plugin

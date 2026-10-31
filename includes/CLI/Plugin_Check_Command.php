@@ -99,7 +99,7 @@ final class Plugin_Check_Command {
 	 *   - strict-ctrf
 	 * ---
 	 *
-	 * [--categories]
+	 * [--categories=<categories>]
 	 * : Limit displayed results to include only specific categories Checks.
 	 *
 	 * [--fields=<fields>]
@@ -221,6 +221,14 @@ final class Plugin_Check_Command {
 
 		// Create the categories array from CLI arguments.
 		$categories = isset( $options['categories'] ) ? wp_parse_list( $options['categories'] ) : array();
+
+		$invalid_categories_message = $this->get_invalid_categories_message( $categories );
+		if ( '' !== $invalid_categories_message ) {
+			// The runner may already have prepared the runtime environment, so clean it up before stopping.
+			Plugin_Request_Utility::destroy_runner();
+
+			WP_CLI::error( $invalid_categories_message );
+		}
 
 		$excluded_directories = isset( $options['exclude-directories'] ) ? wp_parse_list( $options['exclude-directories'] ) : array();
 
@@ -449,7 +457,7 @@ final class Plugin_Check_Command {
 	 *   - json
 	 * ---
 	 *
-	 * [--categories]
+	 * [--categories=<categories>]
 	 * : Limit displayed results to include only specific categories.
 	 *
 	 * [--include-experimental]
@@ -493,7 +501,13 @@ final class Plugin_Check_Command {
 
 		// Filters the checks by specific categories.
 		if ( ! empty( $options['categories'] ) ) {
-			$categories = array_map( 'trim', explode( ',', $options['categories'] ) );
+			$categories = wp_parse_list( $options['categories'] );
+
+			$invalid_categories_message = $this->get_invalid_categories_message( $categories );
+			if ( '' !== $invalid_categories_message ) {
+				WP_CLI::error( $invalid_categories_message );
+			}
+
 			$collection = Check_Categories::filter_checks_by_categories( $collection, $categories );
 		}
 
@@ -605,6 +619,35 @@ final class Plugin_Check_Command {
 		}
 
 		return $categories;
+	}
+
+	/**
+	 * Returns an error message for any of the given categories that are not registered check categories.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param array $categories List of category slugs passed to `--categories`.
+	 * @return string Error message, or an empty string if all categories are valid.
+	 */
+	private function get_invalid_categories_message( array $categories ) {
+		$valid_categories   = Check_Categories::get_category_slugs();
+		$invalid_categories = array_values( array_diff( $categories, $valid_categories ) );
+
+		if ( empty( $invalid_categories ) ) {
+			return '';
+		}
+
+		return sprintf(
+			/* translators: 1: Comma-separated list of invalid categories, 2: Comma-separated list of valid categories. */
+			_n(
+				'Invalid category: %1$s. Valid categories are: %2$s.',
+				'Invalid categories: %1$s. Valid categories are: %2$s.',
+				count( $invalid_categories ),
+				'plugin-check'
+			),
+			implode( ', ', $invalid_categories ),
+			implode( ', ', $valid_categories )
+		);
 	}
 
 	/**

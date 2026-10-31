@@ -38,7 +38,7 @@ options:
   - strict-ctrf
 ---
 
-[--categories]
+[--categories=<categories>]
 : Limit displayed results to include only specific categories Checks.
 
 [--fields=<fields>]
@@ -139,7 +139,7 @@ options:
   - json
 ---
 
-[--categories]
+[--categories=<categories>]
 : Limit displayed results to include only specific categories.
 
 [--include-experimental]

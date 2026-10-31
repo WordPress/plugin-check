@@ -37,3 +37,11 @@ Feature: Test that the WP-CLI plugin list checks command works.
       """
       late_escaping,"security, plugin_repo",stable
       """
+
+    When I try the WP-CLI command `plugin list-checks --format=csv --categories=general,foo`
+    Then STDERR should contain:
+      """
+      Error: Invalid category: foo. Valid categories are: general, plugin_repo, security, performance, accessibility.
+      """
+    And STDOUT should be empty
+    And the return code should be 1
