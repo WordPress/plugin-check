@@ -113,10 +113,10 @@ Feature: Test that the WP-CLI command works.
       """
       WordPress.WP.AlternativeFunctions.rand_mt_rand
       """
-    When I try the WP-CLI command `plugin check foo-single.php --categories=securty`
+    When I try the WP-CLI command `plugin check foo-single.php --categories=secure`
     Then STDERR should contain:
       """
-      Error: Invalid category: securty. Valid categories are: general, plugin_repo, security, performance, accessibility.
+      Error: Invalid category: secure. Valid categories are: general, plugin_repo, security, performance, accessibility.
       """
     And STDOUT should be empty
     And the return code should be 1
