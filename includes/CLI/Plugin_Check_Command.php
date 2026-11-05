@@ -629,9 +629,9 @@ final class Plugin_Check_Command {
 	 * @param array $categories List of category slugs passed to `--categories`.
 	 * @return string Error message, or an empty string if all categories are valid.
 	 */
-	private function get_invalid_categories_message( array $categories ) {
+	private function get_invalid_categories_message( array $categories ): string {
 		$valid_categories   = Check_Categories::get_category_slugs();
-		$invalid_categories = array_values( array_diff( $categories, $valid_categories ) );
+		$invalid_categories = array_values( array_unique( array_diff( $categories, $valid_categories ) ) );
 
 		if ( empty( $invalid_categories ) ) {
 			return '';
