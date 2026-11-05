@@ -19,7 +19,7 @@ class Check_Result_Tests extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 
-		$check_context = new Check_Context( 'test-plugin/test-plugin.php' );
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin/test-plugin.php' );
 
 		$this->check_result = new Check_Result( $check_context );
 	}
@@ -28,7 +28,7 @@ class Check_Result_Tests extends WP_UnitTestCase {
 		$this->assertInstanceOf( Check_Context::class, $this->check_result->plugin() );
 
 		// Check the Check_Context has the correct basename.
-		$this->assertSame( 'test-plugin/test-plugin.php', $this->check_result->plugin()->basename() );
+		$this->assertStringEndsWith( 'test-plugin/test-plugin.php', $this->check_result->plugin()->basename() );
 	}
 
 	public function test_add_message_with_warning() {
@@ -37,7 +37,7 @@ class Check_Result_Tests extends WP_UnitTestCase {
 			'Warning message',
 			array(
 				'code'   => 'test_warning',
-				'file'   => 'test-plugin/test-plugin.php',
+				'file'   => UNIT_TESTS_PLUGIN_DIR . 'test-plugin/test-plugin.php',
 				'line'   => 12,
 				'column' => 40,
 			)
@@ -73,7 +73,7 @@ class Check_Result_Tests extends WP_UnitTestCase {
 			'Error message',
 			array(
 				'code'   => 'test_error',
-				'file'   => 'test-plugin/test-plugin.php',
+				'file'   => UNIT_TESTS_PLUGIN_DIR . 'test-plugin/test-plugin.php',
 				'line'   => 22,
 				'column' => 30,
 			)
@@ -113,7 +113,7 @@ class Check_Result_Tests extends WP_UnitTestCase {
 			'Error message',
 			array(
 				'code'   => 'test_error',
-				'file'   => 'test-plugin/test-plugin.php',
+				'file'   => UNIT_TESTS_PLUGIN_DIR . 'test-plugin/test-plugin.php',
 				'line'   => 22,
 				'column' => 30,
 			)
@@ -146,7 +146,7 @@ class Check_Result_Tests extends WP_UnitTestCase {
 			'Warning message',
 			array(
 				'code'   => 'test_warning',
-				'file'   => 'test-plugin/test-plugin.php',
+				'file'   => UNIT_TESTS_PLUGIN_DIR . 'test-plugin/test-plugin.php',
 				'line'   => 22,
 				'column' => 30,
 			)
