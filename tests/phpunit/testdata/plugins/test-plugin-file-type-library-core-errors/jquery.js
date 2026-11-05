@@ -1,1 +1,2 @@
-// For testing purposes, this file is empty.
+/*! jQuery JavaScript Library v3.7.1 | jquery.org/license */
+window.jQuery = window.jQuery || {};
