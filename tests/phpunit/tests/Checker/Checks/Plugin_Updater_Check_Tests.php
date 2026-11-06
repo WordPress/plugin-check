@@ -123,6 +123,18 @@ class Plugin_Updater_Check_Tests extends WP_UnitTestCase {
 		$this->assertEquals( 0, $check_result->get_warning_count() );
 	}
 
+	public function test_run_with_native_auto_update_option_no_warning() {
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-updater-routines-native-option/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check = new Plugin_Updater_Check( Plugin_Updater_Check::TYPE_PLUGIN_UPDATER_ROUTINES );
+		$check->run( $check_result );
+
+		$this->assertEmpty( $check_result->get_errors() );
+		$this->assertEmpty( $check_result->get_warnings() );
+		$this->assertSame( 0, $check_result->get_warning_count() );
+	}
+
 	/**
 	 * Update URI may point at this plugin’s WordPress.org URL; that must not be flagged.
 	 */
