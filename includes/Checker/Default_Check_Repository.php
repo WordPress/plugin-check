@@ -93,6 +93,7 @@ class Default_Check_Repository extends Empty_Check_Repository {
 				'enqueued_scripts_scope'     => new Checks\Performance\Enqueued_Scripts_Scope_Check(),
 				'localhost'                  => new Checks\Plugin_Repo\Localhost_Check(),
 				'no_unfiltered_uploads'      => new Checks\Plugin_Repo\No_Unfiltered_Uploads_Check(),
+				'private_upload_protection'  => new Checks\Security\Private_Upload_Protection_Check(),
 				'trademarks'                 => new Checks\Plugin_Repo\Trademarks_Check(),
 				'non_blocking_scripts'       => new Checks\Performance\Non_Blocking_Scripts_Check(),
 				'offloading_files'           => new Checks\Plugin_Repo\Offloading_Files_Check(),
