@@ -2,7 +2,7 @@
 
 Contributors:      wordpressdotorg
 Tested up to:      7.0
-Stable tag:        2.1.0
+Stable tag:        2.2.0
 License:           GPLv2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 Tags:              plugin best practices, testing, accessibility, performance, security
@@ -88,6 +88,29 @@ To be approved in the WordPress.org plugin directory, a plugin must typically pa
 In any case, passing the checks in this tool likely helps to achieve a smooth plugin review process, but is no guarantee that a plugin will be approved in the WordPress.org plugin directory.
 
 == Changelog ==
+
+= 2.2.0 =
+
+* Enhancement - Add React usage check to detect React 19 incompatibilities.
+* Enhancement - Add `menu_image_icon` check to detect raster image admin menu icons.
+* Enhancement - Add sniff to detect direct access to AI Connector API keys.
+* Enhancement - Add opt-in `.pcpignore` exclusions.
+* Enhancement - Enforce "Tested up to" exclusively in the readme file.
+* Enhancement - Allow includes of safe files in the direct file access check.
+* Enhancement - Reject unknown categories in `wp plugin check` and `wp plugin list-checks`.
+* Enhancement - Add Blue Oak license to the allowed licenses.
+* Enhancement - Clarify the `Requires Plugins` directory availability warning.
+* Enhancement - Make the AI false-positive summary translatable.
+* Enhancement - Improve AI sanitization prompt to avoid false positives for password, token, and API key fields.
+* Enhancement - Improve admin UI accessibility.
+* Fix - Fix false positive for the `auto_update_plugins` option.
+* Fix - Fix "Check it!" button failing silently with a nonce error.
+* Fix - Define plugin constants when `cli.php` is loaded without the plugin active.
+* Chore - Document check result codes and severity.
+* Chore - Add unit test coverage for `Amend_Check_Result`, `Readme_Utils` and `Ignore_Matcher`.
+* Chore - Update WordPress function since dataset.
+* Chore - Update Playground PR preview workflow.
+* Chore - Update development and CI dependencies.
 
 = 2.1.0 =
 
