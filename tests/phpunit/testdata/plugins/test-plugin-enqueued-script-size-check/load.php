@@ -6,7 +6,7 @@
 add_action(
 	'wp_enqueue_scripts',
 	function() {
-		// Script size is 21 bytes.
+		// Script size is 23 bytes.
 		wp_enqueue_script(
 			'plugin_check_test_script',
 			plugin_dir_url( __FILE__ ) . 'test-script.js'
