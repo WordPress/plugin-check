@@ -44,7 +44,6 @@ class Private_Upload_Protection_Check extends Abstract_File_Check {
 	 */
 	protected function check_files( Check_Result $result, array $files ) {
 		$parser = ( new ParserFactory() )->create( ParserFactory::PREFER_PHP7 );
-		$finder = new NodeFinder();
 		foreach ( $files as $file ) {
 			if ( 'php' !== strtolower( pathinfo( $file, PATHINFO_EXTENSION ) ) ) {
 				continue;
@@ -63,34 +62,7 @@ class Private_Upload_Protection_Check extends Abstract_File_Check {
 				continue;
 			}
 
-			$calls       = $finder->findInstanceOf( $nodes ?? array(), Node\Expr\FuncCall::class );
-			$has_uploads = false;
-			$writes      = array();
-			foreach ( $calls as $call ) {
-				if ( ! $call instanceof Node\Expr\FuncCall || $call->isFirstClassCallable() ) {
-					continue;
-				}
-				if ( ! $call->name instanceof Node\Name || $call->name->isQualified() || $call->name->isRelative() ) {
-					continue;
-				}
-				$name = strtolower( $call->name->toString() );
-				if ( in_array( $name, array( 'wp_upload_dir', 'wp_get_upload_dir', 'wp_upload_bits', 'wp_handle_upload', 'wp_handle_sideload', 'media_handle_upload', 'media_handle_sideload', '_wp_handle_upload', 'move_uploaded_file' ), true ) ) {
-					$has_uploads = true;
-				}
-				if ( 'file_put_contents' !== $name || ! isset( $call->args[0], $call->args[1] ) || ! $call->args[0] instanceof Node\Arg || ! $call->args[1] instanceof Node\Arg || $call->args[0]->unpack || $call->args[1]->unpack || null !== $call->args[0]->name || null !== $call->args[1]->name ) {
-					continue;
-				}
-				$path = $this->literal_path_suffix( $call->args[0]->value );
-				$rule = $this->literal_string( $call->args[1]->value );
-				if ( null !== $path && null !== $rule && $this->contains_deny_rule( $rule, basename( $path ) ) ) {
-					$writes[] = $call->getStartLine();
-				}
-			}
-
-			if ( ! $has_uploads ) {
-				continue;
-			}
-			foreach ( $writes as $line ) {
+			foreach ( $this->get_deny_rule_lines( $nodes ?? array() ) as $line ) {
 				$this->add_result_warning_for_file(
 					$result,
 					__( 'Review upload privacy: this PHP file uses upload APIs and writes Apache or IIS access-denial rules. Nginx ignores .htaccess and web.config. If uploads are private, verify that direct URLs are blocked on every supported server, or store files outside the public web root and serve them through an authorized handler. This advisory does not establish that files are exposed.', 'plugin-check' ),
@@ -102,6 +74,55 @@ class Private_Upload_Protection_Check extends Abstract_File_Check {
 				);
 			}
 		}
+	}
+
+	/**
+	 * Collects supported denial writes only when this PHP file uses an upload API.
+	 *
+	 * @param Node[] $nodes Parsed file nodes.
+	 * @return int[] Source lines of supported writes.
+	 */
+	private function get_deny_rule_lines( array $nodes ) {
+		$finder      = new NodeFinder();
+		$calls       = $finder->findInstanceOf( $nodes, Node\Expr\FuncCall::class );
+		$has_uploads = false;
+		$writes      = array();
+		foreach ( $calls as $call ) {
+			if ( ! $call instanceof Node\Expr\FuncCall || $call->isFirstClassCallable() ) {
+				continue;
+			}
+			if ( ! $call->name instanceof Node\Name || $call->name->isQualified() || $call->name->isRelative() ) {
+				continue;
+			}
+			$name = strtolower( $call->name->toString() );
+			if ( in_array( $name, array( 'wp_upload_dir', 'wp_get_upload_dir', 'wp_upload_bits', 'wp_handle_upload', 'wp_handle_sideload', 'media_handle_upload', 'media_handle_sideload', '_wp_handle_upload', 'move_uploaded_file' ), true ) ) {
+				$has_uploads = true;
+			}
+			$line = $this->get_deny_rule_line( $call, $name );
+			if ( null !== $line ) {
+				$writes[] = $line;
+			}
+		}
+		return $has_uploads ? $writes : array();
+	}
+
+	/**
+	 * Recognizes a literal denial configuration in a supported write call.
+	 *
+	 * @param Node\Expr\FuncCall $call Global function call.
+	 * @param string             $name Lowercase function name.
+	 * @return int|null Source line, or null for unsupported writes.
+	 */
+	private function get_deny_rule_line( Node\Expr\FuncCall $call, $name ) {
+		if ( 'file_put_contents' !== $name || ! isset( $call->args[0], $call->args[1] ) || ! $call->args[0] instanceof Node\Arg || ! $call->args[1] instanceof Node\Arg || $call->args[0]->unpack || $call->args[1]->unpack || null !== $call->args[0]->name || null !== $call->args[1]->name ) {
+			return null;
+		}
+		$path = $this->literal_path_suffix( $call->args[0]->value );
+		$rule = $this->literal_string( $call->args[1]->value );
+		if ( null !== $path && null !== $rule && $this->contains_deny_rule( $rule, basename( $path ) ) ) {
+			return $call->getStartLine();
+		}
+		return null;
 	}
 
 	/**
