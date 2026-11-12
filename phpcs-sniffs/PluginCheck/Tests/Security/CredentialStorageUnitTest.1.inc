@@ -29,3 +29,17 @@ update_option( 'my_plugin_passwordless_enabled', true ); // OK, not a whole name
 update_option( 'my_plugin_token_expired', true ); // OK, metadata.
 update_option( 'my_plugin_api_key_last4', '1234' ); // OK, metadata.
 update_option( "my_plugin_{$slug}_token", $token ); // OK, interpolated name.
+update_option( 'my_plugin_accesstoken', $value ); // Warning.
+update_option( 'my_plugin_authtoken', $value ); // Warning.
+update_option( 'my_plugin_secretkey', $value ); // Warning.
+update_option( 'my_plugin_passphrase', $value ); // Warning.
+update_option( 'my_plugin_credentials', $value ); // Warning.
+update_option( 'my_plugin_token_limit', 100 ); // OK, metadata.
+update_option( 'my_plugin_tokens_used', 10 ); // OK, metadata.
+update_option( 'my_plugin_password_min_length', 8 ); // OK, metadata.
+update_option( 'my_plugin_password_reset_page', 5 ); // OK, metadata.
+update_option( 'my_plugin_password_field_label', 'Password' ); // OK, metadata.
+update_option( 'my_plugin_secret_enabled', true ); // OK, metadata.
+update_option( 'my_plugin_api_key_url', $url ); // OK, metadata.
+update_option( 'my_plugin_max_tokens', 100 ); // OK, model limit.
+update_option( 'my-plugin-max-tokens', 100 ); // OK, model limit.
