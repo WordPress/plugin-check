@@ -172,9 +172,9 @@ class Private_Upload_Protection_Check extends Abstract_File_Check {
 	 */
 	private function contains_deny_rule( $contents, $filename ) {
 		if ( '.htaccess' === $filename ) {
-			// Ignore comments before removing file-scoped rules, including unclosed sections.
+			// Ignore comments before removing file- or method-scoped rules, including unclosed sections.
 			$contents = preg_replace( '/^[ \t]*#.*$/m', '', $contents );
-			$contents = preg_replace( '~<Files(?:Match)?\b[^>]*>.*?(?:</Files(?:Match)?\s*>|\z)~is', '', $contents );
+			$contents = preg_replace( '~<(FilesMatch|Files|LimitExcept|Limit)\b[^>]*>.*?(?:</\1\s*>|\z)~is', '', $contents );
 			return (bool) preg_match( '/^[ \t]*(?:Deny[ \t]+from[ \t]+all|Require[ \t]+all[ \t]+denied)[ \t]*(?:#.*)?\r?$/im', $contents );
 		}
 

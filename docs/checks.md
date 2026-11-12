@@ -102,7 +102,9 @@ directory prefix followed by a literal slash-prefixed path is supported. Content
 must be a literal string or a concatenation of literal strings within that same
 write call. Apache recognition covers standalone `Deny from all` and
 `Require all denied` lines, ignoring comment lines and `<Files>`/`<FilesMatch>`
-sections. IIS recognition covers broad or anonymous-user denial inside an
+and `<Limit>`/`<LimitExcept>` sections, including unclosed sections. Method-scoped
+rules alone do not establish that all direct requests are denied. IIS recognition
+covers broad or anonymous-user denial inside an
 `authorization` section, excluding XML comments and `location` sections.
 
 Apache and IIS configuration files do not provide protection on Nginx. If the

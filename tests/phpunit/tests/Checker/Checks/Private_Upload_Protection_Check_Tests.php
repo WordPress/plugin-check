@@ -44,6 +44,11 @@ class Private_Upload_Protection_Check_Tests extends WP_UnitTestCase {
 
 	public static function data_upload_protection() {
 		return array(
+			'apache-limit'                 => array( array( 'apache-limit.php' ), 0 ),
+			'apache-limitexcept'           => array( array( 'apache-limitexcept.php' ), 0 ),
+			'apache-unclosed-limit'        => array( array( 'apache-unclosed-limit.php' ), 0 ),
+			'apache-global-after-limit'    => array( array( 'apache-global-after-limit.php' ), 1 ),
+			'apache-commented-limit'       => array( array( 'apache-commented-limit.php' ), 1 ),
 			'iis-deny-restricted-verbs'    => array( array( 'iis-deny-restricted-verbs.php' ), 0 ),
 			'help-with-write'              => array( array( 'help-with-write.php' ), 0 ),
 			'named-arguments-limitation'   => array( array( 'named-arguments-limitation.php' ), 0 ),
@@ -110,6 +115,6 @@ class Private_Upload_Protection_Check_Tests extends WP_UnitTestCase {
 		$result  = new Check_Result( $context );
 		$check->run( $result );
 		$this->assertSame( 0, $result->get_error_count() );
-		$this->assertSame( 14, $result->get_warning_count() );
+		$this->assertSame( 16, $result->get_warning_count() );
 	}
 }
