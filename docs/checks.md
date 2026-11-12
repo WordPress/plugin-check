@@ -75,3 +75,15 @@ echo esc_html( $title );
 echo wp_kses_post( $args['after_title'] );
 echo wp_kses_post( $args['after_widget'] );
 ```
+
+### Custom nonce, sanitizing and unslashing functions
+
+Checks that run the WordPress Coding Standards sniffs (such as `plugin_review_phpcs`) do not know about your own helper functions. If a wrapper around `wp_verify_nonce()`, a sanitizing function or an unslashing function is reported as missing, tell the sniff about it with a `phpcs:set` comment near the top of the file that uses it:
+
+```php
+// phpcs:set WordPress.Security.NonceVerification customNonceVerificationFunctions[] is_valid_nonce
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] my_sanitize
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customUnslashingSanitizingFunctions[] my_unslash
+```
+
+Use a comma-separated list for several functions, e.g. `customSanitizingFunctions[] my_sanitize,my_sanitize_html`. Add the comment to every file that needs it. PHP_CodeSniffer may also carry the setting over to files scanned after it, but the scan order is not guaranteed, so do not rely on that.
