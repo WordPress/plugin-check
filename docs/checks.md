@@ -7,6 +7,7 @@
 | i18n_usage | general, plugin_repo | Checks for various internationalization best practices. | [Learn more](https://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/) |
 | code_obfuscation | plugin_repo | Detects the usage of code obfuscation tools. | [Learn more](https://developer.wordpress.org/plugins/wordpress-org/detailed-plugin-guidelines/) |
 | plugin_content | plugin_repo | Detects content that does not comply with the WordPress.org plugin guidelines. | [Learn more](https://developer.wordpress.org/plugins/wordpress-org/detailed-plugin-guidelines/) |
+| private_upload_protection | security | Experimental advisory for upload API calls and generated server-specific denial rules in the same PHP file. Requires `--include-experimental`. | [Learn more](#private-upload-protection-experimental) |
 | direct_file_access | security, plugin_repo | Checks that plugin files include proper security validation using the ABSPATH constant to prevent direct file access. | [Learn more](https://developer.wordpress.org/plugins/plugin-basics/best-practices/#file-security) |
 | file_type | plugin_repo | Detects the usage of hidden and compressed files, VCS directories, application files, badly named files, AI development directories (.cursor, .claude, .aider, .continue, .windsurf, .ai, .github), and unexpected markdown files in plugin root. | [Learn more](https://developer.wordpress.org/plugins/wordpress-org/detailed-plugin-guidelines/) |
 | plugin_header_fields | plugin_repo | Checks adherence to the Headers requirements. | [Learn more](https://developer.wordpress.org/plugins/plugin-basics/header-requirements/) |
@@ -75,3 +76,59 @@ echo esc_html( $title );
 echo wp_kses_post( $args['after_title'] );
 echo wp_kses_post( $args['after_widget'] );
 ```
+
+### Private upload protection (experimental)
+
+Run this opt-in advisory with:
+
+```bash
+wp plugin check <plugin> --checks=private_upload_protection --include-experimental
+```
+
+`potentially_unprotected_private_uploads` is a warning for manual review, not a
+confirmed vulnerability. It identifies a PHP file that both calls a supported
+upload API and calls `file_put_contents()` with a recognizable configuration
+filename and literal access-denial content. Results point to the write call and
+link to this guidance. The check does not execute plugin code.
+
+Supported upload calls include `wp_upload_dir()`, `wp_get_upload_dir()`,
+`wp_upload_bits()`, `wp_handle_upload()`, `wp_handle_sideload()`,
+`media_handle_upload()`, `media_handle_sideload()`, `_wp_handle_upload()`, and
+`move_uploaded_file()`. Global and fully qualified calls are recognized; method
+calls, declarations, and explicitly namespaced calls are excluded.
+
+The filename must have the exact basename `.htaccess` or `web.config`. A dynamic
+directory prefix followed by a literal slash-prefixed path is supported. Content
+must be a literal string or a concatenation of literal strings within that same
+write call. Apache recognition covers standalone `Deny from all` and
+`Require all denied` lines, ignoring comment lines and `<Files>`/`<FilesMatch>`
+and `<Limit>`/`<LimitExcept>` sections, including unclosed sections. Method-scoped
+rules alone do not establish that all direct requests are denied. IIS recognition
+covers broad or anonymous-user denial inside an
+`authorization` section, excluding XML comments and `location` sections.
+
+Apache and IIS configuration files do not provide protection on Nginx. If the
+files are intended to be private, verify unauthenticated direct-URL requests on
+every supported server. Check authorization for each file, including access by
+another logged-in user. Consider storage outside the public web root with an
+authorized download handler. Public uploads or independently configured server
+protection may require no change.
+
+Limitations:
+
+- Same-file proximity does not prove that the upload and rule-writing operations
+  are related, that either operation executes or succeeds, or that files are private.
+  Directory APIs may merely read a path or URL. Review the actual destination and
+  deployment configuration before deciding whether action is needed.
+- Bundled configuration files and cross-file relationships are deliberately ignored.
+- Variable-held filenames/content, interpolated strings, custom writers, `fopen()`/
+  `fwrite()`, filesystem wrappers, named arguments, and dynamic function calls are
+  not resolved. Aliased imports and local functions that shadow global API names
+  are not resolved either.
+- Apache rewrite-based denial (such as `RewriteRule .* - [F]`), scoped denial, and
+  complex IIS rules are outside this heuristic. It does not model server rule
+  precedence or inherited configuration. PHP syntax errors are skipped.
+- A warning does not prove exposure, and no warning does not prove protection.
+
+The check remains experimental in the `security` category and is excluded from
+default runs. It does not enforce a Plugin Directory requirement.
