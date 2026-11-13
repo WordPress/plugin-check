@@ -489,7 +489,7 @@ trait AI_Check_Names {
 			return $plugin['slug'];
 		}
 
-		if ( ! empty( $plugin['link'] ) && is_string( $plugin['link'] ) && preg_match( '#wordpress\.org/plugins/([^/?\#]+)#', $plugin['link'], $m ) ) {
+		if ( ! empty( $plugin['link'] ) && is_string( $plugin['link'] ) && preg_match( '#wordpress\.org/plugins/([^/?\#]+)#', $plugin['link'], $m ) ) { // phpcs:ignore WordPress.WP.CapitalPDangit.MisspelledInText -- Matches the lowercase domain in URLs.
 			return sanitize_title( $m[1] );
 		}
 
