@@ -421,15 +421,15 @@ final class CredentialStorageSniff extends AbstractFunctionParameterSniff {
 	 * @return bool True when the guarded code only runs without the Secrets API.
 	 */
 	private function implies_unavailable( $start, $end, $depth, $when_true ) {
-		$tokens  = $this->phpcsFile->getTokens();
-		$ands    = array( T_BOOLEAN_AND, T_LOGICAL_AND );
-		$ors     = array( T_BOOLEAN_OR, T_LOGICAL_OR );
-		$strict  = $when_true ? $ors : $ands;
-		$found   = array();
-		$checks  = 0;
-		$joins   = 0;
-		$has_and = false;
-		$has_or  = false;
+		$tokens     = $this->phpcsFile->getTokens();
+		$and_tokens = array( T_BOOLEAN_AND, T_LOGICAL_AND );
+		$or_tokens  = array( T_BOOLEAN_OR, T_LOGICAL_OR );
+		$strict     = $when_true ? $or_tokens : $and_tokens;
+		$found      = array();
+		$checks     = 0;
+		$joins      = 0;
+		$has_and    = false;
+		$has_or     = false;
 
 		for ( $i = $start; $i <= $end; $i++ ) {
 			if ( $this->get_depth( $i ) !== $depth ) {
@@ -443,8 +443,8 @@ final class CredentialStorageSniff extends AbstractFunctionParameterSniff {
 				return false;
 			}
 
-			$has_and = $has_and || in_array( $code, $ands, true );
-			$has_or  = $has_or || in_array( $code, $ors, true );
+			$has_and = $has_and || in_array( $code, $and_tokens, true );
+			$has_or  = $has_or || in_array( $code, $or_tokens, true );
 			$joins  += in_array( $code, $strict, true ) ? 1 : 0;
 
 			$sign = $this->get_check_sign( $i );
