@@ -5,6 +5,7 @@
 		'plugin-check__export-controls'
 	);
 	const spinner = document.getElementById( 'plugin-check__spinner' );
+	const clientError = document.getElementById( 'plugin-check__client-error' );
 	const pluginsList = document.getElementById(
 		'plugin-check__plugins-dropdown'
 	);
@@ -21,6 +22,7 @@
 		! resultsContainer ||
 		! exportContainer ||
 		! spinner ||
+		! clientError ||
 		! categoriesList.length ||
 		! typesList.length
 	) {
@@ -38,6 +40,9 @@
 		'plugin-check__include-experimental'
 	);
 	const useAi = document.getElementById( 'plugin-check__use-ai' );
+	const usePcpignore = document.getElementById(
+		'plugin-check__use-pcpignore'
+	);
 
 	// Handle disabling the Check it button when a plugin is not selected.
 	function canRunChecks() {
@@ -46,6 +51,54 @@
 		} else {
 			checkItButton.disabled = false;
 		}
+	}
+
+	/**
+	 * Gets the values of checked inputs from a list.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param {NodeList} list Inputs to read from.
+	 * @return {Array} Selected values.
+	 */
+	function getSelectedValues( list ) {
+		const values = [];
+		for ( let i = 0; i < list.length; i++ ) {
+			if ( list[ i ].checked ) {
+				values.push( list[ i ].value );
+			}
+		}
+		return values;
+	}
+
+	/**
+	 * Posts FormData to the plugin's AJAX endpoint.
+	 *
+	 * Wraps fetch with the standard options (ajaxurl, POST, same-origin
+	 * credentials) and parses the JSON response, surfacing server errors
+	 * via handleDataErrors. The wrapper automatically appends the shared
+	 * `pluginCheck.nonce` to the request body, so callers do not need to.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param {FormData} formData Form data to send. Must include 'action'.
+	 * @return {Promise<Object>} Resolves with the response data on success.
+	 */
+	function fetchAJAX( formData ) {
+		const requestBody = new FormData();
+		for ( const pair of formData.entries() ) {
+			requestBody.append( pair[ 0 ], pair[ 1 ] );
+		}
+		requestBody.append( 'nonce', pluginCheck.nonce );
+
+		return fetch( ajaxurl, {
+			method: 'POST',
+			credentials: 'same-origin',
+			body: requestBody,
+		} )
+			.then( ( response ) => response.json() )
+			.then( handleDataErrors )
+			.then( ( responseData ) => responseData.data );
 	}
 
 	// Run on page load to test if dropdown is auto populated.
@@ -80,9 +133,13 @@
 		e.preventDefault();
 
 		resetResults();
+		announce( defaultString( 'checkingPlugin' ) );
 		checkItButton.disabled = true;
 		pluginsList.disabled = true;
 		spinner.classList.add( 'is-active' );
+		clientError.innerText = '';
+		clientError.classList.add( 'is-hidden' );
+
 		for ( let i = 0; i < categoriesList.length; i++ ) {
 			categoriesList[ i ].disabled = true;
 		}
@@ -92,21 +149,64 @@
 		if ( useAi ) {
 			useAi.disabled = true;
 		}
+		if ( usePcpignore ) {
+			usePcpignore.disabled = true;
+		}
 		if ( includeExperimental ) {
 			includeExperimental.disabled = true;
 		}
 
-		getChecksToRun()
-			.then( setUpEnvironment )
-			.then( runChecks )
-			.then( cleanUpEnvironment )
+		const plugin = pluginsList.value;
+		const categories = getSelectedValues( categoriesList );
+		const types = getSelectedValues( typesList );
+		const useAiChecked = useAi && useAi.checked ? 1 : 0;
+		const usePcpignoreChecked =
+			usePcpignore && usePcpignore.checked ? 1 : 0;
+		const includeExperimentalChecked =
+			includeExperimental && includeExperimental.checked ? 1 : 0;
+		let currentChecks;
+
+		getChecksToRun(
+			plugin,
+			categories,
+			includeExperimentalChecked,
+			useAiChecked,
+			usePcpignoreChecked
+		)
+			.then( ( data ) => {
+				currentChecks = data.checks;
+				return setUpEnvironment(
+					plugin,
+					currentChecks,
+					includeExperimentalChecked,
+					useAiChecked,
+					usePcpignoreChecked
+				);
+			} )
+			.then( () =>
+				runChecks(
+					plugin,
+					currentChecks,
+					types,
+					includeExperimentalChecked,
+					useAiChecked,
+					usePcpignoreChecked
+				)
+			)
+			.then( () => cleanUpEnvironment() )
 			.then( ( data ) => {
 				console.log( data.message );
-
 				resetForm();
 			} )
 			.catch( ( error ) => {
+				clientError.innerText = error.message;
+				clientError.classList.remove( 'is-hidden' );
+				clientError.focus();
+
 				console.error( error );
+				const errorMsg =
+					error && error.message ? error.message : String( error );
+				announce( errorMsg );
 
 				resetForm();
 			} );
@@ -119,7 +219,7 @@
 	 */
 	function resetResults() {
 		// Empty the results container.
-		resultsContainer.innerText = '';
+		resultsContainer.textContent = '';
 		exportContainer.innerHTML = '';
 		exportContainer.classList.add( 'is-hidden' );
 		resetAggregatedResults();
@@ -143,6 +243,9 @@
 		}
 		if ( useAi ) {
 			useAi.disabled = false;
+		}
+		if ( usePcpignore ) {
+			usePcpignore.disabled = false;
 		}
 		if ( includeExperimental ) {
 			includeExperimental.disabled = false;
@@ -420,6 +523,19 @@
 		return '';
 	}
 
+	/**
+	 * Rounds a number and formats it with the thousands separator of the WordPress locale.
+	 *
+	 * @param {number} number Number to format.
+	 * @return {string} Formatted number.
+	 */
+	function formatNumber( number ) {
+		return String( Math.round( number ) ).replace(
+			/\B(?=(\d{3})+(?!\d))/g,
+			() => pluginCheck.thousandsSeparator
+		);
+	}
+
 	function renderExportButtons() {
 		exportContainer.innerHTML = '';
 		if ( ! checksCompleted ) {
@@ -513,7 +629,6 @@
 
 	function requestExport( format ) {
 		const payload = new FormData();
-		payload.append( 'nonce', pluginCheck.nonce );
 		payload.append( 'action', pluginCheck.actionExportResults );
 		payload.append( 'format', format );
 		if ( pluginsList.value ) {
@@ -522,37 +637,12 @@
 		payload.append( 'plugin_label', getSelectedPluginLabel() );
 		payload.append( 'results', JSON.stringify( getExportResults() ) );
 
-		return fetch( ajaxurl, {
-			method: 'POST',
-			credentials: 'same-origin',
-			body: payload,
-		} )
-			.then( ( response ) => response.json() )
-			.then( ( responseData ) => {
-				if ( ! responseData ) {
-					throw new Error( 'Response contains no data' );
-				}
-
-				if ( ! responseData.success ) {
-					const defaultExportErrorMessage =
-						defaultString( 'exportError' );
-					let message = defaultExportErrorMessage;
-					if ( responseData.data && responseData.data.message ) {
-						message = responseData.data.message;
-					}
-					throw new Error( message );
-				}
-
-				if (
-					! responseData.data ||
-					! responseData.data.content ||
-					! responseData.data.filename
-				) {
-					throw new Error( 'Export payload is incomplete' );
-				}
-
-				return responseData.data;
-			} );
+		return fetchAJAX( payload ).then( ( data ) => {
+			if ( ! data || ! data.content || ! data.filename ) {
+				throw new Error( 'Export payload is incomplete' );
+			}
+			return data;
+		} );
 	}
 
 	function downloadExport( exportPayload ) {
@@ -581,44 +671,46 @@
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param {Object} data Data object with props passed to form data.
+	 * @param {string} plugin                   Plugin basename to check.
+	 * @param {Array}  checks                   Check slugs that will run.
+	 * @param {number} includeExperimentalInput Whether to include experimental checks.
+	 * @param {number} useAiInput               Whether to enable AI analysis.
+	 * @param {number} usePcpignoreInput        Whether to apply .pcpignore exclusions.
+	 * @return {Promise<Object>} Resolves with the response message.
 	 */
-	function setUpEnvironment( data ) {
+	function setUpEnvironment(
+		plugin,
+		checks,
+		includeExperimentalInput,
+		useAiInput,
+		usePcpignoreInput
+	) {
 		const pluginCheckData = new FormData();
-		pluginCheckData.append( 'nonce', pluginCheck.nonce );
-		pluginCheckData.append( 'plugin', data.plugin );
+		pluginCheckData.append( 'plugin', plugin );
 		pluginCheckData.append(
 			'action',
 			pluginCheck.actionSetUpRuntimeEnvironment
 		);
 		pluginCheckData.append(
 			'include-experimental',
-			includeExperimental && includeExperimental.checked ? 1 : 0
+			includeExperimentalInput
 		);
-		pluginCheckData.append( 'use-ai', useAi && useAi.checked ? 1 : 0 );
+		pluginCheckData.append( 'use-ai', useAiInput );
+		pluginCheckData.append( 'use-pcpignore', usePcpignoreInput );
 
-		for ( let i = 0; i < data.checks.length; i++ ) {
-			pluginCheckData.append( 'checks[]', data.checks[ i ] );
+		for ( let i = 0; i < checks.length; i++ ) {
+			pluginCheckData.append( 'checks[]', checks[ i ] );
 		}
 
-		return fetch( ajaxurl, {
-			method: 'POST',
-			credentials: 'same-origin',
-			body: pluginCheckData,
-		} )
-			.then( ( response ) => {
-				return response.json();
-			} )
-			.then( handleDataErrors )
-			.then( ( responseData ) => {
-				if ( ! responseData.data || ! responseData.data.message ) {
-					throw new Error( 'Response contains no data.' );
-				}
+		return fetchAJAX( pluginCheckData ).then( ( data ) => {
+			if ( ! data || ! data.message ) {
+				throw new Error( 'Response contains no data.' );
+			}
 
-				console.log( responseData.data.message );
+			console.log( data.message );
 
-				return responseData.data;
-			} );
+			return data;
+		} );
 	}
 
 	/**
@@ -626,81 +718,64 @@
 	 *
 	 * @since 1.0.0
 	 *
-	 * @return {Object} The response data.
+	 * @return {Promise<Object>} Resolves with the response message.
 	 */
 	function cleanUpEnvironment() {
 		const pluginCheckData = new FormData();
-		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append(
 			'action',
 			pluginCheck.actionCleanUpRuntimeEnvironment
 		);
 
-		return fetch( ajaxurl, {
-			method: 'POST',
-			credentials: 'same-origin',
-			body: pluginCheckData,
-		} )
-			.then( ( response ) => {
-				return response.json();
-			} )
-			.then( handleDataErrors )
-			.then( ( responseData ) => {
-				if ( ! responseData.data || ! responseData.data.message ) {
-					throw new Error( 'Response contains no data.' );
-				}
+		return fetchAJAX( pluginCheckData ).then( ( data ) => {
+			if ( ! data || ! data.message ) {
+				throw new Error( 'Response contains no data.' );
+			}
 
-				return responseData.data;
-			} );
+			return data;
+		} );
 	}
 
 	/**
 	 * Get the Checks to run.
 	 *
 	 * @since 1.0.0
+	 *
+	 * @param {string} plugin                   Plugin basename to evaluate.
+	 * @param {Array}  categories               Selected category slugs.
+	 * @param {number} includeExperimentalInput Whether to include experimental checks.
+	 * @param {number} useAiInput               Whether to enable AI analysis.
+	 * @param {number} usePcpignoreInput        Whether to apply .pcpignore exclusions.
+	 * @return {Promise<Object>} Resolves with the response containing plugin and checks.
 	 */
-	function getChecksToRun() {
+	function getChecksToRun(
+		plugin,
+		categories,
+		includeExperimentalInput,
+		useAiInput,
+		usePcpignoreInput
+	) {
 		const pluginCheckData = new FormData();
-		pluginCheckData.append( 'nonce', pluginCheck.nonce );
-		pluginCheckData.append( 'plugin', pluginsList.value );
+		pluginCheckData.append( 'plugin', plugin );
 		pluginCheckData.append( 'action', pluginCheck.actionGetChecksToRun );
 		pluginCheckData.append(
 			'include-experimental',
-			includeExperimental && includeExperimental.checked ? 1 : 0
+			includeExperimentalInput
 		);
-		pluginCheckData.append( 'use-ai', useAi && useAi.checked ? 1 : 0 );
+		pluginCheckData.append( 'use-ai', useAiInput );
+		pluginCheckData.append( 'use-pcpignore', usePcpignoreInput );
 
-		for ( let i = 0; i < categoriesList.length; i++ ) {
-			if ( categoriesList[ i ].checked ) {
-				pluginCheckData.append(
-					'categories[]',
-					categoriesList[ i ].value
-				);
-			}
+		for ( let i = 0; i < categories.length; i++ ) {
+			pluginCheckData.append( 'categories[]', categories[ i ] );
 		}
 
-		return fetch( ajaxurl, {
-			method: 'POST',
-			credentials: 'same-origin',
-			body: pluginCheckData,
-		} )
-			.then( ( response ) => {
-				return response.json();
-			} )
-			.then( handleDataErrors )
-			.then( ( responseData ) => {
-				if (
-					! responseData.data ||
-					! responseData.data.plugin ||
-					! responseData.data.checks
-				) {
-					throw new Error(
-						'Plugin and Checks are missing from the response.'
-					);
-				}
+		return fetchAJAX( pluginCheckData ).then( ( data ) => {
+			if ( ! data || ! data.checks ) {
+				throw new Error( 'Checks are missing from the response.' );
+			}
 
-				return responseData.data;
-			} );
+			return data;
+		} );
 	}
 
 	/**
@@ -708,14 +783,33 @@
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param {Object} data The response data.
+	 * @param {string} plugin                   Plugin basename to check.
+	 * @param {Array}  checks                   Check slugs to run.
+	 * @param {Array}  types                    Result types to include (error, warning).
+	 * @param {number} includeExperimentalInput Whether to include experimental checks.
+	 * @param {number} useAiInput               Whether to enable AI analysis.
+	 * @param {number} usePcpignoreInput        Whether to apply .pcpignore exclusions.
 	 */
-	async function runChecks( data ) {
+	async function runChecks(
+		plugin,
+		checks,
+		types,
+		includeExperimentalInput,
+		useAiInput,
+		usePcpignoreInput
+	) {
 		let isSuccessMessage = true;
 		let aiStats = null;
-		for ( let i = 0; i < data.checks.length; i++ ) {
+		for ( let i = 0; i < checks.length; i++ ) {
 			try {
-				const results = await runCheck( data.plugin, data.checks[ i ] );
+				const results = await runCheck(
+					plugin,
+					checks[ i ],
+					types,
+					includeExperimentalInput,
+					useAiInput,
+					usePcpignoreInput
+				);
 				const splitResults = splitResultsByFalsePositive( results );
 				const errorsLength = countResultTree(
 					splitResults.actionable.errors
@@ -768,7 +862,17 @@
 		}
 
 		renderFalsePositiveResults();
-		renderResultsMessage( isSuccessMessage, aiStats );
+		const resultsMessage = renderResultsMessage(
+			isSuccessMessage,
+			aiStats
+		);
+
+		// Announce the check results summary so screen-reader users know
+		// whether errors or warnings were found, rather than only the
+		// internal runtime cleanup status.
+		if ( resultsMessage ) {
+			announce( resultsMessage );
+		}
 	}
 
 	/**
@@ -778,6 +882,7 @@
 	 *
 	 * @param {boolean} isSuccessMessage Whether the message is a success message.
 	 * @param {Object}  aiStats          AI statistics.
+	 * @return {string} The rendered results message.
 	 */
 	function renderResultsMessage( isSuccessMessage, aiStats ) {
 		// Count errors and warnings to determine notice severity and compose the message.
@@ -867,6 +972,7 @@
 		}
 
 		if ( aiStats ) {
+			const { __, _n, sprintf } = wp.i18n;
 			const aiParts = [];
 			const modelsUsed = [
 				...new Set( aiStats.models_used.filter( Boolean ) ),
@@ -877,53 +983,68 @@
 
 			if ( aiStats.false_positives > 0 ) {
 				aiParts.push(
-					'AI detected ' +
-						aiStats.false_positives +
-						' ' +
-						( 1 === aiStats.false_positives
-							? 'possible false positive'
-							: 'possible false positives' )
+					sprintf(
+						/* translators: %s: Number of possible false positives. */
+						_n(
+							'AI detected %s possible false positive.',
+							'AI detected %s possible false positives.',
+							aiStats.false_positives,
+							'plugin-check'
+						),
+						formatNumber( aiStats.false_positives )
+					)
 				);
 			}
 			if ( aiStats.input_tokens > 0 ) {
 				aiParts.push(
-					'Input tokens: ' + aiStats.input_tokens.toLocaleString()
+					sprintf(
+						/* translators: %s: Number of input tokens. */
+						__( 'Input tokens: %s.', 'plugin-check' ),
+						formatNumber( aiStats.input_tokens )
+					)
 				);
 			}
 			if ( aiStats.output_tokens > 0 ) {
 				aiParts.push(
-					'Output tokens: ' + aiStats.output_tokens.toLocaleString()
+					sprintf(
+						/* translators: %s: Number of output tokens. */
+						__( 'Output tokens: %s.', 'plugin-check' ),
+						formatNumber( aiStats.output_tokens )
+					)
 				);
 			}
 			if ( aiStats.tokens_spent > 0 ) {
 				aiParts.push(
-					'Tokens spent: ' + aiStats.tokens_spent.toLocaleString()
+					sprintf(
+						/* translators: %s: Number of tokens spent. */
+						__( 'Tokens spent: %s.', 'plugin-check' ),
+						formatNumber( aiStats.tokens_spent )
+					)
 				);
 			}
 			if ( modelsUsed.length > 0 || providersUsed.length > 0 ) {
-				if ( 1 === modelsUsed.length && 1 === providersUsed.length ) {
-					aiParts.push(
-						'Model: ' + providersUsed[ 0 ] + ' ' + modelsUsed[ 0 ]
-					);
-				} else if (
-					modelsUsed.length > 0 &&
-					providersUsed.length > 0
-				) {
-					aiParts.push(
-						'Model: ' +
-							providersUsed.join( ', ' ) +
-							' ' +
-							modelsUsed.join( ', ' )
-					);
+				let model;
+				if ( modelsUsed.length > 0 && providersUsed.length > 0 ) {
+					model =
+						providersUsed.join( ', ' ) +
+						' ' +
+						modelsUsed.join( ', ' );
 				} else if ( modelsUsed.length > 0 ) {
-					aiParts.push( 'Model: ' + modelsUsed.join( ', ' ) );
+					model = modelsUsed.join( ', ' );
 				} else {
-					aiParts.push( 'Model: ' + providersUsed.join( ', ' ) );
+					model = providersUsed.join( ', ' );
 				}
+				aiParts.push(
+					sprintf(
+						/* translators: %s: AI provider and model names. */
+						__( 'Model: %s.', 'plugin-check' ),
+						model
+					)
+				);
 			}
+			// Each part is a whole translated sentence with its own punctuation.
 			if ( aiParts.length > 0 ) {
-				messageText += /[.!?]\s*$/.test( messageText ) ? ' ' : '. ';
-				messageText += aiParts.join( '. ' );
+				messageText += ' ' + aiParts.join( ' ' );
 			}
 		}
 
@@ -935,6 +1056,8 @@
 
 		checksCompleted = true;
 		renderExportButtons();
+
+		return messageText;
 	}
 
 	/**
@@ -942,59 +1065,52 @@
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param {string} plugin The plugin to check.
-	 * @param {string} check  The check to run.
-	 * @return {Object} The check results.
+	 * @param {string} plugin                   The plugin to check.
+	 * @param {string} check                    The check to run.
+	 * @param {Array}  types                    Result types to include (error, warning).
+	 * @param {number} includeExperimentalInput Whether to include experimental checks.
+	 * @param {number} useAiInput               Whether to enable AI analysis.
+	 * @param {number} usePcpignoreInput        Whether to apply .pcpignore exclusions.
+	 * @return {Promise<Object>} The check results.
 	 */
-	function runCheck( plugin, check ) {
+	function runCheck(
+		plugin,
+		check,
+		types,
+		includeExperimentalInput,
+		useAiInput,
+		usePcpignoreInput
+	) {
 		const pluginCheckData = new FormData();
-		pluginCheckData.append( 'nonce', pluginCheck.nonce );
 		pluginCheckData.append( 'plugin', plugin );
 		pluginCheckData.append( 'checks[]', check );
 		pluginCheckData.append( 'action', pluginCheck.actionRunChecks );
 		pluginCheckData.append(
 			'include-experimental',
-			includeExperimental && includeExperimental.checked ? 1 : 0
+			includeExperimentalInput
 		);
-		pluginCheckData.append( 'use-ai', useAi && useAi.checked ? 1 : 0 );
+		pluginCheckData.append( 'use-ai', useAiInput );
+		pluginCheckData.append( 'use-pcpignore', usePcpignoreInput );
 
-		for ( let i = 0; i < typesList.length; i++ ) {
-			if ( typesList[ i ].checked ) {
-				pluginCheckData.append( 'types[]', typesList[ i ].value );
-			}
+		for ( let i = 0; i < types.length; i++ ) {
+			pluginCheckData.append( 'types[]', types[ i ] );
 		}
 
-		return fetch( ajaxurl, {
-			method: 'POST',
-			credentials: 'same-origin',
-			body: pluginCheckData,
-		} )
-			.then( ( response ) => {
-				return response.json();
-			} )
-			.then( handleDataErrors )
-			.then( ( responseData ) => {
-				// If the response is successful and there is no message in the response.
-				if ( ! responseData.data || ! responseData.data.message ) {
-					throw new Error( 'Response contains no data' );
-				}
+		return fetchAJAX( pluginCheckData ).then( ( data ) => {
+			if ( ! data || ! data.message ) {
+				throw new Error( 'Response contains no data' );
+			}
 
-				// Debug: Log AI data if present.
-				if ( responseData.data.ai_analysis ) {
-					console.log(
-						'AI Analysis received:',
-						responseData.data.ai_analysis
-					);
-				}
-				if ( responseData.data.ai_stats ) {
-					console.log(
-						'AI Stats received:',
-						responseData.data.ai_stats
-					);
-				}
+			// Debug: Log AI data if present.
+			if ( data.ai_analysis ) {
+				console.log( 'AI Analysis received:', data.ai_analysis );
+			}
+			if ( data.ai_stats ) {
+				console.log( 'AI Stats received:', data.ai_stats );
+			}
 
-				return responseData.data;
-			} );
+			return data;
+		} );
 	}
 
 	/**
@@ -1011,13 +1127,20 @@
 		}
 
 		if ( ! data.success ) {
+			// Error payloads come in two shapes: WP_Error responses are
+			// arrays ( [{ code, message }, ...] ), everything else is
+			// passed through as-is ( e.g. { message: ... } ).
+			const firstError = Array.isArray( data.data )
+				? data.data[ 0 ]
+				: data.data;
+
 			// If not successful and no message in the response.
-			if ( ! data.data || ! data.data[ 0 ].message ) {
+			if ( ! firstError || ! firstError.message ) {
 				throw new Error( 'Response contains no data' );
 			}
 
 			// If not successful and there is a message in the response.
-			throw new Error( data.data[ 0 ].message );
+			throw new Error( firstError.message );
 		}
 
 		return data;

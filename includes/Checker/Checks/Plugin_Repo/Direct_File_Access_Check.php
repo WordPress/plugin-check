@@ -31,6 +31,7 @@ use WordPress\Plugin_Check\Traits\Stable_Check;
  *
  * @since 1.8.0
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class Direct_File_Access_Check extends Abstract_File_Check {
 
@@ -356,14 +357,18 @@ class Direct_File_Access_Check extends Abstract_File_Check {
 	 *
 	 * @since 1.8.0
 	 *
-	 * @param string $file The file path to check.
+	 * @param string        $file    The file path to check.
+	 * @param array<string> $visited Optional. Real paths of files already being checked through includes. Default empty array.
 	 * @return bool True if the file is safe for direct access, false otherwise.
 	 */
-	private function is_valid_for_direct_access( $file ) {
+	private function is_valid_for_direct_access( $file, array $visited = array() ) {
 		$contents = file_get_contents( $file );
 		if ( false === $contents ) {
 			return false;
 		}
+
+		$real_path = realpath( $file );
+		$visited[] = false !== $real_path ? $real_path : $file;
 
 		$parser = ( new ParserFactory() )->create( ParserFactory::PREFER_PHP7 );
 		try {
@@ -372,7 +377,7 @@ class Direct_File_Access_Check extends Abstract_File_Check {
 				return $this->is_valid_for_direct_access_regex( $contents );
 			}
 
-			return $this->is_ast_valid_for_direct_access( $ast );
+			return $this->is_ast_valid_for_direct_access( $ast, $file, $visited );
 		} catch ( Error $e ) {
 			return $this->is_valid_for_direct_access_regex( $contents );
 		}
@@ -383,11 +388,13 @@ class Direct_File_Access_Check extends Abstract_File_Check {
 	 *
 	 * @since 1.9.0
 	 *
-	 * @param array $ast The parsed AST nodes.
+	 * @param array         $ast     The parsed AST nodes.
+	 * @param string        $file    The path of the file the AST belongs to.
+	 * @param array<string> $visited Real paths of files already being checked through includes.
 	 * @return bool True if the AST only contains structural code, false otherwise.
 	 * @SuppressWarnings(PHPMD.NPathComplexity)
 	 */
-	private function is_ast_valid_for_direct_access( array $ast ) {
+	private function is_ast_valid_for_direct_access( array $ast, $file, array $visited ) {
 		$safe_node_types = array(
 			Stmt\Nop::class,
 			Stmt\Declare_::class,
@@ -408,7 +415,7 @@ class Direct_File_Access_Check extends Abstract_File_Check {
 
 			if ( in_array( $node_class, $safe_node_types, true ) ) {
 				if ( $node instanceof Stmt\Namespace_ && ! empty( $node->stmts ) ) {
-					if ( ! $this->is_ast_valid_for_direct_access( $node->stmts ) ) {
+					if ( ! $this->is_ast_valid_for_direct_access( $node->stmts, $file, $visited ) ) {
 						return false;
 					}
 				}
@@ -428,6 +435,13 @@ class Direct_File_Access_Check extends Abstract_File_Check {
 			}
 
 			if ( $node instanceof Stmt\Expression ) {
+				if ( $node->expr instanceof Expr\Include_ ) {
+					if ( $this->is_safe_include( $node->expr, $file, $visited ) ) {
+						continue;
+					}
+					return false;
+				}
+
 				if ( $this->is_safe_expression( $node->expr ) ) {
 					continue;
 				}
@@ -453,6 +467,112 @@ class Direct_File_Access_Check extends Abstract_File_Check {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Checks if an include/require statement is safe for direct access.
+	 *
+	 * An include is safe if its target path can be resolved statically and the included file
+	 * is itself either protected against direct access or safe for direct access.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param Expr\Include_ $expr    The include expression.
+	 * @param string        $file    The path of the file containing the include.
+	 * @param array<string> $visited Real paths of files already being checked through includes.
+	 * @return bool True if the include is safe, false otherwise.
+	 */
+	private function is_safe_include( Expr\Include_ $expr, $file, array $visited ) {
+		$path = $this->resolve_include_path( $expr->expr, $file );
+		if ( null === $path ) {
+			return false;
+		}
+
+		if ( ! path_is_absolute( $path ) ) {
+			$path = dirname( $file ) . '/' . $path;
+		}
+
+		$target = realpath( $path );
+		if ( false === $target || ! is_file( $target ) ) {
+			return false;
+		}
+
+		// Include cycle - the file is already being checked.
+		if ( in_array( $target, $visited, true ) ) {
+			return true;
+		}
+
+		return $this->has_direct_access_protection( $target ) || $this->is_valid_for_direct_access( $target, $visited );
+	}
+
+	/**
+	 * Statically resolves the path of an include/require statement.
+	 *
+	 * Supports string literals, __DIR__, __FILE__, dirname() and concatenations of those.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param Expr   $expr The include path expression.
+	 * @param string $file The path of the file containing the include.
+	 * @return string|null The resolved path, or null if it cannot be resolved statically.
+	 */
+	private function resolve_include_path( $expr, $file ) {
+		if ( $expr instanceof Node\Scalar\String_ ) {
+			return $expr->value;
+		}
+
+		if ( $expr instanceof Node\Scalar\MagicConst\Dir ) {
+			return dirname( $file );
+		}
+
+		if ( $expr instanceof Node\Scalar\MagicConst\File ) {
+			return $file;
+		}
+
+		if ( $expr instanceof Expr\BinaryOp\Concat ) {
+			$left  = $this->resolve_include_path( $expr->left, $file );
+			$right = $this->resolve_include_path( $expr->right, $file );
+			if ( null === $left || null === $right ) {
+				return null;
+			}
+			return $left . $right;
+		}
+
+		if ( $expr instanceof Expr\FuncCall && 'dirname' === $this->get_function_name( $expr ) ) {
+			return $this->resolve_dirname_include_path( $expr, $file );
+		}
+
+		return null;
+	}
+
+	/**
+	 * Statically resolves a dirname() call in the path of an include/require statement.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param Expr\FuncCall $expr The dirname() call expression.
+	 * @param string        $file The path of the file containing the include.
+	 * @return string|null The resolved path, or null if it cannot be resolved statically.
+	 */
+	private function resolve_dirname_include_path( Expr\FuncCall $expr, $file ) {
+		$args = $expr->getArgs();
+		if ( count( $args ) < 1 || count( $args ) > 2 ) {
+			return null;
+		}
+
+		$path = $this->resolve_include_path( $args[0]->value, $file );
+		if ( null === $path ) {
+			return null;
+		}
+
+		if ( ! isset( $args[1] ) ) {
+			return dirname( $path );
+		}
+
+		if ( ! ( $args[1]->value instanceof Node\Scalar\LNumber ) || $args[1]->value->value < 1 ) {
+			return null;
+		}
+		return dirname( $path, $args[1]->value->value );
 	}
 
 	/**

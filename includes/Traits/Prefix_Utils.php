@@ -12,6 +12,7 @@ use RecursiveIteratorIterator;
 use WordPress\Plugin_Check\Checker\Check_Context;
 use WordPress\Plugin_Check\Checker\Check_Result;
 use WordPress\Plugin_Check\Scanner\Prefix_Scanner;
+use WordPress\Plugin_Check\Utilities\Ignore_Matcher;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 
 /**
@@ -74,6 +75,11 @@ trait Prefix_Utils {
 			self::$file_list_cache[ $location ][] = $location;
 		} else {
 			$iterator = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $location ) );
+
+			$plugin_root           = untrailingslashit( $location );
+			$directories_to_ignore = Plugin_Request_Utility::get_directories_to_ignore();
+			$files_to_ignore       = Plugin_Request_Utility::get_files_to_ignore();
+
 			foreach ( $iterator as $file ) {
 				if ( ! $file->isFile() ) {
 					continue;
@@ -87,31 +93,15 @@ trait Prefix_Utils {
 
 				$file_path = wp_normalize_path( $file->getPathname() );
 
-				$directories_to_ignore = Plugin_Request_Utility::get_directories_to_ignore();
-
-				// Flag to check if the file should be included or not.
-				$include_file = true;
-
-				foreach ( $directories_to_ignore as $directory ) {
-					// Check if the current file belongs to the directory you want to ignore.
-					if ( false !== strpos( $file_path, '/' . $directory . '/' ) ) {
-						$include_file = false;
-						break; // Skip the file if it matches any ignored directory.
-					}
+				if ( Ignore_Matcher::is_file_in_ignored_directory( $file_path, $plugin_root, $directories_to_ignore ) ) {
+					continue;
 				}
 
-				$files_to_ignore = Plugin_Request_Utility::get_files_to_ignore();
-
-				foreach ( $files_to_ignore as $ignore_file ) {
-					if ( str_ends_with( $file_path, "/$ignore_file" ) ) {
-						$include_file = false;
-						break;
-					}
+				if ( Ignore_Matcher::is_file_ignored( $file_path, $plugin_root, $files_to_ignore ) ) {
+					continue;
 				}
 
-				if ( $include_file ) {
-					self::$file_list_cache[ $location ][] = $file_path;
-				}
+				self::$file_list_cache[ $location ][] = $file_path;
 			}
 		}
 

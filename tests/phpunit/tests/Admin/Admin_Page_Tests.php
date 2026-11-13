@@ -60,6 +60,42 @@ class Admin_Page_Tests extends WP_UnitTestCase {
 		$this->assertEquals( 10, has_action( 'admin_enqueue_scripts', array( $this->admin_page, 'enqueue_scripts' ) ) );
 	}
 
+	/**
+	 * @dataProvider data_thousands_separators
+	 */
+	public function test_enqueue_scripts_passes_decoded_thousands_separator( $locale_separator, $expected ) {
+		global $wp_locale, $wp_scripts;
+
+		$original_scripts   = $wp_scripts;
+		$original_separator = $wp_locale->number_format['thousands_sep'];
+
+		$wp_scripts                                = null;
+		$wp_locale->number_format['thousands_sep'] = $locale_separator;
+
+		$this->admin_page->enqueue_scripts();
+		$inline = wp_scripts()->get_data( 'plugin-check-admin', 'before' );
+
+		$wp_locale->number_format['thousands_sep'] = $original_separator;
+		$wp_scripts                                = $original_scripts;
+
+		$this->assertIsArray( $inline );
+		$data = json_decode( substr( end( $inline ), strlen( 'const PLUGIN_CHECK = ' ) ), true );
+		$this->assertSame( $expected, $data['thousandsSeparator'] );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_thousands_separators() {
+		return array(
+			'comma'                 => array( ',', ',' ),
+			'period'                => array( '.', '.' ),
+			'space stored as &nbsp' => array( '&nbsp;', "\u{00A0}" ),
+		);
+	}
+
 	public function test_render_page() {
 		global $wp_object_cache;
 

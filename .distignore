@@ -18,6 +18,7 @@ tests
 .gherkin-lintrc
 .gitattributes
 .gitignore
+.npmrc
 .nvmrc
 .phpunit.result.cache
 .typos.toml

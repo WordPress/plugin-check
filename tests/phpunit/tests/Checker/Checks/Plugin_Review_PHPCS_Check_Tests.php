@@ -161,4 +161,76 @@ class Plugin_Review_PHPCS_Check_Tests extends WP_UnitTestCase {
 		$this->assertEquals( 0, $check_result->get_error_count() );
 		$this->assertEquals( 0, $check_result->get_warning_count() );
 	}
+
+	public function test_run_suppresses_phpcs_auto_detect_line_endings_deprecation() {
+
+		$plugin_review_phpcs_check = new Plugin_Review_PHPCS_Check();
+		$check_context             = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-review-phpcs-without-errors/load.php' );
+		$check_result              = new Check_Result( $check_context );
+
+		$previous_error_handler = null;
+
+		$previous_error_handler = set_error_handler(
+			static function ( $errno, $errstr, $errfile, $errline ) use ( &$previous_error_handler ) {
+				if ( E_DEPRECATED === $errno && false !== strpos( $errstr, 'auto_detect_line_endings is deprecated' ) ) {
+					throw new ErrorException( $errstr, 0, $errno, $errfile, $errline );
+				}
+
+				if ( is_callable( $previous_error_handler ) ) {
+					return (bool) call_user_func( $previous_error_handler, $errno, $errstr, $errfile, $errline );
+				}
+
+				return false;
+			}
+		);
+
+		try {
+			$plugin_review_phpcs_check->run( $check_result );
+		} finally {
+			restore_error_handler();
+		}
+
+		$this->assertEquals( 0, $check_result->get_error_count() );
+		$this->assertEquals( 0, $check_result->get_warning_count() );
+	}
+
+	public function test_run_restores_original_error_handler_when_phpcs_throws() {
+		$plugin_review_phpcs_check = new class() extends Plugin_Review_PHPCS_Check {
+			protected function run_php_codesniffer() {
+				set_error_handler(
+					static function () {
+						return false;
+					}
+				);
+				throw new Exception( 'Test exception after PHP_CodeSniffer registers its error handler.' );
+			}
+		};
+		$check_context             = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-review-phpcs-without-errors/load.php' );
+		$check_result              = new Check_Result( $check_context );
+		$original_error_handler    = static function () {
+			return false;
+		};
+
+		set_error_handler( $original_error_handler );
+
+		try {
+			try {
+				$plugin_review_phpcs_check->run( $check_result );
+				$this->fail( 'Expected PHP_CodeSniffer to throw an exception.' );
+			} catch ( Exception $e ) {
+				$this->assertSame( 'Test exception after PHP_CodeSniffer registers its error handler.', $e->getMessage() );
+			}
+
+			$current_error_handler = set_error_handler(
+				static function () {
+					return false;
+				}
+			);
+			restore_error_handler();
+
+			$this->assertSame( $original_error_handler, $current_error_handler );
+		} finally {
+			restore_error_handler();
+		}
+	}
 }

@@ -14,6 +14,7 @@ use WordPress\Plugin_Check\Checker\Check_Repository;
 use WordPress\Plugin_Check\Checker\CLI_Runner;
 use WordPress\Plugin_Check\Checker\Default_Check_Repository;
 use WordPress\Plugin_Check\Plugin_Context;
+use WordPress\Plugin_Check\Utilities\PCP_Ignore_Utility;
 use WordPress\Plugin_Check\Utilities\Plugin_Request_Utility;
 use WordPress\Plugin_Check\Utilities\Results_Exporter;
 use WP_CLI;
@@ -77,7 +78,11 @@ final class Plugin_Check_Command {
 	 * Applies after evaluating `--checks`.
 	 *
 	 * [--ignore-codes=<codes>]
-	 * : Ignore error codes provided as an argument in comma-separated values.
+	 * : Ignore result codes provided as an argument in comma-separated values, e.g. missing_composer_json_file.
+	 * Result codes are individual findings emitted by checks. They are different from check slugs used with
+	 * `--checks` and `--exclude-checks`.
+	 * Use an output format such as `--format=json` or `--format=csv` to inspect result codes.
+	 * For example: `wp plugin check akismet --format=csv --fields=code,message`.
 	 *
 	 * [--format=<format>]
 	 * : Format to display the results. Options are table, csv, json, ctrf, strict-table, strict-csv, strict-json, and strict-ctrf. The default will be a table.
@@ -94,7 +99,7 @@ final class Plugin_Check_Command {
 	 *   - strict-ctrf
 	 * ---
 	 *
-	 * [--categories]
+	 * [--categories=<categories>]
 	 * : Limit displayed results to include only specific categories Checks.
 	 *
 	 * [--fields=<fields>]
@@ -112,9 +117,18 @@ final class Plugin_Check_Command {
 	 * [--exclude-directories=<directories>]
 	 * : Additional directories to exclude from checks.
 	 * By default, `.git`, `vendor`, `vendor_prefixed`, `vendor-prefixed` and `node_modules` directories are excluded.
+	 * This only excludes files from file-based scans. It does not suppress plugin-level findings such as
+	 * missing_composer_json_file; use `--ignore-codes` for specific result codes.
 	 *
 	 * [--exclude-files=<files>]
 	 * : Additional files to exclude from checks.
+	 * This only excludes files from file-based scans. It does not suppress plugin-level findings such as
+	 * missing_composer_json_file; use `--ignore-codes` for specific result codes.
+	 *
+	 * [--use-pcpignore]
+	 * : Apply custom file and directory exclusions from a .pcpignore file in the plugin root.
+	 * Entries are anchored to the plugin root and may include * and ? wildcards. Not supported for
+	 * single-file plugins. This is intended for local and CI scans only and is disabled by default.
 	 *
 	 * [--severity=<severity>]
 	 * : Severity level.
@@ -153,8 +167,11 @@ final class Plugin_Check_Command {
 	 *
 	 *   wp plugin check akismet
 	 *   wp plugin check akismet --checks=late_escaping
+	 *   wp plugin check akismet --format=csv --fields=code,message
+	 *   wp plugin check akismet --ignore-codes=missing_composer_json_file
 	 *   wp plugin check akismet --format=json
 	 *   wp plugin check akismet --mode=update
+	 *   wp plugin check akismet --use-pcpignore
 	 *   wp plugin check akismet --ai
 	 *   wp plugin check akismet --ai --ai-model=openai::gpt-4o
 	 *
@@ -191,6 +208,7 @@ final class Plugin_Check_Command {
 				'mode'                          => 'new',
 				'ai'                            => false,
 				'ai-model'                      => '',
+				'use-pcpignore'                 => false,
 			)
 		);
 
@@ -203,6 +221,14 @@ final class Plugin_Check_Command {
 
 		// Create the categories array from CLI arguments.
 		$categories = isset( $options['categories'] ) ? wp_parse_list( $options['categories'] ) : array();
+
+		$invalid_categories_message = $this->get_invalid_categories_message( $categories );
+		if ( '' !== $invalid_categories_message ) {
+			// The runner may already have prepared the runtime environment, so clean it up before stopping.
+			Plugin_Request_Utility::destroy_runner();
+
+			WP_CLI::error( $invalid_categories_message );
+		}
 
 		$excluded_directories = isset( $options['exclude-directories'] ) ? wp_parse_list( $options['exclude-directories'] ) : array();
 
@@ -248,6 +274,16 @@ final class Plugin_Check_Command {
 			$runner->set_experimental_flag( $options['include-experimental'] );
 			$runner->set_check_slugs( $checks );
 			$runner->set_plugin( $plugin );
+			if ( $options['use-pcpignore'] ) {
+				$plugin_path = $runner->get_plugin_basename();
+				$plugin_path = is_dir( $plugin_path ) ? $plugin_path : WP_PLUGIN_DIR . '/' . $plugin_path;
+
+				PCP_Ignore_Utility::apply_exclusions( $plugin_path );
+
+				if ( '' !== PCP_Ignore_Utility::get_warning() ) {
+					WP_CLI::warning( PCP_Ignore_Utility::get_warning() );
+				}
+			}
 			$runner->set_categories( $categories );
 			$runner->set_slug( $options['slug'] );
 			$runner->set_mode( $options['mode'] );
@@ -294,27 +330,7 @@ final class Plugin_Check_Command {
 		}
 
 		if ( empty( $errors ) && empty( $warnings ) ) {
-			$message = __( 'Checks complete. No errors found.', 'plugin-check' );
-
-			// Add AI statistics to the message if available.
-			if ( ! empty( $ai_stats ) && isset( $ai_stats['false_positives'] ) && $ai_stats['false_positives'] > 0 ) {
-				$ai_info = sprintf(
-					// translators: %1$d: Number of possible false positives, %2$s: "possible false positive(s)" label.
-					__( ' AI detected %1$d %2$s', 'plugin-check' ),
-					$ai_stats['false_positives'],
-					_n( 'possible false positive', 'possible false positives', $ai_stats['false_positives'], 'plugin-check' )
-				);
-				if ( isset( $ai_stats['tokens_spent'] ) && $ai_stats['tokens_spent'] > 0 ) {
-					$ai_info .= sprintf(
-						// translators: %s: Tokens spent (formatted).
-						__( ' (Tokens spent: %s)', 'plugin-check' ),
-						number_format_i18n( $ai_stats['tokens_spent'] )
-					);
-				}
-				$message .= '.' . $ai_info;
-			}
-
-			WP_CLI::success( $message );
+			WP_CLI::success( $this->get_success_message( $ai_stats ) );
 
 			return;
 		}
@@ -441,7 +457,7 @@ final class Plugin_Check_Command {
 	 *   - json
 	 * ---
 	 *
-	 * [--categories]
+	 * [--categories=<categories>]
 	 * : Limit displayed results to include only specific categories.
 	 *
 	 * [--include-experimental]
@@ -485,7 +501,13 @@ final class Plugin_Check_Command {
 
 		// Filters the checks by specific categories.
 		if ( ! empty( $options['categories'] ) ) {
-			$categories = array_map( 'trim', explode( ',', $options['categories'] ) );
+			$categories = wp_parse_list( $options['categories'] );
+
+			$invalid_categories_message = $this->get_invalid_categories_message( $categories );
+			if ( '' !== $invalid_categories_message ) {
+				WP_CLI::error( $invalid_categories_message );
+			}
+
 			$collection = Check_Categories::filter_checks_by_categories( $collection, $categories );
 		}
 
@@ -597,6 +619,35 @@ final class Plugin_Check_Command {
 		}
 
 		return $categories;
+	}
+
+	/**
+	 * Returns an error message for any of the given categories that are not registered check categories.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param array $categories List of category slugs passed to `--categories`.
+	 * @return string Error message, or an empty string if all categories are valid.
+	 */
+	private function get_invalid_categories_message( array $categories ): string {
+		$valid_categories   = Check_Categories::get_category_slugs();
+		$invalid_categories = array_values( array_unique( array_diff( $categories, $valid_categories ) ) );
+
+		if ( empty( $invalid_categories ) ) {
+			return '';
+		}
+
+		return sprintf(
+			/* translators: 1: Comma-separated list of invalid categories, 2: Comma-separated list of valid categories. */
+			_n(
+				'Invalid category: %1$s. Valid categories are: %2$s.',
+				'Invalid categories: %1$s. Valid categories are: %2$s.',
+				count( $invalid_categories ),
+				'plugin-check'
+			),
+			implode( ', ', $invalid_categories ),
+			implode( ', ', $valid_categories )
+		);
 	}
 
 	/**
@@ -759,6 +810,43 @@ final class Plugin_Check_Command {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Returns the message shown when the check finds no errors or warnings.
+	 *
+	 * When AI analysis ran, the number of possible false positives and the
+	 * tokens spent are added as separate sentences.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param array $ai_stats AI statistics from the check result.
+	 * @return string The success message.
+	 */
+	private function get_success_message( array $ai_stats ) {
+		$message = __( 'Checks complete. No errors found.', 'plugin-check' );
+
+		$false_positives = isset( $ai_stats['false_positives'] ) ? (int) $ai_stats['false_positives'] : 0;
+		if ( $false_positives <= 0 ) {
+			return $message;
+		}
+
+		$message .= ' ' . sprintf(
+			/* translators: %s: Number of possible false positives. */
+			_n( 'AI detected %s possible false positive.', 'AI detected %s possible false positives.', $false_positives, 'plugin-check' ),
+			number_format_i18n( $false_positives )
+		);
+
+		$tokens_spent = isset( $ai_stats['tokens_spent'] ) ? (int) $ai_stats['tokens_spent'] : 0;
+		if ( $tokens_spent > 0 ) {
+			$message .= ' ' . sprintf(
+				/* translators: %s: Number of tokens spent. */
+				__( 'Tokens spent: %s.', 'plugin-check' ),
+				number_format_i18n( $tokens_spent )
+			);
+		}
+
+		return $message;
 	}
 
 	/**

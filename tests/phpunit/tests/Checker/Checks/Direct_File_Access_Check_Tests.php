@@ -90,6 +90,35 @@ class Direct_File_Access_Check_Tests extends WP_UnitTestCase {
 		$this->assertArrayNotHasKey( 'includes/namespace-class-only.php', $errors );
 	}
 
+	public function test_run_allows_includes_of_safe_files() {
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-direct-file-access-without-errors/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check = new Direct_File_Access_Check();
+		$check->run( $check_result );
+
+		$errors = $check_result->get_errors();
+
+		$this->assertArrayNotHasKey( 'includes/require-once-class-only.php', $errors );
+		$this->assertArrayNotHasKey( 'includes/require-only.php', $errors );
+		$this->assertArrayNotHasKey( 'includes/include-cycle-a.php', $errors );
+		$this->assertArrayNotHasKey( 'includes/include-cycle-b.php', $errors );
+	}
+
+	public function test_run_flags_unsafe_includes() {
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-plugin-direct-file-access-with-errors/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check = new Direct_File_Access_Check();
+		$check->run( $check_result );
+
+		$errors = $check_result->get_errors();
+
+		$this->assertArrayHasKey( 'includes/some-include.php', $errors );
+		$this->assertArrayHasKey( 'includes/require-procedural-file.php', $errors );
+		$this->assertArrayHasKey( 'includes/require-dynamic-path.php', $errors );
+	}
+
 	/**
 	 * Test that files with procedural code without guards are flagged.
 	 */

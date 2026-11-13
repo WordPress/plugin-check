@@ -113,6 +113,19 @@ Feature: Test that the WP-CLI command works.
       """
       WordPress.WP.AlternativeFunctions.rand_mt_rand
       """
+    When I try the WP-CLI command `plugin check foo-single.php --categories=secure`
+    Then STDERR should contain:
+      """
+      Error: Invalid category: secure. Valid categories are: general, plugin_repo, security, performance, accessibility.
+      """
+    And STDOUT should be empty
+    And the return code should be 1
+    When I try the WP-CLI command `plugin check foo-single.php --categories=security,foo,bar`
+    Then STDERR should contain:
+      """
+      Error: Invalid categories: foo, bar.
+      """
+    And the return code should be 1
     When I run the WP-CLI command `plugin check foo-single.php --checks=plugin_review_phpcs,late_escaping --exclude-checks=late_escaping`
     Then STDOUT should contain:
       """
@@ -314,6 +327,140 @@ Feature: Test that the WP-CLI command works.
       FILE: subdirectory/error.php
       """
 
+  Scenario: Apply .pcpignore exclusions only when requested
+    Given a WP install with the Plugin Check plugin
+    And an empty wp-content/plugins/foo-plugin directory
+    And an empty wp-content/plugins/foo-plugin/docs directory
+    And a wp-content/plugins/foo-plugin/foo-plugin.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Plugin
+       * Text Domain: foo-plugin
+       */
+      """
+    And a wp-content/plugins/foo-plugin/docs/example.php file:
+      """
+      <?php
+      $value = 1;
+      echo $value;
+      """
+    And a wp-content/plugins/foo-plugin/.pcpignore file:
+      """
+      # Documentation is not distributed.
+      docs/
+      """
+
+    When I run the WP-CLI command `plugin check foo-plugin`
+    Then STDOUT should contain:
+      """
+      FILE: docs/example.php
+      """
+
+    When I run the WP-CLI command `plugin check foo-plugin --use-pcpignore`
+    Then STDOUT should not contain:
+      """
+      FILE: docs/example.php
+      """
+
+  Scenario: .pcpignore exclusions are anchored to the plugin root
+    Given a WP install with the Plugin Check plugin
+    And an empty wp-content/plugins/foo-plugin directory
+    And an empty wp-content/plugins/foo-plugin/docs directory
+    And an empty wp-content/plugins/foo-plugin/includes/docs directory
+    And a wp-content/plugins/foo-plugin/foo-plugin.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Plugin
+       * Text Domain: foo-plugin
+       */
+      """
+    And a wp-content/plugins/foo-plugin/docs/example.php file:
+      """
+      <?php
+      $value = 1;
+      echo $value;
+      """
+    And a wp-content/plugins/foo-plugin/includes/docs/real-code.php file:
+      """
+      <?php
+      $value = 1;
+      echo $value;
+      """
+    And a wp-content/plugins/foo-plugin/.pcpignore file:
+      """
+      # Only the top-level docs directory is not distributed.
+      docs/
+      """
+
+    When I run the WP-CLI command `plugin check foo-plugin --use-pcpignore`
+    Then STDOUT should not contain:
+      """
+      FILE: docs/example.php
+      """
+    And STDOUT should contain:
+      """
+      FILE: includes/docs/real-code.php
+      """
+
+  Scenario: .pcpignore exclusions support wildcard patterns
+    Given a WP install with the Plugin Check plugin
+    And an empty wp-content/plugins/foo-plugin directory
+    And a wp-content/plugins/foo-plugin/foo-plugin.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Plugin
+       * Text Domain: foo-plugin
+       */
+      """
+    And a wp-content/plugins/foo-plugin/app.exe file:
+      """
+      This file is not executable.
+      """
+    And a wp-content/plugins/foo-plugin/.pcpignore file:
+      """
+      # Application files are not distributed.
+      *.exe
+      """
+
+    When I run the WP-CLI command `plugin check foo-plugin --checks=file_type`
+    Then STDOUT should contain:
+      """
+      FILE: app.exe
+      """
+
+    When I run the WP-CLI command `plugin check foo-plugin --checks=file_type --use-pcpignore`
+    Then STDOUT should not contain:
+      """
+      FILE: app.exe
+      """
+
+  Scenario: An invalid .pcpignore path produces a warning instead of failing the scan
+    Given a WP install with the Plugin Check plugin
+    And an empty wp-content/plugins/foo-plugin directory
+    And a wp-content/plugins/foo-plugin/foo-plugin.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Plugin
+       * Text Domain: foo-plugin
+       */
+      """
+    And an empty wp-content/plugins/foo-plugin/.pcpignore directory
+
+    When I try the WP-CLI command `plugin check foo-plugin --use-pcpignore`
+    Then STDERR should contain:
+      """
+      Warning:
+      """
+    And STDERR should contain:
+      """
+      .pcpignore
+      """
+    And the return code should be 0
+
   Scenario: Perform runtime check
     Given a WP install with the Plugin Check plugin
     And a wp-content/plugins/foo-single.php file:
@@ -338,6 +485,64 @@ Feature: Test that the WP-CLI command works.
         }
       );
       """
+
+    When I run the WP-CLI command `plugin check foo-single.php --require=./wp-content/plugins/plugin-check/cli.php`
+    Then STDOUT should contain:
+      """
+      mt_rand() is discouraged.
+      """
+
+  Scenario: Clean up the runtime environment when an invalid category is passed
+    Given a WP install with the Plugin Check plugin
+    And a wp-content/plugins/foo-single.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Single
+       * Plugin URI: https://foo-single.com
+       * Description: Custom plugin.
+       * Version: 0.1.0
+       * Author: WordPress Performance Team
+       * Author URI: https://make.wordpress.org/performance/
+       * License: GPL-2.0+
+       * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+       */
+      """
+    And I run the WP-CLI command `plugin activate foo-single.php`
+
+    When I try the WP-CLI command `plugin check foo-single.php --categories=performance,foo --require=./wp-content/plugins/plugin-check/cli.php`
+    Then STDERR should contain:
+      """
+      Error: Invalid category: foo.
+      """
+    And the return code should be 1
+    And the wp-content/object-cache.php file should not exist
+
+  Scenario: Check a plugin using --require while Plugin Check is not active
+    Given a WP install with the Plugin Check plugin
+    And a wp-content/plugins/foo-single.php file:
+      """
+      <?php
+      /**
+       * Plugin Name: Foo Single
+       * Plugin URI: https://foo-single.com
+       * Description: Custom plugin.
+       * Version: 0.1.0
+       * Author: WordPress Performance Team
+       * Author URI: https://make.wordpress.org/performance/
+       * License: GPL-2.0+
+       * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+       */
+
+      add_action(
+        'init',
+        function () {
+          $number = mt_rand( 10, 100 );
+          echo $number;
+        }
+      );
+      """
+    And I run the WP-CLI command `plugin deactivate plugin-check`
 
     When I run the WP-CLI command `plugin check foo-single.php --require=./wp-content/plugins/plugin-check/cli.php`
     Then STDOUT should contain:

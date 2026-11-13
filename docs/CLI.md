@@ -17,7 +17,11 @@ Runs plugin check.
 Applies after evaluating `--checks`.
 
 [--ignore-codes=<codes>]
-: Ignore error codes provided as an argument in comma-separated values.
+: Ignore result codes provided as an argument in comma-separated values, e.g. missing_composer_json_file.
+Result codes are individual findings emitted by checks. They are different from check slugs used with
+`--checks` and `--exclude-checks`.
+Use an output format such as `--format=json` or `--format=csv` to inspect result codes.
+For example: `wp plugin check akismet --format=csv --fields=code,message`.
 
 [--format=<format>]
 : Format to display the results. Options are table, csv, json, ctrf, strict-table, strict-csv, strict-json, and strict-ctrf. The default will be a table.
@@ -34,7 +38,7 @@ options:
   - strict-ctrf
 ---
 
-[--categories]
+[--categories=<categories>]
 : Limit displayed results to include only specific categories Checks.
 
 [--fields=<fields>]
@@ -52,9 +56,22 @@ options:
 [--exclude-directories=<directories>]
 : Additional directories to exclude from checks.
 By default, `.git`, `vendor`, `vendor_prefixed`, `vendor-prefixed` and `node_modules` directories are excluded.
+This only excludes files from file-based scans. It does not suppress plugin-level findings such as
+missing_composer_json_file; use `--ignore-codes` for specific result codes.
 
 [--exclude-files=<files>]
 : Additional files to exclude from checks.
+This only excludes files from file-based scans. It does not suppress plugin-level findings such as
+missing_composer_json_file; use `--ignore-codes` for specific result codes.
+
+[--use-pcpignore]
+: Apply custom file and directory exclusions from a `.pcpignore` file in the plugin root.
+Each non-empty, non-comment line is a path anchored to that root (not matched at any depth), so `docs/`
+only excludes a top-level `docs` directory, not a `docs` directory nested elsewhere. A trailing slash
+excludes a directory; all other entries exclude files. Entries may include `*` and `?` wildcards, e.g.
+`*.map`. Single-file plugins are not supported, since they have no dedicated plugin directory to hold a
+`.pcpignore` file. This option is disabled by default and is intended for local and CI scans.
+WordPress.org scans must not use this option.
 
 [--severity=<severity>]
 : Severity level.
@@ -93,9 +110,12 @@ options:
 ```
 wp plugin check akismet
 wp plugin check akismet --checks=late_escaping
+wp plugin check akismet --format=csv --fields=code,message
+wp plugin check akismet --ignore-codes=missing_composer_json_file
 wp plugin check akismet --format=json
 wp plugin check akismet --format=ctrf
 wp plugin check akismet --mode=update
+wp plugin check akismet --use-pcpignore
 wp plugin check akismet --ai
 wp plugin check akismet --ai --ai-model=openai::gpt-4o
 ```
@@ -119,7 +139,7 @@ options:
   - json
 ---
 
-[--categories]
+[--categories=<categories>]
 : Limit displayed results to include only specific categories.
 
 [--include-experimental]

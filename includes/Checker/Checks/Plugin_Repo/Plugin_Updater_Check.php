@@ -230,7 +230,8 @@ class Plugin_Updater_Check extends Abstract_File_Check {
 	protected function look_for_updater_routines( Check_Result $result, array $php_files ) {
 
 		$look_for_regex = array(
-			'#auto_update_plugin#',
+			// Match the auto_update_plugin filter without matching the auto_update_plugins option.
+			'#auto_update_plugin\b#',
 			'#pre_set_site_transient_update_\w+#i',
 			'#_site_transient_update_\w+#i',
 		);

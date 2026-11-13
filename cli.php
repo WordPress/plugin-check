@@ -84,3 +84,28 @@ WP_CLI::add_hook(
 		}
 	}
 );
+
+/*
+ * Define the plugin's path constants when Plugin Check itself is not active.
+ *
+ * This file can be loaded with `--require` while the plugin is inactive. In that case
+ * plugin.php never runs, and checks that rely on these constants fail with a fatal error.
+ * By the time WordPress has loaded, plugin.php has already defined them if the plugin is
+ * active, so this only fills in what is missing.
+ */
+WP_CLI::add_hook(
+	'after_wp_load',
+	function () {
+		if ( ! defined( 'WP_PLUGIN_CHECK_MAIN_FILE' ) ) {
+			define( 'WP_PLUGIN_CHECK_MAIN_FILE', __DIR__ . '/plugin.php' );
+		}
+
+		if ( ! defined( 'WP_PLUGIN_CHECK_PLUGIN_DIR_PATH' ) ) {
+			define( 'WP_PLUGIN_CHECK_PLUGIN_DIR_PATH', plugin_dir_path( WP_PLUGIN_CHECK_MAIN_FILE ) );
+		}
+
+		if ( ! defined( 'WP_PLUGIN_CHECK_PLUGIN_DIR_URL' ) ) {
+			define( 'WP_PLUGIN_CHECK_PLUGIN_DIR_URL', plugin_dir_url( WP_PLUGIN_CHECK_MAIN_FILE ) );
+		}
+	}
+);

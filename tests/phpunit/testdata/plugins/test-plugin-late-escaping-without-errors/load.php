@@ -20,3 +20,24 @@
  */
 
 esc_html_e( 'Hello World!', 'test-plugin-check' );
+
+/**
+ * Outputs widget markup with escaped wrapper arguments.
+ *
+ * @param array $args     Widget display arguments.
+ * @param array $instance Widget instance settings.
+ */
+function test_plugin_check_widget_output( $args, $instance ) {
+	$title = isset( $instance['title'] ) ? $instance['title'] : '';
+
+	echo wp_kses_post( $args['before_widget'] );
+
+	if ( '' !== $title ) {
+		echo wp_kses_post( $args['before_title'] );
+		echo esc_html( $title );
+		echo wp_kses_post( $args['after_title'] );
+	}
+
+	echo '<p>' . esc_html__( 'Widget content.', 'test-plugin-check' ) . '</p>';
+	echo wp_kses_post( $args['after_widget'] );
+}
