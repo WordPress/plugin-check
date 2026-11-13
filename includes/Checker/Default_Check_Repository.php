@@ -107,6 +107,7 @@ class Default_Check_Repository extends Empty_Check_Repository {
 				'wp_functions_compatibility' => new Checks\Plugin_Repo\WP_Functions_Compatibility_Check(),
 				'ai_provider'                => new Checks\General\AI_Provider_Check(),
 				'react_usage'                => new Checks\General\React_Usage_Check(),
+				'credential_storage'         => new Checks\Security\Credential_Storage_Check(),
 			)
 		);
 
