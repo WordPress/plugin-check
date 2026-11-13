@@ -96,7 +96,7 @@ trait License_Utils {
 			return true;
 		}
 
-		$match = preg_match( '/GPL|EUPL|GNU|MIT|FreeBSD|New BSD|BSD-3-Clause|BSD 3 Clause|OpenLDAP|Expat|Apache2|MPL20|ISC|CC0|Unlicense|WTFPL|BlueOak/im', $license );
+		$match = preg_match( '/GPL|EUPL|GNU|MIT|FreeBSD|New BSD|BSD[\s-]*[23][\s-]*Clause|OpenLDAP|Expat|Apache2|MPL20|ISC|CC0|Unlicense|WTFPL|BlueOak/im', $license );
 
 		return ( false === $match || 0 === $match ) ? false : true;
 	}

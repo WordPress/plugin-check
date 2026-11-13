@@ -38,6 +38,29 @@ class License_Utils_Tests extends WP_UnitTestCase {
 		$this->assertSame( $validity, $result );
 	}
 
+	/**
+	 * @dataProvider data_raw_license_gpl_compatibility
+	 */
+	public function test_normalized_license_gpl_compatibility( $raw, $validity ) {
+		$result = $this->is_license_gpl_compatible( $this->get_normalized_license( $raw ) );
+
+		$this->assertSame( $validity, $result );
+	}
+
+	public function data_raw_license_gpl_compatibility() {
+		return array(
+			array( 'BSD-3-Clause', true ),
+			array( 'BSD-2-Clause', true ),
+			array( 'BSD 3 Clause', true ),
+			array( 'BSD 2 Clause', true ),
+			array( 'MIT', true ),
+			array( 'Apache-2.0', true ),
+			array( 'MPL-2.0', true ),
+			array( 'GPL-2.0-or-later', true ),
+			array( 'BSD-4-Clause', false ),
+		);
+	}
+
 	public function data_licenses_for_normalization() {
 		return array(
 			array( 'GPLv2', 'GPL2' ),
@@ -127,6 +150,10 @@ class License_Utils_Tests extends WP_UnitTestCase {
 			array( 'New BSD', true ),
 			array( 'BSD-3-Clause', true ),
 			array( 'BSD 3 Clause', true ),
+			array( 'BSD3Clause', true ),
+			array( 'BSD-2-Clause', true ),
+			array( 'BSD 2 Clause', true ),
+			array( 'BSD2Clause', true ),
 			array( 'OpenLDAP', true ),
 			array( 'Expat', true ),
 			array( 'ISC', true ),
