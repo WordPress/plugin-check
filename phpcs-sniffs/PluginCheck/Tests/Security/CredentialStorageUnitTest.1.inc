@@ -43,3 +43,9 @@ update_option( 'my_plugin_secret_enabled', true ); // OK, metadata.
 update_option( 'my_plugin_api_key_url', $url ); // OK, metadata.
 update_option( 'my_plugin_max_tokens', 100 ); // OK, model limit.
 update_option( 'my-plugin-max-tokens', 100 ); // OK, model limit.
+update_option( 'my_plugin_password', wp_hash_password( $password ) ); // OK, hashed value.
+update_option( 'my_plugin_password', \password_hash( $password, PASSWORD_DEFAULT ) ); // OK, hashed value.
+update_site_option( 'my_plugin_password', wp_hash_password( $password ) ); // OK, hashed value.
+update_network_option( null, 'my_plugin_password', password_hash( $password, PASSWORD_DEFAULT ) ); // OK, hashed value.
+update_option( 'my_plugin_password', wp_hash_password( $password ) . $suffix ); // Warning, not only a hash.
+update_option( 'my_plugin_password', $hash ); // Warning, unknown value.

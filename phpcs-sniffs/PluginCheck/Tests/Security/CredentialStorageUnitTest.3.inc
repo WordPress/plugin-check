@@ -5,7 +5,7 @@ function my_plugin_save_key( $key ) {
 		return \wp_set_secret( 'my-plugin/api-key', $key );
 	}
 
-	return update_option( 'my_plugin_api_key', $key ); // OK, early return guard.
+	return update_option( 'my_plugin_api_key', $key ); // No warning, early return guard. function_exists() alone is not a full check on 7.2.
 }
 
 function my_plugin_save_password( $password, $other ) {
@@ -305,4 +305,14 @@ function my_plugin_bitwise_or( $force_legacy, $key ) {
 	if ( ! wp_is_secrets_api_available() | $force_legacy ) {
 		update_option( 'my_plugin_api_key', $key ); // Warning, the condition can be true with the API.
 	}
+}
+
+function my_plugin_double_negation( $key ) {
+	if ( !! wp_is_secrets_api_available() ) {
+		update_option( 'my_plugin_api_key', $key ); // Warning, two negations mean the API is available.
+	}
+}
+
+function my_plugin_ternary_then_or( $key ) {
+	$ok = wp_is_secrets_api_available() ? ! is_wp_error( wp_set_secret( 'my-plugin/api-key', $key ) ) : false or update_option( 'my_plugin_api_key', $key ); // Warning, "or" ends the ternary.
 }

@@ -113,22 +113,67 @@ final class CredentialStorageSniff extends AbstractFunctionParameterSniff {
 
 		$option_name = TextStrings::stripQuotes( $option_param['clean'] );
 
-		if ( ! $this->is_credential_name( $option_name ) || $this->is_guarded_fallback( $stackPtr ) ) {
+		if ( ! $this->is_credential_name( $option_name ) || $this->is_hashed_value( $parameters, $matched_content, $param['position'] + 1 ) || $this->is_guarded_fallback( $stackPtr ) ) {
 			return;
 		}
 
 		$is_network = false !== strpos( $matched_content, '_site_' ) || false !== strpos( $matched_content, '_network_' );
 
 		$this->phpcsFile->addWarning(
-			'The option "%1$s" appears to store a credential outside the Secrets API. Since WordPress 7.2, use %2$s() and %3$s() so the value is encrypted at rest with core key management and rotation, instead of plain text or custom encryption. Check wp_is_secrets_api_available() (after function_exists( \'wp_is_secrets_api_available\' ) on older WordPress versions) and keep your current storage only as a fallback when it returns false.',
+			'The option "%1$s" appears to store a credential outside the Secrets API. Since WordPress 7.2, use %2$s() and %3$s() so the value is encrypted at rest with core key management and rotation, instead of plain text or custom encryption.%4$s Keep your current storage only as a fallback when wp_is_secrets_api_available() returns false (check function_exists( \'wp_is_secrets_api_available\' ) first on older WordPress versions). Do not fall back when a write returns a WP_Error, because a host can manage secrets itself.',
 			$stackPtr,
 			'CredentialOutsideSecretsAPI',
 			array(
 				$option_name,
 				$is_network ? 'wp_set_network_secret' : 'wp_set_secret',
 				$is_network ? 'wp_get_network_secret' : 'wp_get_secret',
+				$is_network ? '' : ' Use wp_import_option_as_secret() to move an existing option.',
 			)
 		);
+	}
+
+	/**
+	 * Checks whether the written value is a password hash.
+	 *
+	 * A password that the plugin only verifies must stay hashed, not move to reversible
+	 * encryption. Only a value that is a single wp_hash_password() or password_hash()
+	 * call counts, so "wp_hash_password( $a ) . $b" keeps the warning.
+	 *
+	 * @since 2.3.0
+	 *
+	 * @param array  $parameters      Array with information about the parameters.
+	 * @param string $matched_content The matched function name in lowercase.
+	 * @param int    $position        Position of the value parameter.
+	 * @return bool True when the value is the result of a password hashing function.
+	 */
+	private function is_hashed_value( $parameters, $matched_content, $position ) {
+		// register_setting() has no value parameter.
+		if ( 'register_setting' === $matched_content ) {
+			return false;
+		}
+
+		$value = PassedParameters::getParameterFromStack( $parameters, $position, 'value' );
+
+		if ( false === $value ) {
+			return false;
+		}
+
+		$tokens = $this->phpcsFile->getTokens();
+		$skip   = Tokens::$emptyTokens + array( T_NS_SEPARATOR => T_NS_SEPARATOR );
+		$name   = $this->phpcsFile->findNext( $skip, $value['start'], $value['end'] + 1, true );
+
+		if ( false === $name || ! in_array( $this->get_function_name( $name ), array( 'wp_hash_password', 'password_hash' ), true ) ) {
+			return false;
+		}
+
+		$opener = $this->phpcsFile->findNext( Tokens::$emptyTokens, $name + 1, $value['end'] + 1, true );
+
+		if ( false === $opener || T_OPEN_PARENTHESIS !== $tokens[ $opener ]['code'] || ! isset( $tokens[ $opener ]['parenthesis_closer'] ) ) {
+			return false;
+		}
+
+		// The call must be the whole value, not the start of a larger expression.
+		return false === $this->phpcsFile->findNext( Tokens::$emptyTokens, $tokens[ $opener ]['parenthesis_closer'] + 1, $value['end'] + 1, true );
 	}
 
 	/**
@@ -308,9 +353,10 @@ final class CredentialStorageSniff extends AbstractFunctionParameterSniff {
 		$token_depth = $this->get_depth( $stackPtr );
 
 		// Commas and array arrows inside the arguments of a nested call do not end the expression.
+		// "and", "or" and "xor" bind weaker than a ternary, so "a ? b : c or write()" is not one ternary.
 		return $token_depth < $depth
 			|| in_array( $code, array( T_SEMICOLON, T_OPEN_TAG, T_OPEN_CURLY_BRACKET, T_CLOSE_CURLY_BRACKET ), true )
-			|| ( $token_depth === $depth && in_array( $code, array( T_COMMA, T_DOUBLE_ARROW ), true ) );
+			|| ( $token_depth === $depth && in_array( $code, array( T_COMMA, T_DOUBLE_ARROW, T_LOGICAL_AND, T_LOGICAL_OR, T_LOGICAL_XOR ), true ) );
 	}
 
 	/**
@@ -499,9 +545,16 @@ final class CredentialStorageSniff extends AbstractFunctionParameterSniff {
 		}
 
 		// PHPCS 3 splits a fully qualified name into a namespace separator and a name, so skip the separator.
-		$prev = $this->phpcsFile->findPrevious( Tokens::$emptyTokens + array( T_NS_SEPARATOR => T_NS_SEPARATOR ), $stackPtr - 1, null, true );
+		$skip = Tokens::$emptyTokens + array( T_NS_SEPARATOR => T_NS_SEPARATOR );
+		$prev = $this->phpcsFile->findPrevious( $skip, $stackPtr - 1, null, true );
 
-		return ( false !== $prev && T_BOOLEAN_NOT === $tokens[ $prev ]['code'] ) ? -$sign : $sign;
+		// Every "!" flips the meaning, so "!! check()" is a positive check.
+		while ( false !== $prev && T_BOOLEAN_NOT === $tokens[ $prev ]['code'] ) {
+			$sign = -$sign;
+			$prev = $this->phpcsFile->findPrevious( $skip, $prev - 1, null, true );
+		}
+
+		return $sign;
 	}
 
 	/**

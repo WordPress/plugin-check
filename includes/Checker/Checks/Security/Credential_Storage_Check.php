@@ -73,6 +73,6 @@ class Credential_Storage_Check extends Abstract_PHP_CodeSniffer_Check {
 	 * @return string The documentation URL.
 	 */
 	public function get_documentation_url(): string {
-		return __( 'https://developer.wordpress.org/plugins/security/', 'plugin-check' );
+		return __( 'https://make.wordpress.org/core/2026/11/11/the-secrets-api-in-wordpress-7-2/', 'plugin-check' );
 	}
 }
