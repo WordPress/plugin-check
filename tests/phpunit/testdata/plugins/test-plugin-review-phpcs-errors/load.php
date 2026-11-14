@@ -37,6 +37,7 @@ $encoded_value = json_encode( array( 'key' => 'value' ) );
 
 file_get_contents( $url );
 file_put_contents();
+fclose();
 
 load_plugin_textdomain( 'sample-textdomain', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 
