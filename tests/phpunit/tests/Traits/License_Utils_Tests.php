@@ -58,6 +58,9 @@ class License_Utils_Tests extends WP_UnitTestCase {
 			array( 'MPL-2.0', true ),
 			array( 'GPL-2.0-or-later', true ),
 			array( 'BSD-4-Clause', false ),
+			array( 'BSD-3-Clause-No-Nuclear-License', false ),
+			array( 'BSD-3-Clause-Clear', false ),
+			array( 'BSD-3-Clause OR GPL-2.0-or-later', true ),
 		);
 	}
 
@@ -154,6 +157,7 @@ class License_Utils_Tests extends WP_UnitTestCase {
 			array( 'BSD-2-Clause', true ),
 			array( 'BSD 2 Clause', true ),
 			array( 'BSD2Clause', true ),
+			array( 'BSD3ClauseNoNuclearLicense', false ),
 			array( 'OpenLDAP', true ),
 			array( 'Expat', true ),
 			array( 'ISC', true ),
