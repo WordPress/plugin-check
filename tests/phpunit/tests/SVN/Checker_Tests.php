@@ -354,4 +354,52 @@ class Checker_Tests extends WP_UnitTestCase {
 		$this->assertSame( 'pass', $this->get_check_by_key( $trunk_section->get_checks(), 'trunk_stable_tag_declared' )['status'] );
 		$this->assertSame( 'pass', $this->get_check_by_key( $trunk_section->get_checks(), 'trunk_stable_tag_matches_version' )['status'] );
 	}
+
+	public function test_run_reports_tag_mismatch_without_claiming_equality() {
+		$this->svn_mock_responses = array(
+			'trunk/readme.txt'       => array(
+				'code' => 200,
+				'body' => "=== Example Plugin ===\nStable tag: 1.0.1\n",
+			),
+			'trunk/'                 => array(
+				'code' => 200,
+				'body' => '<a href="example.php">example.php</a>',
+			),
+			'trunk/example.php'      => array(
+				'code' => 200,
+				'body' => "Plugin Name: Example Plugin\nVersion: 1.0.2\n",
+			),
+			'tags/'                  => array(
+				'code' => 200,
+				'body' => '<a href="1.0.1/">1.0.1</a>',
+			),
+			'assets/'                => array( 'code' => 200 ),
+			'tags/1.0.1/'            => array(
+				'code' => 200,
+				'body' => '<a href="readme.txt">readme.txt</a><a href="example.php">example.php</a>',
+			),
+			'tags/1.0.1/readme.txt'  => array(
+				'code' => 200,
+				'body' => "=== Example Plugin ===\nStable tag: 1.0.0\n",
+			),
+			'tags/1.0.1/example.php' => array(
+				'code' => 200,
+				'body' => "Plugin Name: Example Plugin\nVersion: 1.0.0\n",
+			),
+		);
+
+		$checker = new Checker( 'example' );
+		$report  = $checker->run();
+
+		$section = $this->get_section_by_id( $report['sections'], 'stable_tag' );
+		$this->assertNotNull( $section );
+
+		$readme_check = $this->get_check_by_key( $section->get_checks(), 'tag_readme_stable_tag_matches_trunk' );
+		$this->assertSame( 'fail', $readme_check['status'] );
+		$this->assertSame( 'tag=1.0.0, trunk=1.0.1', $readme_check['detail'] );
+
+		$php_check = $this->get_check_by_key( $section->get_checks(), 'tag_php_version_matches_trunk' );
+		$this->assertSame( 'fail', $php_check['status'] );
+		$this->assertSame( 'tag=1.0.0, trunk=1.0.2', $php_check['detail'] );
+	}
 }
