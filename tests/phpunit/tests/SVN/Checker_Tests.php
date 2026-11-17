@@ -146,7 +146,9 @@ class Checker_Tests extends WP_UnitTestCase {
 		$stable_tag_section = $this->get_section_by_id( $report['sections'], 'stable_tag' );
 		$this->assertNotNull( $stable_tag_section );
 		$this->assertSame( 'pass', $this->get_check_by_key( $stable_tag_section->get_checks(), 'tag_readme_stable_tag_matches_trunk' )['status'] );
+		$this->assertSame( '1.0.0 === 1.0.0', $this->get_check_by_key( $stable_tag_section->get_checks(), 'tag_readme_stable_tag_matches_trunk' )['detail'] );
 		$this->assertSame( 'pass', $this->get_check_by_key( $stable_tag_section->get_checks(), 'tag_php_version_matches_trunk' )['status'] );
+		$this->assertSame( '1.0.0 === 1.0.0', $this->get_check_by_key( $stable_tag_section->get_checks(), 'tag_php_version_matches_trunk' )['detail'] );
 		$this->assertSame( 'pass', $this->get_check_by_key( $stable_tag_section->get_checks(), 'tag_unexpected_files' )['status'] );
 
 		$assets_section = $this->get_section_by_id( $report['sections'], 'assets' );
