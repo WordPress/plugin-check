@@ -14,7 +14,7 @@ class Enqueued_Scripts_Size_Check_Tests extends Runtime_Check_UnitTestCase {
 	public function tear_down() {
 		// Remove the dependency files the size-check fixture writes to the uploads directory.
 		$basedir = trailingslashit( wp_upload_dir()['basedir'] );
-		foreach ( array( 'plugin-check-external-dependency.js', 'plugin-check-external-transitive-dependency.js', 'plugin-check-scheme-test.js' ) as $file ) {
+		foreach ( array( 'plugin-check-external-dependency.js', 'plugin-check-external-transitive-dependency.js', 'plugin-check-scheme-test.js', 'plugin-check-relative-test.js' ) as $file ) {
 			if ( file_exists( $basedir . $file ) ) {
 				unlink( $basedir . $file );
 			}
@@ -163,5 +163,34 @@ class Enqueued_Scripts_Size_Check_Tests extends Runtime_Check_UnitTestCase {
 		$resolved = $method->invoke( $check, $https_src );
 
 		$this->assertSame( wp_normalize_path( $file ), $resolved );
+	}
+
+	public function test_get_path_resolves_root_relative_and_protocol_relative_dependency() {
+		// Core registers its scripts root-relative (e.g. /wp-includes/js/jquery/jquery.min.js), and
+		// some are enqueued protocol-relative (//host/path). Both have to resolve to the local file,
+		// not just fully-qualified srcs, or a plugin's core dependencies get counted as zero bytes.
+		$uploads = wp_upload_dir();
+		$file    = trailingslashit( $uploads['basedir'] ) . 'plugin-check-relative-test.js';
+		file_put_contents( $file, str_repeat( 'a', 64 ) );
+
+		$absolute          = trailingslashit( $uploads['baseurl'] ) . 'plugin-check-relative-test.js';
+		$root_relative     = wp_parse_url( $absolute, PHP_URL_PATH );
+		$protocol_relative = preg_replace( '#^https?:#', '', set_url_scheme( $absolute, 'http' ) );
+
+		$check  = new Enqueued_Scripts_Size_Check();
+		$method = new ReflectionMethod( $check, 'get_path_from_src' );
+		$method->setAccessible( true );
+
+		// The plugin url/path are irrelevant here: a non-plugin src falls through to root resolution.
+		$this->assertSame(
+			wp_normalize_path( $file ),
+			$method->invoke( $check, $root_relative, 'http://plugin.invalid/', '/plugin/invalid/' ),
+			'A root-relative dependency src should resolve to its local file.'
+		);
+		$this->assertSame(
+			wp_normalize_path( $file ),
+			$method->invoke( $check, $protocol_relative, 'http://plugin.invalid/', '/plugin/invalid/' ),
+			'A protocol-relative dependency src should resolve to its local file.'
+		);
 	}
 }
