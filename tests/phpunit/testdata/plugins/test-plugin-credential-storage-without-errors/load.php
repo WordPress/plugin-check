@@ -15,7 +15,7 @@
  * @package test-plugin-credential-storage-without-errors
  */
 
-if ( function_exists( 'wp_set_secret' ) ) {
+if ( function_exists( 'wp_is_secrets_api_available' ) && wp_is_secrets_api_available() ) {
 	wp_set_secret( 'test-plugin/api-key', 'abc123' );
 } else {
 	update_option( 'test_plugin_api_key', 'abc123' );

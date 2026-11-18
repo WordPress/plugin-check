@@ -49,6 +49,7 @@ final class CredentialStorageSniff extends AbstractFunctionParameterSniff {
 		'add_network_option'    => true,
 		'update_network_option' => true,
 		'register_setting'      => true,
+		'function_exists'       => true,
 	);
 
 	/**
@@ -102,6 +103,11 @@ final class CredentialStorageSniff extends AbstractFunctionParameterSniff {
 	 * @return void
 	 */
 	public function process_parameters( $stackPtr, $group_name, $matched_content, $parameters ) {
+		if ( 'function_exists' === $matched_content ) {
+			$this->check_function_exists_guard( $stackPtr, $parameters );
+			return;
+		}
+
 		$param = $this->option_params[ $matched_content ];
 
 		$option_param = PassedParameters::getParameterFromStack( $parameters, $param['position'], $param['name'] );
@@ -129,6 +135,63 @@ final class CredentialStorageSniff extends AbstractFunctionParameterSniff {
 				$is_network ? 'wp_get_network_secret' : 'wp_get_secret',
 				$is_network ? '' : ' Use wp_import_option_as_secret() to move an existing option.',
 			)
+		);
+	}
+
+	/**
+	 * Warns when function_exists() on a Secrets API write function is used as the availability check.
+	 *
+	 * On WordPress 7.2 wp_set_secret() exists even when no encryption key is configured,
+	 * and then it returns a WP_Error. wp_is_secrets_api_available() is the real check.
+	 * A condition that also calls wp_is_secrets_api_available() is fine.
+	 *
+	 * @since 2.3.0
+	 *
+	 * @param int   $stackPtr   Position of the function_exists token.
+	 * @param array $parameters Array with information about the parameters.
+	 * @return void
+	 */
+	private function check_function_exists_guard( $stackPtr, $parameters ) {
+		$arg = PassedParameters::getParameterFromStack( $parameters, 1, 'function' );
+
+		if ( false === $arg ) {
+			return;
+		}
+
+		$function = strtolower( ltrim( TextStrings::stripQuotes( $arg['clean'] ), '\\' ) );
+
+		if ( ! in_array( $function, array( 'wp_set_secret', 'wp_set_network_secret' ), true ) ) {
+			return;
+		}
+
+		$tokens = $this->phpcsFile->getTokens();
+
+		// Look in the outermost parentheses around the call, for example an if condition, or else in the statement.
+		if ( isset( $tokens[ $stackPtr ]['nested_parenthesis'] ) ) {
+			$start = array_key_first( $tokens[ $stackPtr ]['nested_parenthesis'] );
+			$end   = $tokens[ $stackPtr ]['nested_parenthesis'][ $start ];
+		} else {
+			$start = $this->phpcsFile->findStartOfStatement( $stackPtr );
+			$end   = $this->phpcsFile->findEndOfStatement( $stackPtr );
+		}
+
+		for ( $i = $start; $i <= $end; $i++ ) {
+			if ( 'wp_is_secrets_api_available' !== $this->get_function_name( $i ) ) {
+				continue;
+			}
+
+			$next = $this->phpcsFile->findNext( Tokens::$emptyTokens, $i + 1, null, true );
+
+			if ( false !== $next && T_OPEN_PARENTHESIS === $tokens[ $next ]['code'] ) {
+				return;
+			}
+		}
+
+		$this->phpcsFile->addWarning(
+			'function_exists( \'%s\' ) does not tell whether the Secrets API can be used. On WordPress 7.2 the function exists even when no encryption key is configured, and then it returns a WP_Error. Use wp_is_secrets_api_available() instead (check function_exists( \'wp_is_secrets_api_available\' ) first on older WordPress versions).',
+			$stackPtr,
+			'FunctionExistsGuard',
+			array( $function )
 		);
 	}
 

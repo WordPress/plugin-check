@@ -66,29 +66,39 @@ final class CredentialStorageUnitTest extends AbstractSniffUnitTest {
 				);
 			case 'CredentialStorageUnitTest.3.inc':
 				return array(
+					4   => 1,
 					13  => 1,
 					18  => 1,
+					22  => 1,
 					25  => 1,
+					29  => 1,
 					46  => 1,
+					50  => 1,
 					51  => 1,
 					57  => 1,
 					67  => 1,
 					74  => 1,
+					79  => 1,
 					83  => 1,
+					89  => 1,
 					91  => 1,
 					99  => 1,
 					119 => 1,
 					133 => 1,
+					146 => 1,
 					149 => 1,
+					153 => 1,
 					192 => 1,
 					198 => 1,
-					212 => 1,
+					203 => 1,
+					212 => 2,
 					213 => 1,
 					214 => 1,
 					221 => 1,
 					228 => 1,
 					233 => 1,
 					248 => 1,
+					252 => 1,
 					255 => 1,
 					283 => 1,
 					294 => 1,
@@ -96,6 +106,14 @@ final class CredentialStorageUnitTest extends AbstractSniffUnitTest {
 					306 => 1,
 					312 => 1,
 					317 => 1,
+				);
+			case 'CredentialStorageUnitTest.4.inc':
+				return array(
+					4  => 1,
+					8  => 1,
+					12 => 1,
+					14 => 1,
+					35 => 1,
 				);
 			default:
 				return array();
