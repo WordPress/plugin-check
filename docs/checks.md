@@ -39,6 +39,7 @@
 | non_blocking_scripts | performance | Checks whether scripts and styles are enqueued using a recommended loading strategy. | [Learn more](https://developer.wordpress.org/plugins/) |
 | ai_provider | general | Recommends the WordPress AI Client when a plugin integrates directly with a third-party AI provider. | [Learn more](https://developer.wordpress.org/plugins/) |
 | react_usage | general, plugin_repo | Detects React usage that breaks when WordPress upgrades to React 19. | [Learn more](https://react.dev/blog/2024/04/25/react-19-upgrade-guide) |
+| credential_storage | security | Recommends the WordPress Secrets API for options that look like they store credentials. | [Learn more](https://make.wordpress.org/core/2026/11/11/the-secrets-api-in-wordpress-7-2/) |
 
 ## Results and severity
 
