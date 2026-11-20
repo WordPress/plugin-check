@@ -23,11 +23,6 @@ trait URL_Utils {
 	 * @return bool true if the URL is valid, otherwise false.
 	 */
 	protected function is_valid_url( string $url ): bool {
-		// Must start with http or https.
-		if ( ! str_starts_with( $url, 'http' ) ) {
-			return false;
-		}
-
 		// Parse the URL to validate its structure.
 		$parsed_url = wp_parse_url( $url );
 
@@ -38,6 +33,11 @@ trait URL_Utils {
 
 		// Must have a valid scheme and host.
 		if ( empty( $parsed_url['scheme'] ) || empty( $parsed_url['host'] ) ) {
+			return false;
+		}
+
+		// Scheme must be http or https (case-insensitive).
+		if ( ! in_array( strtolower( $parsed_url['scheme'] ), array( 'http', 'https' ), true ) ) {
 			return false;
 		}
 
