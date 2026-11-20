@@ -464,7 +464,7 @@ class Checker {
 				'tag_readme_stable_tag_matches_trunk',
 				__( 'readme stable tag matches trunk', 'plugin-check' ),
 				$match ? 'pass' : 'fail',
-				"{$tag_stable} === {$trunk_stable}"
+				$match ? "{$tag_stable} === {$trunk_stable}" : "tag={$tag_stable}, trunk={$trunk_stable}"
 			);
 		}
 	}
@@ -513,7 +513,7 @@ class Checker {
 				'tag_php_version_matches_trunk',
 				__( 'PHP version matches trunk', 'plugin-check' ),
 				$match ? 'pass' : 'fail',
-				"{$php_version} === {$trunk_version}"
+				$match ? "{$php_version} === {$trunk_version}" : "tag={$php_version}, trunk={$trunk_version}"
 			);
 		}
 	}
