@@ -1,0 +1,11 @@
+var bound = handler.bind( this );
+var trimmed = value.trim();
+items.push( 1 );
+var time = Date.now();
+var parsed = JSON.parse( text );
+var list = Array.isArray( items );
+var unrelated = obj.$.trim( value );
+var suffixed = foo$.trim( value );
+var prefixed = $jquery.trim( value );
+var method = $.trimLeft( value );
+var property = jQuery.type;
