@@ -1,7 +1,7 @@
 {
     "metadata": {
         "source": "wordpress-core",
-        "wordpress_version": "7.1.4"
+        "wordpress_version": "7.1.5"
     },
     "function_since": {
         "_": "0.71",
@@ -267,6 +267,7 @@
         "_wp_call_all_hook": "2.5.0",
         "_wp_can_use_pcre_u": "4.2.2",
         "_wp_check_alternate_file_names": "5.8.1",
+        "_wp_check_comment_target_post": "7.1.5",
         "_wp_check_existing_file_names": "5.3.1",
         "_wp_check_for_scheduled_split_terms": "4.3.0",
         "_wp_check_for_scheduled_update_comment_type": "5.5.0",
