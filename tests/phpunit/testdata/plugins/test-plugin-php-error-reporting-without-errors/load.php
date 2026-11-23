@@ -14,3 +14,11 @@ ini_set( 'memory_limit', '256M' );
 
 // Unaffected define statements are allowed.
 define( 'MY_CUSTOM_CONSTANT', true );
+
+// Referencing debug constants as values in const declarations is allowed.
+const MY_PLUGIN_DEBUG = WP_DEBUG;
+
+// Class constants named after debug constants do not override global WordPress constants.
+class My_Plugin_Debug_Config {
+	const WP_DEBUG = false;
+}

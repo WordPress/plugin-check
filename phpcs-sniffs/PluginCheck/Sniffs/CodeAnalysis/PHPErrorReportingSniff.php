@@ -17,7 +17,9 @@ use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Util\Tokens;
 use PHPCSUtils\Utils\MessageHelper;
+use PHPCSUtils\Utils\Namespaces;
 use PHPCSUtils\Utils\PassedParameters;
+use PHPCSUtils\Utils\Scopes;
 
 /**
  * Flags PHP error reporting changes and debug constant overrides.
@@ -176,7 +178,9 @@ final class PHPErrorReportingSniff implements Sniff {
 	 * Inspects a `const` declaration block for debug constants.
 	 *
 	 * Handles both single (`const WP_DEBUG = true;`) and comma-separated
-	 * (`const A = 1, WP_DEBUG = true;`) declarations.
+	 * (`const A = 1, WP_DEBUG = true;`) declarations in the global namespace,
+	 * while ignoring OO constants, namespaced constants, and debug constants
+	 * referenced in value expressions.
 	 *
 	 * @since 2.1.0
 	 *
@@ -187,20 +191,35 @@ final class PHPErrorReportingSniff implements Sniff {
 	 * @return void
 	 */
 	private function check_const_declaration( File $phpcsFile, $stackPtr, $tokens ) {
-		$end = $phpcsFile->findNext( array( T_SEMICOLON, T_OPEN_CURLY_BRACKET ), $stackPtr + 1 );
+		if ( Scopes::isOOConstant( $phpcsFile, $stackPtr ) ) {
+			return;
+		}
+		if ( '' !== Namespaces::determineNamespace( $phpcsFile, $stackPtr ) ) {
+			return;
+		}
+
+		$end = $phpcsFile->findNext( T_SEMICOLON, $stackPtr + 1 );
 		if ( false === $end ) {
 			return;
 		}
 
 		for ( $i = $stackPtr + 1; $i < $end; $i++ ) {
-			if ( T_STRING === $tokens[ $i ]['code'] && in_array( $tokens[ $i ]['content'], self::DEBUG_CONSTANTS, true ) ) {
-				$this->report(
-					$phpcsFile,
-					$i,
-					MessageHelper::stringToErrorcode( 'Const' . $tokens[ $i ]['content'] ),
-					true
-				);
+			if ( T_STRING !== $tokens[ $i ]['code'] || ! in_array( $tokens[ $i ]['content'], self::DEBUG_CONSTANTS, true ) ) {
+				continue;
 			}
+
+			$prev = $phpcsFile->findPrevious( Tokens::$emptyTokens, $i - 1, null, true );
+			$next = $phpcsFile->findNext( Tokens::$emptyTokens, $i + 1, null, true );
+			if ( ! in_array( $tokens[ $prev ]['code'], array( T_CONST, T_COMMA ), true ) || T_EQUAL !== $tokens[ $next ]['code'] ) {
+				continue;
+			}
+
+			$this->report(
+				$phpcsFile,
+				$i,
+				MessageHelper::stringToErrorcode( 'Const' . $tokens[ $i ]['content'] ),
+				true
+			);
 		}
 	}
 
