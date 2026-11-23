@@ -7,7 +7,11 @@ Runs plugin check.
 ## OPTIONS
 ```
 <plugin>
-: The plugin to check. Plugin name.
+: The plugin to check. Accepts an installed plugin slug or basename (e.g. `akismet` or
+`akismet/akismet.php`), a path to a plugin directory, or a URL to a plugin ZIP file.
+A directory path lets you check plugins outside `wp-content/plugins`, such as a must-use
+plugin in its own directory. The directory must contain a top-level PHP file with a
+`Plugin Name` header. Single-file must-use plugins need to be moved into a directory first.
 
 [--checks=<checks>]
 : Only runs checks provided as an argument in comma-separated values, e.g. i18n_usage, late_escaping. Otherwise runs all checks.
@@ -89,7 +93,8 @@ WordPress.org scans must not use this option.
 : Include warnings with lower severity than the threshold as other type.
 
 [--slug=<slug>]
-: Slug to override the default.
+: Slug to override the default. When a directory path is given, the default is the directory
+name. When a ZIP URL is given, the default is the file name without `.zip`.
 
 [--mode=<mode>]
 : Mode to run the checks in. Options are 'new' (default) or 'update'.
@@ -118,6 +123,8 @@ wp plugin check akismet --mode=update
 wp plugin check akismet --use-pcpignore
 wp plugin check akismet --ai
 wp plugin check akismet --ai --ai-model=openai::gpt-4o
+wp plugin check wp-content/mu-plugins/my-plugin
+wp plugin check /path/to/build --slug=my-plugin
 ```
 
 # wp plugin list-checks
