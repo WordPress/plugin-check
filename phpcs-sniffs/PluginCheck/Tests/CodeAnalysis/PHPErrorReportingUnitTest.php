@@ -34,23 +34,35 @@ final class PHPErrorReportingUnitTest extends AbstractSniffUnitTest {
 	/**
 	 * Returns the lines where warnings should occur.
 	 *
+	 * @param string $test_file The name of the test file being checked.
+	 *
 	 * @return array <int line number> => <int number of warnings>
 	 */
-	public function getWarningList() {
-		return array(
-			10 => 1,
-			13 => 1,
-			16 => 1,
-			19 => 1,
-			22 => 1,
-			25 => 1,
-			28 => 1,
-			31 => 1,
-			34 => 1,
-			37 => 1,
-			40 => 1,
-			43 => 1,
-		);
+	public function getWarningList( $test_file = '' ) {
+		switch ( $test_file ) {
+			case 'PHPErrorReportingUnitTest.inc':
+				return array(
+					10 => 1,
+					13 => 1,
+					16 => 1,
+					19 => 1,
+					22 => 1,
+					25 => 1,
+					28 => 1,
+					31 => 1,
+					34 => 1,
+					37 => 1,
+					40 => 1,
+					43 => 1,
+					69 => 1,
+				);
+			case 'PHPErrorReportingUnitTest.namespaced.inc':
+				return array(
+					15 => 1,
+				);
+			default:
+				return array();
+		}
 	}
 
 	/**
