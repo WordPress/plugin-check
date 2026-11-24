@@ -36,6 +36,10 @@ Feature: Test that the WP-CLI plugin check command works with remote ZIP url.
     When I run the WP-CLI command `plugin check https://github.com/WordPress/plugin-check/raw/trunk/tests/behat/testdata/foo-bar-wp.zip --fields=code,type --format=csv`
     Then STDOUT should contain:
       """
+      FILE: foo-bar-wp.php
+      """
+    And STDOUT should contain:
+      """
       WordPress.WP.AlternativeFunctions.rand_mt_rand,ERROR
       """
     And STDOUT should contain:
