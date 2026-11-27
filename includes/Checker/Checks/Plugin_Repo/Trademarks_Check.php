@@ -160,6 +160,18 @@ class Trademarks_Check extends Abstract_File_Check {
 	);
 
 	/**
+	 * Short trademark terms that are matched only as whole dash-delimited tokens.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @var string[]
+	 */
+	const TOKEN_MATCH_TERMS = array(
+		'wp',
+		'wc',
+	);
+
+	/**
 	 * Lists of commonly used 'combo' names (to prevent things like 'woopress').
 	 *
 	 * @since 1.0.0
@@ -441,7 +453,7 @@ class Trademarks_Check extends Abstract_File_Check {
 					$has_trademarked_slug = $trademark;
 					break;
 				}
-			} elseif ( false !== strpos( $slug, $trademark ) ) {
+			} elseif ( $this->slug_contains_term( $slug, $trademark ) ) {
 				// Otherwise, the term cannot appear anywhere in slug.
 
 				// check for 'for-TRADEMARK' exceptions.
@@ -466,6 +478,27 @@ class Trademarks_Check extends Abstract_File_Check {
 		}
 
 		return $has_trademarked_slug;
+	}
+
+	/**
+	 * Whether the slug contains the given trademark term.
+	 *
+	 * Short terms ("wp" and "wc") are matched only as whole dash-delimited tokens, so that
+	 * ordinary words such as "flowchart" or "showcase" are not flagged. All other terms are
+	 * matched as substrings.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param string $slug The plugin slug.
+	 * @param string $term The trademark term.
+	 * @return bool True if the term is found, false otherwise.
+	 */
+	private function slug_contains_term( $slug, $term ) {
+		if ( in_array( $term, self::TOKEN_MATCH_TERMS, true ) ) {
+			return 1 === preg_match( '/(?:^|-)' . preg_quote( $term, '/' ) . '(?:-|$)/', $slug );
+		}
+
+		return false !== strpos( $slug, $term );
 	}
 
 	/**

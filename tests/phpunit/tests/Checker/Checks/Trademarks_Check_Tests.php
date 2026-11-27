@@ -142,4 +142,41 @@ class Trademarks_Check_Tests extends WP_UnitTestCase {
 		$this->assertSame( 0, $check_result->get_error_count() );
 		$this->assertSame( 0, $check_result->get_warning_count() );
 	}
+
+	public function test_short_terms_inside_words_are_not_flagged_in_name() {
+		$check_context = new Check_Context( UNIT_TESTS_PLUGIN_DIR . 'test-trademarks-plugin-header-wc-substring/load.php' );
+		$check_result  = new Check_Result( $check_context );
+
+		$check = new Trademarks_Check( Trademarks_Check::TYPE_NAME );
+		$check->run( $check_result );
+
+		$this->assertEmpty( $check_result->get_warnings() );
+		$this->assertSame( 0, $check_result->get_warning_count() );
+	}
+
+	/**
+	 * @dataProvider data_short_term_slugs
+	 */
+	public function test_short_terms_are_matched_as_whole_tokens( $slug, $expected ) {
+		$check  = new Trademarks_Check();
+		$method = new ReflectionMethod( $check, 'has_trademarked_slug' );
+		$method->setAccessible( true );
+
+		$this->assertSame( $expected, $method->invoke( $check, $slug ) );
+	}
+
+	public function data_short_term_slugs() {
+		return array(
+			'flowchart'     => array( 'diagram-flowchart-tool', false ),
+			'showcase'      => array( 'product-showcase', false ),
+			'newcomer'      => array( 'newcomer-guide', false ),
+			'cowpea'        => array( 'cowpea-recipes', false ),
+			'wc prefix'     => array( 'wc-extra-fees', 'wc' ),
+			'wc suffix'     => array( 'extra-fees-wc', 'wc' ),
+			'wc middle'     => array( 'extra-wc-fees', 'wc' ),
+			'wp prefix'     => array( 'wp-helper', 'wp' ),
+			'wc only'       => array( 'wc', 'wc' ),
+			'long term sub' => array( 'my-wordpress-tool', 'wordpress' ),
+		);
+	}
 }
