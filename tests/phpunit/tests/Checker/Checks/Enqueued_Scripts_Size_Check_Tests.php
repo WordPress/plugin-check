@@ -146,6 +146,28 @@ class Enqueued_Scripts_Size_Check_Tests extends Runtime_Check_UnitTestCase {
 
 		$this->assertEquals( 0, $results->get_error_count() );
 		$this->assertEquals( 4, $results->get_warning_count() );
+
+		// The fixture enqueues a 23-byte script with a 29-byte inline block (52 bytes the plugin
+		// controls) and pulls in a 1000-byte dependency that itself depends on a 500-byte one
+		// (1500 bytes of dependencies). The warning must report those two figures separately and
+		// add up to the combined total, so a regression in the plugin/dependency split would
+		// change the reported numbers and fail here rather than slipping through on the count alone.
+		$expected_plugin_size     = 52;
+		$expected_dependency_size = 1500;
+		$expected_total_size      = $expected_plugin_size + $expected_dependency_size;
+
+		$split_warning = null;
+		foreach ( $this->flatten_warning_messages( $results->get_warnings() ) as $message ) {
+			if ( false !== strpos( $message, 'add a further' ) ) {
+				$split_warning = $message;
+				break;
+			}
+		}
+
+		$this->assertNotNull( $split_warning, 'A warning should break down the plugin scripts and their dependencies.' );
+		$this->assertStringContainsString( 'total ' . size_format( $expected_plugin_size ) . ',', $split_warning );
+		$this->assertStringContainsString( 'add a further ' . size_format( $expected_dependency_size ) . ',', $split_warning );
+		$this->assertStringContainsString( 'for a combined ' . size_format( $expected_total_size ) . ',', $split_warning );
 	}
 
 	public function test_get_local_path_resolves_dependency_with_mismatched_scheme() {
@@ -192,5 +214,32 @@ class Enqueued_Scripts_Size_Check_Tests extends Runtime_Check_UnitTestCase {
 			$method->invoke( $check, $protocol_relative, 'http://plugin.invalid/', '/plugin/invalid/' ),
 			'A protocol-relative dependency src should resolve to its local file.'
 		);
+	}
+
+	/**
+	 * Flattens the nested warnings array into a plain list of warning messages.
+	 *
+	 * Warnings are keyed by file, then line, then column, with a list of message data at each
+	 * position, so pull every message out regardless of where it landed.
+	 *
+	 * @param array $warnings Warnings as returned by Check_Result::get_warnings().
+	 * @return string[] The warning messages.
+	 */
+	private function flatten_warning_messages( $warnings ) {
+		$messages = array();
+
+		foreach ( $warnings as $lines ) {
+			foreach ( $lines as $columns ) {
+				foreach ( $columns as $items ) {
+					foreach ( $items as $item ) {
+						if ( isset( $item['message'] ) ) {
+							$messages[] = $item['message'];
+						}
+					}
+				}
+			}
+		}
+
+		return $messages;
 	}
 }

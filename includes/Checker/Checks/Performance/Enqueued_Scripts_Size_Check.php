@@ -257,17 +257,31 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 					continue;
 				}
 
-				$this->add_result_warning_for_file(
-					$result,
-					sprintf(
-						/* translators: 1: script file size. 2: tested URL. 3: total size of the plugin's enqueued scripts. 4: total size of their dependencies. 5: threshold file size. */
-						__( 'This script has a size of %1$s. The scripts enqueued on %2$s total %3$s, with dependencies adding a further %4$s, which exceeds the script size threshold of %5$s.', 'plugin-check' ),
+				if ( $dependency_size > 0 ) {
+					$message = sprintf(
+						/* translators: 1: script file size. 2: tested URL. 3: total size of the plugin's own scripts. 4: total size of their dependencies. 5: combined total size. 6: threshold file size. */
+						__( 'This script has a size of %1$s. The scripts from this plugin on %2$s total %3$s, and their dependencies add a further %4$s, for a combined %5$s, which exceeds the script size threshold of %6$s.', 'plugin-check' ),
 						size_format( $measured[ $handle ]['size'] ),
 						$url,
 						size_format( $plugin_size ),
 						size_format( $dependency_size ),
+						size_format( $total_size ),
 						size_format( $this->threshold_size )
-					),
+					);
+				} else {
+					$message = sprintf(
+						/* translators: 1: script file size. 2: tested URL. 3: total size of the plugin's own scripts. 4: threshold file size. */
+						__( 'This script has a size of %1$s. The scripts from this plugin on %2$s total %3$s, which exceeds the script size threshold of %4$s.', 'plugin-check' ),
+						size_format( $measured[ $handle ]['size'] ),
+						$url,
+						size_format( $plugin_size ),
+						size_format( $this->threshold_size )
+					);
+				}
+
+				$this->add_result_warning_for_file(
+					$result,
+					$message,
 					'EnqueuedScriptsSize.ScriptSizeGreaterThanThreshold',
 					$measured[ $handle ]['path']
 				);
@@ -278,7 +292,7 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	/**
 	 * Returns a script handle together with its dependencies, resolved recursively and de-duplicated.
 	 *
-	 * @since 1.6.0
+	 * @since 2.3.0
 	 *
 	 * @param string             $handle     Script handle to start from.
 	 * @param \WP_Scripts        $wp_scripts The scripts registry.
@@ -307,7 +321,7 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	 * (core scripts under wp-includes, other plugins, the uploads or content directories). Scripts
 	 * served from another host, such as a CDN, return false since their size can't be read locally.
 	 *
-	 * @since 1.6.0
+	 * @since 2.3.0
 	 *
 	 * @param string $src         The script src.
 	 * @param string $plugin_url  The plugin's base URL.
@@ -328,8 +342,10 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 
 		$src = strtok( $src, '?' );
 
+		// A protocol-relative src (//host/path) just needs a scheme to become comparable; the root
+		// matching below normalizes schemes anyway, so the specific one here does not matter.
 		if ( strpos( $src, '//' ) === 0 ) {
-			$src = ( is_ssl() ? 'https:' : 'http:' ) . $src;
+			$src = 'https:' . $src;
 		}
 
 		// Core registers its scripts with a root-relative src, e.g. /wp-includes/js/jquery/jquery.min.js.
@@ -344,7 +360,7 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	 * Maps a fully-qualified local URL to a readable filesystem path, or false when
 	 * it maps to no known local root (e.g. a script served from another host).
 	 *
-	 * @since 1.6.0
+	 * @since 2.3.0
 	 *
 	 * @param string $src Fully-qualified script URL (query string already stripped).
 	 * @return string|false The local file path, or false if it can't be resolved to a readable file.
@@ -354,8 +370,8 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 		$roots = array(
 			array( plugins_url(), WP_PLUGIN_DIR ),
 			array( content_url(), WP_CONTENT_DIR ),
-			array( includes_url(), ABSPATH . 'wp-includes/' ),
-			array( site_url( '/' ), ABSPATH ),
+			array( includes_url(), ABSPATH . 'wp-includes' ),
+			array( site_url(), untrailingslashit( ABSPATH ) ),
 		);
 
 		// Compare on a single scheme so a dependency served over https still matches an http URL root
@@ -369,7 +385,10 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 				continue;
 			}
 
-			$url_root = set_url_scheme( $url_root, 'https' );
+			// Trailing slashes keep a root from also matching a sibling, e.g. content_url() must not
+			// match https://example.com/wp-content-cache/.
+			$url_root = trailingslashit( set_url_scheme( $url_root, 'https' ) );
+			$dir_root = trailingslashit( $dir_root );
 
 			if ( strpos( $src, $url_root ) !== 0 ) {
 				continue;
@@ -377,7 +396,12 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 
 			$path = wp_normalize_path( $dir_root . substr( $src, strlen( $url_root ) ) );
 
-			return ( file_exists( $path ) && is_readable( $path ) ) ? $path : false;
+			if ( file_exists( $path ) && is_readable( $path ) ) {
+				return $path;
+			}
+
+			// Overlapping roots mean a later one (e.g. site_url()) can still resolve the file, so keep
+			// looking rather than giving up on the first prefix match.
 		}
 
 		return false;
@@ -386,21 +410,19 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 	/**
 	 * Returns the byte size of a file, treating an unreadable file as zero.
 	 *
-	 * @since 1.6.0
+	 * @since 2.3.0
 	 *
 	 * @param string $path Absolute file path.
 	 * @return int Size in bytes.
 	 */
 	private function get_file_size( $path ) {
-		$size = function_exists( 'wp_filesize' ) ? wp_filesize( $path ) : filesize( $path );
-
-		return is_int( $size ) ? $size : (int) $size;
+		return wp_filesize( $path );
 	}
 
 	/**
 	 * Returns the combined byte size of a script's inline before/after additions.
 	 *
-	 * @since 1.6.0
+	 * @since 2.3.0
 	 *
 	 * @param object $script The registered script object.
 	 * @return int Size in bytes.
