@@ -257,27 +257,13 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 					continue;
 				}
 
-				if ( $dependency_size > 0 ) {
-					$message = sprintf(
-						/* translators: 1: script file size. 2: tested URL. 3: total size of the plugin's own scripts. 4: total size of their dependencies. 5: combined total size. 6: threshold file size. */
-						__( 'This script has a size of %1$s. The scripts from this plugin on %2$s total %3$s, and their dependencies add a further %4$s, for a combined %5$s, which exceeds the script size threshold of %6$s.', 'plugin-check' ),
-						size_format( $measured[ $handle ]['size'] ),
-						$url,
-						size_format( $plugin_size ),
-						size_format( $dependency_size ),
-						size_format( $total_size ),
-						size_format( $this->threshold_size )
-					);
-				} else {
-					$message = sprintf(
-						/* translators: 1: script file size. 2: tested URL. 3: total size of the plugin's own scripts. 4: threshold file size. */
-						__( 'This script has a size of %1$s. The scripts from this plugin on %2$s total %3$s, which exceeds the script size threshold of %4$s.', 'plugin-check' ),
-						size_format( $measured[ $handle ]['size'] ),
-						$url,
-						size_format( $plugin_size ),
-						size_format( $this->threshold_size )
-					);
-				}
+				$message = $this->get_size_warning_message(
+					$measured[ $handle ]['size'],
+					$url,
+					$plugin_size,
+					$dependency_size,
+					$total_size
+				);
 
 				$this->add_result_warning_for_file(
 					$result,
@@ -287,6 +273,45 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 				);
 			}
 		}
+	}
+
+	/**
+	 * Builds the warning message for a script that pushes the plugin over the size threshold.
+	 *
+	 * Reports the plugin's own scripts and their dependencies as separate figures, falling back to a
+	 * shorter message when nothing measurable comes from dependencies.
+	 *
+	 * @since 2.3.0
+	 *
+	 * @param int    $script_size     Size of the individual script being flagged, in bytes.
+	 * @param string $url             The URL the scripts were measured on.
+	 * @param int    $plugin_size     Combined size of the plugin's own scripts, in bytes.
+	 * @param int    $dependency_size Combined size of their dependencies, in bytes.
+	 * @param int    $total_size      Combined size of the plugin's scripts and their dependencies, in bytes.
+	 * @return string The warning message.
+	 */
+	private function get_size_warning_message( $script_size, $url, $plugin_size, $dependency_size, $total_size ) {
+		if ( $dependency_size > 0 ) {
+			return sprintf(
+				/* translators: 1: script file size. 2: tested URL. 3: total size of the plugin's own scripts. 4: total size of their dependencies. 5: combined total size. 6: threshold file size. */
+				__( 'This script has a size of %1$s. The scripts from this plugin on %2$s total %3$s, and their dependencies add a further %4$s, for a combined %5$s, which exceeds the script size threshold of %6$s.', 'plugin-check' ),
+				size_format( $script_size ),
+				$url,
+				size_format( $plugin_size ),
+				size_format( $dependency_size ),
+				size_format( $total_size ),
+				size_format( $this->threshold_size )
+			);
+		}
+
+		return sprintf(
+			/* translators: 1: script file size. 2: tested URL. 3: total size of the plugin's own scripts. 4: threshold file size. */
+			__( 'This script has a size of %1$s. The scripts from this plugin on %2$s total %3$s, which exceeds the script size threshold of %4$s.', 'plugin-check' ),
+			size_format( $script_size ),
+			$url,
+			size_format( $plugin_size ),
+			size_format( $this->threshold_size )
+		);
 	}
 
 	/**
