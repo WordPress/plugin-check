@@ -198,56 +198,274 @@ class Enqueued_Scripts_Size_Check extends Abstract_Runtime_Check implements With
 		wp_scripts()->do_footer_items();
 		ob_get_clean();
 
-		$plugin_scripts     = array();
-		$plugin_script_size = 0;
+		$wp_scripts  = wp_scripts();
+		$plugin_url  = $result->plugin()->url();
+		$plugin_path = $result->plugin()->path();
 
-		foreach ( wp_scripts()->done as $handle ) {
-			$script = wp_scripts()->registered[ $handle ];
+		$plugin_scripts = array();
+		$measured       = array();
+		$seen           = array();
+		$total_size     = 0;
 
-			if ( ! $script->src || strpos( $script->src, $result->plugin()->url() ) !== 0 ) {
+		foreach ( $wp_scripts->done as $handle ) {
+			$script = isset( $wp_scripts->registered[ $handle ] ) ? $wp_scripts->registered[ $handle ] : null;
+
+			if ( ! $script || ! $script->src || strpos( $script->src, $plugin_url ) !== 0 ) {
 				continue;
 			}
 
-			// Get size of script src.
-			$script_path = str_replace( $result->plugin()->url(), $result->plugin()->path(), $script->src );
-			$script_size = function_exists( 'wp_filesize' ) ? wp_filesize( $script_path ) : filesize( $script_path );
+			$plugin_scripts[ $handle ] = true;
 
-			// Get size of additional inline scripts.
-			if ( ! empty( $script->extra['after'] ) ) {
-				foreach ( $script->extra['after'] as $extra ) {
-					$script_size += ( is_string( $extra ) ) ? mb_strlen( $extra, '8bit' ) : 0;
+			// Count the plugin's own script and every dependency it pulls in (jQuery, shared vendor
+			// libraries and so on). Those load because of the plugin, so they add to the page weight
+			// even when they are served from outside the plugin directory.
+			foreach ( $this->get_handle_with_dependencies( $handle, $wp_scripts, $seen ) as $dep_handle ) {
+				if ( isset( $measured[ $dep_handle ] ) ) {
+					continue;
 				}
-			}
 
-			if ( ! empty( $script->extra['before'] ) ) {
-				foreach ( $script->extra['before'] as $extra ) {
-					$script_size += ( is_string( $extra ) ) ? mb_strlen( $extra, '8bit' ) : 0;
-				}
-			}
+				$dep_script = $wp_scripts->registered[ $dep_handle ];
+				$dep_path   = $this->get_path_from_src( $dep_script->src, $plugin_url, $plugin_path );
 
-			$plugin_scripts[]    = array(
-				'path' => $script_path,
-				'size' => $script_size,
-			);
-			$plugin_script_size += $script_size;
+				// The file itself may be unmeasurable (e.g. a CDN-hosted dependency), but any inline
+				// before/after code attached to the handle is still printed, so count it regardless.
+				$dep_size = ( $dep_path ? $this->get_file_size( $dep_path ) : 0 ) + $this->get_inline_size( $dep_script );
+
+				$measured[ $dep_handle ] = array(
+					'path' => $dep_path,
+					'size' => $dep_size,
+				);
+				$total_size             += $dep_size;
+			}
 		}
 
-		if ( $plugin_script_size > $this->threshold_size ) {
-			foreach ( $plugin_scripts as $plugin_script ) {
+		if ( $total_size > $this->threshold_size ) {
+			// Report the plugin's own scripts and their dependencies separately, so the author can see
+			// how much weight comes from the files they control versus what their dependencies pull in.
+			$plugin_size = 0;
+			foreach ( array_keys( $plugin_scripts ) as $handle ) {
+				if ( isset( $measured[ $handle ] ) ) {
+					$plugin_size += $measured[ $handle ]['size'];
+				}
+			}
+			$dependency_size = $total_size - $plugin_size;
+
+			foreach ( array_keys( $plugin_scripts ) as $handle ) {
+				// Only surface warnings for the plugin's own files; dependencies are counted toward
+				// the total but are not something the plugin author edits directly.
+				if ( empty( $measured[ $handle ]['path'] ) ) {
+					continue;
+				}
+
+				$message = $this->get_size_warning_message(
+					$measured[ $handle ]['size'],
+					$url,
+					$plugin_size,
+					$dependency_size,
+					$total_size
+				);
+
 				$this->add_result_warning_for_file(
 					$result,
-					sprintf(
-						/* translators: 1: style file size. 2: tested URL. 3: threshold file size. */
-						__( 'This script has a size of %1$s which in combination with the other scripts enqueued on %2$s exceeds the script size threshold of %3$s.', 'plugin-check' ),
-						size_format( $plugin_script['size'] ),
-						$url,
-						size_format( $this->threshold_size )
-					),
+					$message,
 					'EnqueuedScriptsSize.ScriptSizeGreaterThanThreshold',
-					$plugin_script['path']
+					$measured[ $handle ]['path']
 				);
 			}
 		}
+	}
+
+	/**
+	 * Builds the warning message for a script that pushes the plugin over the size threshold.
+	 *
+	 * Reports the plugin's own scripts and their dependencies as separate figures, falling back to a
+	 * shorter message when nothing measurable comes from dependencies.
+	 *
+	 * @since 2.3.0
+	 *
+	 * @param int    $script_size     Size of the individual script being flagged, in bytes.
+	 * @param string $url             The URL the scripts were measured on.
+	 * @param int    $plugin_size     Combined size of the plugin's own scripts, in bytes.
+	 * @param int    $dependency_size Combined size of their dependencies, in bytes.
+	 * @param int    $total_size      Combined size of the plugin's scripts and their dependencies, in bytes.
+	 * @return string The warning message.
+	 */
+	private function get_size_warning_message( $script_size, $url, $plugin_size, $dependency_size, $total_size ) {
+		if ( $dependency_size > 0 ) {
+			return sprintf(
+				/* translators: 1: script file size. 2: tested URL. 3: total size of the plugin's own scripts. 4: total size of their dependencies. 5: combined total size. 6: threshold file size. */
+				__( 'This script has a size of %1$s. The scripts from this plugin on %2$s total %3$s, and their dependencies add a further %4$s, for a combined %5$s, which exceeds the script size threshold of %6$s.', 'plugin-check' ),
+				size_format( $script_size ),
+				$url,
+				size_format( $plugin_size ),
+				size_format( $dependency_size ),
+				size_format( $total_size ),
+				size_format( $this->threshold_size )
+			);
+		}
+
+		return sprintf(
+			/* translators: 1: script file size. 2: tested URL. 3: total size of the plugin's own scripts. 4: threshold file size. */
+			__( 'This script has a size of %1$s. The scripts from this plugin on %2$s total %3$s, which exceeds the script size threshold of %4$s.', 'plugin-check' ),
+			size_format( $script_size ),
+			$url,
+			size_format( $plugin_size ),
+			size_format( $this->threshold_size )
+		);
+	}
+
+	/**
+	 * Returns a script handle together with its dependencies, resolved recursively and de-duplicated.
+	 *
+	 * @since 2.3.0
+	 *
+	 * @param string             $handle     Script handle to start from.
+	 * @param \WP_Scripts        $wp_scripts The scripts registry.
+	 * @param array<string,bool> $seen     Handles already collected, passed by reference to de-duplicate.
+	 * @return string[] The handle followed by every dependency handle, each appearing once.
+	 */
+	private function get_handle_with_dependencies( $handle, $wp_scripts, array &$seen ) {
+		if ( isset( $seen[ $handle ] ) || ! isset( $wp_scripts->registered[ $handle ] ) ) {
+			return array();
+		}
+
+		$seen[ $handle ] = true;
+		$handles         = array( $handle );
+
+		foreach ( $wp_scripts->registered[ $handle ]->deps as $dep ) {
+			$handles = array_merge( $handles, $this->get_handle_with_dependencies( $dep, $wp_scripts, $seen ) );
+		}
+
+		return $handles;
+	}
+
+	/**
+	 * Resolves a script src to a local file path, or false when it can't be measured.
+	 *
+	 * Handles the plugin's own assets as well as dependencies served from elsewhere on the site
+	 * (core scripts under wp-includes, other plugins, the uploads or content directories). Scripts
+	 * served from another host, such as a CDN, return false since their size can't be read locally.
+	 *
+	 * @since 2.3.0
+	 *
+	 * @param string $src         The script src.
+	 * @param string $plugin_url  The plugin's base URL.
+	 * @param string $plugin_path The plugin's base path.
+	 * @return string|false The local file path, or false if it can't be resolved to a readable file.
+	 */
+	private function get_path_from_src( $src, $plugin_url, $plugin_path ) {
+		if ( ! $src ) {
+			return false;
+		}
+
+		// The plugin's own assets map directly, which also handles symlinked or mu-plugin locations.
+		if ( strpos( $src, $plugin_url ) === 0 ) {
+			$path = strtok( str_replace( $plugin_url, $plugin_path, $src ), '?' );
+
+			return ( $path && file_exists( $path ) ) ? $path : false;
+		}
+
+		$src = strtok( $src, '?' );
+
+		// A protocol-relative src (//host/path) just needs a scheme to become comparable; the root
+		// matching below normalizes schemes anyway, so the specific one here does not matter.
+		if ( strpos( $src, '//' ) === 0 ) {
+			$src = 'https:' . $src;
+		}
+
+		// Core registers its scripts with a root-relative src, e.g. /wp-includes/js/jquery/jquery.min.js.
+		if ( strpos( $src, '/' ) === 0 ) {
+			$src = site_url( $src );
+		}
+
+		return $this->get_local_path_from_roots( $src );
+	}
+
+	/**
+	 * Maps a fully-qualified local URL to a readable filesystem path, or false when
+	 * it maps to no known local root (e.g. a script served from another host).
+	 *
+	 * @since 2.3.0
+	 *
+	 * @param string $src Fully-qualified script URL (query string already stripped).
+	 * @return string|false The local file path, or false if it can't be resolved to a readable file.
+	 */
+	private function get_local_path_from_roots( $src ) {
+		// Map known local URL roots to their filesystem paths, most specific first.
+		$roots = array(
+			array( plugins_url(), WP_PLUGIN_DIR ),
+			array( content_url(), WP_CONTENT_DIR ),
+			array( includes_url(), ABSPATH . 'wp-includes' ),
+			array( site_url(), untrailingslashit( ABSPATH ) ),
+		);
+
+		// Compare on a single scheme so a dependency served over https still matches an http URL root
+		// (or vice versa). The host and path still have to match for the prefix check to succeed.
+		$src = set_url_scheme( $src, 'https' );
+
+		foreach ( $roots as $root ) {
+			list( $url_root, $dir_root ) = $root;
+
+			if ( ! $url_root ) {
+				continue;
+			}
+
+			// Trailing slashes keep a root from also matching a sibling, e.g. content_url() must not
+			// match https://example.com/wp-content-cache/.
+			$url_root = trailingslashit( set_url_scheme( $url_root, 'https' ) );
+			$dir_root = trailingslashit( $dir_root );
+
+			if ( strpos( $src, $url_root ) !== 0 ) {
+				continue;
+			}
+
+			$path = wp_normalize_path( $dir_root . substr( $src, strlen( $url_root ) ) );
+
+			if ( file_exists( $path ) && is_readable( $path ) ) {
+				return $path;
+			}
+
+			// Overlapping roots mean a later one (e.g. site_url()) can still resolve the file, so keep
+			// looking rather than giving up on the first prefix match.
+		}
+
+		return false;
+	}
+
+	/**
+	 * Returns the byte size of a file, treating an unreadable file as zero.
+	 *
+	 * @since 2.3.0
+	 *
+	 * @param string $path Absolute file path.
+	 * @return int Size in bytes.
+	 */
+	private function get_file_size( $path ) {
+		return wp_filesize( $path );
+	}
+
+	/**
+	 * Returns the combined byte size of a script's inline before/after additions.
+	 *
+	 * @since 2.3.0
+	 *
+	 * @param object $script The registered script object.
+	 * @return int Size in bytes.
+	 */
+	private function get_inline_size( $script ) {
+		$size = 0;
+
+		foreach ( array( 'before', 'after' ) as $position ) {
+			if ( empty( $script->extra[ $position ] ) ) {
+				continue;
+			}
+
+			foreach ( $script->extra[ $position ] as $extra ) {
+				$size += is_string( $extra ) ? mb_strlen( $extra, '8bit' ) : 0;
+			}
+		}
+
+		return $size;
 	}
 
 	/**
